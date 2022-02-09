@@ -6,3 +6,4 @@ interface ShapeSelectProps {
 }
 export declare function ShapeSelect(props: ShapeSelectProps): JSX.Element;
 export {};
+//# sourceMappingURL=ShapeSelect.d.ts.map

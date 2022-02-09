@@ -8,3 +8,4 @@ export interface IStripConfig {
 }
 export declare function stripMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IStripConfig): IVisConfig;
 export declare function createStripTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IStripConfig, scales: Scales): PlotlyInfo;
+//# sourceMappingURL=utils.d.ts.map

@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {Range1D} from '../../src/range/Range1D';
+import { Range1D } from '../../src/range/Range1D';
 
 describe('Range1D', () => {
   describe('all', () => {
@@ -34,7 +34,7 @@ describe('Range1D', () => {
     it('1,2,3', () => expect(Range1D.from([1, 2, 3]).toString()).toBe('(1:4)'));
     it('1,2,3,6', () => expect(Range1D.from([1, 2, 3, 6]).toString()).toBe('(1:4,6)'));
     // TODO why not allowed anymore?
-    //it('1,2,3,9,8,7', () => expect(Range1D.from([1,2,3,9,8,7]).toString()).toBe('(1:4,9:6:-1)'));
+    // it('1,2,3,9,8,7', () => expect(Range1D.from([1,2,3,9,8,7]).toString()).toBe('(1:4,9:6:-1)'));
     it('1,2,3,9,8,7', () => expect(Range1D.from([1, 2, 3, 9, 8, 7]).toString()).toBe('(1:4,9,8,7)'));
   });
 });

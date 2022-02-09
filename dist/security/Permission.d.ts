@@ -32,6 +32,7 @@ export declare class Permission {
     constructor(user: Set<EPermission>, group: Set<EPermission>, others: Set<EPermission>, buddies?: Set<EPermission>);
     encode(): number;
     toString(): string;
+    clone(): Permission;
     getPermissions(entity: EEntity): Set<EPermission>;
     hasPermission(entity: EEntity, permission: EPermission): boolean;
     static toNumber(p: Set<EPermission>): number;
@@ -40,3 +41,4 @@ export declare class Permission {
     static encode(user: Set<EPermission>, group: Set<EPermission>, others: Set<EPermission>, buddies?: Set<EPermission>): number;
     static decode(permission?: number): Permission;
 }
+//# sourceMappingURL=Permission.d.ts.map

@@ -12,3 +12,4 @@ export declare abstract class ABaseSelectionAdapter {
     protected abstract createColumnsFor(context: IContext, _id: number, id: string): PromiseLike<ISelectionColumn[]>;
     static patchDesc(desc: IAdditionalColumnDesc, selectedId: number): IAdditionalColumnDesc;
 }
+//# sourceMappingURL=ABaseSelectionAdapter.d.ts.map

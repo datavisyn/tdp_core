@@ -1,4 +1,4 @@
-import { IVisPluginDesc } from '../../provvis';
+import { IVisPluginDesc } from '../../provvis/IVisPluginDesc';
 export declare class FormUtils {
     /**
      * @internal
@@ -13,3 +13,4 @@ export declare class FormUtils {
      */
     static createNode(parent: HTMLElement, type?: string, clazz?: string): HTMLElement;
 }
+//# sourceMappingURL=FormUtils.d.ts.map

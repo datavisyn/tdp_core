@@ -16,3 +16,4 @@ export interface IRect extends IShape {
     xy: Vector2D;
     x2y2: Vector2D;
 }
+//# sourceMappingURL=IRect.d.ts.map

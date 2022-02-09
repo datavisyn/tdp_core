@@ -4,3 +4,4 @@ export interface IRankingWrapper {
     groupBy(column: string, aggregate?: boolean): boolean;
     findColumn<T extends Column>(column: string): T | null;
 }
+//# sourceMappingURL=IRankingWrapper.d.ts.map

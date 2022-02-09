@@ -1,7 +1,7 @@
-import {Rect} from '../geom';
+import { Rect } from '../geom';
 
 export interface ILayoutElem {
-  setBounds(x: number, y: number, w: number, h: number): Promise<void>|null;
+  setBounds(x: number, y: number, w: number, h: number): Promise<void> | null;
 
   getBounds(): Rect;
 
@@ -38,9 +38,7 @@ export interface ILayoutOptions {
 }
 
 export class ALayoutElem {
-  constructor(private options: ILayoutOptions = {}) {
-
-  }
+  constructor(private options: ILayoutOptions = {}) {}
 
   getBounds(): Rect {
     return Rect.rect(0, 0, 0, 0);
@@ -72,9 +70,9 @@ class HTMLLayoutElem extends ALayoutElem implements ILayoutElem {
     super(options);
   }
 
-  setBounds(x: number, y: number, w: number, h: number): Promise<void>|null {
-    const unit = this.layoutOption('unit', 'px'),
-      style = this.node.style;
+  setBounds(x: number, y: number, w: number, h: number): Promise<void> | null {
+    const unit = this.layoutOption('unit', 'px');
+    const { style } = this.node;
     style.left = x + unit;
     style.top = y + unit;
     style.width = w + unit;
@@ -83,8 +81,8 @@ class HTMLLayoutElem extends ALayoutElem implements ILayoutElem {
   }
 
   getBounds() {
-    const unit = this.layoutOption('unit', 'px'),
-      style = this.node.style;
+    const unit = this.layoutOption('unit', 'px');
+    const { style } = this.node;
 
     function v(f: string) {
       if (f.length >= unit.length && f.substring(f.length - unit.length) === unit) {
@@ -100,8 +98,6 @@ class HTMLLayoutElem extends ALayoutElem implements ILayoutElem {
   static wrapDOM(node: HTMLElement, options: any = {}) {
     return new HTMLLayoutElem(node, options);
   }
-
-
 }
 
 export interface IPadding {
@@ -110,7 +106,6 @@ export interface IPadding {
   readonly right: number;
   readonly bottom: number;
 }
-
 
 export interface ILayout {
   (elems: ILayoutElem[], w: number, h: number, parent: ILayoutElem): Promise<boolean>;

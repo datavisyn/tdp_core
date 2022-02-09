@@ -3,23 +3,19 @@
  */
 /// <amd-dependency path='font-awesome' />
 /// <amd-dependency path='bootstrap' />
-import {
-  MixedStorageProvenanceGraphManager,
-  IObjectRef,
-  ProvenanceGraph
-} from '../provenance';
-import {select} from 'd3';
-import {SelectionRecorder} from '../base/Selection';
-import {CLUEMode, ButtonModeSelector, ModeWrapper} from '../base/mode';
-import {VisLoader} from '../provvis';
-import {CLUEGraphManager} from '../base/CLUEGraphManager';
-import {ProvenanceGraphMenu} from '../menu/ProvenanceGraphMenu';
-import {LoginMenu} from '../menu/LoginMenu';
-import {ACLUEWrapper, IACLUEWrapperOptions} from './ACLUEWrapper';
+import { select } from 'd3';
 import * as d3 from 'd3';
-import {AppHeader, AppHeaderLink, IAppHeaderOptions, IHeaderLink} from '../components';
-import {BaseUtils, IEvent, ResolveNow} from '../base';
-
+import { MixedStorageProvenanceGraphManager, IObjectRef, ProvenanceGraph } from '../provenance';
+import { SelectionRecorder } from '../base/Selection';
+import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
+// import { VisLoader } from '../vis/VisLoader';
+import { CLUEGraphManager } from '../base/CLUEGraphManager';
+import { ProvenanceGraphMenu } from '../menu/ProvenanceGraphMenu';
+import { LoginMenu } from '../base/LoginMenu';
+import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';
+import { AppHeader, AppHeaderLink, IAppHeaderOptions, IHeaderLink } from '../components';
+import { BaseUtils, IEvent, ResolveNow } from '../base';
+import { VisLoader } from '../provvis/VisLoader';
 
 export interface ICLUEWrapperOptions extends IACLUEWrapperOptions {
   /**
@@ -75,11 +71,13 @@ export class CLUEWrapper extends ACLUEWrapper {
     thumbnails: true,
     appLink: new AppHeaderLink('CLUE'),
     provVisCollapsed: false,
-    headerOptions: {}
+    headerOptions: {},
   };
 
   header: AppHeader;
+
   $main: d3.Selection<any>;
+
   $mainRef: IObjectRef<d3.Selection<any>>;
 
   constructor(body: HTMLElement, options: ICLUEWrapperOptions = {}) {
@@ -90,26 +88,27 @@ export class CLUEWrapper extends ACLUEWrapper {
   }
 
   protected buildImpl(body: HTMLElement) {
-    //create the common header
+    // create the common header
     const headerOptions = BaseUtils.mixin(this.options.headerOptions, {
       showOptionsLink: true, // always activate options
-      appLink: this.options.appLink
+      appLink: this.options.appLink,
     });
     this.header = AppHeader.create(<HTMLElement>body.querySelector('div.box'), headerOptions);
 
-    //load all available provenance graphs
+    // load all available provenance graphs
     const manager = new MixedStorageProvenanceGraphManager({
       prefix: this.options.id,
       storage: sessionStorage,
-      application: this.options.application
+      application: this.options.application,
     });
     const clueManager = new CLUEGraphManager(manager);
 
     this.header.wait();
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const _ = new LoginMenu(this.header, {
       loginForm: this.options.loginForm,
-      insertIntoHeader: true
+      insertIntoHeader: true,
     });
     const provenanceMenu = new ProvenanceGraphMenu(clueManager, body, false);
     this.header.insertCustomRightMenu(provenanceMenu.node);
@@ -118,7 +117,7 @@ export class CLUEWrapper extends ACLUEWrapper {
     const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
     modeSelector.classList.add('clue-modeselector');
     ButtonModeSelector.createButton(modeSelector, {
-      size: 'sm'
+      size: 'sm',
     });
 
     this.$main = select(body).select('main');
@@ -128,34 +127,34 @@ export class CLUEWrapper extends ACLUEWrapper {
       return clueManager.choose(graphs);
     });
 
-    graph.then((graph) => {
-      provenanceMenu.setGraph(graph);
-      this.$mainRef = graph.findOrAddObject(this.$main, 'Application', 'visual');
+    graph.then((g) => {
+      provenanceMenu.setGraph(g);
+      this.$mainRef = g.findOrAddObject(this.$main, 'Application', 'visual');
 
-      graph.on('sync_start,sync', (event: IEvent) => {
+      g.on('sync_start,sync', (event: IEvent) => {
         select('nav span.glyphicon-cog').classed('fa-spin', event.type !== 'sync');
       });
 
       if (this.options.recordSelectionTypes) {
-        //record selections of the given type
-        SelectionRecorder.createSelectionRecorder(graph, this.options.recordSelectionTypes, {
+        // record selections of the given type
+        SelectionRecorder.createSelectionRecorder(g, this.options.recordSelectionTypes, {
           filter(idtype) {
             return idtype && idtype.name[0] !== '_';
           },
-          animated: this.options.animatedSelections
+          animated: this.options.animatedSelections,
         });
       }
     });
 
     const provVis = VisLoader.loadProvenanceGraphVis(graph, body.querySelector('div.content'), {
       thumbnails: this.options.thumbnails,
-      provVisCollapsed: this.options.provVisCollapsed
+      provVisCollapsed: this.options.provVisCollapsed,
     });
     const storyVis = VisLoader.loadStoryVis(graph, <HTMLElement>body.querySelector('div.content'), <HTMLElement>this.$main.node(), {
-      thumbnails: this.options.thumbnails
+      thumbnails: this.options.thumbnails,
     });
 
-    return {graph, manager: clueManager, storyVis, provVis};
+    return { graph, manager: clueManager, storyVis, provVis };
   }
 
   reset() {
@@ -184,18 +183,18 @@ export class CLUEWrapper extends ACLUEWrapper {
    * @param options
    * @returns {CLUEWrapper}
    */
-  static createWrapperFactory(body:HTMLElement, options:any = {}) {
+  static createWrapperFactory(body: HTMLElement, options: any = {}) {
     AppHeader.create(body, {
-        appLink: new AppHeaderLink(options.app || 'Caleydo'),
-        inverse: true
-      });
+      appLink: new AppHeaderLink(options.app || 'Caleydo'),
+      inverse: true,
+    });
     const $main = d3.select(body).append('main').style('height', '92vh');
     const graph = ProvenanceGraph.createDummy();
     return {
       on: (...args: any[]) => 0,
       $main,
       graph: ResolveNow.resolveImmediately(graph),
-      jumpToStored: () => 0
+      jumpToStored: () => 0,
     };
   }
 }

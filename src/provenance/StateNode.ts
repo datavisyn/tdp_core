@@ -1,6 +1,6 @@
-import {GraphNode, GraphEdge} from '../graph/graph';
-import {ActionNode} from './ActionNode';
-import {ObjectNode} from './ObjectNode';
+import { GraphNode, GraphEdge } from '../graph/graph';
+import { ActionNode } from './ActionNode';
+import { ObjectNode } from './ObjectNode';
 
 /**
  * a state node is one state in the visual exploration consisting of an action creating it and one or more following ones.
@@ -55,8 +55,11 @@ export class StateNode extends GraphNode {
    * @returns {any}
    */
   get creator() {
-    //results and not a inversed actions
-    const from = this.incoming.filter(GraphEdge.isGraphType('resultsIn')).map((e) => <ActionNode>e.source).filter((s) => !s.isInverse);
+    // results and not a inversed actions
+    const from = this.incoming
+      .filter(GraphEdge.isGraphType('resultsIn'))
+      .map((e) => <ActionNode>e.source)
+      .filter((s) => !s.isInverse);
     if (from.length === 0) {
       return null;
     }
@@ -64,7 +67,10 @@ export class StateNode extends GraphNode {
   }
 
   get next(): ActionNode[] {
-    return this.outgoing.filter(GraphEdge.isGraphType('next')).map((e) => <ActionNode>e.target).filter((s) => !s.isInverse);
+    return this.outgoing
+      .filter(GraphEdge.isGraphType('next'))
+      .map((e) => <ActionNode>e.target)
+      .filter((s) => !s.isInverse);
   }
 
   get previousState(): StateNode {
@@ -89,8 +95,8 @@ export class StateNode extends GraphNode {
   }
 
   get path(): StateNode[] {
-    const p = this.previousState,
-      r: StateNode[] = [];
+    const p = this.previousState;
+    const r: StateNode[] = [];
     r.unshift(this);
     if (p) {
       p.pathImpl(r);
@@ -101,14 +107,17 @@ export class StateNode extends GraphNode {
   private pathImpl(r: StateNode[]) {
     const p = this.previousState;
     r.unshift(this);
-    if (p && r.indexOf(p) < 0) { //no loop
-      //console.log(p.toString() + ' path '+ r.join(','));
+    if (p && r.indexOf(p) < 0) {
+      // no loop
+      // console.log(p.toString() + ' path '+ r.join(','));
       p.pathImpl(r);
     }
   }
+
   toString() {
     return this.name;
   }
+
   static resultsIn<T>(node: GraphNode): StateNode {
     const r = node.outgoing.filter(GraphEdge.isGraphType('resultsIn'))[0];
     return r ? <StateNode>r.target : null;
@@ -118,5 +127,4 @@ export class StateNode extends GraphNode {
     const r = node.incoming.filter(GraphEdge.isGraphType('next'))[0];
     return r ? <StateNode>r.source : null;
   }
-
 }

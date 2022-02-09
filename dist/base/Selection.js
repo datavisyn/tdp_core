@@ -9,38 +9,43 @@ import { BaseUtils } from './BaseUtils';
 const disabler = new EventHandler();
 export class Selection {
     static select(inputs, parameter, graph, within) {
-        const idtype = IDTypeManager.getInstance().resolveIdType(parameter.idtype), range = ParseRangeUtils.parseRangeLike(parameter.range), type = parameter.type;
+        const idtype = IDTypeManager.getInstance().resolveIdType(parameter.idtype);
+        const range = ParseRangeUtils.parseRangeLike(parameter.range);
+        const { type } = parameter;
         const bak = parameter.old ? ParseRangeUtils.parseRangeLike(parameter.old) : idtype.selections(type);
         if (AppContext.getInstance().hash.has('debug')) {
             console.log('select', range.toString());
         }
-        disabler.fire('disable-' + idtype.id);
+        disabler.fire(`disable-${idtype.id}`);
         idtype.select(type, range);
-        disabler.fire('enable-' + idtype.id);
+        disabler.fire(`enable-${idtype.id}`);
         return Selection.createSelection(idtype, type, bak, range, parameter.animated).then((cmd) => ({ inverse: cmd, consumed: parameter.animated ? within : 0 }));
     }
     static capitalize(s) {
-        return s.split(' ').map((d) => d[0].toUpperCase() + d.slice(1)).join(' ');
+        return s
+            .split(' ')
+            .map((d) => d[0].toUpperCase() + d.slice(1))
+            .join(' ');
     }
     static meta(idtype, type, range) {
         const l = range.dim(0).length;
-        let title = type === SelectionUtils.defaultSelectionType ? '' : (Selection.capitalize(type) + ' ');
+        let title = type === SelectionUtils.defaultSelectionType ? '' : `${Selection.capitalize(type)} `;
         let p;
         if (l === 0) {
-            title += 'no ' + idtype.names;
+            title += `no ${idtype.names}`;
             p = ResolveNow.resolveImmediately(title);
         }
         else if (l === 1) {
-            title += idtype.name + ' ';
+            title += `${idtype.name} `;
             p = idtype.unmap(range).then((r) => {
                 title += r[0];
                 return title;
             });
         }
         else if (l < 3) {
-            title += idtype.names + ' (';
+            title += `${idtype.names} (`;
             p = idtype.unmap(range).then((r) => {
-                title += r.join(', ') + ')';
+                title += `${r.join(', ')})`;
                 return title;
             });
         }
@@ -48,7 +53,7 @@ export class Selection {
             title += `${range.dim(0).length} ${idtype.names}`;
             p = ResolveNow.resolveImmediately(title);
         }
-        return p.then((title) => ActionMetaData.actionMeta(title, ObjectRefUtils.category.selection));
+        return p.then((t) => ActionMetaData.actionMeta(t, ObjectRefUtils.category.selection));
     }
     /**
      * create a selection command
@@ -69,13 +74,13 @@ export class Selection {
                     range: range.toString(),
                     type,
                     old: old.toString(),
-                    animated
-                }
+                    animated,
+                },
             };
         });
     }
     static compressSelection(path) {
-        return Compression.lastOnly(path, 'select', (p) => p.parameter.idtype + '@' + p.parameter.type);
+        return Compression.lastConsecutive(path, 'select', (p) => `${p.parameter.idtype}@${p.parameter.type}`);
     }
 }
 /**
@@ -102,13 +107,13 @@ class SelectionTypeRecorder {
             });
         }
         this.enable();
-        disabler.on('enable-' + this.idtype.id, this._enable);
-        disabler.on('disable-' + this.idtype.id, this._disable);
+        disabler.on(`enable-${this.idtype.id}`, this._enable);
+        disabler.on(`disable-${this.idtype.id}`, this._disable);
     }
     disable() {
         if (this.type) {
             this.type.split(',').forEach((ttype, i) => {
-                this.idtype.off('select-' + ttype, this.typeRecorders[i]);
+                this.idtype.off(`select-${ttype}`, this.typeRecorders[i]);
             });
         }
         else {
@@ -118,7 +123,7 @@ class SelectionTypeRecorder {
     enable() {
         if (this.type) {
             this.type.split(',').forEach((ttype, i) => {
-                this.idtype.on('select-' + ttype, this.typeRecorders[i]);
+                this.idtype.on(`select-${ttype}`, this.typeRecorders[i]);
             });
         }
         else {
@@ -127,8 +132,8 @@ class SelectionTypeRecorder {
     }
     destroy() {
         this.disable();
-        disabler.off('enable-' + this.idtype.id, this._enable);
-        disabler.off('disable-' + this.idtype.id, this._disable);
+        disabler.off(`enable-${this.idtype.id}`, this._enable);
+        disabler.off(`disable-${this.idtype.id}`, this._disable);
     }
 }
 /**
@@ -147,10 +152,12 @@ export class SelectionRecorder {
         };
         this.options = BaseUtils.mixin({
             filter: BaseUtils.constantTrue,
-            animated: false
+            animated: false,
         }, this.options);
         GlobalEventHandler.getInstance().on('register.idtype', this.adder);
-        IDTypeManager.getInstance().listIdTypes().forEach((d) => {
+        IDTypeManager.getInstance()
+            .listIdTypes()
+            .forEach((d) => {
             this.adder(null, d);
         });
     }

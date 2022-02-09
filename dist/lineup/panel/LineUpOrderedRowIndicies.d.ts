@@ -1,5 +1,5 @@
 import { LocalDataProvider } from 'lineupjs';
-import { EventHandler } from '../../base';
+import { EventHandler } from '../../base/event';
 /**
  *  Store the ordered row indices for all, selected or filtered rows of the first ranking.
  */
@@ -45,3 +45,4 @@ export declare class LineUpOrderedRowIndicies extends EventHandler {
     private addEventListener;
     private sortValues;
 }
+//# sourceMappingURL=LineUpOrderedRowIndicies.d.ts.map

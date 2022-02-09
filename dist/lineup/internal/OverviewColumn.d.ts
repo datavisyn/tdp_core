@@ -27,3 +27,4 @@ export declare class OverviewColumn extends BooleanColumn {
         color: string;
     };
 }
+//# sourceMappingURL=OverviewColumn.d.ts.map

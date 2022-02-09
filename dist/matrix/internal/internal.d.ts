@@ -4,3 +4,4 @@ export * from './ProjectedVector';
 export * from './SliceColVector';
 export * from './SliceRowVector';
 export * from './TransposedMatrix';
+//# sourceMappingURL=internal.d.ts.map

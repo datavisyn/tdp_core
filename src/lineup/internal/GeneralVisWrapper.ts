@@ -1,39 +1,46 @@
-import {LocalDataProvider, Ranking} from 'lineupjs';
-import {EventHandler, IDTypeManager, Range} from '../..';
+import { LocalDataProvider, Ranking } from 'lineupjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {ARankingView} from '..';
-import {Vis} from '../../vis/Vis';
-import {EColumnTypes} from '../../vis/interfaces';
-import {LineUpSelectionHelper} from './LineUpSelectionHelper';
+import { Vis } from '../../vis/Vis';
+import { EColumnTypes } from '../../vis/interfaces';
+import { LineUpSelectionHelper } from './LineUpSelectionHelper';
+import { EventHandler } from '../../base/event';
+import { IDTypeManager } from '../../idtype/IDTypeManager';
+import { Range } from '../../range/Range';
+import { IDType } from '../../idtype/IDType';
 
 export class GeneralVisWrapper extends EventHandler {
-    readonly node: HTMLElement; // wrapper node
-    private viewable: boolean;
-    private provider: LocalDataProvider;
-    private selectionHelper: LineUpSelectionHelper;
-    private view: ARankingView;
-    private data: any[];
+  readonly node: HTMLElement; // wrapper node
 
-    constructor(provider: LocalDataProvider, view: ARankingView, selectionHelper: LineUpSelectionHelper, doc = document) {
-        super();
+  private viewable: boolean;
 
-        this.view = view;
-        this.provider = provider;
-        this.selectionHelper = selectionHelper;
-        this.node = doc.createElement('div');
-        this.node.id = 'customVisDiv';
-        this.node.classList.add('custom-vis-panel');
-        this.viewable = false;
-    }
+  private provider: LocalDataProvider;
 
-    getAllData(): any[] {
-        //make a real copy at some point
-        const globalFilter = this.provider.getFilter();
+  private idType: IDType;
 
-        // TODO: Think about using this.provider.getFirstRanking().flatColumns instead of the descriptions.
+  private lineupSelectionHelper: LineUpSelectionHelper;
 
-        /* TODO: This is an untested way of resolving the values of all possible ValueColumn variants (could be lazy for example).
+  private data: any[];
+
+  constructor(provider: LocalDataProvider, idType: IDType, lineupSelectionHelper: LineUpSelectionHelper, doc = document) {
+    super();
+
+    this.provider = provider;
+    this.idType = idType;
+    this.lineupSelectionHelper = lineupSelectionHelper;
+    this.node = doc.createElement('div');
+    this.node.id = 'customVisDiv';
+    this.node.classList.add('custom-vis-panel');
+    this.viewable = false;
+  }
+
+  getAllData(): any[] {
+    // make a real copy at some point
+    const globalFilter = this.provider.getFilter();
+
+    // TODO: Think about using this.provider.getFirstRanking().flatColumns instead of the descriptions.
+
+    /* TODO: This is an untested way of resolving the values of all possible ValueColumn variants (could be lazy for example).
         this.provider.getFirstRanking().flatColumns.forEach((v) => {
             if(v instanceof ValueColumn) {
                 if(v.isLoaded()) {
@@ -54,114 +61,111 @@ export class GeneralVisWrapper extends EventHandler {
         })
         */
 
-        let newData = [];
+    let newData = [];
 
-        if(globalFilter) {
-            newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)) && globalFilter(this.provider.getRow(i)));
-        } else {
-            newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)));
-        }
-
-        console.log(this.provider.getColumns());
-
-        const scoreColumns = this.provider.getColumns().filter((d) => typeof (<any>d).accessor === 'function' && (<any>d).selectedId !== -1);
-
-        for(const j of newData) {
-          for(const s of scoreColumns) {
-            j[(<any> s).column] = (<any> s).accessor({v: {id: j.id}}, s);
-          }
-        }
-
-        return newData;
+    if (globalFilter) {
+      newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)) && globalFilter(this.provider.getRow(i)));
+    } else {
+      newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)));
     }
 
-    selectCallback(selected: number[]) {
-        const r = Range.list(selected);
-        //???
-        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
+    console.log(this.provider.getColumns());
 
-        this.view.selectionHelper.setGeneralVisSelection({idtype: id, range: r});
+    const scoreColumns = this.provider.getColumns().filter((d) => typeof (<any>d).accessor === 'function' && (<any>d).selectedId !== -1);
+
+    for (const j of newData) {
+      for (const s of scoreColumns) {
+        j[(<any>s).column] = (<any>s).accessor({ v: { id: j.id } }, s);
+      }
     }
 
-    filterCallback(s: string) {
-        const selectedIds = this.provider.getSelection();
+    return newData;
+  }
 
-        if(selectedIds.length === 0) {
-            return;
-        }
+  selectCallback(selected: number[]) {
+    const r = Range.list(selected);
+    // ???
+    const id = IDTypeManager.getInstance().resolveIdType(this.idType.id);
 
-        this.provider.setFilter((row) => {
-            return s === 'Filter In' ? selectedIds.includes(row.i) : s === 'Filter Out' ? !selectedIds.includes(row.i) : true;
-        });
+    this.lineupSelectionHelper.setGeneralVisSelection({ idtype: id, range: r });
+  }
 
-        this.updateCustomVis();
+  filterCallback(s: string) {
+    const selectedIds = this.provider.getSelection();
+
+    if (selectedIds.length === 0) {
+      return;
     }
 
-    updateCustomVis() {
-        const data = this.getAllData();
-        const colDescriptions = this.provider.getColumns();
-        //need some way to convert these to _ids.
-        const selectedIndeces = this.selectionHelper.getSelection();
-        const cols: any[] = [];
+    this.provider.setFilter((row) => {
+      return s === 'Filter In' ? selectedIds.includes(row.i) : s === 'Filter Out' ? !selectedIds.includes(row.i) : true;
+    });
 
-        const selectedMap: { [key: number]: boolean } = {};
+    this.updateCustomVis();
+  }
 
-        for(const i of data) {
-            selectedMap[i._id] = false;
-        }
+  updateCustomVis() {
+    const data = this.getAllData();
+    const colDescriptions = this.provider.getColumns();
+    // need some way to convert these to _ids.
+    const selectedIndeces = this.lineupSelectionHelper.getSelection();
+    const cols: any[] = [];
 
-        for(const i of selectedIndeces) {
-            selectedMap[i] = true;
-        }
+    const selectedMap: { [key: number]: boolean } = {};
 
-        console.log(data);
-
-        for(const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
-            cols.push({
-                info: {
-                    name: c.label.replace(/(<([^>]+)>)/gi, ''),
-                    description: c.summary ? c.summary.replace(/(<([^>]+)>)/gi, '') : '',
-                    id: c.label + (<any> c)._id
-                },
-                values: data.map((d, i) => {
-                    return {id: d._id, val: d[(<any> c).column] ? d[(<any> c).column] : c.type === 'number' ? null : '--'};
-                }),
-                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL
-            });
-        }
-
-        ReactDOM.render(
-            React.createElement(
-                Vis,
-                {
-                    columns: cols,
-                    selected: selectedMap,
-                    selectionCallback: (s: number[]) => this.selectCallback(s),
-                    filterCallback: (s: string) => this.filterCallback(s)
-                }
-            ),
-            this.node
-        );
+    for (const i of data) {
+      selectedMap[i._id] = false;
     }
 
-    toggleCustomVis() {
-        this.viewable = !this.viewable;
-        this.node.style.display = this.viewable ? 'flex' : 'none';
-
-        this.provider.getFirstRanking().on(`${Ranking.EVENT_FILTER_CHANGED}.track`, () => {
-            this.updateCustomVis();
-        });
-
-        this.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.track`, () => {
-            this.updateCustomVis();
-        });
-
-        this.updateCustomVis();
+    for (const i of selectedIndeces) {
+      selectedMap[i] = true;
     }
 
-    hide() {
-        ReactDOM.unmountComponentAtNode(this.node);
-        this.viewable = false;
-        this.node.style.display = 'none';
+    console.log(data);
+
+    for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
+      cols.push({
+        info: {
+          name: c.label.replace(/(<([^>]+)>)/gi, ''),
+          description: c.summary ? c.summary.replace(/(<([^>]+)>)/gi, '') : '',
+          id: c.label + (<any>c)._id,
+        },
+        values: data.map((d, i) => {
+          return { id: d._id, val: d[(<any>c).column] ? d[(<any>c).column] : c.type === 'number' ? null : '--' };
+        }),
+        type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
+      });
     }
+
+    ReactDOM.render(
+      React.createElement(Vis, {
+        columns: cols,
+        selected: selectedMap,
+        selectionCallback: (s: number[]) => this.selectCallback(s),
+        filterCallback: (s: string) => this.filterCallback(s),
+      }),
+      this.node,
+    );
+  }
+
+  toggleCustomVis() {
+    this.viewable = !this.viewable;
+    this.node.style.display = this.viewable ? 'flex' : 'none';
+
+    this.provider.getFirstRanking().on(`${Ranking.EVENT_FILTER_CHANGED}.track`, () => {
+      this.updateCustomVis();
+    });
+
+    this.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.track`, () => {
+      this.updateCustomVis();
+    });
+
+    this.updateCustomVis();
+  }
+
+  hide() {
+    ReactDOM.unmountComponentAtNode(this.node);
+    this.viewable = false;
+    this.node.style.display = 'none';
+  }
 }

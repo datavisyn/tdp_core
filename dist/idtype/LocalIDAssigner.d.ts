@@ -8,3 +8,4 @@ export declare class LocalIDAssigner {
     map(ids: string[]): Range;
     static create(): any;
 }
+//# sourceMappingURL=LocalIDAssigner.d.ts.map

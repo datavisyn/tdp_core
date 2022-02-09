@@ -4,3 +4,4 @@ interface BrushOptionProps {
 }
 export declare function BrushOptionButtons(props: BrushOptionProps): JSX.Element;
 export {};
+//# sourceMappingURL=BrushOptionButtons.d.ts.map

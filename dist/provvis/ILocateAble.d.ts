@@ -16,3 +16,4 @@ export interface ILocateAble {
     locate(...range: Range[]): Promise<any>;
     locateById(...range: Range[]): Promise<any>;
 }
+//# sourceMappingURL=ILocateAble.d.ts.map

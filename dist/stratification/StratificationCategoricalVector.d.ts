@@ -34,3 +34,4 @@ export declare class StratificationCategoricalVector extends AVector<string, ICa
     sort(compareFn?: (a: string, b: string) => number, thisArg?: any): Promise<ICategoricalVector>;
     filter(callbackfn: (value: string, index: number) => boolean, thisArg?: any): Promise<ICategoricalVector>;
 }
+//# sourceMappingURL=StratificationCategoricalVector.d.ts.map

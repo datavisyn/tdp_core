@@ -1,5 +1,5 @@
-import {IPanelButton, PanelButton} from './PanelButton';
-import {LocalDataProvider, Ranking} from 'lineupjs';
+import { LocalDataProvider, Ranking } from 'lineupjs';
+import { IPanelButton, PanelButton } from './PanelButton';
 
 /**
  * Plain HTML button with a custom title, CSS class and an onClick function.
@@ -18,7 +18,7 @@ export class PanelRankingButton implements IPanelButton {
         if (firstRanking) {
           onClick(firstRanking);
         }
-      }
+      },
     }).node;
   }
 }

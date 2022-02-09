@@ -44,15 +44,21 @@ export class StateNode extends GraphNode {
      * @returns {any}
      */
     get creator() {
-        //results and not a inversed actions
-        const from = this.incoming.filter(GraphEdge.isGraphType('resultsIn')).map((e) => e.source).filter((s) => !s.isInverse);
+        // results and not a inversed actions
+        const from = this.incoming
+            .filter(GraphEdge.isGraphType('resultsIn'))
+            .map((e) => e.source)
+            .filter((s) => !s.isInverse);
         if (from.length === 0) {
             return null;
         }
         return from[0];
     }
     get next() {
-        return this.outgoing.filter(GraphEdge.isGraphType('next')).map((e) => e.target).filter((s) => !s.isInverse);
+        return this.outgoing
+            .filter(GraphEdge.isGraphType('next'))
+            .map((e) => e.target)
+            .filter((s) => !s.isInverse);
     }
     get previousState() {
         const a = this.creator;
@@ -72,7 +78,8 @@ export class StateNode extends GraphNode {
         return r ? StateNode.resultsIn(r) : null;
     }
     get path() {
-        const p = this.previousState, r = [];
+        const p = this.previousState;
+        const r = [];
         r.unshift(this);
         if (p) {
             p.pathImpl(r);
@@ -82,8 +89,9 @@ export class StateNode extends GraphNode {
     pathImpl(r) {
         const p = this.previousState;
         r.unshift(this);
-        if (p && r.indexOf(p) < 0) { //no loop
-            //console.log(p.toString() + ' path '+ r.join(','));
+        if (p && r.indexOf(p) < 0) {
+            // no loop
+            // console.log(p.toString() + ' path '+ r.join(','));
             p.pathImpl(r);
         }
     }

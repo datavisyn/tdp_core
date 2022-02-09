@@ -29,3 +29,4 @@ export declare class DataUtils {
         prototype: any;
     };
 }
+//# sourceMappingURL=DataUtils.d.ts.map

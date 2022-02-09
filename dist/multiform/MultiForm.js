@@ -14,14 +14,15 @@ export class MultiForm extends AVisInstance {
         this._metaData = new ProxyMetaData(() => this.actDesc);
         this.options = BaseUtils.mixin({
             initialVis: 0,
-            all: { //options to all visses
+            all: {
+            // options to all visses
             },
-            filter: () => true
+            filter: () => true,
         }, options);
         this.node = FormUtils.createNode(parent, 'div', 'multiform');
         DataUtils.assignData(parent, data);
         VisUtils.assignVis(this.node, this);
-        //find all suitable plugins
+        // find all suitable plugins
         this.visses = VisUtils.listVisPlugins(data).filter(this.options.filter);
         this.build();
     }
@@ -33,14 +34,14 @@ export class MultiForm extends AVisInstance {
         return this._metaData;
     }
     build() {
-        //create select option field
-        //create content
+        // create select option field
+        // create content
         this.content = FormUtils.createNode(this.node, 'div', 'content');
-        //switch to first
+        // switch to first
         this.switchTo(this.options.initialVis);
     }
     destroy() {
-        if (this.actVis && typeof (this.actVis.destroy) === 'function') {
+        if (this.actVis && typeof this.actVis.destroy === 'function') {
             this.actVis.destroy();
         }
         super.destroy();
@@ -48,16 +49,17 @@ export class MultiForm extends AVisInstance {
     persist() {
         return {
             id: this.actDesc ? this.actDesc.id : null,
-            content: this.actVis && typeof (this.actVis.persist) === 'function' ? this.actVis.persist() : null
+            content: this.actVis && typeof this.actVis.persist === 'function' ? this.actVis.persist() : null,
         };
     }
     async restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         if (persisted.id) {
             const selected = this.visses.find((e) => e.id === persisted.id);
             if (selected) {
                 const vis = await this.switchTo(selected);
-                if (vis && persisted.content && typeof (vis.restore) === 'function') {
+                if (vis && persisted.content && typeof vis.restore === 'function') {
                     await Promise.resolve(vis.restore(persisted.content));
                 }
                 return that;
@@ -69,24 +71,20 @@ export class MultiForm extends AVisInstance {
         const p = this.actVisPromise || Promise.resolve(null);
         return p.then((...aa) => {
             const vis = aa.length > 0 ? aa[0] : undefined;
-            if (vis && typeof (vis.locate) === 'function') {
+            if (vis && typeof vis.locate === 'function') {
                 return vis.locate.apply(vis, range);
             }
-            else {
-                return Promise.resolve((aa.length === 1 ? undefined : new Array(range.length)));
-            }
+            return Promise.resolve(aa.length === 1 ? undefined : new Array(range.length));
         });
     }
     locateById(...range) {
         const p = this.actVisPromise || Promise.resolve(null);
         return p.then((...aa) => {
             const vis = aa.length > 0 ? aa[0] : undefined;
-            if (vis && typeof (vis.locateById) === 'function') {
+            if (vis && typeof vis.locateById === 'function') {
                 return vis.locateById.apply(vis, range);
             }
-            else {
-                return Promise.resolve((aa.length === 1 ? undefined : new Array(range.length)));
-            }
+            return Promise.resolve(aa.length === 1 ? undefined : new Array(range.length));
         });
     }
     transform(scale, rotate) {
@@ -94,23 +92,21 @@ export class MultiForm extends AVisInstance {
             if (arguments.length === 0) {
                 return this.actVis.transform();
             }
-            else {
-                const t = (event, newValue, old) => {
-                    this.fire('transform', newValue, old);
-                };
-                this.actVis.on('transform', t);
-                const r = this.actVis.transform(scale, rotate);
-                this.actVis.off('transform', t);
-                return r;
-            }
+            const t = (event, newValue, old) => {
+                this.fire('transform', newValue, old);
+            };
+            this.actVis.on('transform', t);
+            const r = this.actVis.transform(scale, rotate);
+            this.actVis.off('transform', t);
+            return r;
         }
         if (this.actVisPromise && arguments.length > 0) {
-            //2nd try
+            // 2nd try
             this.actVisPromise.then((v) => this.transform(scale, rotate));
         }
         return {
             scale: [1, 1],
-            rotate: 0
+            rotate: 0,
         };
     }
     /**
@@ -142,17 +138,17 @@ export class MultiForm extends AVisInstance {
     switchTo(param) {
         const vis = FormUtils.selectVis(param, this.visses);
         if (vis === this.actDesc) {
-            return this.actVisPromise; //already selected
+            return this.actVisPromise; // already selected
         }
-        //gracefully destroy
+        // gracefully destroy
         if (this.actVis) {
             this.actVis.destroy();
             this.actVis = null;
             this.actVisPromise = null;
         }
-        //remove content dom side
+        // remove content dom side
         FormUtils.clearNode(this.content);
-        //switch and trigger event
+        // switch and trigger event
         const bak = this.actDesc;
         this.actDesc = vis;
         this.markReady(false);
@@ -160,9 +156,10 @@ export class MultiForm extends AVisInstance {
         this.actVis = null;
         this.actVisPromise = null;
         if (vis) {
-            //load the plugin and create the instance
-            return this.actVisPromise = vis.load().then((plugin) => {
-                if (this.actDesc !== vis) { //changed in the meanwhile
+            // load the plugin and create the instance
+            return (this.actVisPromise = vis.load().then((plugin) => {
+                if (this.actDesc !== vis) {
+                    // changed in the meanwhile
                     return null;
                 }
                 this.actVis = plugin.factory(this.data, this.content, BaseUtils.mixin({}, this.options.all, this.options[vis.id] || {}));
@@ -176,11 +173,9 @@ export class MultiForm extends AVisInstance {
                 }
                 this.fire('changed', vis, bak);
                 return this.actVis;
-            });
+            }));
         }
-        else {
-            return Promise.resolve(null);
-        }
+        return Promise.resolve(null);
     }
     addIconVisChooser(toolbar) {
         return VisChooser.addIconVisChooser(toolbar, this);

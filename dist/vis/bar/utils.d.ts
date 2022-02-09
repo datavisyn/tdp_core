@@ -30,3 +30,4 @@ export interface IBarConfig {
 }
 export declare function barMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig): IVisConfig;
 export declare function createBarTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig, scales: Scales): PlotlyInfo;
+//# sourceMappingURL=utils.d.ts.map

@@ -37,3 +37,4 @@ export declare class FormButton extends EventHandler implements IFormElement {
     init(): void;
     focus(): void;
 }
+//# sourceMappingURL=FormButton.d.ts.map

@@ -20,7 +20,7 @@ export class MatrixColumnNameVector extends ANameVector {
     persist() {
         return {
             root: this.base.persist(),
-            names: 'column'
+            names: 'column',
         };
     }
     /**

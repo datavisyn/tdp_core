@@ -1,20 +1,20 @@
-import {Range} from './Range';
-import {Range1D} from './Range1D';
-import {Range1DGroup} from './Range1DGroup';
-import {RangeElem} from './internal/RangeElem';
-import {CompositeRange1D} from './CompositeRange1D';
-import {RangeLike} from './RangeLike';
+import { Range } from './Range';
+import { Range1D } from './Range1D';
+import { Range1DGroup } from './Range1DGroup';
+import { RangeElem } from './internal/RangeElem';
+import { CompositeRange1D } from './CompositeRange1D';
+import { RangeLike } from './RangeLike';
 
-//Range EBNF grammar
-//R   = Dim { ',' Dim }
-//Dim = '' | SR | '(' SR { ',' SR ' } ')'
-//SR  = N [ ':' N [ ':' N ] ]
-//N   = '0'...'9'
-//Str =  '"' literal '"'
-//Name= Str
-//Col = Str
-//GDim= Name Col Dim
-//CDim= Name '{' GDim { ',' GDim } '}'
+// Range EBNF grammar
+// R   = Dim { ',' Dim }
+// Dim = '' | SR | '(' SR { ',' SR ' } ')'
+// SR  = N [ ':' N [ ':' N ] ]
+// N   = '0'...'9'
+// Str =  '"' literal '"'
+// Name= Str
+// Col = Str
+// GDim= Name Col Dim
+// CDim= Name '{' GDim { ',' GDim } '}'
 
 interface IParseDimResult {
   act: number;
@@ -22,7 +22,6 @@ interface IParseDimResult {
 }
 
 export class ParseRangeUtils {
-
   /**
    * parse the give code created toString
    * @param code
@@ -30,17 +29,19 @@ export class ParseRangeUtils {
    */
   static parseRange(code: string) {
     const dims: Range1D[] = [];
-    let act = 0, c: string, t: IParseDimResult;
+    let act = 0;
+    let c: string;
+    let t: IParseDimResult;
     code = code.trim();
     while (act < code.length) {
       c = code.charAt(act);
       switch (c) {
-        case '"' :
+        case '"':
           t = ParseRangeUtils.parseNamedRange1D(code, act);
-          act = t.act + 1; //skip ,
+          act = t.act + 1; // skip ,
           dims.push(t.dim);
           break;
-        case ',' :
+        case ',':
           act++;
           dims.push(Range1D.all());
           break;
@@ -49,20 +50,21 @@ export class ParseRangeUtils {
             act++;
           } else {
             t = ParseRangeUtils.parseRange1D(code, act);
-            act = t.act + 1; //skip ,
+            act = t.act + 1; // skip ,
             dims.push(t.dim);
           }
           break;
       }
     }
-    if (code.charAt(code.length - 1) === ',') { //last is an empty one
+    if (code.charAt(code.length - 1) === ',') {
+      // last is an empty one
       dims.push(Range1D.all());
     }
     return new Range(dims);
   }
 
   static parseNamedRange1D(code: string, act: number): IParseDimResult {
-    act += 1; //skip "
+    act += 1; // skip "
     let end = code.indexOf('"', act);
     const name = code.slice(act, end);
     let r: IParseDimResult;
@@ -73,9 +75,10 @@ export class ParseRangeUtils {
         r = ParseRangeUtils.parseRange1D(code, end + 1);
         return {
           dim: new Range1DGroup(name, code.slice(act + 1, end), r.dim),
-          act: r.act
+          act: r.act,
         };
       case '{':
+        // eslint-disable-next-line no-case-declarations
         const groups: Range1DGroup[] = [];
         while (code.charAt(act) !== '}') {
           r = ParseRangeUtils.parseNamedRange1D(code, act + 1);
@@ -84,18 +87,20 @@ export class ParseRangeUtils {
         }
         return {
           dim: new CompositeRange1D(name, groups),
-          act: r.act + 1
+          act: r.act + 1,
         };
-      default: //ERROR
+      default:
+        // ERROR
         return {
           dim: Range1D.all(),
-          act
+          act,
         };
     }
   }
 
   static parseRange1D(code: string, act: number): IParseDimResult {
-    let next: number, r: Range1D;
+    let next: number;
+    let r: Range1D;
     switch (code.charAt(act)) {
       case ',':
       case '}':
@@ -105,13 +110,21 @@ export class ParseRangeUtils {
       case '(':
         r = new Range1D();
         next = code.indexOf(')', act);
-        if (next > act + 1) { //not ()
-          r.push.apply(r, code.slice(act + 1, next).split(',').map(RangeElem.parse));
+        if (next > act + 1) {
+          // not ()
+          r.push.apply(
+            r,
+            code
+              .slice(act + 1, next)
+              .split(',')
+              .map(RangeElem.parse),
+          );
         }
-        next += 1; //skip )
+        next += 1; // skip )
         break;
       default:
         next = code.indexOf('}', act);
+        // eslint-disable-next-line no-case-declarations
         const n2 = code.indexOf(',', act);
         if (next >= 0 && n2 >= 0) {
           next = Math.min(next, n2);
@@ -127,7 +140,7 @@ export class ParseRangeUtils {
     }
     return {
       act: next,
-      dim: r
+      dim: r,
     };
   }
 
@@ -151,11 +164,12 @@ export class ParseRangeUtils {
     }
     if (Array.isArray(arange)) {
       if (Array.isArray(arange[0])) {
-        return Range.list(...<number[][]>arange);
+        return Range.list(...(<number[][]>arange));
       }
       return Range.list(<number[]>arange);
     }
-    //join given array as string combined with ,
+    // join given array as string combined with ,
+    // eslint-disable-next-line prefer-rest-params
     return ParseRangeUtils.parseRange(Array.from(arguments).map(String).join(','));
   }
 }

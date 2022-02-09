@@ -20,3 +20,4 @@ export declare class AdapterUtils {
      */
     static none(): ISelectionAdapter;
 }
+//# sourceMappingURL=AdapterUtils.d.ts.map

@@ -16,3 +16,4 @@ export interface IAsAtomOptions {
     idtype?: string;
     rowassigner?(ids: string[]): Range;
 }
+//# sourceMappingURL=Atom.d.ts.map

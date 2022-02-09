@@ -1,14 +1,13 @@
-import {Range, RangeLike, ParseRangeUtils} from '../range';
-import {ASelectAble, IDTypeManager} from '../idtype';
-import {IValueTypeDesc} from '../data/valuetype';
-import {IAtom, IAtomDataDescription} from './IAtom';
+import { Range, RangeLike, ParseRangeUtils } from '../range';
+import { ASelectAble, IDTypeManager } from '../idtype';
+import { IValueTypeDesc } from '../data/valuetype';
+import { IAtom, IAtomDataDescription } from './IAtom';
 
 /**
  * base class for different Atom implementations
  * @internal
  */
-export abstract class AAtom<T,D extends IValueTypeDesc> extends ASelectAble {
-
+export abstract class AAtom<T, D extends IValueTypeDesc> extends ASelectAble {
   constructor(public readonly desc: IAtomDataDescription<D>) {
     super();
   }
@@ -37,8 +36,8 @@ export abstract class AAtom<T,D extends IValueTypeDesc> extends ASelectAble {
     return this.id();
   }
 
-  idView(idRange?: RangeLike): Promise<IAtom<T,D>> {
-    return Promise.resolve(<IAtom<T,D>><any>this);
+  idView(idRange?: RangeLike): Promise<IAtom<T, D>> {
+    return Promise.resolve(<IAtom<T, D>>(<any>this));
   }
 
   abstract id(): Promise<Range>;

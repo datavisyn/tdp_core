@@ -1,5 +1,5 @@
-import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import * as d3 from 'd3';
+import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { AFormElement } from './AFormElement';
 import { IFormSelectOption } from './FormSelect';
 import { IPluginDesc } from '../../base';
@@ -39,3 +39,4 @@ export declare class FormRadio extends AFormElement<IRadioElementDesc> {
     set value(v: any);
     focus(): void;
 }
+//# sourceMappingURL=FormRadio.d.ts.map

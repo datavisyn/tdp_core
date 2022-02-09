@@ -6,3 +6,4 @@ import { PlotlyInfo } from './interfaces';
  * @returns the changed layout
  */
 export declare function beautifyLayout(traces: PlotlyInfo, layout: any): any;
+//# sourceMappingURL=layoutUtils.d.ts.map

@@ -19,9 +19,7 @@ export class SearchBoxProvider {
      * @returns A new LineUp SearchBox instance
      */
     createSearchBox(options = {}) {
-        const mergedOptions = Object.assign({
-            placeholder: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.searchPlaceholder')
-        }, options);
+        const mergedOptions = { placeholder: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.searchPlaceholder'), ...options };
         const searchBox = new SearchBox(mergedOptions);
         searchBox.on(SearchBox.EVENT_SELECT, (item) => {
             item.action();
@@ -34,7 +32,7 @@ export class SearchBoxProvider {
      * @param items List of searchable items for the SearchBox
      */
     update(items) {
-        this.searchBoxes.forEach((searchBox) => searchBox.data = items);
+        this.searchBoxes.forEach((searchBox) => (searchBox.data = items));
     }
 }
 //# sourceMappingURL=SearchBoxProvider.js.map

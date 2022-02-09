@@ -1,5 +1,5 @@
-import {I18nextManager} from '../i18n';
-import {Dialog} from './dialogs';
+import { I18nextManager } from '../i18n';
+import { Dialog } from './dialogs';
 
 let globalErrorTemplate = (details: string) => details;
 
@@ -28,42 +28,47 @@ export class Errors {
    * @param error
    * @returns {Promise<any>|Promise}
    */
-  static showErrorModalDialog(error: any, additionalCSSClasses: string = '') {
+  static showErrorModalDialog(error: any, additionalCSSClasses = '') {
     function commonDialog(title: string, body: string) {
-      return import('./dialogs').then(() =>
-      ({generateDialog}: {generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): Dialog}) => new Promise((resolve, reject) => {
-        const dialog = generateDialog(title, I18nextManager.getInstance().i18n.t('phovea:ui.dismiss'), additionalCSSClasses);
+      return import('./dialogs').then(
+        () =>
+          ({ generateDialog }: { generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): Dialog }) =>
+            new Promise((resolve, reject) => {
+              const dialog = generateDialog(title, I18nextManager.getInstance().i18n.t('phovea:ui.dismiss'), additionalCSSClasses);
 
-        dialog.body.innerHTML = globalErrorTemplate(body);
+              dialog.body.innerHTML = globalErrorTemplate(body);
 
-        dialog.onSubmit(() => {
-          dialog.hide();
-          return false;
-        });
+              dialog.onSubmit(() => {
+                dialog.hide();
+                return false;
+              });
 
-        dialog.onHide(() => {
-          reject(error);
-          dialog.destroy();
-        });
+              dialog.onHide(() => {
+                reject(error);
+                dialog.destroy();
+              });
 
-        dialog.show();
-      }));
+              dialog.show();
+            }),
+      );
     }
 
     if (error instanceof Response || error.response instanceof Response) {
       const xhr: Response = error instanceof Response ? error : error.response;
       return xhr.text().then((body: string) => {
-        const title = I18nextManager.getInstance().i18n.t('phovea:ui.errorHeader', {status: xhr.status, statusText: xhr.statusText});
+        const title = I18nextManager.getInstance().i18n.t('phovea:ui.errorHeader', { status: xhr.status, statusText: xhr.statusText });
         if (xhr.status !== 400) {
           body = `${body}<hr>
-          ${I18nextManager.getInstance().i18n.t('phovea:ui.errorBody')}<br><a href="${xhr.url}" target="_blank">${(xhr.url.length > 100) ? xhr.url.substring(0, 100) + '...' : xhr.url}</a>`;
+          ${I18nextManager.getInstance().i18n.t('phovea:ui.errorBody')}<br><a href="${xhr.url}" target="_blank">${
+            xhr.url.length > 100 ? `${xhr.url.substring(0, 100)}...` : xhr.url
+          }</a>`;
         }
         return commonDialog(title, body);
       });
-    } else if (error instanceof Error) {
-      return commonDialog(error.name, error.message);
-    } else {
-      return commonDialog(I18nextManager.getInstance().i18n.t('phovea:ui.unknownError'), error.toString());
     }
+    if (error instanceof Error) {
+      return commonDialog(error.name, error.message);
+    }
+    return commonDialog(I18nextManager.getInstance().i18n.t('phovea:ui.unknownError'), error.toString());
   }
 }

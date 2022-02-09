@@ -9,15 +9,15 @@ export class ASelectAble extends EventHandler {
         this.selectionListeners = [];
         this.singleSelectionListener = async (event, type, act, added, removed) => {
             const ids = await this.ids();
-            //filter to the right ids and convert to indices format
-            //given all ids convert the selected ids to the indices in the data type
+            // filter to the right ids and convert to indices format
+            // given all ids convert the selected ids to the indices in the data type
             act = ids.indexOf(act);
             added = ids.indexOf(added);
             removed = ids.indexOf(removed);
             if (act.isNone && added.isNone && removed.isNone) {
                 return;
             }
-            //ensure the right number of dimensions
+            // ensure the right number of dimensions
             SelectionUtils.fillWithNone(act, ids.ndim);
             SelectionUtils.fillWithNone(added, ids.ndim);
             SelectionUtils.fillWithNone(removed, ids.ndim);
@@ -36,7 +36,7 @@ export class ASelectAble extends EventHandler {
     selectionListener(idtype, index, total) {
         return (event, type, act, added, removed) => {
             this.selectionCache[index] = { act, added, removed };
-            if (this.accumulateEvents < 0 || (++this.accumulateEvents) === total) {
+            if (this.accumulateEvents < 0 || ++this.accumulateEvents === total) {
                 this.fillAndSend(type, index);
             }
         };
@@ -51,14 +51,14 @@ export class ASelectAble extends EventHandler {
             return {
                 act: id.selections(type),
                 added: Range.none(),
-                removed: Range.none()
+                removed: Range.none(),
             };
         });
         const act = Range.join(full.map((entry) => entry.act));
         const added = Range.join(full.map((entry) => entry.added));
         const removed = Range.join(full.map((entry) => entry.removed));
         this.selectionCache = [];
-        this.accumulateEvents = -1; //reset
+        this.accumulateEvents = -1; // reset
         this.singleSelectionListener(null, type, act, added, removed);
     }
     on(events, handler) {
@@ -97,8 +97,12 @@ export class ASelectAble extends EventHandler {
         return ids.indexRangeOf(r);
     }
     select() {
+        // eslint-disable-next-line prefer-rest-params
         const a = Array.from(arguments);
-        const dim = (typeof a[0] === 'number') ? +a.shift() : -1, type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType, range = ParseRangeUtils.parseRangeLike(a[0]), op = SelectionUtils.asSelectOperation(a[1]);
+        const dim = typeof a[0] === 'number' ? +a.shift() : -1;
+        const type = typeof a[0] === 'string' ? a.shift() : SelectionUtils.defaultSelectionType;
+        const range = ParseRangeUtils.parseRangeLike(a[0]);
+        const op = SelectionUtils.asSelectOperation(a[1]);
         return this.selectImpl(range, op, type, dim);
     }
     async selectImpl(range, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType, dim = -1) {
@@ -107,27 +111,27 @@ export class ASelectAble extends EventHandler {
         if (dim === -1) {
             range = ids.preMultiply(range);
             this.accumulateEvents = 0;
-            const r = Range.join(range.split().map((r, i) => types[i].select(type, r, op)));
-            if (this.accumulateEvents > 0) { //one event has not been fires, so do it manually
+            const r = Range.join(range.split().map((ran, i) => types[i].select(type, ran, op)));
+            if (this.accumulateEvents > 0) {
+                // one event has not been fires, so do it manually
                 this.fillAndSend(type, -1);
             }
             while (r.ndim < types.length) {
-                r.dim(r.ndim); //create intermediate ones
+                r.dim(r.ndim); // create intermediate ones
             }
             return ids.indexRangeOf(r);
         }
-        else {
-            //just a single dimension
-            ids = ids.split()[dim];
-            range = ids.preMultiply(range);
-            types[dim].select(type, range, op);
-            return ids.indexRangeOf(range);
-        }
+        // just a single dimension
+        ids = ids.split()[dim];
+        range = ids.preMultiply(range);
+        types[dim].select(type, range, op);
+        return ids.indexRangeOf(range);
     }
     clear() {
+        // eslint-disable-next-line prefer-rest-params
         const a = Array.from(arguments);
-        const dim = (typeof a[0] === 'number') ? +a.shift() : -1;
-        const type = (typeof a[0] === 'string') ? a[0] : SelectionUtils.defaultSelectionType;
+        const dim = typeof a[0] === 'number' ? +a.shift() : -1;
+        const type = typeof a[0] === 'string' ? a[0] : SelectionUtils.defaultSelectionType;
         return this.selectImpl(Range.none(), SelectOperation.SET, type, dim);
     }
 }

@@ -6,8 +6,8 @@ export class AtomUtils {
             type: 'atom',
             idtype: '_rows',
             value: {
-                type: 'string'
-            }
+                type: 'string',
+            },
         });
     }
 }

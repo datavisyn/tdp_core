@@ -1,14 +1,14 @@
 /**
  * This file defines interfaces for various data types and their metadata.
  */
-import {IPersistable} from '../base/IPersistable';
-import {IDType} from '../idtype/IDType';
-import {ISelectAble, ASelectAble} from '../idtype/ASelectAble';
-import {IHistogram} from './histogram';
-import {IAdvancedStatistics, IStatistics} from '../base/statistics';
-import {RangeLike, Range} from '../range';
-import {IDataDescription} from './DataDescription';
-import {IValueTypeDesc} from './valuetype';
+import { IPersistable } from '../base/IPersistable';
+import { IDType } from '../idtype/IDType';
+import { ISelectAble, ASelectAble } from '../idtype/ASelectAble';
+import { IHistogram } from './histogram';
+import { IAdvancedStatistics, IStatistics } from '../base/statistics';
+import { RangeLike, Range } from '../range';
+import { IDataDescription } from './DataDescription';
+import type { IValueTypeDesc } from './valuetype';
 /**
  * Basic data type interface
  */
@@ -22,7 +22,6 @@ export interface IDataType extends ISelectAble, IPersistable {
    * rows, cols, ....
    */
   readonly dim: number[];
-
 
   idView(idRange?: RangeLike): Promise<IDataType>;
 }
@@ -61,6 +60,7 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
   toString() {
     return this.persist();
   }
+
   /**
    * since there is no instanceOf for interfaces
    * @param v
@@ -73,18 +73,19 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
     if (v instanceof ADataType) {
       return true;
     }
-    //sounds good
-    return (typeof(v.idView) === 'function' && typeof(v.persist) === 'function' && typeof(v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v) && ('dim' in v));
+    // sounds good
+    return (
+      typeof v.idView === 'function' &&
+      typeof v.persist === 'function' &&
+      typeof v.restore === 'function' &&
+      v instanceof ASelectAble &&
+      'desc' in v &&
+      'dim' in v
+    );
   }
 }
 
-export class DummyDataType extends ADataType<IDataDescription> {
-  constructor(desc: IDataDescription) {
-    super(desc);
-  }
-
-}
-
+export class DummyDataType extends ADataType<IDataDescription> {}
 
 export interface IHistAbleDataType<D extends IValueTypeDesc> extends IDataType {
   valuetype: D;

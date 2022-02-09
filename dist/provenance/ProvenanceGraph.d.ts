@@ -4,11 +4,10 @@ import { ADataType } from '../data/datatype';
 import { ObjectNode, IObjectRef } from './ObjectNode';
 import { StateNode } from './StateNode';
 import { ActionNode } from './ActionNode';
-import { IAction } from './ICmd';
+import { IAction, IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph } from './ICmd';
 import { SlideNode } from './SlideNode';
 import { GraphEdge } from '../graph/graph';
 import { GraphBase } from '../graph/GraphBase';
-import { IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph } from './ICmd';
 import { ActionMetaData } from './ActionMeta';
 export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> implements IProvenanceGraph {
     backend: GraphBase;
@@ -107,3 +106,4 @@ export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescr
     static updateInverse(node: ActionNode, graph: ProvenanceGraph, inverter: IInverseActionCreator): void;
     static execute(node: ActionNode, graph: ProvenanceGraph, withinMilliseconds: number): PromiseLike<ICmdResult>;
 }
+//# sourceMappingURL=ProvenanceGraph.d.ts.map

@@ -20,7 +20,6 @@ interface IRegExpFilter {
   isRegExp: boolean;
 }
 
-
 /**
  * This interface combines the `IStringFilter` from `StringColumn`
  * and `ICategoricalFilter` from `ICategoricalColumn`.
@@ -87,7 +86,12 @@ export class LineUpFilterUtils {
    * @returns Returns true if filter should be serialized/restored or false if not.
    */
   static isLineUpStringFilter(filter: any): filter is ILineUpStringFilter {
-    return filter && filter.hasOwnProperty('filter') && (LineUpFilterUtils.isLineUpStringFilterValue(filter.filter) || filter.filter instanceof RegExp) && filter.hasOwnProperty('filterMissing');
+    return (
+      filter &&
+      filter.hasOwnProperty('filter') &&
+      (LineUpFilterUtils.isLineUpStringFilterValue(filter.filter) || filter.filter instanceof RegExp) &&
+      filter.hasOwnProperty('filterMissing')
+    );
   }
 
   /**
@@ -99,7 +103,12 @@ export class LineUpFilterUtils {
    * @returns Returns true if filter should be serialized/restored or false if not.
    */
   static isSerializedFilter(filter: any): filter is ISerializableLineUpFilter {
-    return filter && filter.hasOwnProperty('filter') && (LineUpFilterUtils.isLineUpStringFilterValue(filter.filter) || LineUpFilterUtils.isIRegExpFilter(filter.filter)) && filter.hasOwnProperty('filterMissing');
+    return (
+      filter &&
+      filter.hasOwnProperty('filter') &&
+      (LineUpFilterUtils.isLineUpStringFilterValue(filter.filter) || LineUpFilterUtils.isIRegExpFilter(filter.filter)) &&
+      filter.hasOwnProperty('filterMissing')
+    );
   }
 
   /**
@@ -122,10 +131,10 @@ export class LineUpFilterUtils {
     const isRegExp = value instanceof RegExp;
     return {
       filter: {
-        value: isRegExp ? value.toString() : value as LineUpStringFilterValue,
-        isRegExp
+        value: isRegExp ? value.toString() : (value as LineUpStringFilterValue),
+        isRegExp,
       },
-      filterMissing: filter.filterMissing
+      filterMissing: filter.filterMissing,
     };
   }
 
@@ -140,10 +149,11 @@ export class LineUpFilterUtils {
     const serializedRegexParser = /^\/(.+)\/(\w+)?$/; // from https://gist.github.com/tenbits/ec7f0155b57b2d61a6cc90ef3d5f8b49
     const matches = serializedRegexParser.exec(value);
 
-    if(matches === null) {
+    if (matches === null) {
       throw new Error('Unable to parse regular expression from string. The string does not seem to be a valid RegExp.');
     }
 
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     const [_full, regexString, regexFlags] = matches;
     return new RegExp(regexString, regexFlags);
   }
@@ -164,21 +174,18 @@ export class LineUpFilterUtils {
    */
   static restoreLineUpFilter(filter: LineUpStringFilterValue | IRegExpFilter | ISerializableLineUpFilter, filterMissing = false): ILineUpStringFilter {
     if (LineUpFilterUtils.isLineUpStringFilterValue(filter)) {
-      return {filter, filterMissing};
-
-    } else if (LineUpFilterUtils.isIRegExpFilter(filter) && filter.isRegExp === true) {
-      if(typeof filter.value === 'string') {
-        return {filter: LineUpFilterUtils.restoreRegExp(filter.value), filterMissing};
+      return { filter, filterMissing };
+    }
+    if (LineUpFilterUtils.isIRegExpFilter(filter) && filter.isRegExp === true) {
+      if (typeof filter.value === 'string') {
+        return { filter: LineUpFilterUtils.restoreRegExp(filter.value), filterMissing };
       }
 
       throw new Error('Wrong type of filter value. Unable to restore RegExp instance from the given filter value.');
-
     } else if (LineUpFilterUtils.isIRegExpFilter(filter) && filter.isRegExp === false) {
       return LineUpFilterUtils.restoreLineUpFilter(filter.value, filterMissing);
-
     } else if (LineUpFilterUtils.isSerializedFilter(filter)) {
       return LineUpFilterUtils.restoreLineUpFilter(filter.filter, filter.filterMissing);
-
     }
 
     throw new Error('Unknown LineUp filter format. Unable to restore the given filter.');
@@ -190,11 +197,11 @@ export class LineUpFilterUtils {
    * @param groupBy Value returned from the `Group By` dialog
    */
   static serializeGroupByValue(groupBy: IStringGroupCriteria) {
-    const {type, values} = groupBy;
+    const { type, values } = groupBy;
     if (type === 'regex') {
       return {
         type,
-        values: values.map((value) => value.toString())
+        values: values.map((value) => value.toString()),
       };
     }
     return groupBy;
@@ -205,11 +212,11 @@ export class LineUpFilterUtils {
    * @param groupBy Value as saved in the provenance graph.
    */
   static restoreGroupByValue(groupBy: ISerializedStringGroupCriteria) {
-    const {type, values} = groupBy;
+    const { type, values } = groupBy;
     if (type === 'regex') {
       return {
         type,
-        values: values.map((value) => LineUpFilterUtils.restoreRegExp(value as string))
+        values: values.map((value) => LineUpFilterUtils.restoreRegExp(value as string)),
       };
     }
     return groupBy;

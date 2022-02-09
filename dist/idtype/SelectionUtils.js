@@ -7,11 +7,17 @@ export var SelectOperation;
 })(SelectOperation || (SelectOperation = {}));
 export class SelectionUtils {
     static toSelectOperation(event) {
-        let ctryKeyDown, shiftDown, altDown, metaDown;
+        let ctryKeyDown;
+        let shiftDown;
+        let altDown;
+        let metaDown;
         if (typeof event === 'boolean') {
             ctryKeyDown = event;
+            // eslint-disable-next-line prefer-rest-params
             altDown = arguments[1] || false;
+            // eslint-disable-next-line prefer-rest-params
             shiftDown = arguments[2] || false;
+            // eslint-disable-next-line prefer-rest-params
             metaDown = arguments[3] || false;
         }
         else {
@@ -23,7 +29,7 @@ export class SelectionUtils {
         if (ctryKeyDown || shiftDown) {
             return SelectOperation.ADD;
         }
-        else if (altDown || metaDown) {
+        if (altDown || metaDown) {
             return SelectOperation.REMOVE;
         }
         return SelectOperation.SET;

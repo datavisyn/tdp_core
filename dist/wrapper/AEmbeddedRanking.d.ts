@@ -8,7 +8,7 @@ import { IRow } from '../base/rest';
 import { IFormElementDesc } from '../form/interfaces';
 import { ILazyLoadedColumn } from '../lineup/internal/column';
 export interface IEmbeddedRanking extends ARankingView {
-    rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): void;
+    rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): Promise<any>;
     runWithoutTracking<T>(f: () => T): Promise<T>;
 }
 export declare abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderLocal {
@@ -27,8 +27,8 @@ export declare abstract class AEmbeddedRanking<T extends IRow> implements IViewP
     protected selectedRowsChanged(_rows: T[]): void;
     protected initialized(): void;
     protected setSelectedRows(rows: T[]): void;
-    protected rebuild(mode?: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): void;
-    protected runWithoutTracking<T>(f: (lineup: LocalDataProvider) => T): Promise<T>;
+    protected rebuild(mode?: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): Promise<void>;
+    protected runWithoutTracking<D>(f: (lineup: LocalDataProvider) => D): Promise<D>;
     protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn[]>;
     protected addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn>;
     update(): void;
@@ -38,3 +38,4 @@ export declare abstract class AEmbeddedRanking<T extends IRow> implements IViewP
      */
     protected getParameterFormDescs(): IFormElementDesc[];
 }
+//# sourceMappingURL=AEmbeddedRanking.d.ts.map

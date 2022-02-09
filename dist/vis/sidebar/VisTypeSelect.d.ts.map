@@ -1,0 +1,1 @@
+{"version":3,"file":"VisTypeSelect.d.ts","sourceRoot":"","sources":["../../../src/vis/sidebar/VisTypeSelect.tsx"],"names":[],"mappings":"AAEA,OAAO,EAAc,mBAAmB,EAAC,MAAM,eAAe,CAAC;AAE/D,UAAU,kBAAkB;IACxB,QAAQ,EAAE,CAAC,CAAC,EAAE,mBAAmB,KAAK,IAAI,CAAC;IAC3C,eAAe,EAAE,mBAAmB,CAAC;CACxC;AAED,wBAAgB,aAAa,CAAC,KAAK,EAAE,kBAAkB,eAmBtD"}

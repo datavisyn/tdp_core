@@ -107,3 +107,4 @@ export declare class RelativeSmoothCurveto3 extends RelativePathSegment {
     get lastControlPoint(): Vector2D;
     asIntersectionParams(): IIntersectionParam;
 }
+//# sourceMappingURL=PathSegment.d.ts.map

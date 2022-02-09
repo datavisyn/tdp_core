@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {Select3Utils} from '../src/form/elements/Select3';
+import { Select3Utils } from '../src/form/elements/Select3';
 
 describe('select3', () => {
   describe('splitEscaped', () => {
@@ -22,7 +22,7 @@ describe('select3', () => {
       expect(Select3Utils.splitEscaped('abc\\', reg, false)).toEqual(['abc\\']);
       expect(Select3Utils.splitEscaped('abc\\', reg, true)).toEqual(['abc\\']);
     });
-    it('two', () => {
+    it('two_drastic', () => {
       expect(Select3Utils.splitEscaped('abc def ', reg, false)).toEqual(['abc', 'def', '']);
       expect(Select3Utils.splitEscaped('abc   def', reg, false)).toEqual(['abc', 'def']);
     });

@@ -36,3 +36,4 @@ interface ScatterVisProps {
 }
 export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, scales }: ScatterVisProps): JSX.Element;
 export {};
+//# sourceMappingURL=ScatterVis.d.ts.map

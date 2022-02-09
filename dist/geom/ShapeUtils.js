@@ -33,7 +33,7 @@ export class ShapeUtils {
             return Polygon.polygon(obj);
         }
         // TODO throw error?
-        return obj; //can't derive it, yet
+        return obj; // can't derive it, yet
     }
 }
 //# sourceMappingURL=ShapeUtils.js.map

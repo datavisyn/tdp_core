@@ -16,13 +16,13 @@ export class Categorical2PartioningUtils {
             skipEmptyCategories: true,
             colors: ['gray'],
             labels: null,
-            name: 'Partitioning'
+            name: 'Partitioning',
         }, options);
         let groups = categories.map((d, i) => {
             return {
                 name: m.labels ? m.labels[i] : d.toString(),
                 color: m.colors[Math.min(i, m.colors.length - 1)],
-                indices: []
+                indices: [],
             };
         });
         data.forEach((d, j) => {

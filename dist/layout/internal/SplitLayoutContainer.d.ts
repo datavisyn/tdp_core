@@ -1,5 +1,4 @@
-import { ILayoutContainer, ILayoutDump, ISplitLayoutContainer } from '../interfaces';
-import { IDropArea } from '../interfaces';
+import { ILayoutContainer, ILayoutDump, ISplitLayoutContainer, IDropArea } from '../interfaces';
 import { ASequentialLayoutContainer, ISequentialLayoutContainerOptions } from './ASequentialLayoutContainer';
 export declare class SplitLayoutContainer extends ASequentialLayoutContainer<ISequentialLayoutContainerOptions> implements ISplitLayoutContainer {
     private static readonly SEPARATOR;
@@ -35,3 +34,4 @@ export declare class SplitLayoutContainer extends ASequentialLayoutContainer<ISe
     static restore(dump: ILayoutDump, restore: (dump: ILayoutDump) => ILayoutContainer, doc: Document): SplitLayoutContainer;
     static derive(node: HTMLElement, derive: (node: HTMLElement) => ILayoutContainer): SplitLayoutContainer;
 }
+//# sourceMappingURL=SplitLayoutContainer.d.ts.map

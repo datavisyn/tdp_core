@@ -18,13 +18,13 @@ export class PluginRegistry {
             load: async () => {
                 const instance = await Promise.resolve(loader());
                 return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory) };
-            }
+            },
         }, typeof descOrLoader === 'function' ? desc : descOrLoader);
         PluginRegistry.getInstance().registry.push(p);
     }
     register(plugin, generator) {
         if (typeof generator !== 'function') {
-            //wrong type - not a function, maybe a dummy inline
+            // wrong type - not a function, maybe a dummy inline
             return;
         }
         if (PluginRegistry.getInstance().knownPlugins.has(plugin)) {
@@ -65,7 +65,7 @@ export class PluginRegistry {
      */
     asResource(data) {
         return {
-            create: () => data
+            create: () => data,
         };
     }
     /**
@@ -74,18 +74,20 @@ export class PluginRegistry {
     getFactoryMethod(instance, factory) {
         let f = factory.trim();
         if (f === 'new') {
-            //instantiate the default class
+            // instantiate the default class
             f = 'new default';
         }
-        if (f === 'create') { //default value
+        if (f === 'create') {
+            // default value
             if (typeof instance.create === 'function') {
-                //default exists
+                // default exists
                 return instance.create;
             }
             // try another default
             if (typeof instance.default === 'function') {
-                //we have a default export
-                if (instance.default.prototype !== undefined) { // it has a prototype so guess it is a class
+                // we have a default export
+                if (instance.default.prototype !== undefined) {
+                    // it has a prototype so guess it is a class
                     f = 'new default';
                 }
                 else {

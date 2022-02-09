@@ -1,7 +1,7 @@
 import { IDataType } from '../data';
 import { IVisMetaData, IVisPluginDesc, AVisInstance, ITransform, IVisInstance } from '../provvis';
-import { IMultiForm, IMultiFormOptions } from './IMultiForm';
 import { Range } from '../range';
+import { IMultiForm, IMultiFormOptions } from './IMultiForm';
 /**
  * a simple multi form class using a select to switch
  */
@@ -48,3 +48,4 @@ export declare class MultiForm extends AVisInstance implements IVisInstance, IMu
     addSelectVisChooser(toolbar: HTMLElement): void;
     static create(data: IDataType, parent: HTMLElement, options?: IMultiFormOptions): MultiForm;
 }
+//# sourceMappingURL=MultiForm.d.ts.map

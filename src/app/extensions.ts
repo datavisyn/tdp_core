@@ -1,11 +1,9 @@
-import {IPluginDesc, IPlugin} from '../base/plugin';
-import {IUser} from '../security';
-
+import { IPluginDesc, IPlugin } from '../base/plugin';
+import { IUser } from '../security';
 
 export const EP_PHOVEA_CORE_LOGIN = 'epPhoveaCoreLogin';
 export const EP_PHOVEA_CORE_LOGOUT = 'epPhoveaCoreLogout';
 export const EP_PHOVEA_CORE_LOCALE = 'epPhoveaCoreLocale';
-
 
 export interface ILoginExtensionPoint {
   /**
@@ -18,7 +16,6 @@ export interface ILoginExtensionPointDesc extends IPluginDesc {
   load(): Promise<IPlugin & ILoginExtensionPoint>;
 }
 
-
 export interface ILogoutEP {
   factory(): void;
 }
@@ -26,7 +23,6 @@ export interface ILogoutEP {
 export interface ILogoutEPDesc extends IPluginDesc {
   load(): Promise<IPlugin & ILogoutEP>;
 }
-
 
 export interface ILocaleEPDesc extends IPluginDesc {
   /**

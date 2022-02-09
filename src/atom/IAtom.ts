@@ -1,10 +1,7 @@
-import {BaseUtils} from '../base/BaseUtils';
-import {Range} from '../range';
-import {IIDType, IDTypeLike} from '../idtype';
-import {
-  IDataType, IValueTypeDesc, IDataDescription, DataUtils,
-  INumberValueTypeDesc, ICategoricalValueTypeDesc, IStringValueTypeDesc
-} from '../data';
+import { BaseUtils } from '../base/BaseUtils';
+import { Range } from '../range';
+import { IIDType, IDTypeLike } from '../idtype';
+import { IDataType, IValueTypeDesc, IDataDescription, DataUtils, INumberValueTypeDesc, ICategoricalValueTypeDesc, IStringValueTypeDesc } from '../data';
 
 export interface IAtomValue<T> {
   name: string;
@@ -42,14 +39,13 @@ export declare type IStringAtom = IAtom<string, IStringValueTypeDesc>;
 export declare type IAnyAtom = IAtom<any, IValueTypeDesc>;
 
 export class AtomUtils {
-
   static createDefaultAtomDesc(): IAtomDataDescription<IValueTypeDesc> {
     return <IAtomDataDescription<IValueTypeDesc>>BaseUtils.mixin(DataUtils.createDefaultDataDesc(), {
       type: 'atom',
       idtype: '_rows',
       value: {
-        type: 'string'
-      }
+        type: 'string',
+      },
     });
   }
 }

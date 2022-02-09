@@ -1,7 +1,6 @@
-import {IObjectRef} from './ObjectNode';
-import {IGraphDataDescription} from '../graph/graph';
-import {ActionMetaData} from './ActionMeta';
-
+import { IObjectRef } from './ObjectNode';
+import { IGraphDataDescription } from '../graph/graph';
+import { ActionMetaData } from './ActionMeta';
 
 export interface IProvenanceGraph {
   clear(): void;
@@ -60,5 +59,3 @@ export interface ICmdFunction {
 export interface ICmdFunctionFactory {
   (id: string): ICmdFunction;
 }
-
-

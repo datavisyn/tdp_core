@@ -19,13 +19,14 @@ export class AEmbeddedRanking {
             graph,
             ref,
             desc: {
-                idtype: idtype.id
-            }
+                idtype: idtype.id,
+            },
         };
         const selection = {
             idtype,
-            range: Range.none()
+            range: Range.none(),
         };
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
         class EmbeddedRankingView extends ARankingView {
             constructor() {
@@ -42,7 +43,7 @@ export class AEmbeddedRanking {
                     width: -1,
                     selectedId: -1,
                     selectedSubtype: undefined,
-                    ...c
+                    ...c,
                 }));
             }
             loadRows() {
@@ -62,6 +63,8 @@ export class AEmbeddedRanking {
                     case 'data+desc+scores':
                         this.triggerScoreReload = true;
                         return this.rebuild();
+                    default:
+                        return undefined;
                 }
             }
             setLineUpData(rows) {
@@ -72,10 +75,10 @@ export class AEmbeddedRanking {
                     setTimeout(() => this.reloadScores(), 200); // HACK: wait until lineup has finished creating its new order before the score is reloaded
                 }
             }
-            createInitialRanking(lineup, options = {}) {
+            createInitialRanking(lineup, opts = {}) {
                 that.createInitialRanking(lineup);
                 if (lineup.getRankings().length === 0) {
-                    super.createInitialRanking(lineup, options);
+                    super.createInitialRanking(lineup, opts);
                 }
             }
             runWithoutTracking(f) {
@@ -83,10 +86,7 @@ export class AEmbeddedRanking {
             }
             getParameterFormDescs() {
                 const base = super.getParameterFormDescs();
-                return [
-                    ...base,
-                    ...that.getParameterFormDescs()
-                ];
+                return [...base, ...that.getParameterFormDescs()];
             }
         }
         this.ranking = new EmbeddedRankingView(context, selection, this.node, options);
@@ -95,8 +95,8 @@ export class AEmbeddedRanking {
         // with `graph.findOrAddObject` above the reference of `this` (AEmbeddedRanking) is set to `this.context.ref.value` in ARankingView
         // therefore is this.data of AEmbeddedRanking === `this.context.ref.value` in ARankingView's constructor
         const lineup = this.data;
-        lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', (selection) => {
-            const rows = selection.map((d) => lineup.data[d]);
+        lineup.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.embedded`, (sel) => {
+            const rows = sel.map((d) => lineup.data[d]);
             this.selectedRowsChanged(rows);
         });
         const form = this.node.ownerDocument.createElement('div');
@@ -115,20 +115,21 @@ export class AEmbeddedRanking {
     }
     setSelectedRows(rows) {
         const lineup = this.data;
-        lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', null);
+        lineup.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.embedded`, null);
         this.ranking.setItemSelection({
             idtype: this.ranking.itemIDType,
-            range: ParseRangeUtils.parseRangeLike(rows.map((d) => d._id))
+            range: ParseRangeUtils.parseRangeLike(rows.map((d) => d._id)),
         });
-        lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', (selection) => {
-            const rows = selection.map((d) => lineup.data[d]);
-            this.selectedRowsChanged(rows);
+        lineup.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.embedded`, (selection) => {
+            const rs = selection.map((d) => lineup.data[d]);
+            this.selectedRowsChanged(rs);
         });
     }
-    rebuild(mode = 'data') {
+    async rebuild(mode = 'data') {
         if (this.ranking) {
-            this.ranking.rebuildLineUp(mode);
+            return this.ranking.rebuildLineUp(mode);
         }
+        return undefined;
     }
     runWithoutTracking(f) {
         return this.ranking.runWithoutTracking(() => f(this.data));

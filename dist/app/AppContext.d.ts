@@ -13,7 +13,7 @@ export declare class AppContext {
      */
     static version: string;
     /**
-     * server prefix ofr api calls
+     * server prefix of api calls
      * @type {string}
      */
     server_url: string;
@@ -102,3 +102,4 @@ export declare class AppContext {
     static getInstance(): AppContext;
 }
 export {};
+//# sourceMappingURL=AppContext.d.ts.map

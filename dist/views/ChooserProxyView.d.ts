@@ -51,3 +51,4 @@ export declare class ChooserProxyView extends AView {
     private static isNoNSecurePage;
     private showNoHttpsMessage;
 }
+//# sourceMappingURL=ChooserProxyView.d.ts.map

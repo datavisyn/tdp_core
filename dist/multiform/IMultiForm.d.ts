@@ -1,4 +1,5 @@
-import { IVisInstance, IVisPluginDesc } from '../provvis';
+import { IVisInstance } from '../provvis/visInstance';
+import { IVisPluginDesc } from '../provvis/IVisPluginDesc';
 export interface IMultiForm extends IVisInstance {
     readonly act: IVisPluginDesc;
     readonly actLoader: Promise<IVisInstance>;
@@ -28,3 +29,4 @@ export interface IMultiFormOptions {
      */
     filter?(vis: IVisPluginDesc): boolean;
 }
+//# sourceMappingURL=IMultiForm.d.ts.map

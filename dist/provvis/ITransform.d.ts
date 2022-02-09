@@ -8,3 +8,4 @@ export interface ITransform {
      */
     readonly rotate: number;
 }
+//# sourceMappingURL=ITransform.d.ts.map

@@ -1,29 +1,32 @@
-import {IAreYouSureOptions, Dialog, PHOVEA_UI_FormDialog} from '../components';
-import {I18nextManager} from '../i18n';
-import {CLUEGraphManager} from './CLUEGraphManager';
+import { IAreYouSureOptions, Dialog, PHOVEA_UI_FormDialog } from '../components';
+import { I18nextManager } from '../i18n';
+import { CLUEGraphManager } from './CLUEGraphManager';
 
 export interface IDialogModule {
   generateDialog(title: string, primaryBtnText?: string, additionalCSSClasses?: string): Dialog;
 
   areyousure(msg?: string, options?: IAreYouSureOptions | string): Promise<boolean>;
 
-  FormDialog: {new(title: string, primaryBtnText?: string, formId?: string, additionalCSSClasses?: string): PHOVEA_UI_FormDialog};
+  FormDialog: { new (title: string, primaryBtnText?: string, formId?: string, additionalCSSClasses?: string): PHOVEA_UI_FormDialog };
 }
 
 export class DialogUtils {
-
   /**
    * utility dialog when a session was not found
    * @param {CLUEGraphManager} manager
    * @param {string} id session id
    */
-  static showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string, additionalCSSClasses: string = '') {
-    const dialog = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('tdp:core.sessionNotFound'), I18nextManager.getInstance().i18n.t('tdp:core.newSession'), additionalCSSClasses);
+  static showProveanceGraphNotFoundDialog(manager: CLUEGraphManager, id: string, additionalCSSClasses = '') {
+    const dialog = Dialog.generateDialog(
+      I18nextManager.getInstance().i18n.t('tdp:core.sessionNotFound'),
+      I18nextManager.getInstance().i18n.t('tdp:core.newSession'),
+      additionalCSSClasses,
+    );
     // append bg-danger to the dialog parent element
     dialog.body.parentElement.parentElement.parentElement.classList.add('bg-danger');
     dialog.body.innerHTML = `
         <p>
-          ${I18nextManager.getInstance().i18n.t('tdp:core.notAccessibleMessage', {id})}
+          ${I18nextManager.getInstance().i18n.t('tdp:core.notAccessibleMessage', { id })}
         </p>
         <p>
         ${I18nextManager.getInstance().i18n.t('tdp:core.possibleReasons')}

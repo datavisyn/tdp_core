@@ -34,3 +34,4 @@ export declare abstract class AReactChooserView extends AReactView {
         generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
 }
+//# sourceMappingURL=AReactChooserView.d.ts.map

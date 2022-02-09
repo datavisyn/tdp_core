@@ -45,3 +45,4 @@ export interface IAsStratifcationOptions {
     idtype?: string;
     rowassigner?(ids: string[]): Range;
 }
+//# sourceMappingURL=Stratification.d.ts.map

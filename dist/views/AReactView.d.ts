@@ -1,4 +1,4 @@
-/*********************************************************
+/** *******************************************************
  * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
@@ -7,9 +7,9 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
+ ******************************************************** */
 import { ReactElement } from 'react';
-import { AView } from '.';
+import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
 import { IDTypeLike } from '../idtype';
 /**
@@ -69,3 +69,4 @@ export declare abstract class AReactView extends AView {
         generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
     }) => Promise<unknown>)>;
 }
+//# sourceMappingURL=AReactView.d.ts.map

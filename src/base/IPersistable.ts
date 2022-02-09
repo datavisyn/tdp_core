@@ -8,5 +8,5 @@ export interface IPersistable {
    * @param persisted a result of a previous persist call
    * @return the restored view or null if it could be in place restored
    */
-  restore(persisted: any): IPersistable|Promise<IPersistable>;
+  restore(persisted: any): IPersistable | Promise<IPersistable>;
 }

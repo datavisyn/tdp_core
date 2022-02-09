@@ -32,18 +32,16 @@ export class IDTypeManager {
     }
     toPlural(name) {
         if (name[name.length - 1] === 'y') {
-            return name.slice(0, name.length - 1) + 'ies';
+            return `${name.slice(0, name.length - 1)}ies`;
         }
-        return name + 's';
+        return `${name}s`;
     }
     resolveIdType(id) {
         if (id instanceof IDType) {
             return id;
         }
-        else {
-            const sid = id;
-            return IDTypeManager.getInstance().registerIdType(sid, new IDType(sid, sid, IDTypeManager.getInstance().toPlural(sid)));
-        }
+        const sid = id;
+        return IDTypeManager.getInstance().registerIdType(sid, new IDType(sid, sid, IDTypeManager.getInstance().toPlural(sid)));
     }
     resolveProduct(...idtypes) {
         const p = new ProductIDType(idtypes);
@@ -116,7 +114,9 @@ export class IDTypeManager {
      */
     getCanBeMappedTo(idType) {
         if (idType.canBeMappedTo === null) {
-            idType.canBeMappedTo = AppContext.getInstance().getAPIJSON(`/idtype/${idType.id}/`).then((list) => list.map(IDTypeManager.getInstance().resolveIdType));
+            idType.canBeMappedTo = AppContext.getInstance()
+                .getAPIJSON(`/idtype/${idType.id}/`)
+                .then((list) => list.map(IDTypeManager.getInstance().resolveIdType));
         }
         return idType.canBeMappedTo;
     }
@@ -166,7 +166,9 @@ export class IDTypeManager {
                 return true;
             }
             // lookup the targets and check if our target is part of it
-            return IDTypeManager.getInstance().getCanBeMappedTo(IDTypeManager.getInstance().resolveIdType(idtype)).then((mappables) => mappables.some((d) => d.id === target.id));
+            return IDTypeManager.getInstance()
+                .getCanBeMappedTo(IDTypeManager.getInstance().resolveIdType(idtype))
+                .then((mappables) => mappables.some((d) => d.id === target.id));
         }
         // check which idTypes can be mapped to the target one
         return Promise.all(idTypes.map(canBeMappedTo)).then((mappable) => {
@@ -175,10 +177,12 @@ export class IDTypeManager {
         });
     }
     init() {
-        //register known idtypes via registry
-        PluginRegistry.getInstance().listPlugins(IDTypeManager.EXTENSION_POINT_IDTYPE).forEach((plugin) => {
-            const id = plugin.id;
-            const name = plugin.name;
+        // register known idtypes via registry
+        PluginRegistry.getInstance()
+            .listPlugins(IDTypeManager.EXTENSION_POINT_IDTYPE)
+            .forEach((plugin) => {
+            const { id } = plugin;
+            const { name } = plugin;
             const names = plugin.names || this.toPlural(name);
             const internal = Boolean(plugin.internal);
             this.registerIdType(id, new IDType(id, name, names, internal));

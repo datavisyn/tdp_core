@@ -1,20 +1,28 @@
 export enum EPermission {
-  READ = 4, WRITE = 2, EXECUTE = 1
+  READ = 4,
+  WRITE = 2,
+  EXECUTE = 1,
 }
 
 export enum EEntity {
-  USER, GROUP, OTHERS, BUDDIES
+  USER,
+  GROUP,
+  OTHERS,
+  BUDDIES,
 }
 
 export class Permission {
-
   /**
    * by default only the creator has all permissions
    * @type {number}
    */
+  // TODO: When to enable buddies?
   public static ALL_READ_READ = 744;
+
   public static ALL_NONE_NONE = 700;
+
   public static ALL_READ_NONE = 740;
+
   public static DEFAULT_PERMISSION = Permission.ALL_READ_READ;
 
   /**
@@ -22,28 +30,46 @@ export class Permission {
    * buddies first for backward compatibility
    */
   public static ALL_ALL_READ_READ = 7744;
+
   public static ALL_ALL_NONE_NONE = 7700;
+
   public static ALL_ALL_READ_NONE = 7740;
 
-  constructor(public readonly user: Set<EPermission>, public readonly group: Set<EPermission>, public readonly others: Set<EPermission>, public readonly buddies: Set<EPermission> = new Set()) {
-  }
+  constructor(
+    public readonly user: Set<EPermission>,
+    public readonly group: Set<EPermission>,
+    public readonly others: Set<EPermission>,
+    public readonly buddies: Set<EPermission> = new Set(),
+  ) {}
 
   encode() {
-    return Permission.encode(this.user, this.group, this.others);
+    return Permission.encode(this.user, this.group, this.others, this.buddies);
   }
 
   toString() {
     const userEncoded = Permission.toString(this.user);
     const groupEncoded = Permission.toString(this.group);
     const othersEncoded = Permission.toString(this.others);
-    return userEncoded + groupEncoded + othersEncoded;
+    const buddiesEncoded = Permission.toString(this.buddies);
+    return buddiesEncoded + userEncoded + groupEncoded + othersEncoded;
+  }
+
+  clone() {
+    return new Permission(new Set(this.user), new Set(this.group), new Set(this.others), new Set(this.buddies));
   }
 
   getPermissions(entity: EEntity) {
-    switch(entity) {
-      case EEntity.USER: return this.user;
-      case EEntity.GROUP: return this.group;
-      case EEntity.OTHERS: return this.others;
+    switch (entity) {
+      case EEntity.USER:
+        return this.user;
+      case EEntity.GROUP:
+        return this.group;
+      case EEntity.OTHERS:
+        return this.others;
+      case EEntity.BUDDIES:
+        return this.buddies;
+      default:
+        return undefined;
     }
   }
 

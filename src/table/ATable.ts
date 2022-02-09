@@ -1,11 +1,11 @@
-import {IPersistable} from '../base/IPersistable';
-import {Range, ParseRangeUtils, RangeLike} from '../range';
-import {IDTypeManager, IDType, ASelectAble} from '../idtype';
-import {IVector} from '../vector';
-import {ITable, IQueryArgs} from './ITable';
-import {MultiTableVector} from './internal/MultiTableVector';
-import {IValueType, IValueTypeDesc} from '../data';
-import {IInternalAccess} from './internal/InternalAccess';
+import { IPersistable } from '../base/IPersistable';
+import { Range, ParseRangeUtils, RangeLike } from '../range';
+import { IDTypeManager, IDType, ASelectAble } from '../idtype';
+import { IVector } from '../vector';
+import { ITable, IQueryArgs } from './ITable';
+import { MultiTableVector } from './internal/MultiTableVector';
+import { IValueType, IValueTypeDesc } from '../data';
+import { IInternalAccess } from './internal/InternalAccess';
 
 /**
  * base class for different Table implementations, views, transposed,...
@@ -31,8 +31,8 @@ export abstract class ATable extends ASelectAble implements IInternalAccess {
   abstract size(): number[];
 
   view(range: RangeLike = Range.all()): ITable {
-    // tslint:disable:no-use-before-declare
     // Disabled the rule, because the classes below reference each other in a way that it is impossible to find a successful order.
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new TableView(this.root, ParseRangeUtils.parseRangeLike(range));
   }
 
@@ -44,20 +44,25 @@ export abstract class ATable extends ASelectAble implements IInternalAccess {
     return this.view((await this.ids()).indexOf(ParseRangeUtils.parseRangeLike(idRange)));
   }
 
-  reduce<T, D extends IValueTypeDesc>(f: (row: IValueType[]) => T, thisArgument?: any, valuetype?: D, idtype?: IDType): IVector<T,D> {
+  reduce<T, D extends IValueTypeDesc>(f: (row: IValueType[]) => T, thisArgument?: any, valuetype?: D, idtype?: IDType): IVector<T, D> {
     return new MultiTableVector(this.root, f, thisArgument, valuetype, idtype);
   }
 
   restore(persisted: any): IPersistable {
     if (persisted && persisted.f) {
-      /* tslint:disable:no-eval */
-      return this.reduce(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
-      /* tslint:enable:no-eval */
-    } else if (persisted && persisted.range) { //some view onto it
-      return this.view(ParseRangeUtils.parseRangeLike(persisted.range));
-    } else {
-      return <IPersistable>(<any>this);
+      return this.reduce(
+        // eslint-disable-next-line no-eval
+        eval(persisted.f),
+        this,
+        persisted.valuetype,
+        persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined,
+      );
     }
+    if (persisted && persisted.range) {
+      // some view onto it
+      return this.view(ParseRangeUtils.parseRangeLike(persisted.range));
+    }
+    return <IPersistable>(<any>this);
   }
 }
 
@@ -82,13 +87,15 @@ export class TableView extends ATable implements ITable {
   persist() {
     return {
       root: this.root.persist(),
-      range: this.range.toString()
+      range: this.range.toString(),
     };
   }
 
   restore(persisted: any) {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let r: ITable = this;
-    if (persisted && persisted.range) { //some view onto it
+    if (persisted && persisted.range) {
+      // some view onto it
       r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
     }
     return r;
@@ -161,4 +168,3 @@ export class TableView extends ATable implements ITable {
     throw new Error('not implemented');
   }
 }
-

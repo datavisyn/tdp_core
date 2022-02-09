@@ -34,3 +34,4 @@ export declare class GraphBase extends AGraph implements IGraph {
     persist(): any;
     restore(dump: any): this;
 }
+//# sourceMappingURL=GraphBase.d.ts.map

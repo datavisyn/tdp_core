@@ -13,3 +13,4 @@ export declare class Path {
     tokenize(d: string): any[];
     asIntersectionParams(): import("./IIntersectionParam").IIntersectionParam;
 }
+//# sourceMappingURL=Path.d.ts.map

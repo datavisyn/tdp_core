@@ -1,15 +1,15 @@
-import {EventHandler} from './event';
-import {BaseUtils} from './BaseUtils';
-import {PluginRegistry} from '../app';
-import {I18nextManager} from '../i18n';
-import {EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM, ICustomizedLoginFormPluginDesc, ICustomizedLoginFormPlugin} from './extensions';
-import {LoginUtils} from './LoginUtils';
-import {SessionWatcher} from './watcher';
+import { EventHandler } from './event';
+import { BaseUtils } from './BaseUtils';
+import { PluginRegistry } from '../app';
+import { I18nextManager } from '../i18n';
+import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM, ICustomizedLoginFormPluginDesc, ICustomizedLoginFormPlugin } from './extensions';
+import { LoginUtils } from './LoginUtils';
+import { SessionWatcher } from './watcher';
+import { AppHeader } from '../components';
 
 // const DEFAULT_SESSION_TIMEOUT = 60 * 1000; // 10 min
 
-// tslint:disable-next-line: class-name
-export interface PHOVEA_SECURITY_FLASK_ILoginMenuOptions {
+export interface ILoginMenuOptions {
   /**
    * formular used for the login dialog
    */
@@ -18,55 +18,39 @@ export interface PHOVEA_SECURITY_FLASK_ILoginMenuOptions {
   document?: Document;
 
   watch?: boolean;
-}
 
-export interface ILoginMenuAdapter {
-  wait(): void;
-  ready(): void;
-
-  /**
-   * `(<any>$(selector)).modal('hide');`
-   * @param {string} selector
-   */
-  hideDialog(selector: string): void;
-
-  /**
-   * ```
-   * $(selector).modal('show')
-   *  .on('shown.bs.modal', function () {
-   *    (<any>$(focusSelector, $loginDialog)).focus();
-   *  });
-   * ```
-   * @param {string} selector
-   * @param {string} focusSelector
-   */
-  showAndFocusOn(selector: string, focusSelector: string): void;
+  insertIntoHeader?: boolean;
 }
 
 /**
  * utility login menu that can be added to the Appheader for instance
  */
-// tslint:disable-next-line: class-name
-export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
+export class LoginMenu extends EventHandler {
   static readonly EVENT_LOGGED_IN = 'loggedIn';
+
   static readonly EVENT_LOGGED_OUT = 'loggedOut';
 
   readonly node: HTMLUListElement;
-  private readonly options: PHOVEA_SECURITY_FLASK_ILoginMenuOptions = {
+
+  private readonly options: ILoginMenuOptions = {
     loginForm: undefined,
     document,
-    watch: false
+    watch: false,
   };
 
   private readonly customizer: ICustomizedLoginFormPluginDesc[];
 
-  constructor(private readonly adapter: ILoginMenuAdapter, options: PHOVEA_SECURITY_FLASK_ILoginMenuOptions = {}) {
+  constructor(private readonly header: AppHeader, options: ILoginMenuOptions = {}) {
     super();
-    BaseUtils.mixin(this.options, options);
+
+    BaseUtils.mixin(this.options, { document: header.rightMenu.ownerDocument }, options);
     this.customizer = PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM);
     this.node = this.init();
     if (this.options.watch) {
       SessionWatcher.startWatching(() => this.logout());
+    }
+    if (this.options.insertIntoHeader) {
+      this.header.insertCustomRightMenu(this.node);
     }
   }
 
@@ -82,12 +66,13 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
       </li>
       <li style="display: none" class="nav-item dropdown" id="user_menu">
           <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" id="userMenuDropdown"
-              aria-expanded="false"><i class="fas fa-user" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t('phovea:security_flask.unknown')}</span></a>
+              aria-expanded="false"><i class="fas fa-user" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t(
+                'phovea:security_flask.unknown',
+              )}</span></a>
           <div class="dropdown-menu dropdown-menu-end" data-bs-popper="none" aria-labelledby="userMenuDropdown">
               <a class="dropdown-item" href="#" id="logout_link">${I18nextManager.getInstance().i18n.t('phovea:security_flask.logoutButton')}</a>
           </div>
       </li>`;
-
 
     ul.querySelector('#logout_link').addEventListener('click', (evt) => {
       evt.preventDefault();
@@ -104,9 +89,9 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
 
   private logout() {
     const doc = this.options.document;
-    this.adapter.wait();
+    this.header.wait();
     LoginUtils.logout().then(() => {
-      this.fire(PHOVEA_SECURITY_FLASK_LoginMenu.EVENT_LOGGED_OUT);
+      this.fire(LoginMenu.EVENT_LOGGED_OUT);
       const userMenu = <HTMLElement>doc.querySelector('#user_menu');
       if (userMenu) {
         userMenu.style.display = 'none';
@@ -115,7 +100,7 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
       Array.from(doc.querySelectorAll('.login_required')).forEach((n: HTMLElement) => {
         n.classList.add('disabled');
       });
-      this.adapter.ready();
+      this.header.ready();
     });
   }
 
@@ -129,12 +114,11 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
     const doc = this.options.document;
     const loginDialog = <HTMLElement>doc.querySelector('#loginDialog');
     (<HTMLElement>loginDialog.querySelector('.modal-header .btn-close')).setAttribute('hidden', null); // disable closing the dialog
-    this.adapter.showAndFocusOn('#loginDialog', '#login_username');
+    this.header.showAndFocusOn('#loginDialog', '#login_username');
   }
 
   private initLoginDialog(body: HTMLElement) {
-
-    let loginForm = this.options.loginForm;
+    let { loginForm } = this.options;
     if (!loginForm) {
       const t = this.customizer.find((d) => d.template != null);
       if (t) {
@@ -143,14 +127,18 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
         loginForm = LoginUtils.defaultLoginForm();
       }
     }
-    body.insertAdjacentHTML('beforeend', `
+    body.insertAdjacentHTML(
+      'beforeend',
+      `
       <!--login dialog-->
       <div class="modal fade" id="loginDialog" tabindex="-1" role="dialog" aria-labelledby="loginDialog" data-keyboard="false" data-bs-backdrop="static">
         <div class="modal-dialog modal-sm">
           <div class="modal-content">
             <div class="modal-header">
             <h5 class="modal-title">${I18nextManager.getInstance().i18n.t('phovea:security_flask.title')}</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t('phovea:security_flask.closeButton')}"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${I18nextManager.getInstance().i18n.t(
+                'phovea:security_flask.closeButton',
+              )}"></button>
             </div>
             <div class="modal-body">
               <div class="alert alert-warning" role="alert">${I18nextManager.getInstance().i18n.t('phovea:security_flask.alertOffline')}</div>
@@ -159,49 +147,54 @@ export class PHOVEA_SECURITY_FLASK_LoginMenu extends EventHandler {
             </div>
           </div>
         </div>
-      </div>`);
+      </div>`,
+    );
 
     const dialog = <HTMLDivElement>body.querySelector('#loginDialog');
     const form = <HTMLFormElement>dialog.querySelector('form');
-    LoginUtils.bindLoginForm(form, (error, user) => {
-      const success = !error && user;
-      if (!success) {
-        this.adapter.ready();
-        if (error === 'not_reachable') {
-          dialog.classList.add('has-warning');
-        } else {
-          dialog.classList.remove('has-warning');
-          dialog.classList.add('has-error');
+    LoginUtils.bindLoginForm(
+      form,
+      (error, user) => {
+        const success = !error && user;
+        if (!success) {
+          this.header.ready();
+          if (error === 'not_reachable') {
+            dialog.classList.add('has-warning');
+          } else {
+            dialog.classList.remove('has-warning');
+            dialog.classList.add('has-error');
+          }
+          return;
         }
-        return;
-      }
 
-      this.fire(PHOVEA_SECURITY_FLASK_LoginMenu.EVENT_LOGGED_IN);
-      const doc = this.options.document;
+        this.fire(LoginMenu.EVENT_LOGGED_IN);
+        const doc = this.options.document;
 
-      dialog.classList.remove('has-error', 'has-warning');
+        dialog.classList.remove('has-error', 'has-warning');
 
-      const userMenu = <HTMLElement>doc.querySelector('#user_menu');
-      if (userMenu) {
-        userMenu.style.display = null;
-        const userName = <HTMLElement>userMenu.querySelector('a:first-of-type span');
-        if (userName) {
-          userName.textContent = user.name;
+        const userMenu = <HTMLElement>doc.querySelector('#user_menu');
+        if (userMenu) {
+          userMenu.style.display = null;
+          const userName = <HTMLElement>userMenu.querySelector('a:first-of-type span');
+          if (userName) {
+            userName.textContent = user.name;
+          }
         }
-      }
 
-      (<HTMLElement>doc.querySelector('#login_menu')).style.display = 'none';
-      // remove all .login_required magic flags
-      Array.from(doc.querySelectorAll('.login_required.disabled')).forEach((n: HTMLElement) => {
-        n.classList.remove('disabled');
-        n.setAttribute('disabled', null);
-      });
+        (<HTMLElement>doc.querySelector('#login_menu')).style.display = 'none';
+        // remove all .login_required magic flags
+        Array.from(doc.querySelectorAll('.login_required.disabled')).forEach((n: HTMLElement) => {
+          n.classList.remove('disabled');
+          n.setAttribute('disabled', null);
+        });
 
-      this.adapter.hideDialog('#loginDialog');
-    }, () => {
-      // reset error
-      dialog.classList.remove('has-error', 'has-warning');
-    });
+        this.header.hideDialog('#loginDialog');
+      },
+      () => {
+        // reset error
+        dialog.classList.remove('has-error', 'has-warning');
+      },
+    );
 
     return dialog;
   }

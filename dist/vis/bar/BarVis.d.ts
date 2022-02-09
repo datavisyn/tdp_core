@@ -38,3 +38,4 @@ interface BarVisProps {
 }
 export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales }: BarVisProps): JSX.Element;
 export {};
+//# sourceMappingURL=BarVis.d.ts.map

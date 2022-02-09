@@ -1,17 +1,17 @@
-import {
-  ILayoutContainer, ILayoutDump, ILayoutParentContainer, IRootLayoutContainer, ISize,
-  LayoutContainerEvents
-} from '../interfaces';
-import {IParentLayoutContainer} from './IParentLayoutContainer';
-import {IDropArea} from '../interfaces';
-import {ALayoutContainer, ILayoutContainerOption} from './ALayoutContainer';
+import { ILayoutContainer, ILayoutDump, ILayoutParentContainer, IRootLayoutContainer, ISize, LayoutContainerEvents, IDropArea } from '../interfaces';
+import { IParentLayoutContainer } from './IParentLayoutContainer';
+import { ALayoutContainer, ILayoutContainerOption } from './ALayoutContainer';
 
 export abstract class AParentLayoutContainer<T extends ILayoutContainerOption> extends ALayoutContainer<T> implements IParentLayoutContainer {
   readonly node: HTMLElement;
+
   abstract readonly minChildCount: number;
+
   protected readonly _children: ILayoutContainer[] = [];
-  private _visible: boolean = false;
-  abstract readonly type: 'tabbing'|'split'|'lineup'|'root';
+
+  private _visible = false;
+
+  abstract readonly type: 'tabbing' | 'split' | 'lineup' | 'root';
 
   constructor(document: Document, options: Partial<T>) {
     super(document, options);
@@ -23,12 +23,13 @@ export abstract class AParentLayoutContainer<T extends ILayoutContainerOption> e
     return false;
   }
 
-  get rootParent(): IRootLayoutContainer&ILayoutParentContainer {
+  get rootParent(): IRootLayoutContainer & ILayoutParentContainer {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let p: ILayoutParentContainer = this;
     while (p.parent !== null) {
       p = p.parent;
     }
-    return <IRootLayoutContainer&ILayoutParentContainer>p;
+    return <IRootLayoutContainer & ILayoutParentContainer>p;
   }
 
   forEach(callback: (child: ILayoutContainer, index: number) => void) {
@@ -55,17 +56,17 @@ export abstract class AParentLayoutContainer<T extends ILayoutContainerOption> e
     if (this._visible === visible) {
       return;
     }
-    this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_VISIBILITY_CHANGED), this._visible, this._visible = visible);
+    this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_VISIBILITY_CHANGED), this._visible, (this._visible = visible));
     this.visibilityChanged(visible);
   }
 
   protected visibilityChanged(visible: boolean): void {
-    this.forEach((c) => c.visible = visible);
+    this.forEach((c) => (c.visible = visible));
   }
 
   abstract get minSize(): ISize;
 
-  push(child: ILayoutContainer, index: number = -1) {
+  push(child: ILayoutContainer, index = -1) {
     this.setupChild(child);
     if (index >= this._children.length || index < 0) {
       index = this._children.length;
@@ -109,7 +110,7 @@ export abstract class AParentLayoutContainer<T extends ILayoutContainerOption> e
     this._children.splice(this._children.indexOf(child), 1);
     if (this.minChildCount > this.length && this.parent) {
       if (this.length > 1) {
-        //remove and inline my children (just one since the remove will be called again
+        // remove and inline my children (just one since the remove will be called again
         this.parent.push(this._children[1]);
       } else if (this.length > 0) {
         this.parent.replace(this, this._children[0]);
@@ -153,11 +154,11 @@ export abstract class AParentLayoutContainer<T extends ILayoutContainerOption> e
 
   persist(): ILayoutDump {
     return Object.assign(super.persist(), {
-      children: this._children.map((d) => d.persist())
+      children: this._children.map((d) => d.persist()),
     });
   }
 
-  find(id: number|((container: ILayoutContainer)=>boolean)) {
+  find(id: number | ((container: ILayoutContainer) => boolean)) {
     if (super.find(id) != null) {
       return <ILayoutContainer>this;
     }
@@ -170,7 +171,7 @@ export abstract class AParentLayoutContainer<T extends ILayoutContainerOption> e
     return null;
   }
 
-  findAll(predicate: (container: ILayoutContainer)=>boolean) {
+  findAll(predicate: (container: ILayoutContainer) => boolean) {
     const base = super.findAll(predicate);
     return base.concat(...this._children.map((d) => d.findAll(predicate)));
   }

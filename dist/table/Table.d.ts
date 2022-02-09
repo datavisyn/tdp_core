@@ -79,3 +79,4 @@ export declare class Table extends ATable implements ITable {
      */
     static listAsTable(tablesAsVectors?: boolean): Promise<Table>;
 }
+//# sourceMappingURL=Table.d.ts.map

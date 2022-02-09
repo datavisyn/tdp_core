@@ -1,4 +1,4 @@
-/*********************************************************
+/** *******************************************************
  * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
@@ -7,9 +7,9 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
-import { IReactHandler } from './AReactView';
+ ******************************************************** */
 import * as React from 'react';
+import { IReactHandler } from './AReactView';
 import { IViewPluginDesc } from '../base';
 export interface ITDPViewProps {
     viewId: string;
@@ -25,14 +25,15 @@ export declare class TDPView extends React.Component<Readonly<ITDPViewProps>, IT
     private viewPromise;
     private view;
     private viewId;
-    private readonly listener;
     constructor(props: ITDPViewProps, context?: any);
     componentDidMount(): void;
-    componentWillUnmount(): void;
     componentDidUpdate(): void;
+    componentWillUnmount(): void;
+    private readonly listener;
     private createContext;
     private buildSelection;
     private triggerSelection;
-    render(): JSX.Element;
     private selectNative;
+    render(): JSX.Element;
 }
+//# sourceMappingURL=TDPView.d.ts.map

@@ -1,16 +1,15 @@
-import {PluginRegistry} from '../app/PluginRegistry';
-import {ObjectNode, IObjectRef, ObjectRefUtils} from './ObjectNode';
-import {StateNode, } from './StateNode';
-import {ActionNode, IActionCompressor} from './ActionNode';
-import {SlideNode} from './SlideNode';
-import {GraphEdge} from '../graph/graph';
-import {IGraphFactory} from '../graph/GraphBase';
-import {ResolveNow} from '../base/promise';
-import {ICmdFunctionFactory, ICmdResult} from './ICmd';
-import {ActionMetaData} from './ActionMeta';
+import { PluginRegistry } from '../app/PluginRegistry';
+import { ObjectNode, IObjectRef, ObjectRefUtils } from './ObjectNode';
+import { StateNode } from './StateNode';
+import { ActionNode, IActionCompressor } from './ActionNode';
+import { SlideNode } from './SlideNode';
+import { GraphEdge } from '../graph/graph';
+import type { IGraphFactory } from '../graph/GraphBase';
+import { ResolveNow } from '../base/promise';
+import type { ICmdFunctionFactory, ICmdResult } from './ICmd';
+import { ActionMetaData } from './ActionMeta';
 
 export class ProvenanceGraphUtils {
-
   private static removeNoops(path: ActionNode[]) {
     return path.filter((a) => a.f_id !== 'noop');
   }
@@ -21,36 +20,41 @@ export class ProvenanceGraphUtils {
       let before: number;
       do {
         before = path.length;
-        cs.forEach((c) => path = c(path));
+        // eslint-disable-next-line @typescript-eslint/no-loop-func
+        cs.forEach((c) => (path = c(path)));
       } while (before > path.length);
       return path;
     };
   }
+
   private static async createCompressor(path: ActionNode[]) {
-    const toload = PluginRegistry.getInstance().listPlugins('actionCompressor').filter((plugin: any) => {
-      return path.some((action) => action.f_id.match(plugin.matches) != null);
-    });
+    const toload = PluginRegistry.getInstance()
+      .listPlugins('actionCompressor')
+      .filter((plugin: any) => {
+        return path.some((action) => action.f_id.match(plugin.matches) != null);
+      });
     return ProvenanceGraphUtils.compositeCompressor((await PluginRegistry.getInstance().loadPlugin(toload)).map((l) => <IActionCompressor>l.factory));
   }
+
   /**
    * returns a compressed version of the paths where just the last selection operation remains
    * @param path
    */
   static async compressGraph(path: ActionNode[]) {
     if (path.length <= 1) {
-      return path; //can't compress single one
+      return path; // can't compress single one
     }
-    //return resolveImmediately(path);
-    //TODO find a strategy how to compress but also invert skipped actions
+    // return resolveImmediately(path);
+    // TODO find a strategy how to compress but also invert skipped actions
     const compressor = await ProvenanceGraphUtils.createCompressor(path);
-    //return path;
-    //console.log('before', path.map((path) => path.toString()));
+    // return path;
+    // console.log('before', path.map((path) => path.toString()));
     let before: number;
     do {
       before = path.length;
       path = compressor(path);
     } while (before > path.length);
-    //console.log('after', path.map((path) => path.toString()));
+    // console.log('after', path.map((path) => path.toString()));
     return path;
   }
 
@@ -62,20 +66,23 @@ export class ProvenanceGraphUtils {
    */
   static findCommon<T>(a: T[], b: T[]) {
     let c = 0;
-    while (c < a.length && c < b.length && a[c] === b[c]) { //go to next till a difference
+    while (c < a.length && c < b.length && a[c] === b[c]) {
+      // go to next till a difference
       c++;
     }
-    if (c === 0) { //not even the root common
+    if (c === 0) {
+      // not even the root common
       return null;
     }
     return {
       i: c - 1,
-      j: c - 1
+      j: c - 1,
     };
   }
 
   static asFunction(i: any) {
-    if (typeof(i) !== 'function') { //make a function
+    if (typeof i !== 'function') {
+      // make a function
       return () => i;
     }
     return i;
@@ -83,7 +90,7 @@ export class ProvenanceGraphUtils {
 
   private static noop(inputs: IObjectRef<any>[], parameter: any): ICmdResult {
     return {
-      inverse: ProvenanceGraphUtils.createNoop()
+      inverse: ProvenanceGraphUtils.createNoop(),
     };
   }
 
@@ -93,7 +100,7 @@ export class ProvenanceGraphUtils {
       id: 'noop',
       f: ProvenanceGraphUtils.noop,
       inputs: <IObjectRef<any>[]>[],
-      parameter: {}
+      parameter: {},
     };
   }
 
@@ -113,13 +120,27 @@ export class ProvenanceGraphUtils {
       if (factory) {
         return factory.load().then((f) => f.factory(id));
       }
-      return Promise.reject('no factory found for ' + id);
+      return Promise.reject(`no factory found for ${id}`);
     }
 
     const lazyFunction = (id: string) => {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
       let _resolved: PromiseLike<any> = null;
-      return function (this: any, inputs: IObjectRef<any>[], parameters: any) {
-        const that = this, args = Array.from(arguments);
+      return async function (this: any, inputs: IObjectRef<any>[], parameters: any) {
+        // ObjectRef value might not be defined when replayed -> therefore
+        // waiting until it is defined
+        let counter = 0;
+        while (!inputs.every((o) => o.v) && counter < 10) {
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((resolve) => {
+            setTimeout(resolve, 500);
+          });
+          counter++;
+        }
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const that = this;
+        // eslint-disable-next-line prefer-rest-params
+        const args = Array.from(arguments);
         if (_resolved == null) {
           _resolved = resolveFun(id);
         }
@@ -135,17 +156,15 @@ export class ProvenanceGraphUtils {
       action: ActionNode,
       state: StateNode,
       object: ObjectNode,
-      story: SlideNode
+      story: SlideNode,
     };
     return {
       makeNode: (n) => types[n.type].restore(n, factory),
-      makeEdge: (n, lookup) => ((new GraphEdge()).restore(n, lookup))
+      makeEdge: (n, lookup) => new GraphEdge().restore(n, lookup),
     };
   }
 
   static findMetaObject<T>(find: IObjectRef<T>) {
-    return (obj: ObjectNode<any>) => find === obj || ((obj.value === null || obj.value === find.value) && (find.hash === obj.hash));
+    return (obj: ObjectNode<any>) => find === obj || ((obj.value === null || obj.value === find.value) && find.hash === obj.hash);
   }
-
-
 }

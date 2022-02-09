@@ -50,10 +50,11 @@ export declare class Renderer {
     private removeAnchors;
     private renderAnnotationsImpl;
     renderAnnotations(state: SlideNode): Promise<unknown>;
-    hideOld(): Promise<unknown>;
+    hideOld(): Promise<void>;
     renderSubtitle(overlay: SlideNode): Promise<unknown>;
     renderText(overlay: SlideNode): Promise<Node>;
     static createAnnotation(main: HTMLElement, graph: ProvenanceGraph): {
         render: any;
     };
 }
+//# sourceMappingURL=annotation.d.ts.map

@@ -1,8 +1,8 @@
 import { IDataType } from '../data';
 import { AShape, Rect } from '../geom';
 import { IVisMetaData, IVisInstance, IVisPluginDesc, AVisInstance, ITransform } from '../provvis';
-import { IMultiForm, IMultiFormOptions } from './IMultiForm';
 import { Range } from '../range';
+import { IMultiForm, IMultiFormOptions } from './IMultiForm';
 export interface IViewFactory {
     (data: IDataType, range: Range, pos: number[]): IDataType;
 }
@@ -70,3 +70,4 @@ export declare class MultiFormGrid extends AVisInstance implements IVisInstance,
     addSelectVisChooser(toolbar: HTMLElement): void;
     static create(data: IDataType, range: Range, parent: HTMLElement, viewFactory: IViewFactory, options?: IMultiFormGridOptions): MultiFormGrid;
 }
+//# sourceMappingURL=MultiFormGrid.d.ts.map

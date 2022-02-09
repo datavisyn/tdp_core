@@ -154,3 +154,4 @@ export declare class ConcatIterator<T> extends AIterator<T> implements IIterator
     get byMinusOne(): boolean;
     static concatIterators<T>(...its: IIterator<T>[]): EmptyIterator<unknown> | ConcatIterator<T>;
 }
+//# sourceMappingURL=iterator.d.ts.map

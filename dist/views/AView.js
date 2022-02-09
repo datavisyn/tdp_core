@@ -54,14 +54,17 @@ export class AView extends EventHandler {
             delete this.node.dataset.hint;
         }
         else {
-            this.node.dataset.hint = hintMessage ? hintMessage : defaultHintMessage;
+            this.node.dataset.hint = hintMessage || defaultHintMessage;
         }
     }
     setNoMappingFoundHint(visible, hintMessage) {
-        const conditionalData = { ...this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' }, id: this.idType ? this.idType.name : '' };
+        const conditionalData = {
+            ...(this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' }),
+            id: this.idType ? this.idType.name : '',
+        };
         return this.setHint(visible, hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', { ...conditionalData }), 'hint-mapping');
     }
-    /*final*/
+    /* final */
     async init(params, onParameterChange) {
         TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
             // If a authorization is removed, rerun the registered authorizations
@@ -103,7 +106,9 @@ export class AView extends EventHandler {
                         : ''}
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
                 <p class="lead">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationRequired', { name: authConfiguration.name })}</p>
-                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending' ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading') : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')}</button>
+                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending'
+                        ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading')
+                        : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')}</button>
             </div>`;
                     overlay.querySelector('button').onclick = async () => {
                         trigger();
@@ -129,8 +134,8 @@ export class AView extends EventHandler {
     }
     buildParameterForm(params, onParameterChange) {
         const builder = new FormBuilder(select(params), undefined, true);
-        //work on a local copy since we change it by adding an onChange handler
-        const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
+        // work on a local copy since we change it by adding an onChange handler
+        const descs = this.getParameterFormDescs().map((d) => ({ ...d }));
         const onInit = onParameterChange;
         // map FormElement change function to provenance graph onChange function
         descs.forEach((p) => {
@@ -165,7 +170,7 @@ export class AView extends EventHandler {
     /**
      * returns the value of the given parameter
      */
-    /*final*/
+    /* final */
     getParameter(name) {
         const elem = this.getParameterElement(name);
         if (!elem) {
@@ -189,7 +194,7 @@ export class AView extends EventHandler {
         await this.paramsChangeListener(name, value, old);
         await this.setParameter(name, value);
     }
-    /*final*/
+    /* final */
     setParameter(name, value) {
         const elem = this.getParameterElement(name);
         if (!elem) {
@@ -228,7 +233,7 @@ export class AView extends EventHandler {
     setInputSelection(selection, name = AView.DEFAULT_SELECTION_NAME) {
         const current = this.selections.get(name);
         if (current && ViewUtils.isSameSelection(current, selection)) {
-            return;
+            return undefined;
         }
         this.selections.set(name, selection);
         if (name === AView.DEFAULT_SELECTION_NAME) {
@@ -296,13 +301,11 @@ export class AView extends EventHandler {
                     selection.idtype.select(selection.range);
                 }
             }
+            else if (selection.range.isNone) {
+                selection.idtype.clear(name);
+            }
             else {
-                if (selection.range.isNone) {
-                    selection.idtype.clear(name);
-                }
-                else {
-                    selection.idtype.select(name, selection.range);
-                }
+                selection.idtype.select(name, selection.range);
             }
         }
         const isEmpty = selection == null || selection.idtype == null || selection.range.isNone;

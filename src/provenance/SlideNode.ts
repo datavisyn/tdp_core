@@ -1,11 +1,10 @@
-import {GraphNode, GraphEdge} from '../graph/graph';
-import {StateNode} from './StateNode';
-
+import { GraphNode, GraphEdge } from '../graph/graph';
+import { StateNode } from './StateNode';
 
 export interface IStateAnnotation {
   readonly type: string;
-  pos: [number, number] | {anchor: string, offset: [number, number]} ;
-  readonly styles?: {[key: string]: string;};
+  pos: [number, number] | { anchor: string; offset: [number, number] };
+  readonly styles?: { [key: string]: string };
 
   readonly [key: string]: any;
 }
@@ -26,11 +25,10 @@ export interface IFrameStateAnnotation extends IStateAnnotation {
   rotation?: number;
 }
 
-
 export class SlideNode extends GraphNode {
+  public static DEFAULT_DURATION = 1500; // ms
 
-  public static DEFAULT_DURATION = 1500; //ms
-  public static DEFAULT_TRANSITION = 0; //ms
+  public static DEFAULT_TRANSITION = 0; // ms
 
   constructor() {
     super('story');
@@ -115,7 +113,7 @@ export class SlideNode extends GraphNode {
   }
 
   updateAnnotation(ann: IStateAnnotation) {
-    //since it is a reference just updated
+    // since it is a reference just updated
     this.setAttr('annotations', this.annotations);
   }
 
@@ -148,13 +146,13 @@ export class SlideNode extends GraphNode {
       s.pushAnnotation({
         type: 'text',
         pos: [25, 25],
-        text: '# ${name}'
+        // eslint-disable-next-line no-template-curly-in-string
+        text: '# ${name}',
       });
       s.name = title;
     }
     return s;
   }
-
 
   static toSlidePath(s?: SlideNode) {
     const r: SlideNode[] = [];
@@ -167,5 +165,4 @@ export class SlideNode extends GraphNode {
     }
     return r;
   }
-
 }

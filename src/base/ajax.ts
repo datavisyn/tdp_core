@@ -1,18 +1,17 @@
-import {GlobalEventHandler} from './event';
-
-
+import { merge } from 'lodash';
+import { GlobalEventHandler } from './event';
 
 export class AjaxError extends Error {
   constructor(public readonly response: Response, message?: string) {
-    super(message ? message : response.statusText);
+    super(message || response.statusText);
     // Set the prototype explicitly. needed for Typescript 2.1
     Object.setPrototypeOf(this, AjaxError.prototype);
   }
 }
 
 export class Ajax {
-
   public static GLOBAL_EVENT_AJAX_PRE_SEND = 'ajaxPreSend';
+
   public static GLOBAL_EVENT_AJAX_POST_SEND = 'ajaxPostSend';
 
   /**
@@ -23,9 +22,8 @@ export class Ajax {
   static checkStatus(response: Response) {
     if (response.ok) {
       return response;
-    } else {
-      throw new AjaxError(response);
     }
+    throw new AjaxError(response);
   }
 
   static parseType(expectedDataType: string, response: Response) {
@@ -54,65 +52,76 @@ export class Ajax {
    * @param requestBody body mime type, default auto derive
    * @returns {Promise<any>}
    */
-  static async send(url: string, data: any = {}, method = 'GET', expectedDataType = 'json', requestBody = 'formdata'): Promise<any> {
+  static async send<T = any>(
+    url: string,
+    data: any = {},
+    method = 'GET',
+    expectedDataType = 'json',
+    requestBody = 'formdata',
+    options: Partial<RequestInit> = {},
+  ): Promise<T> {
     // for compatibility
     method = method.toUpperCase();
 
     // need to encode the body in the url in case of GET and HEAD
     if (method === 'GET' || method === 'HEAD') {
-      data = Ajax.encodeParams(data); //encode in url
+      data = Ajax.encodeParams(data); // encode in url
       if (data) {
         url += (/\?/.test(url) ? '&' : '?') + data;
         data = null;
       }
     }
 
-    const options: RequestInit = {
-      credentials: 'same-origin',
-      method,
-      headers: {
-        'Accept': 'application/json'
+    const mergedOptions: RequestInit = merge(
+      {
+        credentials: 'same-origin',
+        method,
+        headers: {
+          Accept: 'application/json',
+        },
       },
-    };
+      options,
+    );
 
     if (data) {
-      let mimetype: string = '';
+      let mimetype = '';
       switch (requestBody.trim().toLowerCase()) {
         case 'json':
         case 'application/json':
           mimetype = 'application/json';
-          options.body = typeof data === 'string' ? data : JSON.stringify(data);
+          mergedOptions.body = typeof data === 'string' ? data : JSON.stringify(data);
           break;
         case 'text':
         case 'text/plain':
           mimetype = 'text/plain';
-          options.body = String(data);
+          mergedOptions.body = String(data);
           break;
         case 'blob':
         case 'arraybuffer':
           mimetype = 'application/octet-stream';
-          options.body = data;
+          mergedOptions.body = data;
           break;
         default:
           if (data instanceof FormData) {
-            options.body = data;
+            mergedOptions.body = data;
           } else {
             mimetype = 'application/x-www-form-urlencoded';
-            options.body = Ajax.encodeParams(data);
+            mergedOptions.body = Ajax.encodeParams(data);
           }
       }
       if (mimetype) {
-        (<any>options.headers)['Content-Type'] = mimetype;
+        mergedOptions.headers['Content-Type'] = mimetype;
       }
     }
 
     // there are no typings for fetch so far
-    GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_PRE_SEND, url, options);
-    const r = Ajax.checkStatus(await self.fetch(url, options));
+    GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_PRE_SEND, url, mergedOptions);
+    const r = Ajax.checkStatus(await window.fetch(url, mergedOptions));
     const output = Ajax.parseType(expectedDataType, r);
-    GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_POST_SEND, url, options, r, output);
+    GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_POST_SEND, url, mergedOptions, r, output);
     return output;
   }
+
   /**
    * to get some ajax json file
    * @param url
@@ -122,6 +131,7 @@ export class Ajax {
   static getJSON(url: string, data: any = {}): Promise<any> {
     return Ajax.send(url, data);
   }
+
   /**
    * get some generic data via ajax
    * @param url
@@ -157,7 +167,7 @@ export class Ajax {
           if (typeof v === 'object') {
             add(prefix, `${key}[${i}]`, v);
           } else {
-            //primitive values uses the same key
+            // primitive values uses the same key
             add(prefix, `${key}[]`, v);
           }
         });
@@ -168,7 +178,7 @@ export class Ajax {
           add(prefix, `${key}[${v}]`, value[v]);
         });
       } else {
-        s.push(encodeURIComponent(prefix + key) + '=' + encodeURIComponent(value));
+        s.push(`${encodeURIComponent(prefix + key)}=${encodeURIComponent(value)}`);
       }
     }
 

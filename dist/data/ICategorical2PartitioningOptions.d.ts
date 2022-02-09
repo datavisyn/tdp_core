@@ -33,3 +33,4 @@ export declare class Categorical2PartioningUtils {
      */
     static categorical2partitioning<T>(data: T[], categories: T[], options?: ICategorical2PartitioningOptions): CompositeRange1D;
 }
+//# sourceMappingURL=ICategorical2PartitioningOptions.d.ts.map
