@@ -13,16 +13,16 @@ import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
 import { PCPVis } from './pcp/PCPVis';
 import { BarVis } from './bar/BarVis';
 import { getCssValue } from '..';
-export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1').slice(1),
-    getCssValue('visyn-c2').slice(1),
-    getCssValue('visyn-c3').slice(1),
-    getCssValue('visyn-c4').slice(1),
-    getCssValue('visyn-c5').slice(1),
-    getCssValue('visyn-c6').slice(1),
-    getCssValue('visyn-c7').slice(1),
-    getCssValue('visyn-c8').slice(1),
-    getCssValue('visyn-c9').slice(1),
-    getCssValue('visyn-c10').slice(1)], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null, hideSidebar = false }) {
+export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1'),
+    getCssValue('visyn-c2'),
+    getCssValue('visyn-c3'),
+    getCssValue('visyn-c4'),
+    getCssValue('visyn-c5'),
+    getCssValue('visyn-c6'),
+    getCssValue('visyn-c7'),
+    getCssValue('visyn-c8'),
+    getCssValue('visyn-c9'),
+    getCssValue('visyn-c10')], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null, hideSidebar = false }) {
     const [visConfig, setVisConfig] = useState(externalConfig ? externalConfig : {
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
