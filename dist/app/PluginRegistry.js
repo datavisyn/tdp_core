@@ -49,6 +49,15 @@ export class PluginRegistry {
         }
         return PluginRegistry.getInstance().registry.filter(filter);
     }
+    /**
+     * returns an extension identified by type and id
+     * @param type
+     * @param id
+     * @returns {IPluginDesc}
+     */
+    getVisynPlugin(type, id) {
+        return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id);
+    }
     getPlugin(type, id) {
         return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id);
     }

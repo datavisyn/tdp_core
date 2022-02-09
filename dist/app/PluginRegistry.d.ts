@@ -18,7 +18,8 @@ export declare class PluginRegistry implements IRegistry {
      * @param id
      * @returns {IPluginDesc}
      */
-    getPlugin(type: 'visynView', id: string): IVisynViewPluginDesc;
+    getVisynPlugin(type: 'visynView', id: string): IVisynViewPluginDesc;
+    getPlugin(type: string, id: string): IPluginDesc;
     loadPlugin(desc: IPluginDesc[]): Promise<IPlugin[]>;
     /**
      * Helper function to simplify importing of  resource files (e.g., JSON).
