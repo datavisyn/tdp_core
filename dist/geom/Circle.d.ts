@@ -17,3 +17,4 @@ export declare class Circle extends AShape implements ICircle {
     asIntersectionParams(): IIntersectionParam;
     static circle(x: number, y: number, radius: number): Circle;
 }
+//# sourceMappingURL=Circle.d.ts.map

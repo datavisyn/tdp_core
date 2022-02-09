@@ -1,8 +1,7 @@
 import '../webpack/_bootstrap';
 import $ from 'jquery';
-import {BaseUtils} from '../base';
-import {I18nextManager} from '../i18n';
-
+import { I18nextManager } from '../i18n';
+import { BaseUtils } from '../base/BaseUtils';
 
 export interface IDialogOptions {
   title?: string;
@@ -23,11 +22,12 @@ export interface IAreYouSureOptions extends Pick<IDialogOptions, 'title' | 'addi
   cancelButton?: string;
 }
 
-
 export class Dialog {
   protected readonly $dialog: JQuery;
+
   private bakKeyDownListener: (ev: KeyboardEvent) => any = null; // temporal for restoring an old keydown listener
-  static openDialogs: number = 0;
+
+  static openDialogs = 0;
 
   /**
    * @param title Dialog title
@@ -42,7 +42,7 @@ export class Dialog {
    * static: show backdrop, dialog does not close on click outside;
    * @default backdrop true
    */
-  constructor(title: string, primaryBtnText = 'OK', additionalCSSClasses: string = '', backdrop: boolean | 'static' = true) {
+  constructor(title: string, primaryBtnText = 'OK', additionalCSSClasses = '', backdrop: boolean | 'static' = true) {
     const dialog = document.createElement('div');
     dialog.setAttribute('role', 'dialog');
     dialog.classList.add('modal', 'fade');
@@ -70,7 +70,8 @@ export class Dialog {
     this.bakKeyDownListener = document.onkeydown;
     document.onkeydown = (evt) => {
       evt = evt || <KeyboardEvent>window.event;
-      if (evt.keyCode === 27) { // 27 === ESC key
+      if (evt.keyCode === 27) {
+        // 27 === ESC key
         this.hide();
       }
     };
@@ -96,7 +97,6 @@ export class Dialog {
     return <HTMLElement>this.$dialog[0].querySelector('.modal-header');
   }
 
-
   onHide(callback: () => void) {
     this.$dialog.on('hidden.bs.modal', callback);
   }
@@ -116,7 +116,7 @@ export class Dialog {
     return this.$dialog.remove();
   }
 
-  static generateDialog(title: string, primaryBtnText = 'OK', additionalCSSClasses: string = '') {
+  static generateDialog(title: string, primaryBtnText = 'OK', additionalCSSClasses = '') {
     return new Dialog(title, primaryBtnText, additionalCSSClasses);
   }
 
@@ -141,10 +141,10 @@ export class Dialog {
     const o: IPromptOptions = {
       title: 'Input',
       placeholder: 'Enter...',
-      multiline: false
+      multiline: false,
     };
     if (typeof options === 'string') {
-      options = {title: options};
+      options = { title: options };
     }
     BaseUtils.mixin(o, options);
     return new Promise((resolve) => {
@@ -177,9 +177,9 @@ export class Dialog {
   }
 }
 
-// tslint:disable-next-line: class-name
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_UI_FormDialog extends Dialog {
-  constructor(title: string, primaryBtnText = 'OK', private readonly formId = 'form' + BaseUtils.randomId(5), additionalCSSClasses: string = '') {
+  constructor(title: string, primaryBtnText = 'OK', private readonly formId = `form${BaseUtils.randomId(5)}`, additionalCSSClasses = '') {
     super(title, primaryBtnText, additionalCSSClasses);
 
     this.body.innerHTML = `<form id="${formId}"></form>`;
@@ -210,10 +210,10 @@ export class PHOVEA_UI_FormDialog extends Dialog {
     const o: IChooseOptions = {
       title: 'Choose',
       placeholder: 'Enter...',
-      editable: false
+      editable: false,
     };
     if (typeof options === 'string') {
-      options = {title: options};
+      options = { title: options };
     }
     BaseUtils.mixin(o, options);
 
@@ -245,14 +245,14 @@ export class PHOVEA_UI_FormDialog extends Dialog {
     });
   }
 
-  static areyousure(msg: string = '', options: IAreYouSureOptions | string = {}): Promise<boolean> {
+  static areyousure(msg = '', options: IAreYouSureOptions | string = {}): Promise<boolean> {
     const o: IAreYouSureOptions = {
       title: I18nextManager.getInstance().i18n.t('phovea:ui.areYouSure'),
       button: `<i class="fas fa-trash" aria-hidden="true"></i>  ${I18nextManager.getInstance().i18n.t('phovea:ui.delete')}`,
-      cancelButton:  I18nextManager.getInstance().i18n.t('phovea:ui.cancel')
+      cancelButton: I18nextManager.getInstance().i18n.t('phovea:ui.cancel'),
     };
     if (typeof options === 'string') {
-      options = {title: options};
+      options = { title: options };
     }
     BaseUtils.mixin(o, options);
 
@@ -261,13 +261,17 @@ export class PHOVEA_UI_FormDialog extends Dialog {
       dialog.body.innerHTML = msg;
       $(`<button class="btn btn-danger" data-testid="delete-button">${o.button}</button>`).appendTo(dialog.footer);
       let clicked = false;
-      $(dialog.footer).find('button.btn-primary').on('click', function () {
-        dialog.hide();
-      });
-      $(dialog.footer).find('button.btn-danger').on('click', function () {
-        clicked = true;
-        dialog.hide();
-      });
+      $(dialog.footer)
+        .find('button.btn-primary')
+        .on('click', function () {
+          dialog.hide();
+        });
+      $(dialog.footer)
+        .find('button.btn-danger')
+        .on('click', function () {
+          clicked = true;
+          dialog.hide();
+        });
       dialog.onHide(() => {
         dialog.destroy();
         resolve(clicked);

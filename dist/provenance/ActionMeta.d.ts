@@ -19,3 +19,4 @@ export declare class ActionMetaData {
     toString(): string;
     static actionMeta(name: string, category?: string, operation?: string, timestamp?: number, user?: string): ActionMetaData;
 }
+//# sourceMappingURL=ActionMeta.d.ts.map

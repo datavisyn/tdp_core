@@ -75,23 +75,29 @@ export class PropertyHandler extends EventHandler {
     toString() {
         const r = [];
         this.map.forEach((v, key) => {
-            r.push(encodeURIComponent(key) + '=' + encodeURIComponent(v));
+            r.push(`${encodeURIComponent(key)}=${encodeURIComponent(v)}`);
         });
         return r.join('&');
     }
     parse(code = '') {
-        //if available use https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
+        // if available use https://developer.mozilla.org/en-US/docs/Web/API/URLSearchParams
         const oldLength = this.map.size;
         this.map.clear();
-        if (code.length <= 1) { //just the starting character ? or #
+        if (code.length <= 1) {
+            // just the starting character ? or #
             if (oldLength !== 0) {
                 this.fire(PropertyHandler.EVENT_CHANGED);
             }
             return;
         }
-        //http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/21152762#21152762
-        code.substr(1).split('&').forEach((item) => {
-            const s = item.split('='), k = decodeURIComponent(s[0]), v = s[1] && decodeURIComponent(s[1]);
+        // http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/21152762#21152762
+        code
+            .substr(1)
+            .split('&')
+            .forEach((item) => {
+            const s = item.split('=');
+            const k = decodeURIComponent(s[0]);
+            const v = s[1] && decodeURIComponent(s[1]);
             if (this.map.has(k)) {
                 const old = this.map.get(k);
                 if (!Array.isArray(old)) {

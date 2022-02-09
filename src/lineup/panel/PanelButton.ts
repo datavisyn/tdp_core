@@ -1,4 +1,4 @@
-import {IPanelTabDesc} from './IPanelTabDesc';
+import { IPanelTabDesc } from './IPanelTabDesc';
 /**
  * Interface for the LineUp panel button
  */
@@ -27,7 +27,9 @@ export interface IPanelButtonOptions {
  */
 export class PanelButton implements IPanelButton {
   readonly node: HTMLElement;
+
   private readonly options: IPanelButtonOptions;
+
   /**
    * Constructor of the PanelButton
    * @param parent The parent HTML DOM element
@@ -55,6 +57,7 @@ export class PanelButton implements IPanelButton {
  */
 export class PanelNavButton implements IPanelButton {
   readonly node: HTMLElement;
+
   readonly order: number;
 
   /**
@@ -67,7 +70,9 @@ export class PanelNavButton implements IPanelButton {
     this.node = parent.ownerDocument.createElement('li');
     this.node.className = `nav-item ${options.cssClass || ''}`;
     this.order = options.order;
-    this.node.innerHTML = `<a class="nav-link" role="tab" title="${options.title}" data-bs-toggle="tab"><i class="${options.faIcon}"> </i>&nbsp;<span>${options.title || ''}</span></a>`;
+    this.node.innerHTML = `<a class="nav-link" role="tab" title="${options.title}" data-bs-toggle="tab"><i class="${options.faIcon}"> </i>&nbsp;<span>${
+      options.title || ''
+    }</span></a>`;
     this.node.querySelector('a').addEventListener('click', (evt) => {
       evt.preventDefault();
       onClick();

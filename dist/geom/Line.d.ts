@@ -21,3 +21,4 @@ export declare class Line extends AShape {
     asIntersectionParams(): IIntersectionParam;
     static line(x1: number, y1: number, x2: number, y2: number): Line;
 }
+//# sourceMappingURL=Line.d.ts.map

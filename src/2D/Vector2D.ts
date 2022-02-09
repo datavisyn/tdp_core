@@ -1,7 +1,5 @@
 export class Vector2D {
-  constructor(public x = 0, public y = 0) {
-
-  }
+  constructor(public x = 0, public y = 0) {}
 
   add(that: Vector2D) {
     return new Vector2D(this.x + that.x, this.y + that.y);
@@ -64,23 +62,23 @@ export class Vector2D {
   }
 
   eq(that: Vector2D) {
-    return (this.x === that.x && this.y === that.y);
+    return this.x === that.x && this.y === that.y;
   }
 
   lt(that: Vector2D) {
-    return (this.x < that.x && this.y < that.y);
+    return this.x < that.x && this.y < that.y;
   }
 
   lte(that: Vector2D) {
-    return (this.x <= that.x && this.y <= that.y);
+    return this.x <= that.x && this.y <= that.y;
   }
 
   gt(that: Vector2D) {
-    return (this.x > that.x && this.y > that.y);
+    return this.x > that.x && this.y > that.y;
   }
 
   gte(that: Vector2D) {
-    return (this.x >= that.x && this.y >= that.y);
+    return this.x >= that.x && this.y >= that.y;
   }
 
   lerp(that: Vector2D, t: number) {
@@ -102,7 +100,7 @@ export class Vector2D {
   }
 
   toString() {
-    return this.x + ',' + this.y;
+    return `${this.x},${this.y}`;
   }
 
   setXY(x: number, y: number) {
@@ -116,8 +114,8 @@ export class Vector2D {
   }
 
   swap(that: Vector2D) {
-    const x = this.x;
-    const y = this.y;
+    const { x } = this;
+    const { y } = this;
     this.x = that.x;
     this.y = that.y;
     that.x = x;
@@ -149,24 +147,20 @@ export class Vector2D {
     return new Vector2D(-this.y, this.x);
   }
 
-  static fromPoints(p1: {x: number, y: number}, p2: {x: number, y: number}): Vector2D {
+  static fromPoints(p1: { x: number; y: number }, p2: { x: number; y: number }): Vector2D {
     return new Vector2D(p2.x - p1.x, p2.y - p1.y);
   }
 
   static vec(x: number, y: number): Vector2D;
-  static vec(vec: {x: number; y: number}): Vector2D;
+  static vec(vec: { x: number; y: number }): Vector2D;
   static vec(x: any, y: number = Number.NaN): Vector2D {
     if (typeof x === 'number') {
       return new Vector2D(<number>x, y);
-    } else {
-      return new Vector2D(x.x, x.y);
     }
+    return new Vector2D(x.x, x.y);
   }
+
   static vec2(x: number, y: number): Vector2D {
     return new Vector2D(x, y);
   }
-
-
 }
-
-

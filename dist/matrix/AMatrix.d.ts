@@ -70,3 +70,4 @@ export declare class MatrixView<T, D extends IValueTypeDesc> extends AMatrix<T, 
     get producttype(): import("../idtype").ProductIDType;
     get idtypes(): IDType[];
 }
+//# sourceMappingURL=AMatrix.d.ts.map

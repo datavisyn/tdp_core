@@ -1,8 +1,7 @@
-import {ABaseSelectionAdapter} from './ABaseSelectionAdapter';
-import {IContext, ISelectionAdapter} from '../ISelectionAdapter';
-import {IAdditionalColumnDesc} from '../../../base/interfaces';
-import {IScoreRow} from '../../../base/interfaces';
-import {ResolveNow} from '../../../base';
+import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
+import { IContext, ISelectionAdapter } from '../ISelectionAdapter';
+import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
+import { ResolveNow } from '../../../base';
 
 export interface ISingleSelectionAdapter {
   /**
@@ -30,7 +29,9 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISe
   protected parameterChangedImpl(context: IContext) {
     // remove all and start again
     const selectedIds = context.selection.range.dim(0).asList();
-    const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId !== -1 && (<IAdditionalColumnDesc>d.desc).selectedId !== undefined);
+    const usedCols = context.columns.filter(
+      (d) => (<IAdditionalColumnDesc>d.desc).selectedId !== -1 && (<IAdditionalColumnDesc>d.desc).selectedId !== undefined,
+    );
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
     // remove deselected columns
@@ -45,10 +46,12 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter implements ISe
   }
 
   protected createColumnsFor(context: IContext, _id: number, id: string) {
-    return ResolveNow.resolveImmediately(this.adapter.createDesc(_id, id)).then((desc) => [{
-      desc: ABaseSelectionAdapter.patchDesc(desc, _id),
-      data: this.adapter.loadData(_id, id),
-      id: _id
-    }]);
+    return ResolveNow.resolveImmediately(this.adapter.createDesc(_id, id)).then((desc) => [
+      {
+        desc: ABaseSelectionAdapter.patchDesc(desc, _id),
+        data: this.adapter.loadData(_id, id),
+        id: _id,
+      },
+    ]);
   }
 }

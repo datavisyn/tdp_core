@@ -1,26 +1,25 @@
-import {BaseUtils} from '../base/BaseUtils';
-import {IPersistable} from '../base/IPersistable';
-import {Range, ParseRangeUtils, RangeLike} from '../range';
-import {LocalIDAssigner, IDTypeManager} from '../idtype';
-import {IValueType, ValueTypeUtils, IValueTypeDesc, IDataType, DataCache} from '../data';
-import {ITable, ITableColumn, ITableDataDescription} from './ITable';
-import {TableUtils} from './TableUtils';
-import {ATable} from './ATable';
-import {TableVector} from './internal/TableVector';
-import {ITableLoader, ITableLoader2, TableLoaderUtils} from './loader';
-import {IVector} from '../vector';
-import {IAnyVector} from '../vector/IVector';
+import { BaseUtils } from '../base/BaseUtils';
+import { IPersistable } from '../base/IPersistable';
+import { Range, ParseRangeUtils, RangeLike } from '../range';
+import { LocalIDAssigner, IDTypeManager } from '../idtype';
+import { IValueType, ValueTypeUtils, IValueTypeDesc, IDataType, DataCache } from '../data';
+import { ITable, ITableColumn, ITableDataDescription } from './ITable';
+import { TableUtils } from './TableUtils';
+import { ATable } from './ATable';
+import { TableVector } from './internal/TableVector';
+import { ITableLoader, ITableLoader2, TableLoaderUtils } from './loader';
+import { IVector } from '../vector';
+import { IAnyVector } from '../vector/IVector';
 
-
-  /**
-   * Interface for the parsing options for a table
-   */
-  export interface IAsTableOptions {
-    name?: string;
-    idtype?: string;
-    rowassigner?(ids: string[]): Range;
-    keyProperty?: string;
-  }
+/**
+ * Interface for the parsing options for a table
+ */
+export interface IAsTableOptions {
+  name?: string;
+  idtype?: string;
+  rowassigner?(ids: string[]): Range;
+  keyProperty?: string;
+}
 /**
  * root matrix implementation holding the data
  * @internal
@@ -31,7 +30,7 @@ export class Table extends ATable implements ITable {
   constructor(public readonly desc: ITableDataDescription, private loader: ITableLoader2) {
     super(null);
     // set default column
-    desc.columns.forEach((col) => col.column = col.column || col.name);
+    desc.columns.forEach((col) => (col.column = col.column || col.name));
     this.root = this;
     this.vectors = desc.columns.map((cdesc, i) => new TableVector(this, i, cdesc));
   }
@@ -115,25 +114,32 @@ export class Table extends ATable implements ITable {
     }
     return new Table(desc, TableLoaderUtils.viaAPI2Loader());
   }
-  static wrapObjects(desc: ITableDataDescription, data: any[], nameProperty: string|((obj: any) => string)) {
+
+  static wrapObjects(desc: ITableDataDescription, data: any[], nameProperty: string | ((obj: any) => string)) {
     return new Table(desc, TableLoaderUtils.adapterOne2Two(TableLoaderUtils.viaDataLoader(data, nameProperty)));
   }
+
   private static toObjects(data: any[][], cols: string[]) {
     return data.map((row) => {
       const r: any = {};
-      cols.forEach((col, i) => r[col] = row[i]);
+      cols.forEach((col, i) => (r[col] = row[i]));
       return r;
     });
   }
+
   private static toList(objs: any[], cols: string[]) {
     return objs.map((obj) => cols.map((c) => obj[c]));
   }
 
   private static asTableImpl(columns: ITableColumn<any>[], rows: string[], objs: any[], data: IValueType[][], options: IAsTableOptions = {}) {
-    const desc = BaseUtils.mixin(TableUtils.createDefaultTableDesc(), {
-      columns,
-      size: [rows.length, columns.length]
-    }, options);
+    const desc = BaseUtils.mixin(
+      TableUtils.createDefaultTableDesc(),
+      {
+        columns,
+        size: [rows.length, columns.length],
+      },
+      options,
+    );
 
     const rowAssigner = options.rowassigner || LocalIDAssigner.create();
     const loader: ITableLoader = () => {
@@ -141,7 +147,7 @@ export class Table extends ATable implements ITable {
         rowIds: rowAssigner(rows),
         rows,
         objs,
-        data
+        data,
       };
       return Promise.resolve(r);
     };
@@ -157,11 +163,15 @@ export class Table extends ATable implements ITable {
       return {
         name: col,
         column: col,
-        value: ValueTypeUtils.guessValueTypeDesc(tableData.map((row) => row[i]))
+        value: ValueTypeUtils.guessValueTypeDesc(tableData.map((row) => row[i])),
       };
     });
 
-    const realData = tableData.map((row) => columns.map((col, i) => (col.value.type === ValueTypeUtils.VALUE_TYPE_REAL || col.value.type === ValueTypeUtils.VALUE_TYPE_INT) ? parseFloat(row[i]) : row[i]));
+    const realData = tableData.map((row) =>
+      columns.map((col, i) =>
+        col.value.type === ValueTypeUtils.VALUE_TYPE_REAL || col.value.type === ValueTypeUtils.VALUE_TYPE_INT ? parseFloat(row[i]) : row[i],
+      ),
+    );
     const objs = Table.toObjects(realData, cols);
 
     return Table.asTableImpl(columns, rows, objs, realData, options);
@@ -186,7 +196,7 @@ export class Table extends ATable implements ITable {
       return {
         name: col,
         column: col,
-        value: ValueTypeUtils.guessValueTypeDesc(realData.map((row) => row[i]))
+        value: ValueTypeUtils.guessValueTypeDesc(realData.map((row) => row[i])),
       };
     });
     return Table.asTableImpl(columns, rows, objs, realData, options);
@@ -198,48 +208,53 @@ export class Table extends ATable implements ITable {
    * @returns {any}
    */
   static convertToTable(list: IDataType[]) {
-    return Table.wrapObjects({
-      id: '_data' + BaseUtils.randomId(5),
-      name: 'data',
-      description: 'list of data types',
-      fqname: 'custom/data',
-      creator: 'Anonymous',
-      ts: Date.now(),
-      type: 'table',
-      idtype: '_data',
-      size: [list.length, 4],
-      columns: [
-        {
-          name: 'Name',
-          value: {
-            type: 'string'
+    return Table.wrapObjects(
+      {
+        id: `_data${BaseUtils.randomId(5)}`,
+        name: 'data',
+        description: 'list of data types',
+        fqname: 'custom/data',
+        creator: 'Anonymous',
+        ts: Date.now(),
+        type: 'table',
+        idtype: '_data',
+        size: [list.length, 4],
+        columns: [
+          {
+            name: 'Name',
+            value: {
+              type: 'string',
+            },
+            getter: (d) => d.desc.name,
           },
-          getter: (d) => d.desc.name
-        },
-        {
-          name: 'Type',
-          value: {
-            type: 'string'
+          {
+            name: 'Type',
+            value: {
+              type: 'string',
+            },
+            getter: (d) => d.desc.type,
           },
-          getter: (d) => d.desc.type
-        },
-        {
-          name: 'Dimensions',
-          value: {
-            type: 'string'
+          {
+            name: 'Dimensions',
+            value: {
+              type: 'string',
+            },
+            getter: (d) => d.dim.join(' x '),
           },
-          getter: (d) => d.dim.join(' x ')
-        },
-        {
-          name: 'ID Types',
-          value: {
-            type: 'string'
+          {
+            name: 'ID Types',
+            value: {
+              type: 'string',
+            },
+            getter: (d) => d.idtypes.join(' x '),
           },
-          getter: (d) => d.idtypes.join(' x ')
-        },
-      ]
-    }, list, (d: IDataType) => d.desc.name);
+        ],
+      },
+      list,
+      (d: IDataType) => d.desc.name,
+    );
   }
+
   /**
    * utility function converting all contained tables in their vectors of individual columns
    * @param list

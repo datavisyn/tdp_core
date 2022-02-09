@@ -28,3 +28,4 @@ export declare class PersistentSessionList extends ASessionList {
     protected build(manager: CLUEGraphManager): Promise<() => Promise<void>>;
 }
 export {};
+//# sourceMappingURL=SessionList.d.ts.map

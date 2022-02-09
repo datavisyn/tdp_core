@@ -11,13 +11,13 @@ export class ObjectRefUtils {
      * @param hash
      * @returns {{v: T, name: string, category: string}}
      */
-    static objectRef(v, name, category = ObjectRefUtils.category.data, hash = name + '_' + category) {
+    static objectRef(v, name, category = ObjectRefUtils.category.data, hash = `${name}_${category}`) {
         return {
             v: ResolveNow.resolveImmediately(v),
             value: v,
             name,
             category,
-            hash
+            hash,
         };
     }
 }
@@ -31,7 +31,7 @@ ObjectRefUtils.category = {
     layout: 'layout',
     logic: 'logic',
     custom: 'custom',
-    annotation: 'annotation'
+    annotation: 'annotation',
 };
 /**
  * list of operations
@@ -39,7 +39,7 @@ ObjectRefUtils.category = {
 ObjectRefUtils.operation = {
     create: 'create',
     update: 'update',
-    remove: 'remove'
+    remove: 'remove',
 };
 /**
  * tries to persist an object value supporting datatypes and DOM elements having an id
@@ -51,7 +51,8 @@ function persistData(v) {
         return null;
     }
     if (v instanceof Element) {
-        const e = v, id = e.getAttribute('id');
+        const e = v;
+        const id = e.getAttribute('id');
         return { type: 'element', id };
     }
     if (ADataType.isADataType(v)) {
@@ -77,18 +78,20 @@ function restoreData(v) {
             return DataCache.getInstance().get(v.persist);
         case 'primitive':
             return ResolveNow.resolveImmediately(v.v);
+        default:
+            return null;
     }
-    return null;
 }
 /**
  * a graph node of type object
  */
 export class ObjectNode extends GraphNode {
-    constructor(_v, name, category = ObjectRefUtils.category.data, hash = name + '_' + category, description = '') {
+    constructor(_v, name, category = ObjectRefUtils.category.data, hash = `${name}_${category}`, description = '') {
         super('object');
         this._v = _v;
         this._persisted = null;
-        if (_v != null) { //if the value is given, auto generate a promise for it
+        if (_v != null) {
+            // if the value is given, auto generate a promise for it
             this._promise = ResolveNow.resolveImmediately(_v);
         }
         super.setAttr('name', name);
@@ -150,7 +153,7 @@ export class ObjectNode extends GraphNode {
         return this;
     }
     static restore(p) {
-        const r = new ObjectNode(null, p.attrs.name, p.attrs.category, p.attrs.hash || p.attrs.name + '_' + p.attrs.category);
+        const r = new ObjectNode(null, p.attrs.name, p.attrs.category, p.attrs.hash || `${p.attrs.name}_${p.attrs.category}`);
         return r.restore(p);
     }
     toString() {

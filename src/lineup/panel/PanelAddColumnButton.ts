@@ -1,11 +1,9 @@
-import {SearchBox} from 'lineupjs';
-import {ISearchOption} from './ISearchOption';
-import {IPanelButton, PanelButton, IPanelButtonOptions} from './PanelButton';
-import {I18nextManager} from '../../i18n';
+import { SearchBox } from 'lineupjs';
+import { ISearchOption } from './ISearchOption';
+import { IPanelButton, PanelButton, IPanelButtonOptions } from './PanelButton';
+import { I18nextManager } from '../../i18n';
 
-export interface IPanelAddColumnButtonOptions extends Pick<IPanelButtonOptions, 'btnClass'> {
-  // nothing to add
-}
+export type IPanelAddColumnButtonOptions = Pick<IPanelButtonOptions, 'btnClass'>;
 
 /**
  * Div HTMLElement that contains a button and a SearchBox.
@@ -13,6 +11,7 @@ export interface IPanelAddColumnButtonOptions extends Pick<IPanelButtonOptions, 
  */
 export class PanelAddColumnButton implements IPanelButton {
   readonly node: HTMLElement;
+
   /**
    *
    * @param parent The parent HTML DOM element
@@ -26,15 +25,18 @@ export class PanelAddColumnButton implements IPanelButton {
       this.node.classList.remove('once');
     });
 
-    const button = new PanelButton(this.node, Object.assign(options, {
-      title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
-      faIcon: 'fas fa-plus',
-      onClick: () => {
-        this.node.classList.add('once');
-        (<HTMLElement>this.search.node.querySelector('input'))!.focus();
-        this.search.focus();
-      }
-    }));
+    const button = new PanelButton(
+      this.node,
+      Object.assign(options, {
+        title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
+        faIcon: 'fas fa-plus',
+        onClick: () => {
+          this.node.classList.add('once');
+          (<HTMLElement>this.search.node.querySelector('input'))!.focus();
+          this.search.focus();
+        },
+      }),
+    );
 
     this.node.appendChild(button.node);
     this.node.appendChild(this.search.node);

@@ -121,3 +121,4 @@ export interface ICompositeRange1D extends Range1D {
     groups: IRange1DGroup[];
     fromLikeComposite(groups: IRange1DGroup[]): Range1D;
 }
+//# sourceMappingURL=Range1D.d.ts.map

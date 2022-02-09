@@ -1,17 +1,17 @@
-import {IColumnDesc, LocalDataProvider} from 'lineupjs';
-import {ProvenanceGraph, ObjectRefUtils} from '../provenance';
-import {ParseRangeUtils, Range} from '../range';
-import {ARankingView} from '../lineup/ARankingView';
-import {IARankingViewOptions} from '../lineup/IARankingViewOptions';
-import {IInitialRankingOptions} from '../lineup/desc';
-import {IViewProviderLocal} from '../lineup/internal/cmds';
-import {EXTENSION_POINT_TDP_SCORE_IMPL} from '../base/extensions';
-import {IScore} from '../base/interfaces';
-import {IServerColumnDesc, IRow} from '../base/rest';
-import {IFormElementDesc} from '../form/interfaces';
-import {ILazyLoadedColumn} from '../lineup/internal/column';
-import {PluginRegistry} from '../app';
-import {IDTypeManager} from '../idtype';
+import { IColumnDesc, LocalDataProvider } from 'lineupjs';
+import { ProvenanceGraph, ObjectRefUtils } from '../provenance';
+import { ParseRangeUtils, Range } from '../range';
+import { ARankingView } from '../lineup/ARankingView';
+import { IARankingViewOptions } from '../lineup/IARankingViewOptions';
+import { IInitialRankingOptions } from '../lineup/desc';
+import { IViewProviderLocal } from '../lineup/internal/cmds';
+import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
+import { IScore } from '../base/interfaces';
+import { IServerColumnDesc, IRow } from '../base/rest';
+import { IFormElementDesc } from '../form/interfaces';
+import { ILazyLoadedColumn } from '../lineup/internal/column';
+import { PluginRegistry } from '../app';
+import { IDTypeManager } from '../idtype';
 
 export interface IEmbeddedRanking extends ARankingView {
   rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): Promise<any>;
@@ -26,9 +26,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
    */
   data: LocalDataProvider;
 
-  constructor(public readonly node: HTMLElement) {
-
-  }
+  constructor(public readonly node: HTMLElement) {}
 
   getInstance() {
     return this.ranking;
@@ -41,32 +39,35 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
       graph,
       ref,
       desc: <any>{
-        idtype: idtype.id
-      }
+        idtype: idtype.id,
+      },
     };
     const selection = {
       idtype,
-      range: Range.none()
+      range: Range.none(),
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
 
     class EmbeddedRankingView extends ARankingView implements IEmbeddedRanking {
       private triggerScoreReload = false;
 
       protected loadColumnDesc(): Promise<IServerColumnDesc> {
-        return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({columns, idType: this.idType.name}));
+        return Promise.resolve(that.loadColumnDescs()).then((columns: any[]) => ({ columns, idType: this.idType.name }));
       }
 
       protected getColumnDescs(columns: any[]) {
         // columns already in the right format
-        return columns.map((c) => Object.assign(c, {
-          initialRanking: true,
-          width: -1,
-          selectedId: -1,
-          selectedSubtype: undefined,
-          ...c
-        }));
+        return columns.map((c) =>
+          Object.assign(c, {
+            initialRanking: true,
+            width: -1,
+            selectedId: -1,
+            selectedSubtype: undefined,
+            ...c,
+          }),
+        );
       }
 
       protected loadRows() {
@@ -87,6 +88,8 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
           case 'data+desc+scores':
             this.triggerScoreReload = true;
             return this.rebuild();
+          default:
+            return undefined;
         }
       }
 
@@ -99,23 +102,20 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
         }
       }
 
-      protected createInitialRanking(lineup: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
+      protected createInitialRanking(lineup: LocalDataProvider, opts: Partial<IInitialRankingOptions> = {}) {
         that.createInitialRanking(lineup);
         if (lineup.getRankings().length === 0) {
-          super.createInitialRanking(lineup, options);
+          super.createInitialRanking(lineup, opts);
         }
       }
 
-      runWithoutTracking<T>(f: () => T): Promise<T> {
+      runWithoutTracking<D>(f: () => D): Promise<D> {
         return super.withoutTracking(f);
       }
 
       protected getParameterFormDescs(): IFormElementDesc[] {
         const base = super.getParameterFormDescs();
-        return [
-          ...base,
-          ...that.getParameterFormDescs()
-        ];
+        return [...base, ...that.getParameterFormDescs()];
       }
     }
 
@@ -126,8 +126,8 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     // with `graph.findOrAddObject` above the reference of `this` (AEmbeddedRanking) is set to `this.context.ref.value` in ARankingView
     // therefore is this.data of AEmbeddedRanking === `this.context.ref.value` in ARankingView's constructor
     const lineup = this.data;
-    lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', (selection: number[]) => {
-      const rows = selection.map((d) => lineup.data[d]);
+    lineup.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.embedded`, (sel: number[]) => {
+      const rows = sel.map((d) => lineup.data[d]);
       this.selectedRowsChanged(rows);
     });
 
@@ -154,14 +154,14 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
 
   protected setSelectedRows(rows: T[]) {
     const lineup = this.data;
-    lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', null);
+    lineup.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.embedded`, null);
     this.ranking.setItemSelection({
       idtype: this.ranking.itemIDType,
-      range: ParseRangeUtils.parseRangeLike(rows.map((d) => d._id))
+      range: ParseRangeUtils.parseRangeLike(rows.map((d) => d._id)),
     });
-    lineup.on(LocalDataProvider.EVENT_SELECTION_CHANGED + '.embedded', (selection: number[]) => {
-      const rows = selection.map((d) => lineup.data[d]);
-      this.selectedRowsChanged(rows);
+    lineup.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.embedded`, (selection: number[]) => {
+      const rs = selection.map((d) => lineup.data[d]);
+      this.selectedRowsChanged(rs);
     });
   }
 
@@ -169,15 +169,16 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
     if (this.ranking) {
       return this.ranking.rebuildLineUp(mode);
     }
+    return undefined;
   }
 
-  protected runWithoutTracking<T>(f: (lineup: LocalDataProvider) => T): Promise<T> {
+  protected runWithoutTracking<D>(f: (lineup: LocalDataProvider) => D): Promise<D> {
     return this.ranking.runWithoutTracking(() => f(this.data));
   }
 
   protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn[]>;
   protected addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn>;
-  protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn|ILazyLoadedColumn[]> {
+  protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn | ILazyLoadedColumn[]> {
     if (typeof score !== 'string') {
       return this.ranking.addTrackedScoreColumn(score, scoreParams); // aka scoreParams = position
     }

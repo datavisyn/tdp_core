@@ -1,13 +1,13 @@
 export class EmbeddedCLUE {
-  private iframe:HTMLIFrameElement;
+  private iframe: HTMLIFrameElement;
 
   private l = this.onMessage.bind(this);
 
-  private callbacks:{ [key: string]: any } = {};
+  private callbacks: { [key: string]: any } = {};
 
   ready = false;
 
-  constructor(parent:HTMLElement, url:string, private readyCallback: (c: EmbeddedCLUE) => void) {
+  constructor(parent: HTMLElement, url: string, private readyCallback: (c: EmbeddedCLUE) => void) {
     this.iframe = document.createElement('iframe');
     this.iframe.src = url;
 
@@ -15,14 +15,14 @@ export class EmbeddedCLUE {
     parent.appendChild(this.iframe);
   }
 
-  private onMessage(event:MessageEvent) {
+  private onMessage(event: MessageEvent) {
     if (event.data.type !== 'caleydo' || !event.data.clue) {
       return;
     }
     this.onCLUEMessage(event.data.clue, event.data);
   }
 
-  send(type:string, msg:any) {
+  send(type: string, msg: any) {
     msg.type = 'caleydo';
     msg.clue = type;
     msg.ref = this.clue_random_id();
@@ -30,18 +30,18 @@ export class EmbeddedCLUE {
       this.callbacks[msg.ref] = {
         resolve,
         reject,
-        type
+        type,
       };
       this.iframe.contentWindow.postMessage(msg, '*');
     });
   }
 
-  showSlide(slide:number) {
-    return this.send('show_slide', {slide});
+  showSlide(slide: number) {
+    return this.send('show_slide', { slide });
   }
 
-  jumpToState(state:number) {
-    return this.send('jump_to', {state});
+  jumpToState(state: number) {
+    return this.send('jump_to', { state });
   }
 
   nextSlide() {
@@ -52,9 +52,9 @@ export class EmbeddedCLUE {
     return this.send('previous_slide', {});
   }
 
-  private onCLUEMessage(type:string, data:any) {
+  private onCLUEMessage(type: string, data: any) {
     if (type === 'jumped_to_initial') {
-      //ready
+      // ready
       this.ready = true;
       this.readyCallback(this);
       return;
@@ -76,10 +76,10 @@ export class EmbeddedCLUE {
     return id.substr(0, length);
   }
 
-  static embedCLUE(parent:HTMLElement, server:string, app:string, provenanceGraph:string) {
+  static embedCLUE(parent: HTMLElement, server: string, app: string, provenanceGraph: string) {
     const url = `${server}/${app}/#clue_graph=${provenanceGraph}&clue_contained=T&clue=P`;
     return new Promise((resolve) => {
-      return new EmbeddedCLUE(parent, url, resolve);
+      const clue = new EmbeddedCLUE(parent, url, resolve);
     });
   }
 }

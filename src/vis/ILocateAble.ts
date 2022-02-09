@@ -1,5 +1,5 @@
-import {IDataType} from '../data/datatype';
-import {Range} from '../range/Range';
+import { IDataType } from '../data/datatype';
+import { Range } from '../range/Range';
 /**
  *
  */

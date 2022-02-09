@@ -1,7 +1,7 @@
-import {IFormElementDesc, IForm, FormElementType} from '../interfaces';
 import * as d3 from 'd3';
-import {AFormElement} from './AFormElement';
-import {IPluginDesc} from '../../base';
+import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
+import { AFormElement } from './AFormElement';
+import { IPluginDesc } from '../../base';
 
 export interface ICheckBoxElementDesc extends IFormElementDesc {
   type: FormElementType.CHECKBOX;
@@ -29,7 +29,7 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    * @param pluginDesc The phovea extension point description
    */
   constructor(form: IForm, elementDesc: ICheckBoxElementDesc, readonly pluginDesc: IPluginDesc) {
-    super(form, Object.assign({options: {checked: true, unchecked: false}}, elementDesc), pluginDesc);
+    super(form, { options: { checked: true, unchecked: false }, ...elementDesc }, pluginDesc);
   }
 
   /**
@@ -56,11 +56,12 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
   init() {
     super.init();
 
-    const options = this.elementDesc.options;
+    const { options } = this.elementDesc;
     const isChecked: boolean = options.isChecked != null ? options.isChecked : this.getStoredValue(options.unchecked) === options.checked;
     this.previousValue = isChecked;
     this.$inputNode.property('checked', isChecked);
-    if (this.hasStoredValue()) { // trigger if we have a stored value
+    if (this.hasStoredValue()) {
+      // trigger if we have a stored value
       // TODO: using the new value `isChecked` may be wrong, because it's of type boolean and options.checked and options.unchecked could be anything --> this.getStoredValue(...) should probably be used instead
       this.fire(FormCheckBox.EVENT_INITIAL_VALUE, isChecked, options.unchecked); // store initial values as actions with results in the provenance graph
     }
@@ -78,7 +79,7 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    * @returns {string}
    */
   get value() {
-    const options = this.elementDesc.options;
+    const { options } = this.elementDesc;
     return this.$inputNode.property('checked') ? options.checked : options.unchecked;
   }
 
@@ -87,7 +88,7 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    * @param v
    */
   set value(v: any) {
-    const options = this.elementDesc.options;
+    const { options } = this.elementDesc;
     this.$inputNode.property('value', v === options.checked);
     this.previousValue = v === options.checked; // force old value change
     this.updateStoredValue();

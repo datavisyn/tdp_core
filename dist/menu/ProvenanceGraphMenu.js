@@ -19,13 +19,10 @@ export class ProvenanceGraphMenu {
         this.graph = graph;
     }
     init(parent) {
-        const manager = this.manager;
-        //add provenance graph management menu entry
+        const { manager } = this;
+        // add provenance graph management menu entry
         const ul = parent.ownerDocument.createElement('ul');
-        const $ul = select(ul)
-            .attr('class', 'navbar-nav')
-            .attr('data-clue', 'provenanceGraphList')
-            .html(`<li class="nav-item dropdown">
+        const $ul = select(ul).attr('class', 'navbar-nav').attr('data-clue', 'provenanceGraphList').html(`<li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="provenanceGraphDropdown" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
           <i class="fas fa-code-branch fa-lg fa-rotate-180 fa-fw"></i>
         </a>
@@ -49,12 +46,12 @@ export class ProvenanceGraphMenu {
           </a>
         </div>
       </li>`);
-        //new button
+        // new button
         $ul.select('#provenancegraph_new_remote').on('click', () => {
             d3event.preventDefault();
             manager.newRemoteGraph();
         });
-        //new local
+        // new local
         $ul.select('#provenancegraph_new').on('click', () => {
             d3event.preventDefault();
             manager.newGraph();
@@ -63,15 +60,13 @@ export class ProvenanceGraphMenu {
             const e = d3event;
             e.preventDefault();
             e.stopPropagation();
-            console.log(this.graph);
             const r = this.graph.persist();
-            console.log(r);
             const str = JSON.stringify(r, null, '\t');
-            //create blob and save it
+            // create blob and save it
             const blob = new Blob([str], { type: 'application/json;charset=utf-8' });
             const a = new FileReader();
-            a.onload = (e) => {
-                const url = e.target.result;
+            a.onload = (b) => {
+                const url = b.target.result;
                 const helper = parent.ownerDocument.createElement('a');
                 helper.setAttribute('href', url);
                 helper.setAttribute('target', '_blank');
@@ -87,14 +82,16 @@ export class ProvenanceGraphMenu {
             e.preventDefault();
             e.stopPropagation();
             const remote = this.id === 'provenancegraph_import_remote';
-            //import dialog
+            // import dialog
             const d = Dialog.generateDialog(I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.selectFile'), I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.upload'));
             d.body.innerHTML = `<input type="file" placeholder=${I18nextManager.getInstance().i18n.t('phovea:clue.provenanceMenu.selectFileToUpload')}>`;
-            select(d.body).select('input').on('change', function () {
+            select(d.body)
+                .select('input')
+                .on('change', function () {
                 const file = d3event.target.files[0];
                 const reader = new FileReader();
-                reader.onload = function (e) {
-                    const dataS = e.target.result;
+                reader.onload = function (a) {
+                    const dataS = a.target.result;
                     const dump = JSON.parse(dataS);
                     manager.importGraph(dump, remote);
                 };
@@ -106,17 +103,21 @@ export class ProvenanceGraphMenu {
         return $ul;
     }
     build(graphs) {
-        const manager = this.manager;
+        const { manager } = this;
         const $list = this.$node.select('#provenancegraph_list').selectAll('li.graph').data(graphs);
-        $list.enter().insert('li', ':first-child')
+        $list
+            .enter()
+            .insert('li', ':first-child')
             .classed('graph', true)
             .html((d) => `<a href="#clue_graph=${d.id}"><i class="fas fa-code-branch fa-rotate-180" aria-hidden="true"></i> ${d.name} </a>`)
-            .select('a').on('click', (d) => {
+            .select('a')
+            .on('click', (d) => {
             d3event.preventDefault();
             manager.loadGraph(d);
         });
         const format = time.format.utc('%Y-%m-%dT%H:%M');
-        $('#provenancegraph_list li.graph a').popover({
+        $('#provenancegraph_list li.graph a')
+            .popover({
             html: true,
             placement: 'left',
             trigger: 'manual',
@@ -126,12 +127,12 @@ export class ProvenanceGraphMenu {
             },
             content() {
                 const graph = select(this).datum();
-                const creator = graph.creator;
+                const { creator } = graph;
                 const description = graph.description || '';
                 const ts = graph.ts ? format(new Date(graph.ts)) : 'Unknown';
                 const nnodes = graph.size[0];
                 const nedges = graph.size[1];
-                //const locked = false;
+                // const locked = false;
                 const $elem = $(`
             <div class="container-fluid">
             <div class="row">
@@ -171,14 +172,16 @@ export class ProvenanceGraphMenu {
                     return false;
                 });
                 return $elem;
-            }
-        }).parent().on({
+            },
+        })
+            .parent()
+            .on({
             mouseenter() {
                 $(this).find('a').popover('show');
             },
             mouseleave() {
                 $(this).find('a').popover('hide');
-            }
+            },
         });
     }
 }

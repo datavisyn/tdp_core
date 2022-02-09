@@ -1,9 +1,7 @@
 /**
  * Base type for authorization flows.
  */
-export type IAuthorizationFlow<T extends IBaseAuthorizationConfiguration = IAuthorizationConfiguration> = (
-  type: T
-) => Promise<string>;
+export type IAuthorizationFlow<T extends IBaseAuthorizationConfiguration = IAuthorizationConfiguration> = (type: T) => Promise<string>;
 
 /**
  * Base interface for authorization configurations.
@@ -41,7 +39,6 @@ export interface ISimplePopupAuthorizationConfiguration extends IBaseAuthorizati
  * Possible authorization flows.
  */
 export type IAuthorizationConfiguration = ISimplePopupAuthorizationConfiguration;
-
 
 export enum ERenderAuthorizationStatus {
   NOT_TRIGGERED = 'not_triggered',

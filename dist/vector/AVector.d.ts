@@ -33,7 +33,7 @@ export declare abstract class AVector<T, D extends IValueTypeDesc> extends ASele
     reduce<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number) => U, initialValue: U, thisArg?: any): Promise<U>;
     reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number) => U, initialValue: U, thisArg?: any): Promise<U>;
     reduceAtom<U, UD extends IValueTypeDesc>(f: (data: T[], ids: Range, names: string[]) => IAtomValue<U>, thisArgument?: any, valuetype?: UD, idtype?: IDType): IAtom<U, UD>;
-    restore(persisted: any): IVector<T, D> | IAtom<unknown, any>;
+    restore(persisted: any): IAtom<unknown, any> | IVector<T, D>;
 }
 /**
  * view on the vector restricted by a range
@@ -63,3 +63,4 @@ export declare class VectorView<T, D extends IValueTypeDesc> extends AVector<T, 
     sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T, D>>;
     filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T, D>>;
 }
+//# sourceMappingURL=AVector.d.ts.map

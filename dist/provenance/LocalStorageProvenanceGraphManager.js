@@ -12,7 +12,7 @@ export class LocalStorageProvenanceGraphManager {
             storage: localStorage,
             prefix: 'clue',
             application: 'unknown',
-            defaultPermission: Permission.ALL_NONE_NONE
+            defaultPermission: Permission.ALL_NONE_NONE,
         };
         BaseUtils.mixin(this.options, options);
     }
@@ -31,10 +31,10 @@ export class LocalStorageProvenanceGraphManager {
     }
     listSync() {
         const lists = this.loadFromLocalStorage('_provenance_graphs', []);
-        return lists
-            .map((id) => this.loadFromLocalStorage('_provenance_graph.' + id, {}))
+        return (lists
+            .map((id) => this.loadFromLocalStorage(`_provenance_graph.${id}`, {}))
             // filter to right application
-            .filter((d) => d.attrs && d.attrs.of === this.options.application);
+            .filter((d) => d.attrs && d.attrs.of === this.options.application));
     }
     list() {
         return ResolveNow.resolveImmediately(this.listSync());
@@ -46,10 +46,10 @@ export class LocalStorageProvenanceGraphManager {
         return new ProvenanceGraph(desc, await this.getGraph(desc));
     }
     async clone(graph, desc = {}) {
-        const name = graph.desc.name;
+        const { name } = graph.desc;
         const prefix = 'Clone of ';
         const newName = name.includes(prefix) ? name : prefix + name;
-        const description = `Cloned from ${name} created by ${graph.desc.creator}\n${(graph.desc.description || '')}`;
+        const description = `Cloned from ${name} created by ${graph.desc.creator}\n${graph.desc.description || ''}`;
         const pdesc = this.createDesc(BaseUtils.mixin({ name: newName, description }, desc));
         const newGraph = await this.getGraph(pdesc);
         newGraph.restoreDump(graph.persist(), ProvenanceGraphUtils.provenanceGraphFactory());
@@ -62,43 +62,43 @@ export class LocalStorageProvenanceGraphManager {
         return new ProvenanceGraph(pdesc, newGraph);
     }
     delete(desc) {
-        const lists = JSON.parse(this.options.storage.getItem(this.options.prefix + '_provenance_graphs') || '[]');
+        const lists = JSON.parse(this.options.storage.getItem(`${this.options.prefix}_provenance_graphs`) || '[]');
         lists.splice(lists.indexOf(desc.id), 1);
         LocalStorageGraph.delete(desc, this.options.storage);
-        //just remove from the list
-        this.options.storage.removeItem(this.options.prefix + '_provenance_graph.' + desc.id);
-        this.options.storage.setItem(this.options.prefix + '_provenance_graphs', JSON.stringify(lists));
+        // just remove from the list
+        this.options.storage.removeItem(`${this.options.prefix}_provenance_graph.${desc.id}`);
+        this.options.storage.setItem(`${this.options.prefix}_provenance_graphs`, JSON.stringify(lists));
         return ResolveNow.resolveImmediately(true);
     }
     edit(graph, desc = {}) {
         const base = graph instanceof ProvenanceGraph ? graph.desc : graph;
         BaseUtils.mixin(base, desc);
-        this.options.storage.setItem(this.options.prefix + '_provenance_graph.' + base.id, JSON.stringify(base));
+        this.options.storage.setItem(`${this.options.prefix}_provenance_graph.${base.id}`, JSON.stringify(base));
         return ResolveNow.resolveImmediately(base);
     }
     createDesc(overrides = {}) {
-        const lists = JSON.parse(this.options.storage.getItem(this.options.prefix + '_provenance_graphs') || '[]');
-        const uid = (lists.length > 0 ? String(1 + Math.max(...lists.map((d) => parseInt(d.slice(this.options.prefix.length), 10)))) : '0');
+        const lists = JSON.parse(this.options.storage.getItem(`${this.options.prefix}_provenance_graphs`) || '[]');
+        const uid = lists.length > 0 ? String(1 + Math.max(...lists.map((d) => parseInt(d.slice(this.options.prefix.length), 10)))) : '0';
         const id = this.options.prefix + uid;
         const desc = BaseUtils.mixin({
             type: 'provenance_graph',
-            name: 'Temporary Session ' + uid,
-            fqname: this.options.prefix + 'Temporary Session ' + uid,
+            name: `Temporary Session ${uid}`,
+            fqname: `${this.options.prefix}Temporary Session ${uid}`,
             id,
             local: true,
             size: [0, 0],
             attrs: {
                 graphtype: 'provenance_graph',
-                of: this.options.application
+                of: this.options.application,
             },
             creator: UserSession.getInstance().currentUserNameOrAnonymous(),
             permissions: this.options.defaultPermission,
             ts: Date.now(),
-            description: ''
+            description: '',
         }, overrides);
         lists.push(id);
-        this.options.storage.setItem(this.options.prefix + '_provenance_graphs', JSON.stringify(lists));
-        this.options.storage.setItem(this.options.prefix + '_provenance_graph.' + id, JSON.stringify(desc));
+        this.options.storage.setItem(`${this.options.prefix}_provenance_graphs`, JSON.stringify(lists));
+        this.options.storage.setItem(`${this.options.prefix}_provenance_graph.${id}`, JSON.stringify(desc));
         return desc;
     }
     create(desc = {}) {
@@ -115,15 +115,15 @@ export class LocalStorageProvenanceGraphManager {
             size: [0, 0],
             attrs: {
                 graphtype: 'provenance_graph',
-                of: this.options.application
+                of: this.options.application,
             },
             creator: UserSession.getInstance().currentUserNameOrAnonymous(),
             permissions: this.options.defaultPermission,
             ts: Date.now(),
-            description: ''
-        }, base ? base : {}, {
+            description: '',
+        }, base || {}, {
             id: 'memory',
-            local: true
+            local: true,
         });
     }
     createInMemory() {

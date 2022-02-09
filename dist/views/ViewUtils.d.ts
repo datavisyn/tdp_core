@@ -34,3 +34,4 @@ export declare class ViewUtils {
     static isSameSelection(a: ISelection, b: ISelection): boolean;
     static createContext(graph: ProvenanceGraph, desc: IPluginDesc, ref: IObjectRef<any>): IViewContext;
 }
+//# sourceMappingURL=ViewUtils.d.ts.map

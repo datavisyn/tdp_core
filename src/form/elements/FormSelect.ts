@@ -1,9 +1,8 @@
 import * as d3 from 'd3';
-import {AFormElement} from './AFormElement';
-import {IFormElementDesc, IForm, IFormElement, FormElementType} from '../interfaces';
-import {UserSession} from '../../app';
-import {IPluginDesc, ResolveNow} from '../../base';
-
+import { AFormElement } from './AFormElement';
+import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
+import { UserSession } from '../../app';
+import { IPluginDesc, ResolveNow } from '../../base';
 
 export interface IFormSelectOption {
   name: string;
@@ -16,14 +15,16 @@ export interface IFormSelectOptionGroup {
   children: IFormSelectOption[];
 }
 
-export declare type ISelectOptions = ((string|IFormSelectOption)[]|Promise<(string|IFormSelectOption)[]>);
-export declare type IHierarchicalSelectOptions = ((string|IFormSelectOption|IFormSelectOptionGroup)[]|Promise<(string|IFormSelectOption|IFormSelectOptionGroup)[]>);
+export declare type ISelectOptions = (string | IFormSelectOption)[] | Promise<(string | IFormSelectOption)[]>;
+export declare type IHierarchicalSelectOptions =
+  | (string | IFormSelectOption | IFormSelectOptionGroup)[]
+  | Promise<(string | IFormSelectOption | IFormSelectOptionGroup)[]>;
 
 export interface IFormSelectOptions {
   /**
    * Data for the options elements of the select
    */
-  optionsData?: IHierarchicalSelectOptions|((dependents: any[]) => IHierarchicalSelectOptions);
+  optionsData?: IHierarchicalSelectOptions | ((dependents: any[]) => IHierarchicalSelectOptions);
   /**
    * Index of the selected option; this option overrides the selected index from the `useSession` property
    */
@@ -44,7 +45,7 @@ export interface IFormSelectDesc extends IFormElementDesc {
 export interface IFormSelectElement extends IFormElement {
   getSelectedIndex(): number;
 
-  updateOptionElements(data: (string|IFormSelectOption|IFormSelectOptionGroup)[]): void;
+  updateOptionElements(data: (string | IFormSelectOption | IFormSelectOptionGroup)[]): void;
 }
 
 /**
@@ -52,7 +53,6 @@ export interface IFormSelectElement extends IFormElement {
  * Propagates the changes from the DOM select element using the internal `change` event
  */
 export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSelectElement {
-
   private $select: d3.Selection<any>;
 
   /**
@@ -72,7 +72,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     UserSession.getInstance().store(`${this.id}_selectedIndex`, this.getSelectedIndex());
   }
 
-  protected getStoredValue<T>(defaultValue:T): T {
+  protected getStoredValue<T>(defaultValue: T): T {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
@@ -105,7 +105,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   init() {
     super.init();
 
-    const options = this.elementDesc.options;
+    const { options } = this.elementDesc;
 
     // propagate change action with the data of the selected option
     this.$inputNode.on('change.propagate', () => {
@@ -114,8 +114,8 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
 
     const data = FormSelect.resolveData(options.optionsData);
 
-    const values = this.handleDependent((values) => {
-      data(values).then((items) => {
+    const values = this.handleDependent((val) => {
+      data(val).then((items) => {
         this.updateOptionElements(items);
         this.$inputNode.property('selectedIndex', options.selectedIndex || 0);
         this.fire(FormSelect.EVENT_CHANGE, this.value, this.$inputNode);
@@ -126,7 +126,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
 
     data(values).then((items) => {
       this.updateOptionElements(items);
-      const index = options.selectedIndex !== undefined ? options.selectedIndex : Math.min(items.length -1, defaultSelectedIndex);
+      const index = options.selectedIndex !== undefined ? options.selectedIndex : Math.min(items.length - 1, defaultSelectedIndex);
       this.previousValue = items[index];
       this.$inputNode.property('selectedIndex', index);
 
@@ -143,17 +143,17 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   getSelectedIndex(): number {
     const defaultSelectedIndex = this.getStoredValue(0);
     const currentSelectedIndex = <number>this.$inputNode.property('selectedIndex');
-    return (currentSelectedIndex === -1) ? defaultSelectedIndex : currentSelectedIndex;
+    return currentSelectedIndex === -1 ? defaultSelectedIndex : currentSelectedIndex;
   }
 
   /**
    * Update the options of a select form element using the given data array
    * @param data
    */
-  updateOptionElements(data: (string|IFormSelectOption|IFormSelectOptionGroup)[]) {
+  updateOptionElements(data: (string | IFormSelectOption | IFormSelectOptionGroup)[]) {
     const options = data.map(FormSelect.toOption);
 
-    const isGroup = (d: IFormSelectOption|IFormSelectOptionGroup): d is IFormSelectOptionGroup => {
+    const isGroup = (d: IFormSelectOption | IFormSelectOptionGroup): d is IFormSelectOptionGroup => {
       return Array.isArray((<any>d).children);
     };
     const anyGroups = data.some(isGroup);
@@ -169,18 +169,20 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     }
     const node = <HTMLSelectElement>this.$inputNode.node();
     const $options = this.$inputNode.selectAll(() => <HTMLElement[]>Array.from(node.children)).data(options);
-    $options.enter()
-      .append((d) => node.ownerDocument.createElement(isGroup ? 'optgroup' : 'option'));
+    $options.enter().append((d) => node.ownerDocument.createElement(isGroup ? 'optgroup' : 'option'));
 
-    const $sub = $options.filter(isGroup)
+    const $sub = $options
+      .filter(isGroup)
       .attr('label', (d) => d.name)
-      .selectAll('option').data((d) => (<IFormSelectOptionGroup>d).children);
+      .selectAll('option')
+      .data((d) => (<IFormSelectOptionGroup>d).children);
     $sub.enter().append('option');
     $sub.attr('value', (d) => d.value).html((d) => d.name);
     $sub.exit().remove();
 
-    $options.filter((d) => !isGroup)
-      .attr('value', (d) => ((<IFormSelectOption>d).value))
+    $options
+      .filter((d) => !isGroup)
+      .attr('value', (d) => (<IFormSelectOption>d).value)
       .html((d) => d.name);
 
     $options.exit().remove();
@@ -192,7 +194,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
    */
   get value() {
     const option = d3.select((<HTMLSelectElement>this.$inputNode.node()).selectedOptions[0]);
-    return (option.size() > 0) ? option.datum() : null;
+    return option.size() > 0 ? option.datum() : null;
   }
 
   /**
@@ -207,13 +209,16 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
       return;
     }
 
-    this.$inputNode.selectAll('option').data().forEach((d, i) => {
-      if ((v.value && d.value === v.value) || d.value === v || d === v) {
-        this.$inputNode.property('selectedIndex', i);
-        this.updateStoredValue();
-        this.previousValue = d; // force value update
-      }
-    });
+    this.$inputNode
+      .selectAll('option')
+      .data()
+      .forEach((d, i) => {
+        if ((v.value && d.value === v.value) || d.value === v || d === v) {
+          this.$inputNode.property('selectedIndex', i);
+          this.updateStoredValue();
+          this.previousValue = d; // force value update
+        }
+      });
   }
 
   hasValue() {
@@ -224,14 +229,16 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     (<HTMLSelectElement>this.$inputNode.node()).focus();
   }
 
-  static toOption(d: string|IFormSelectOption|IFormSelectOptionGroup): IFormSelectOption|IFormSelectOptionGroup {
+  static toOption(d: string | IFormSelectOption | IFormSelectOptionGroup): IFormSelectOption | IFormSelectOptionGroup {
     if (typeof d === 'string') {
-      return {name: d, value: d, data: d};
+      return { name: d, value: d, data: d };
     }
     return d;
   }
 
-  static resolveData(data?: IHierarchicalSelectOptions|((dependents: any[]) => IHierarchicalSelectOptions)): ((dependents: any[]) => PromiseLike<(IFormSelectOption|IFormSelectOptionGroup)[]>) {
+  static resolveData(
+    data?: IHierarchicalSelectOptions | ((dependents: any[]) => IHierarchicalSelectOptions),
+  ): (dependents: any[]) => PromiseLike<(IFormSelectOption | IFormSelectOptionGroup)[]> {
     if (data === undefined) {
       return () => ResolveNow.resolveImmediately([]);
     }
@@ -241,11 +248,11 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     if (data instanceof Promise) {
       return () => data.then((r) => r.map(this.toOption));
     }
-    //assume it is a function
+    // assume it is a function
     return (dependents: any[]) => {
       const r = data(dependents);
       if (r instanceof Promise) {
-        return r.then((r) => r.map(this.toOption));
+        return r.then((a) => a.map(this.toOption));
       }
       if (Array.isArray(r)) {
         return ResolveNow.resolveImmediately(r.map(this.toOption));
@@ -254,4 +261,3 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     };
   }
 }
-

@@ -21,7 +21,7 @@ export class Compression {
                 return true;
             }
             const key = toKey(p);
-            //last one remains
+            // last one remains
             return lastOnes.get(key) === p;
         });
     }
@@ -43,10 +43,12 @@ export class Compression {
                     arr.splice(len, 1);
                     len--;
                 }
-                const canDelete = arr[len + 1] && (arr[len].f_id === functionId) && (arr[len + 1].f_id === functionId) && toKey(arr[len]) === toKey(arr[len]);
+                // TODO: check if this comparison has an error
+                // eslint-disable-next-line no-self-compare
+                const canDelete = arr[len + 1] && arr[len].f_id === functionId && arr[len + 1].f_id === functionId && toKey(arr[len]) === toKey(arr[len]);
                 return compress(arr, len + 1, canDelete);
             }
-            return;
+            return undefined;
         };
         const pathCopy = path.slice(0); // copy path because path is mutated
         pathCopy.reverse(); // reverse array to keep the last consecutive item and remove the first ones
@@ -56,20 +58,23 @@ export class Compression {
     }
     static createRemove(path, createFunctionId, removeFunctionId) {
         const r = [];
+        // eslint-disable-next-line no-labels
         outer: for (const act of path) {
             if (act.f_id === removeFunctionId) {
                 const removed = act.removes[0];
-                //removed view delete intermediate change and optional creation
-                for (let j = r.length - 1; j >= 0; --j) { //back to forth for better removal
+                // removed view delete intermediate change and optional creation
+                for (let j = r.length - 1; j >= 0; --j) {
+                    // back to forth for better removal
                     const previous = r[j];
-                    const requires = previous.requires;
+                    const { requires } = previous;
                     const usesView = requires.indexOf(removed) >= 0;
                     if (usesView) {
                         r.splice(j, 1);
                     }
                     else if (previous.f_id === createFunctionId && previous.creates[0] === removed) {
-                        //found adding remove both
+                        // found adding remove both
                         r.splice(j, 1);
+                        // eslint-disable-next-line no-labels
                         continue outer;
                     }
                 }

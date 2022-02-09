@@ -16,3 +16,4 @@ export interface ISecureItem {
      */
     readonly buddies?: string[];
 }
+//# sourceMappingURL=ISecureItem.d.ts.map

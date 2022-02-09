@@ -77,3 +77,4 @@ export declare abstract class ATableView<T extends IRow> extends AView {
      */
     private static parseHtmlTableContent;
 }
+//# sourceMappingURL=ATableView.d.ts.map

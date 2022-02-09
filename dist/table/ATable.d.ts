@@ -52,3 +52,4 @@ export declare class TableView extends ATable implements ITable {
     get idtypes(): IDType[];
     queryView(name: string, args: any): ITable;
 }
+//# sourceMappingURL=ATable.d.ts.map

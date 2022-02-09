@@ -1,27 +1,27 @@
-import {SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer} from 'lineupjs';
-import {ISearchOption} from './ISearchOption';
-import {PanelButton, PanelNavButton} from './PanelButton';
-import {IPanelTabDesc} from './IPanelTabDesc';
-import {EventHandler} from '../../base';
-import {I18nextManager} from '../../i18n';
-
+import { SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer } from 'lineupjs';
+import { ISearchOption } from './ISearchOption';
+import { PanelButton, PanelNavButton } from './PanelButton';
+import { IPanelTabDesc } from './IPanelTabDesc';
+import { EventHandler } from '../../base/event';
+import { I18nextManager } from '../../i18n';
 
 /**
  * The PanelTab creates a tab component that with can be toggled through the PanelNavButton
  */
 export class PanelTab extends EventHandler {
-
   static readonly SHOW_PANEL = 'showPanel';
 
   static readonly HIDE_PANEL = 'hidePanel';
 
   readonly node: HTMLElement;
+
   readonly options: IPanelTabDesc = {
     faIcon: 'fas fa-sliders-h',
     title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.rankingPanelTabTitle'),
-    width: '23em',
-    order: 0
+    width: '24em',
+    order: 0,
   };
+
   private navButton: PanelNavButton;
 
   /**
@@ -69,7 +69,7 @@ export class PanelTab extends EventHandler {
       title: this.options.title,
       faIcon: this.options.faIcon,
       cssClass: 'shortcut-nav',
-      onClick
+      onClick,
     });
   }
 }
@@ -79,7 +79,6 @@ export class PanelTab extends EventHandler {
  * Contains LineUp SidePanel and LineUp SearchBox
  */
 export class SidePanelTab extends PanelTab {
-
   readonly panel: SidePanel | null;
 
   /**
@@ -88,11 +87,17 @@ export class SidePanelTab extends PanelTab {
    * @param ctx LineUp context
    * @param doc Document
    */
-  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, doc = document, options?: IPanelTabDesc) {
+  constructor(
+    parent: HTMLElement,
+    private readonly search: SearchBox<ISearchOption>,
+    ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext,
+    doc = document,
+    options?: IPanelTabDesc,
+  ) {
     super(parent, options);
     this.node.classList.add('default');
     this.panel = new SidePanel(ctx, doc, {
-      chooser: false
+      chooser: false,
     });
 
     this.node.appendChild(this.search.node);

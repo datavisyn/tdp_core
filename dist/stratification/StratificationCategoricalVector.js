@@ -15,20 +15,20 @@ export class StratificationCategoricalVector extends AVector {
         this.root = this;
         this.valuetype = {
             type: ValueTypeUtils.VALUE_TYPE_CATEGORICAL,
-            categories: range.groups.map((g) => ({ name: g.name, label: g.name, color: g.color }))
+            categories: range.groups.map((g) => ({ name: g.name, label: g.name, color: g.color })),
         };
         const d = strat.desc;
         this.desc = {
             name: d.name,
             fqname: d.fqname,
             description: d.description,
-            id: d.id + '-v',
+            id: `${d.id}-v`,
             type: 'vector',
             size: d.size,
             idtype: d.idtype,
             value: this.valuetype,
             creator: d.creator,
-            ts: d.ts
+            ts: d.ts,
         };
     }
     get idtype() {
@@ -39,12 +39,14 @@ export class StratificationCategoricalVector extends AVector {
     }
     persist() {
         return {
-            root: this.strat.persist()
+            root: this.strat.persist(),
         };
     }
     restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let r = this;
-        if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
         return r;

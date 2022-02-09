@@ -40,3 +40,4 @@ export interface IStratification extends IDataType {
     origin(): Promise<IDataType>;
     size(): any;
 }
+//# sourceMappingURL=IStratification.d.ts.map

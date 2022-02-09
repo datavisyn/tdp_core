@@ -4,3 +4,4 @@ export * from './ProjectedAtom';
 export * from './AVector';
 export * from './loader';
 export * from './Vector';
+//# sourceMappingURL=index.d.ts.map

@@ -44,3 +44,4 @@ export declare class NameLookupUtils {
      */
     static nameLookupDesc(database: string, table: string, options?: Partial<INameLookupOptions>): IFormElementDesc;
 }
+//# sourceMappingURL=builder.d.ts.map

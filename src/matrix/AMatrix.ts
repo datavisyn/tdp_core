@@ -1,25 +1,23 @@
-import {IPersistable} from '../base/IPersistable';
-import {RangeLike, Range, ParseRangeUtils} from '../range';
-import {IDTypeManager} from '../idtype';
-import {IDType} from '../idtype/IDType';
-import {AProductSelectAble} from '../idtype/AProductSelectAble';
-import {ValueTypeUtils, ICategoricalValueTypeDesc, INumberValueTypeDesc,
-  IValueTypeDesc
-} from '../data';
-import {IVector} from '../vector';
-import {IHistogram, CatHistogram, Histogram} from '../data/histogram';
-import {IAdvancedStatistics, IStatistics, Statistics, AdvancedStatistics} from '../base/statistics';
-import {IMatrix, IHeatMapUrlOptions} from './IMatrix';
-import {SliceColVector} from './internal/SliceColVector';
-import {ProjectedVector} from './internal/ProjectedVector';
+import { IPersistable } from '../base/IPersistable';
+import { RangeLike, Range, ParseRangeUtils } from '../range';
+import { IDTypeManager } from '../idtype';
+import { IDType } from '../idtype/IDType';
+import { AProductSelectAble } from '../idtype/AProductSelectAble';
+import { ValueTypeUtils, ICategoricalValueTypeDesc, INumberValueTypeDesc, IValueTypeDesc } from '../data';
+import { IVector } from '../vector';
+import { IHistogram, CatHistogram, Histogram } from '../data/histogram';
+import { IAdvancedStatistics, IStatistics, Statistics, AdvancedStatistics } from '../base/statistics';
+import { IMatrix, IHeatMapUrlOptions } from './IMatrix';
+import { SliceColVector } from './internal/SliceColVector';
+import { ProjectedVector } from './internal/ProjectedVector';
 
-function flatten<T>(arr: T[][], indices: Range, select: number = 0) {
-  let r: T[]= [];
+function flatten<T>(arr: T[][], indices: Range, select = 0) {
+  let r: T[] = [];
   const dim = [arr.length, arr[0].length];
   if (select === 0) {
     r = r.concat.apply(r, arr);
   } else {
-    //stupid slicing
+    // stupid slicing
     for (let i = 0; i < dim[1]; ++i) {
       arr.forEach((ai) => {
         r.push(ai[i]);
@@ -28,7 +26,7 @@ function flatten<T>(arr: T[][], indices: Range, select: number = 0) {
   }
   return {
     data: r,
-    indices: indices.dim(select).repeat(dim[1 - select])
+    indices: indices.dim(select).repeat(dim[1 - select]),
   };
 }
 
@@ -36,15 +34,15 @@ function flatten<T>(arr: T[][], indices: Range, select: number = 0) {
  * base class for different Matrix implementations, views, transposed,...
  */
 export abstract class AMatrix<T, D extends IValueTypeDesc> extends AProductSelectAble {
-
   public static IDTYPE_ROW = 0;
+
   public static IDTYPE_COLUMN = 1;
+
   public static IDTYPE_CELL = 2;
 
   public static DIM_ROW = 0;
+
   public static DIM_COL = 1;
-
-
 
   constructor(protected root: IMatrix<T, D>) {
     super();
@@ -81,8 +79,8 @@ export abstract class AMatrix<T, D extends IValueTypeDesc> extends AProductSelec
     if (r.isAll) {
       return this.root;
     }
-    // tslint:disable:no-use-before-declare
     // Disabled the rule, because the classes below reference each other in a way that it is impossible to find a successful order.
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new MatrixView(this.root, r);
   }
 
@@ -93,17 +91,17 @@ export abstract class AMatrix<T, D extends IValueTypeDesc> extends AProductSelec
   async stats(range: RangeLike = Range.all()): Promise<IStatistics> {
     const v = this.root.valuetype;
     if (v.type === ValueTypeUtils.VALUE_TYPE_INT || v.type === ValueTypeUtils.VALUE_TYPE_REAL) {
-      return Statistics.computeStats(...<any>await this.data(range));
+      return Statistics.computeStats(...(<any>await this.data(range)));
     }
-    return Promise.reject('invalid value type: ' + v.type);
+    return Promise.reject(`invalid value type: ${v.type}`);
   }
 
   async statsAdvanced(range: RangeLike = Range.all()): Promise<IAdvancedStatistics> {
     const v = this.root.valuetype;
     if (v.type === ValueTypeUtils.VALUE_TYPE_INT || v.type === ValueTypeUtils.VALUE_TYPE_REAL) {
-      return AdvancedStatistics.computeAdvancedStats([].concat(...<any>await this.data(range)));
+      return AdvancedStatistics.computeAdvancedStats([].concat(...(<any>await this.data(range))));
     }
-    return Promise.reject('invalid value type: ' + v.type);
+    return Promise.reject(`invalid value type: ${v.type}`);
   }
 
   async hist(bins?: number, range: RangeLike = Range.all(), containedIds = 0): Promise<IHistogram> {
@@ -112,16 +110,23 @@ export abstract class AMatrix<T, D extends IValueTypeDesc> extends AProductSelec
     const flat = flatten(d, this.indices, containedIds);
     switch (v.type) {
       case ValueTypeUtils.VALUE_TYPE_CATEGORICAL:
-        const vc = <ICategoricalValueTypeDesc><any>v;
-        return CatHistogram.categoricalHist<string>(<any[]>flat.data, flat.indices, flat.data.length, vc.categories.map((d) => typeof d === 'string' ? d : d.name),
-          vc.categories.map((d) => typeof d === 'string' ? d : d.label || d.name),
-          vc.categories.map((d) => typeof d === 'string' ? 'gray' : d.color || 'gray'));
+        // eslint-disable-next-line no-case-declarations
+        const vc = <ICategoricalValueTypeDesc>(<any>v);
+        return CatHistogram.categoricalHist<string>(
+          <any[]>flat.data,
+          flat.indices,
+          flat.data.length,
+          vc.categories.map((a) => (typeof a === 'string' ? a : a.name)),
+          vc.categories.map((a) => (typeof a === 'string' ? a : a.label || a.name)),
+          vc.categories.map((a) => (typeof a === 'string' ? 'gray' : a.color || 'gray')),
+        );
       case ValueTypeUtils.VALUE_TYPE_INT:
       case ValueTypeUtils.VALUE_TYPE_REAL:
-        const vn = <INumberValueTypeDesc><any>v;
-        return Histogram.hist(<any[]>flat.data, flat.indices, flat.data.length, bins ? bins : Math.round(Math.sqrt(this.length)), vn.range);
+        // eslint-disable-next-line no-case-declarations
+        const vn = <INumberValueTypeDesc>(<any>v);
+        return Histogram.hist(<any[]>flat.data, flat.indices, flat.data.length, bins || Math.round(Math.sqrt(this.length)), vn.range);
       default:
-        return Promise.reject<IHistogram>('invalid value type: ' + v.type); //cant create hist for unique objects or other ones
+        return Promise.reject<IHistogram>(`invalid value type: ${v.type}`); // cant create hist for unique objects or other ones
     }
   }
 
@@ -134,28 +139,35 @@ export abstract class AMatrix<T, D extends IValueTypeDesc> extends AProductSelec
     return this.view(ids.indexOf(r));
   }
 
-  reduce<U, UD extends IValueTypeDesc>(f: (row: T[]) => U, thisArgument?: any, valuetype?: UD, idtype?: IDType): IVector<U,UD> {
+  reduce<U, UD extends IValueTypeDesc>(f: (row: T[]) => U, thisArgument?: any, valuetype?: UD, idtype?: IDType): IVector<U, UD> {
     return new ProjectedVector(this.root, f, thisArgument, valuetype, idtype);
   }
 
   restore(persisted: any): IPersistable {
     if (persisted && persisted.f) {
-      /* tslint:disable:no-eval */
-      return this.reduce(eval(persisted.f), this, persisted.valuetype, persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined);
-      /* tslint:enable:no-eval */
-    } else if (persisted && persisted.range) { //some view onto it
-      return this.view(ParseRangeUtils.parseRangeLike(persisted.range));
-    } else if (persisted && persisted.transposed) {
-      return (<IMatrix<T, D>>(<any>this)).t;
-    } else if (persisted && persisted.col) {
-      return this.slice(+persisted.col);
-    } else if (persisted && persisted.row) {
-      return this.t.slice(+persisted.row);
-    } else {
-      return <IPersistable>(<any>this);
+      return this.reduce(
+        // eslint-disable-next-line no-eval
+        eval(persisted.f),
+        this,
+        persisted.valuetype,
+        persisted.idtype ? IDTypeManager.getInstance().resolveIdType(persisted.idtype) : undefined,
+      );
     }
+    if (persisted && persisted.range) {
+      // some view onto it
+      return this.view(ParseRangeUtils.parseRangeLike(persisted.range));
+    }
+    if (persisted && persisted.transposed) {
+      return (<IMatrix<T, D>>(<any>this)).t;
+    }
+    if (persisted && persisted.col) {
+      return this.slice(+persisted.col);
+    }
+    if (persisted && persisted.row) {
+      return this.t.slice(+persisted.row);
+    }
+    return <IPersistable>(<any>this);
   }
-
 }
 
 // circular dependency thus not extractable
@@ -170,7 +182,7 @@ export class MatrixView<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
   constructor(root: IMatrix<T, D>, private range: Range, public readonly t: IMatrix<T, D> = null) {
     super(root);
     this.range = range;
-    //ensure that there are two dimensions
+    // ensure that there are two dimensions
     range.dim(0);
     range.dim(1);
     if (!t) {
@@ -185,7 +197,7 @@ export class MatrixView<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
   persist() {
     return {
       root: this.root.persist(),
-      range: this.range.toString()
+      range: this.range.toString(),
     };
   }
 
@@ -230,7 +242,7 @@ export class MatrixView<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
     return this.root.stats(this.range.preMultiply(ParseRangeUtils.parseRangeLike(range), this.root.dim));
   }
 
-  statsAdvanced(range: RangeLike =Range.all()): Promise<IAdvancedStatistics> {
+  statsAdvanced(range: RangeLike = Range.all()): Promise<IAdvancedStatistics> {
     return this.root.statsAdvanced(this.range.preMultiply(ParseRangeUtils.parseRangeLike(range), this.root.dim));
   }
 
@@ -266,4 +278,3 @@ export class MatrixView<T, D extends IValueTypeDesc> extends AMatrix<T, D> {
     return this.root.idtypes;
   }
 }
-

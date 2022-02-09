@@ -39,7 +39,8 @@ export class AHistogram {
         return this._missingRange;
     }
     pushAll(arr, indices, size) {
-        const binindex = [], missingindex = [];
+        const binindex = [];
+        const missingindex = [];
         for (let i = this.bins - 1; i >= 0; --i) {
             binindex.push([]);
         }
@@ -57,7 +58,7 @@ export class AHistogram {
                     binindex[bin].push(index);
                 }
             });
-            //build range and remove duplicates
+            // build range and remove duplicates
             this._ranges = binindex.map((d) => Range.list(d.sort().filter((di, i, a) => di !== a[i - 1])));
             this._missingRange = Range.list(missingindex.sort().filter((di, i, a) => di !== a[i - 1]));
         }
@@ -91,7 +92,7 @@ export class Histogram extends AHistogram {
         return -1;
     }
     binOfImpl(value) {
-        if (isNaN(value)) {
+        if (Number.isNaN(value)) {
             return -1;
         }
         const n = (value - this.valueRange[0]) / (this.valueRange[1] - this.valueRange[0]);
@@ -102,7 +103,7 @@ export class Histogram extends AHistogram {
         if (bin >= this.bins) {
             bin = this.bins - 1;
         }
-        return isNaN(bin) ? -1 : bin;
+        return Number.isNaN(bin) ? -1 : bin;
     }
     static hist(arr, indices, size, bins, range) {
         const r = new Histogram(bins, range);

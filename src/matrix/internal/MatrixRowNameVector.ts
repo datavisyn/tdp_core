@@ -1,9 +1,8 @@
-import {IAnyMatrix} from '../IMatrix';
-import {RangeLike, Range} from '../../range';
-import {ANameVector, IStringVector} from '../../stratification/vector/ANameVector';
+import { IAnyMatrix } from '../IMatrix';
+import { RangeLike, Range } from '../../range';
+import { ANameVector, IStringVector } from '../../stratification/vector/ANameVector';
 
 export class MatrixRowNameVector extends ANameVector<IAnyMatrix> implements IStringVector {
-
   constructor(matrix: IAnyMatrix) {
     super(matrix);
     this.root = this;
@@ -28,9 +27,10 @@ export class MatrixRowNameVector extends ANameVector<IAnyMatrix> implements IStr
   persist() {
     return {
       root: this.base.persist(),
-      names: 'row'
+      names: 'row',
     };
   }
+
   /**
    * converts the rows of the given matrix as a string vector
    * @param matrix

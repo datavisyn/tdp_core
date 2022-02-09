@@ -49,3 +49,4 @@ export declare class AdvancedStatistics extends Statistics implements IAdvancedS
     constructor(median: number, q1: number, q3: number);
     static computeAdvancedStats(arr: number[]): IAdvancedStatistics;
 }
+//# sourceMappingURL=statistics.d.ts.map

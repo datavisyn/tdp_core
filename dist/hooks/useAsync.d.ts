@@ -34,3 +34,4 @@ export declare const useAsync: <F extends (...args: any[]) => any, E = Error, T 
     error: E;
 };
 export {};
+//# sourceMappingURL=useAsync.d.ts.map

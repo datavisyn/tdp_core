@@ -20,3 +20,4 @@ export interface IProvenanceGraphManager {
     delete(desc: IProvenanceGraphDataDescription): PromiseLike<boolean>;
     import(json: any): PromiseLike<IProvenanceGraph>;
 }
+//# sourceMappingURL=provenance.d.ts.map

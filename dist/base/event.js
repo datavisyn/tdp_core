@@ -28,7 +28,7 @@ class SingleEventHandler {
     constructor(type) {
         this.type = type;
         this.listeners = [];
-        //nothing else to do
+        // nothing else to do
     }
     push(listener) {
         this.listeners.push(listener);
@@ -50,8 +50,9 @@ class SingleEventHandler {
             this.listeners[0].apply(event, largs);
         }
         else {
-            //work on a copy in case the number changes
-            const l = this.listeners.slice(), ll = l.length;
+            // work on a copy in case the number changes
+            const l = this.listeners.slice();
+            const ll = l.length;
             for (let i = 0; i < ll && !event.isImmediatePropagationStopped(); ++i) {
                 l[i].apply(event, largs);
             }

@@ -42,7 +42,7 @@ export class Vector extends AVector {
     async data(range = Range.all()) {
         const data = await this.load();
         const d = ParseRangeUtils.parseRangeLike(range).filter(data.data, this.dim);
-        if ((this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT)) {
+        if (this.valuetype.type === ValueTypeUtils.VALUE_TYPE_REAL || this.valuetype.type === ValueTypeUtils.VALUE_TYPE_INT) {
             return ValueTypeUtils.mask(d, this.valuetype);
         }
         return d;
@@ -81,7 +81,7 @@ export class Vector extends AVector {
      * @returns {IVector}
      */
     static create(desc) {
-        if (typeof (desc.loader) === 'function') {
+        if (typeof desc.loader === 'function') {
             return new Vector(desc, desc.loader);
         }
         return new Vector(desc, VectorLoaderUtils.viaAPILoader());
@@ -92,7 +92,7 @@ export class Vector extends AVector {
     static asVector(rows, data, options = {}) {
         const desc = BaseUtils.mixin(VectorUtils.createDefaultVectorDesc(), {
             size: data.length,
-            value: ValueTypeUtils.guessValueTypeDesc(data)
+            value: ValueTypeUtils.guessValueTypeDesc(data),
         }, options);
         const rowAssigner = options.rowassigner || LocalIDAssigner.create();
         return new Vector(desc, VectorLoaderUtils.viaDataLoader(rows, rowAssigner(rows), data));

@@ -10,15 +10,15 @@ export class ProjectedAtom extends ASelectAble {
         this._idtype = _idtype;
         this.cache = null;
         this.desc = {
-            name: v.desc.name + '-p',
-            fqname: v.desc.fqname + '-p',
+            name: `${v.desc.name}-p`,
+            fqname: `${v.desc.fqname}-p`,
             type: 'atom',
-            id: v.desc.id + '-p',
+            id: `${v.desc.id}-p`,
             idtype: v.idtype,
             value: this.valuetype,
             description: v.desc.description,
             creator: v.desc.creator,
-            ts: v.desc.ts
+            ts: v.desc.ts,
         };
     }
     load() {
@@ -65,7 +65,7 @@ export class ProjectedAtom extends ASelectAble {
             root: this.v.persist(),
             f: this.f.toString(),
             valuetype: this.valuetype === this.v.valuetype ? undefined : this.valuetype,
-            idtype: this.idtype === this.v.idtype ? undefined : this.idtype.name
+            idtype: this.idtype === this.v.idtype ? undefined : this.idtype.name,
         };
     }
     restore(persisted) {

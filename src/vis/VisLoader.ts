@@ -1,11 +1,9 @@
-import {ProvenanceGraph} from '../provenance';
-import {LayoutedProvVis} from './provvis';
-import {VerticalStoryVis} from './storyvis';
-
+import { ProvenanceGraph } from '../provenance';
+import { LayoutedProvVis } from './provvis';
+import { VerticalStoryVis } from './storyvis';
 
 export class VisLoader {
-
-  static loadProvenanceGraphVis(data:Promise<ProvenanceGraph>, parent:Element, options = {}): ()=>Promise<LayoutedProvVis> {
+  static loadProvenanceGraphVis(data: Promise<ProvenanceGraph>, parent: Element, options = {}): () => Promise<LayoutedProvVis> {
     parent.insertAdjacentHTML('beforeend', `<aside class="provenance-sidepanel provenance-layout-vis"></aside>`);
     let c: Promise<LayoutedProvVis>;
     return () => {
@@ -16,7 +14,12 @@ export class VisLoader {
     };
   }
 
-  static loadStoryVis(graph: Promise<ProvenanceGraph>, parent: HTMLElement, main: HTMLElement, options: {thumbnails: boolean}): ()=>Promise<VerticalStoryVis> {
+  static loadStoryVis(
+    graph: Promise<ProvenanceGraph>,
+    parent: HTMLElement,
+    main: HTMLElement,
+    options: { thumbnails: boolean },
+  ): () => Promise<VerticalStoryVis> {
     parent.insertAdjacentHTML('beforeend', `<aside class="provenance-sidepanel provenance-story-vis"></aside>`);
     let c: Promise<VerticalStoryVis>;
     return () => {

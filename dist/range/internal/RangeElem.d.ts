@@ -27,3 +27,4 @@ export declare class RangeElem implements IRangeElem {
     toString(): string;
     static parse(code: string): SingleRangeElem | RangeElem;
 }
+//# sourceMappingURL=RangeElem.d.ts.map

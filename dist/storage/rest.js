@@ -8,17 +8,19 @@ import { ENamedSetType } from './interfaces';
 export class RestStorageUtils {
     static listNamedSets(idType = null) {
         const args = idType ? { idType: IDTypeManager.getInstance().resolveIdType(idType).id } : {};
-        return AppContext.getInstance().getAPIJSON(`${RestStorageUtils.REST_NAMESPACE}/namedsets/`, args).then((sets) => {
+        return AppContext.getInstance()
+            .getAPIJSON(`${RestStorageUtils.REST_NAMESPACE}/namedsets/`, args)
+            .then((sets) => {
             // default value
-            sets.forEach((s) => s.type = s.type || ENamedSetType.NAMEDSET);
+            sets.forEach((s) => (s.type = s.type || ENamedSetType.NAMEDSET));
             return sets;
         });
     }
     static listNamedSetsAsOptions(idType = null) {
         return RestStorageUtils.listNamedSets(idType).then((namedSets) => namedSets.map((d) => ({ name: d.name, value: d.id })));
     }
-    static saveNamedSet(name, idType, ids, subType, description = '', sec) {
-        const data = Object.assign({
+    static saveNamedSet(name, idType, ids, subType, description = '', sec = {}) {
+        const data = {
             name,
             type: ENamedSetType.NAMEDSET,
             creator: UserSession.getInstance().currentUserNameOrAnonymous(),
@@ -27,15 +29,18 @@ export class RestStorageUtils {
             ids: ParseRangeUtils.parseRangeLike(ids).toString(),
             subTypeKey: subType.key,
             subTypeValue: subType.value,
-            description
-        }, sec);
+            description,
+            ...sec,
+        };
         return AppContext.getInstance().sendAPI(`${RestStorageUtils.REST_NAMESPACE}/namedsets/`, data, 'POST');
     }
     static deleteNamedSet(id) {
         return AppContext.getInstance().sendAPI(`${RestStorageUtils.REST_NAMESPACE}/namedset/${id}`, {}, 'DELETE');
     }
     static editNamedSet(id, data) {
-        return AppContext.getInstance().sendAPI(`${RestStorageUtils.REST_NAMESPACE}/namedset/${id}`, data, 'PUT').then((s) => {
+        return AppContext.getInstance()
+            .sendAPI(`${RestStorageUtils.REST_NAMESPACE}/namedset/${id}`, data, 'PUT')
+            .then((s) => {
             s.type = s.type || ENamedSetType.NAMEDSET;
             return s;
         });

@@ -1,5 +1,5 @@
 import * as ReactDOM from 'react-dom';
-import { AView } from '.';
+import { AView } from './AView';
 import { Errors } from '../components';
 import { IDTypeManager } from '../idtype';
 import { Range } from '../range';
@@ -21,7 +21,7 @@ export class AReactView extends AView {
     initReact() {
         if (this.handler) {
             // will be handled externally
-            return;
+            return undefined;
         }
         return this.update();
     }
@@ -33,17 +33,19 @@ export class AReactView extends AView {
             const act = this.getItemSelection();
             let r = [];
             switch (op) {
-                case 'add':
+                case 'add': {
                     const union = act.range.union(range);
                     this.setItemSelection({ idtype, range: union });
                     r = union.dim(0).asList();
                     break;
-                case 'remove':
+                }
+                case 'remove': {
                     const without = act.range.without(range);
                     this.setItemSelection({ idtype, range: without });
                     r = without.dim(0).asList();
                     break;
-                case 'toggle':
+                }
+                case 'toggle': {
                     r = act.range.dim(0).asList();
                     ids.forEach((id) => {
                         const index = r.indexOf(id);
@@ -58,6 +60,7 @@ export class AReactView extends AView {
                     const result = Range.list(r);
                     this.setItemSelection({ idtype, range: result });
                     break;
+                }
                 default:
                     this.setItemSelection({ idtype, range });
                     r = range.dim(0).asList();
@@ -79,10 +82,12 @@ export class AReactView extends AView {
             const inputSelection = names[0];
             const itemSelection = names[1];
             return this.render(inputSelection, itemSelection, this.select);
-        }).then((elem) => {
+        })
+            .then((elem) => {
             this.setBusy(false);
             ReactDOM.render(elem, this.node.querySelector('div.react-view-body'));
-        }).catch(Errors.showErrorModalDialog)
+        })
+            .catch(Errors.showErrorModalDialog)
             .catch((r) => {
             console.error(r);
             this.setBusy(false);
@@ -96,6 +101,7 @@ export class AReactView extends AView {
         else {
             return this.update();
         }
+        return undefined;
     }
     selectionChanged() {
         return this.update();

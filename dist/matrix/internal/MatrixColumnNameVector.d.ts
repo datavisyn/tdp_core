@@ -18,3 +18,4 @@ export declare class MatrixColumnNameVector extends ANameVector<IAnyMatrix> impl
      */
     static asNameVector(matrix: IAnyMatrix): IStringVector;
 }
+//# sourceMappingURL=MatrixColumnNameVector.d.ts.map

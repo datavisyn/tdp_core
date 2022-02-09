@@ -1,7 +1,6 @@
-import {ILayoutContainer, ILayoutDump} from '../interfaces';
-import {EOrientation, IDropArea} from '../interfaces';
-import {ALayoutContainer} from './ALayoutContainer';
-import {ASequentialLayoutContainer, ISequentialLayoutContainerOptions} from './ASequentialLayoutContainer';
+import { ILayoutContainer, ILayoutDump, EOrientation, IDropArea } from '../interfaces';
+import { ALayoutContainer } from './ALayoutContainer';
+import { ASequentialLayoutContainer, ISequentialLayoutContainerOptions } from './ASequentialLayoutContainer';
 
 export interface ILineUpLayoutContainer extends ISequentialLayoutContainerOptions {
   stackLayout: boolean;
@@ -9,14 +8,15 @@ export interface ILineUpLayoutContainer extends ISequentialLayoutContainerOption
 
 export class LineUpLayoutContainer extends ASequentialLayoutContainer<ILineUpLayoutContainer> {
   readonly minChildCount = 1;
+
   readonly type = 'lineup';
 
   constructor(document: Document, options: Partial<ILineUpLayoutContainer>, ...children: ILayoutContainer[]) {
     super(document, options);
     this.node.dataset.layout = 'lineup';
 
-    if(this.options.stackLayout) {
-      this.node.dataset.mode ='stacked';
+    if (this.options.stackLayout) {
+      this.node.dataset.mode = 'stacked';
     }
     children.forEach((d) => this.push(d));
   }
@@ -29,18 +29,18 @@ export class LineUpLayoutContainer extends ASequentialLayoutContainer<ILineUpLay
 
   protected addedChild(child: ILayoutContainer, index: number) {
     super.addedChild(child, index);
-    if (index < 0 || index >= (this._children.length - 1)) {
-      //+1 since we already chanded the children
+    if (index < 0 || index >= this._children.length - 1) {
+      // +1 since we already chanded the children
       this.node.appendChild(ASequentialLayoutContainer.wrap(child));
     } else {
       this.node.insertBefore(ASequentialLayoutContainer.wrap(child), this.node.children[index]);
     }
 
-    if(this.options.stackLayout) {
-      if(this.options.orientation === EOrientation.HORIZONTAL) {
-        child.node.parentElement.style.minWidth = child.minSize[0] > 0? `${child.minSize[0]}px` : null; // set minSize if available or delete CSS property
+    if (this.options.stackLayout) {
+      if (this.options.orientation === EOrientation.HORIZONTAL) {
+        child.node.parentElement.style.minWidth = child.minSize[0] > 0 ? `${child.minSize[0]}px` : null; // set minSize if available or delete CSS property
       } else {
-        child.node.parentElement.style.minHeight = child.minSize[1] > 0? `${child.minSize[1]}px` : null;
+        child.node.parentElement.style.minHeight = child.minSize[1] > 0 ? `${child.minSize[1]}px` : null;
       }
     }
     child.visible = this.visible;
@@ -55,14 +55,14 @@ export class LineUpLayoutContainer extends ASequentialLayoutContainer<ILineUpLay
   persist() {
     return Object.assign(super.persist(), {
       type: 'lineup',
-      stackLayout: this.options.stackLayout
+      stackLayout: this.options.stackLayout,
     });
   }
 
   static restore(dump: ILayoutDump, restore: (dump: ILayoutDump) => ILayoutContainer, doc: Document) {
     const options = Object.assign(ALayoutContainer.restoreOptions(dump), {
       orientation: EOrientation[<string>dump.orientation],
-      stackLayout: dump.stackLayout
+      stackLayout: dump.stackLayout,
     });
     const r = new LineUpLayoutContainer(doc, options);
     dump.children.forEach((d) => r.push(restore(d)));
@@ -81,7 +81,7 @@ export class LineUpLayoutContainer extends ASequentialLayoutContainer<ILineUpLay
     };
     const options = Object.assign(ALayoutContainer.deriveOptions(node), {
       orientation: deriveOrientation(),
-      stackLayout: node.dataset.mode === 'stacked' || node.dataset.layout.endsWith('stack')
+      stackLayout: node.dataset.mode === 'stacked' || node.dataset.layout.endsWith('stack'),
     });
     const r = new LineUpLayoutContainer(node.ownerDocument, options);
     children.forEach((c: HTMLElement) => r.push(derive(c)));
@@ -90,7 +90,7 @@ export class LineUpLayoutContainer extends ASequentialLayoutContainer<ILineUpLay
 
   defaultOptions() {
     return Object.assign(super.defaultOptions(), {
-      stackLayout: false
+      stackLayout: false,
     });
   }
 }

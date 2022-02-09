@@ -1,9 +1,9 @@
-import {AFormElement} from './AFormElement';
-import {IForm, IFormElementDesc, FormElementType} from '../interfaces';
-import {Select3, IdTextPair, ISelect3Item, ISelect3Options} from './Select3';
-import {ISelect2Option} from './FormSelect2';
 import * as d3 from 'd3';
-import {IPluginDesc} from '../../base';
+import { AFormElement } from './AFormElement';
+import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
+import { Select3, IdTextPair, ISelect3Item, ISelect3Options } from './Select3';
+import { ISelect2Option } from './FormSelect2';
+import { IPluginDesc } from '../../base';
 
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
   return?: 'text' | 'id';
@@ -26,7 +26,6 @@ export interface IFormSelect3 extends IFormElementDesc {
  * Propagates the changes from the DOM select element using the internal `change` event
  */
 export class FormSelect3 extends AFormElement<IFormSelect3> {
-
   private readonly isMultiple: boolean;
 
   private select3: Select3<IdTextPair>;
@@ -40,7 +39,7 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
   constructor(form: IForm, elementDesc: IFormSelect3, readonly pluginDesc: IPluginDesc) {
     super(form, elementDesc, pluginDesc);
 
-    this.isMultiple = (pluginDesc.selection === 'multiple');
+    this.isMultiple = pluginDesc.selection === 'multiple';
   }
 
   /**
@@ -56,7 +55,7 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
     this.setVisible(this.elementDesc.visible);
     this.appendLabel(rowNode);
 
-    const options = Object.assign(this.elementDesc.options, {multiple: this.isMultiple});
+    const options = Object.assign(this.elementDesc.options, { multiple: this.isMultiple });
     this.select3 = new Select3(options);
     const divNode = document.createElement('div');
     divNode.classList.add('col');
@@ -77,24 +76,24 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
     });
   }
 
+  hasValue() {
+    return this.select3.value.length > 0;
+  }
+
   /**
    * Returns the selected value or if nothing found `null`
    * @returns {ISelect3Item<IdTextPair> | string | (ISelect3Item<IdTextPair> | string)[]}
    */
   get value(): (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[] {
     const returnValue = this.elementDesc.options.return;
-    const returnFn = returnValue === 'id' ? (d) => d.id : (returnValue === 'text' ? (d) => d.text : (d) => d);
+    const returnFn = returnValue === 'id' ? (d) => d.id : returnValue === 'text' ? (d) => d.text : (d) => d;
     const value = <IdTextPair[]>this.select3.value;
 
     if (!value || value.length === 0) {
-      return this.isMultiple ? [] : returnFn({id: '', text: ''});
+      return this.isMultiple ? [] : returnFn({ id: '', text: '' });
     }
-    const data = value.map((d) => ({id: d.id, text: d.text})).map(returnFn);
+    const data = value.map((d) => ({ id: d.id, text: d.text })).map(returnFn);
     return this.isMultiple ? data : data[0];
-  }
-
-  hasValue() {
-    return this.select3.value.length > 0;
   }
 
   /**
@@ -104,13 +103,12 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
   set value(v: (ISelect3Item<IdTextPair> | string) | (ISelect3Item<IdTextPair> | string)[]) {
     const toIdTextPair = (d) => {
       if (typeof d === 'string') {
-        return {id: d, text: d};
-      } else {
-        return {
-          id: d.id ? d.id : d.text,
-          text: d.text ? d.text : d.id
-        };
+        return { id: d, text: d };
       }
+      return {
+        id: d.id ? d.id : d.text,
+        text: d.text ? d.text : d.id,
+      };
     };
 
     if (!v) {
@@ -120,11 +118,13 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
     }
 
     this.previousValue = this.select3.value;
-    if (Array.isArray(v) && v.length > 0 && !this.isMultiple) { // an array of items or string (id or text)
+    if (Array.isArray(v) && v.length > 0 && !this.isMultiple) {
+      // an array of items or string (id or text)
       this.select3.value = v.slice(0, 1).map(toIdTextPair);
     } else if (Array.isArray(v) && v.length > 0 && this.isMultiple) {
       this.select3.value = v.map(toIdTextPair);
-    } else if (!Array.isArray(v)) { // an item or string (id or text)
+    } else if (!Array.isArray(v)) {
+      // an item or string (id or text)
       this.select3.value = [toIdTextPair(v)];
     }
     this.updateStoredValue();

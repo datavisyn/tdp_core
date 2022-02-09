@@ -6,3 +6,4 @@ export default class TDPLocalDataProvider extends LocalDataProvider {
     constructor(_data: any[], columns?: IColumnDesc[], options?: Partial<ILocalDataProviderOptions & IDataProviderOptions>);
     protected instantiateColumn(type: IColumnConstructor, id: string, desc: IColumnDesc, typeFactory: ITypeFactory): import("lineupjs").Column;
 }
+//# sourceMappingURL=TDPLocalDataProvider.d.ts.map

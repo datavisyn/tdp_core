@@ -1,10 +1,8 @@
-
-import {IDataDescription} from './DataDescription';
-import {UniqueIdManager} from '../app/UniqueIdManager';
-import {UserSession} from '../app/UserSession';
-import {IDataType, ADataType} from './datatype';
-import {BaseUtils} from '../base/BaseUtils';
-
+import { IDataDescription } from './DataDescription';
+import { UniqueIdManager } from '../app/UniqueIdManager';
+import { UserSession } from '../app/UserSession';
+import { IDataType, ADataType } from './datatype';
+import { BaseUtils } from '../base/BaseUtils';
 
 export class DataUtils {
   /**
@@ -20,9 +18,10 @@ export class DataUtils {
       fqname: id,
       description: '',
       creator: UserSession.getInstance().currentUserNameOrAnonymous(),
-      ts: Date.now()
+      ts: Date.now(),
     };
-}
+  }
+
   /**
    * utility to assign a dataset to an html element, similar to d3
    * @param node
@@ -31,6 +30,7 @@ export class DataUtils {
   static assignData(node: Element, data: IDataType) {
     (<any>node).__data__ = data;
   }
+
   /**
    * transpose the given matrix
    * @param m
@@ -42,7 +42,7 @@ export class DataUtils {
     }
     const r = m[0].map((i) => [i]);
     for (let i = 1; i < m.length; ++i) {
-      m[i].forEach((v, i) => r[i].push(v));
+      m[i].forEach((v, j) => r[j].push(v));
     }
     return r;
   }
@@ -56,7 +56,8 @@ export class DataUtils {
   static defineDataType(name: string, functions: any) {
     function DataType(this: any, desc: IDataDescription) {
       ADataType.call(this, desc);
-      if (typeof(this.init) === 'function') {
+      if (typeof this.init === 'function') {
+        // eslint-disable-next-line prefer-rest-params
         this.init.apply(this, Array.from(arguments));
       }
     }

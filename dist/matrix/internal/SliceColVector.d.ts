@@ -39,3 +39,4 @@ export declare class SliceColVector<T, D extends IValueTypeDesc> extends AVector
     sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T, D>>;
     filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T, D>>;
 }
+//# sourceMappingURL=SliceColVector.d.ts.map

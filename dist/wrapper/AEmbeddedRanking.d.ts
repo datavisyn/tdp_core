@@ -28,7 +28,7 @@ export declare abstract class AEmbeddedRanking<T extends IRow> implements IViewP
     protected initialized(): void;
     protected setSelectedRows(rows: T[]): void;
     protected rebuild(mode?: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): Promise<void>;
-    protected runWithoutTracking<T>(f: (lineup: LocalDataProvider) => T): Promise<T>;
+    protected runWithoutTracking<D>(f: (lineup: LocalDataProvider) => D): Promise<D>;
     protected addTrackedScoreColumn(scoreId: string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn[]>;
     protected addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn>;
     update(): void;
@@ -38,3 +38,4 @@ export declare abstract class AEmbeddedRanking<T extends IRow> implements IViewP
      */
     protected getParameterFormDescs(): IFormElementDesc[];
 }
+//# sourceMappingURL=AEmbeddedRanking.d.ts.map

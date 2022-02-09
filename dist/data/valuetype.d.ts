@@ -42,3 +42,4 @@ export declare class ValueTypeUtils {
     private static maskImpl;
     static mask(arr: number | number[], desc: INumberValueTypeDesc): number | number[];
 }
+//# sourceMappingURL=valuetype.d.ts.map

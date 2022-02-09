@@ -19,8 +19,8 @@ export class LineUpLayoutContainer extends ASequentialLayoutContainer {
     }
     addedChild(child, index) {
         super.addedChild(child, index);
-        if (index < 0 || index >= (this._children.length - 1)) {
-            //+1 since we already chanded the children
+        if (index < 0 || index >= this._children.length - 1) {
+            // +1 since we already chanded the children
             this.node.appendChild(ASequentialLayoutContainer.wrap(child));
         }
         else {
@@ -44,13 +44,13 @@ export class LineUpLayoutContainer extends ASequentialLayoutContainer {
     persist() {
         return Object.assign(super.persist(), {
             type: 'lineup',
-            stackLayout: this.options.stackLayout
+            stackLayout: this.options.stackLayout,
         });
     }
     static restore(dump, restore, doc) {
         const options = Object.assign(ALayoutContainer.restoreOptions(dump), {
             orientation: EOrientation[dump.orientation],
-            stackLayout: dump.stackLayout
+            stackLayout: dump.stackLayout,
         });
         const r = new LineUpLayoutContainer(doc, options);
         dump.children.forEach((d) => r.push(restore(d)));
@@ -67,7 +67,7 @@ export class LineUpLayoutContainer extends ASequentialLayoutContainer {
         };
         const options = Object.assign(ALayoutContainer.deriveOptions(node), {
             orientation: deriveOrientation(),
-            stackLayout: node.dataset.mode === 'stacked' || node.dataset.layout.endsWith('stack')
+            stackLayout: node.dataset.mode === 'stacked' || node.dataset.layout.endsWith('stack'),
         });
         const r = new LineUpLayoutContainer(node.ownerDocument, options);
         children.forEach((c) => r.push(derive(c)));
@@ -75,7 +75,7 @@ export class LineUpLayoutContainer extends ASequentialLayoutContainer {
     }
     defaultOptions() {
         return Object.assign(super.defaultOptions(), {
-            stackLayout: false
+            stackLayout: false,
         });
     }
 }

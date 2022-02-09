@@ -60,3 +60,4 @@ export declare class Matomo {
     static getInstance(): Matomo;
 }
 export {};
+//# sourceMappingURL=Matomo.d.ts.map

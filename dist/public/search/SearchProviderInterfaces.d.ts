@@ -63,3 +63,4 @@ export interface ISearchProviderDesc extends IPluginDesc {
      */
     name: string;
 }
+//# sourceMappingURL=SearchProviderInterfaces.d.ts.map

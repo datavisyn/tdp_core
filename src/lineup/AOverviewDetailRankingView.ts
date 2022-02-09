@@ -1,25 +1,24 @@
-
-
-import {ARankingView} from './ARankingView';
-import {IARankingViewOptions} from './IARankingViewOptions';
-import {ISelection, IViewContext} from '../base/interfaces';
-import {ISplitLayoutContainer, BuilderUtils, LayoutContainerEvents} from '../layout';
-import {IRow} from '../base/rest';
-import {LocalDataProvider} from 'lineupjs';
-import {OverviewColumn} from './internal/OverviewColumn';
-import {BaseUtils} from '../base';
-import {I18nextManager} from '../i18n';
-
+import { LocalDataProvider } from 'lineupjs';
+import { ARankingView } from './ARankingView';
+import { IARankingViewOptions } from './IARankingViewOptions';
+import { ISelection, IViewContext } from '../base/interfaces';
+import { ISplitLayoutContainer, BuilderUtils, LayoutContainerEvents } from '../layout';
+import { IRow } from '../base/rest';
+import { OverviewColumn } from './internal/OverviewColumn';
+import { BaseUtils } from '../base';
+import { I18nextManager } from '../i18n';
 
 export abstract class AOverviewDetailRankingView extends ARankingView {
-
   protected readonly overview: HTMLElement;
+
   private readonly split: ISplitLayoutContainer;
 
   private lineup: LocalDataProvider;
+
   private overviewColumn: OverviewColumn;
 
   protected readonly triggerOverviewUpdateDelayed = BaseUtils.debounce(() => this.triggerOverviewUpdate(), 100);
+
   protected readonly triggerUpdateDelayed = BaseUtils.debounce(() => this.update(), 100);
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<IARankingViewOptions> = {}) {
@@ -39,7 +38,7 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
 
   protected showDetailRanking(showRanking = true) {
     const r = this.split.ratios[1];
-    if ((r > 0.1) === showRanking) {
+    if (r > 0.1 === showRanking) {
       return;
     }
     this.setRatio(showRanking ? 0.5 : 1);
@@ -60,18 +59,22 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
       node: lineup,
       destroy: () => undefined,
       dumpReference: () => -1,
-      visible: false
+      visible: false,
     };
     const overviewView = {
       node: this.overview,
       destroy: () => undefined,
       dumpReference: () => -1,
-      visible: true
+      visible: true,
     };
 
-    const r = BuilderUtils.root(BuilderUtils.verticalSplit(1,
-      BuilderUtils.view(overviewView).name(I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewDetailRanking.overview')).hideHeader(),
-      BuilderUtils.view(lineupView).name(I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewDetailRanking.detailTable')).hideHeader()));
+    const r = BuilderUtils.root(
+      BuilderUtils.verticalSplit(
+        1,
+        BuilderUtils.view(overviewView).name(I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewDetailRanking.overview')).hideHeader(),
+        BuilderUtils.view(lineupView).name(I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewDetailRanking.detailTable')).hideHeader(),
+      ),
+    );
     this.node.insertAdjacentElement('afterbegin', r.node);
 
     r.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, () => {
@@ -94,7 +97,7 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
     this.lineup.columnTypes.overview = OverviewColumn;
     this.overviewColumn = <OverviewColumn>this.lineup.create({
       type: 'overview',
-      label: ''
+      label: '',
     });
     // add our helper column at the beginning
     this.lineup.getRankings()[0].insert(this.overviewColumn, 2);
@@ -114,7 +117,7 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
     const r = this.lineup.getRankings()[0];
     const order = r.getOrder();
     const currentRows = <IRow[]>this.lineup.view(order);
-    let {width, height} = this.overview.getBoundingClientRect();
+    let { width, height } = this.overview.getBoundingClientRect();
     // some padding
     width -= 20;
     height -= 20;
@@ -143,5 +146,5 @@ export abstract class AOverviewDetailRankingView extends ARankingView {
   }
 
   protected abstract buildOverview(): Promise<any> | void;
-  protected abstract updateOverview(rows: IRow[], width: number, height: number, focus?: {name: string, rows: IRow[]}): void;
+  protected abstract updateOverview(rows: IRow[], width: number, height: number, focus?: { name: string; rows: IRow[] }): void;
 }

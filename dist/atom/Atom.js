@@ -7,7 +7,7 @@ import { Range } from '../range';
 const noValue = {
     id: -1,
     name: '',
-    value: null
+    value: null,
 };
 export class Atom extends AAtom {
     constructor(desc, loaded) {
@@ -24,20 +24,20 @@ export class Atom extends AAtom {
         return Promise.resolve(this.loaded.value);
     }
     static create(desc) {
-        if (typeof (desc.data) !== undefined) {
+        if (typeof desc.data !== undefined) {
             return new Atom(desc, desc.data);
         }
         return new Atom(desc, noValue);
     }
     static asAtom(name, value, options = {}) {
         const desc = BaseUtils.mixin(AtomUtils.createDefaultAtomDesc(), {
-            value: ValueTypeUtils.guessValueTypeDesc([value])
+            value: ValueTypeUtils.guessValueTypeDesc([value]),
         }, options);
         const rowAssigner = options.rowassigner || LocalIDAssigner.create();
         const atom = {
             name,
             value,
-            id: rowAssigner([name]).first
+            id: rowAssigner([name]).first,
         };
         return new Atom(desc, atom);
     }

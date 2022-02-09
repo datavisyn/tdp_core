@@ -18,3 +18,4 @@ export declare class Range1DGroup extends Range1D implements IRange1DGroup {
      */
     static asUngrouped(range: Range1D): Range1DGroup;
 }
+//# sourceMappingURL=Range1DGroup.d.ts.map

@@ -1,6 +1,6 @@
-import {BaseUtils} from '../base/BaseUtils';
-import {Store} from './Store';
-import {PluginRegistry} from '../app/PluginRegistry';
+import { BaseUtils } from '../base/BaseUtils';
+import { Store } from './Store';
+import { PluginRegistry } from '../app/PluginRegistry';
 
 export interface ITabSyncerOptions {
   keyPrefix?: string;
@@ -13,11 +13,12 @@ export interface ISyncerExtension {
 
 export class TabSyncer {
   public static SYNCER_EXTENSION_POINT = 'tabSyncer';
+
   private static TAB_LIST = 'tabList';
 
   private options: ITabSyncerOptions = {
     keyPrefix: 'tab-sync-',
-    storage: localStorage
+    storage: localStorage,
   };
 
   private store: Store;
@@ -29,9 +30,11 @@ export class TabSyncer {
     this.store.on(Store.EVENT_CHANGED, TabSyncer.handleChange.bind(this));
 
     // instantiate plugins
-    PluginRegistry.getInstance().loadPlugin(PluginRegistry.getInstance().listPlugins(TabSyncer.SYNCER_EXTENSION_POINT)).then((instances) => {
-      instances.forEach((i) => this.push(i.factory));
-    });
+    PluginRegistry.getInstance()
+      .loadPlugin(PluginRegistry.getInstance().listPlugins(TabSyncer.SYNCER_EXTENSION_POINT))
+      .then((instances) => {
+        instances.forEach((i) => this.push(i.factory));
+      });
 
     this.registerTab(document.location.href);
 
@@ -58,7 +61,7 @@ export class TabSyncer {
     const list = this.getTabList();
     const i = list.indexOf(url);
     if (i >= 0) {
-      list.splice(i,1);
+      list.splice(i, 1);
       this.store.setValue(TabSyncer.TAB_LIST, list);
     }
   }

@@ -17,6 +17,7 @@ export class FormUtils {
      */
     static clearNode(parent) {
         let node = parent.firstChild;
+        // eslint-disable-next-line no-cond-assign
         while ((node = parent.firstChild) != null) {
             parent.removeChild(node);
         }

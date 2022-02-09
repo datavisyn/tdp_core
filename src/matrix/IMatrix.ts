@@ -1,16 +1,12 @@
-import {RangeLike} from '../range';
-import {Range} from '../range/Range';
-import {IProductSelectAble} from '../idtype';
-import {IDType} from '../idtype/IDType';
-import {
-  IHistAbleDataType, IValueTypeDesc, IDataDescription, DataUtils,
-  INumberValueTypeDesc, ICategoricalValueTypeDesc, IStatsAbleDataType
-} from '../data';
-import {IVector} from '../vector';
-import {IHistogram} from '../data/histogram';
-import {IAdvancedStatistics, IStatistics} from '../base/statistics';
-import {BaseUtils} from '../base/BaseUtils';
-
+import { RangeLike } from '../range';
+import { Range } from '../range/Range';
+import { IProductSelectAble } from '../idtype';
+import { IDType } from '../idtype/IDType';
+import { IHistAbleDataType, IValueTypeDesc, IDataDescription, DataUtils, INumberValueTypeDesc, ICategoricalValueTypeDesc, IStatsAbleDataType } from '../data';
+import { IVector } from '../vector';
+import { IHistogram } from '../data/histogram';
+import { IAdvancedStatistics, IStatistics } from '../base/statistics';
+import { BaseUtils } from '../base/BaseUtils';
 
 export interface IHeatMapUrlOptions {
   format?: string;
@@ -66,14 +62,13 @@ export interface IMatrix<T, D extends IValueTypeDesc> extends IHistAbleDataType<
    * creates a new view on this matrix specified by the given range
    * @param range
    */
-  view(range?: RangeLike): IMatrix<T,D>;
+  view(range?: RangeLike): IMatrix<T, D>;
 
+  idView(idRange?: RangeLike): Promise<IMatrix<T, D>>;
 
-  idView(idRange?: RangeLike): Promise<IMatrix<T,D>>;
+  slice(col: number): IVector<T, D>;
 
-  slice(col: number): IVector<T,D>;
-
-  //view(filter: string): Promise<IMatrix>;
+  // view(filter: string): Promise<IMatrix>;
 
   /**
    * reduces the current matrix to a vector using the given reduce function
@@ -86,7 +81,7 @@ export interface IMatrix<T, D extends IValueTypeDesc> extends IHistAbleDataType<
   /**
    * transposed version of this matrix
    */
-  readonly t: IMatrix<T,D>;
+  readonly t: IMatrix<T, D>;
   /**
    * returns a promise for getting the col names of the matrix
    * @param range
@@ -139,7 +134,7 @@ export class MatrixUtils {
       type: 'matrix',
       rowtype: '_rows',
       coltype: '_cols',
-      size: [0, 0]
+      size: [0, 0],
     });
   }
 }

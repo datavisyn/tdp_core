@@ -1,9 +1,7 @@
-import { IScoreRow } from '../base/interfaces';
+import { IDataRow, Ranking, LocalDataProvider } from 'lineupjs';
+import { IScoreRow, IScoreLoader } from '../base/interfaces';
 import { IParams, IRow } from '../base/rest';
-import { IDataRow } from 'lineupjs';
 import { IFormMultiMap, IFormRow } from '../form/elements/FormMap';
-import { IScoreLoader } from '../base/interfaces';
-import { Ranking, LocalDataProvider } from 'lineupjs';
 import { IRankingWrapper } from './IRankingWrapper';
 import { IPluginDesc } from '../base';
 /**
@@ -65,3 +63,4 @@ export declare class LineupUtils {
     static set_diff<T>(set1: Set<T>, set2: Set<T>): Set<T>;
     static wrapRanking(data: LocalDataProvider, ranking: Ranking): IRankingWrapper;
 }
+//# sourceMappingURL=utils.d.ts.map

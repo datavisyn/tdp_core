@@ -1,13 +1,10 @@
-import {BaseUtils} from '../base/BaseUtils';
-import {RangeLike, CompositeRange1D, Range} from '../range';
-import {IDType, IDTypeLike} from '../idtype';
-import {
-  IHistAbleDataType, IValueTypeDesc, IDataDescription, DataUtils,
-  INumberValueTypeDesc, ICategoricalValueTypeDesc, IStatsAbleDataType
-} from '../data';
-import {IHistogram} from '../data/histogram';
-import {IAdvancedStatistics, IStatistics} from '../base/statistics';
-import {IAtom, IAtomValue} from '../atom/IAtom';
+import { BaseUtils } from '../base/BaseUtils';
+import { RangeLike, CompositeRange1D, Range } from '../range';
+import { IDType, IDTypeLike } from '../idtype';
+import { IHistAbleDataType, IValueTypeDesc, IDataDescription, DataUtils, INumberValueTypeDesc, ICategoricalValueTypeDesc, IStatsAbleDataType } from '../data';
+import { IHistogram } from '../data/histogram';
+import { IAdvancedStatistics, IStatistics } from '../base/statistics';
+import { IAtom, IAtomValue } from '../atom/IAtom';
 
 export interface IVectorDataDescription<D extends IValueTypeDesc> extends IDataDescription {
   readonly value: D;
@@ -34,9 +31,9 @@ export interface IVector<T, D extends IValueTypeDesc> extends IHistAbleDataType<
    * creates a new view on this matrix specified by the given range
    * @param range optional subset
    */
-  view(range?: RangeLike): IVector<T,D>;
+  view(range?: RangeLike): IVector<T, D>;
 
-  idView(idRange?: RangeLike): Promise<IVector<T,D>>;
+  idView(idRange?: RangeLike): Promise<IVector<T, D>>;
   /**
    * returns a promise for getting one cell
    * @param i at a specific position
@@ -61,13 +58,12 @@ export interface IVector<T, D extends IValueTypeDesc> extends IHistAbleDataType<
    */
   hist(bins?: number, range?: RangeLike): Promise<IHistogram>;
 
-
   /**
    * Sorts an array.
    * @param compareFn The name of the function used to determine the order of the elements. If omitted, the elements are sorted in ascending, ASCII character order.
    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
-  sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T,D>>;
+  sort(compareFn?: (a: T, b: T) => number, thisArg?: any): Promise<IVector<T, D>>;
 
   /**
    * Determines whether all the members of an array satisfy the specified test.
@@ -95,7 +91,7 @@ export interface IVector<T, D extends IValueTypeDesc> extends IHistAbleDataType<
    * @param callbackfn A function that accepts up to three arguments. The filter method calls the callbackfn function one time for each element in the array.
    * @param thisArg An object to which the this keyword can refer in the callbackfn function. If thisArg is omitted, undefined is used as the this value.
    */
-  filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T,D>>;
+  filter(callbackfn: (value: T, index: number) => boolean, thisArg?: any): Promise<IVector<T, D>>;
 
   /**
    * Calls the specified callback function for all the elements in an array. The return value of the callback function is the accumulated result, and is provided as an argument in the next call to the callback function.
@@ -127,7 +123,6 @@ export interface IVector<T, D extends IValueTypeDesc> extends IHistAbleDataType<
    */
   reduceRight<U>(callbackfn: (previousValue: U, currentValue: T, currentIndex: number) => U, initialValue: U, thisArg?: any): Promise<U>;
 
-
   /**
    * reduces the current vector to an atom using the given reduce function
    * @param f the reduce function
@@ -135,7 +130,12 @@ export interface IVector<T, D extends IValueTypeDesc> extends IHistAbleDataType<
    * @param valuetype the new value type by default the same as matrix valuetype
    * @param idtype the new vlaue type by default the same as matrix rowtype
    */
-  reduceAtom<U, UD extends IValueTypeDesc>(f: (data: T[], ids: Range, names: string[]) => IAtomValue<U>, thisArgument?: any, valuetype?: UD, idtype?: IDType): IAtom<U, UD>;
+  reduceAtom<U, UD extends IValueTypeDesc>(
+    f: (data: T[], ids: Range, names: string[]) => IAtomValue<U>,
+    thisArgument?: any,
+    valuetype?: UD,
+    idtype?: IDType,
+  ): IAtom<U, UD>;
 
   /**
    * return the range of this vector as a grouped range, depending on the type this might be a single group or multiple ones
@@ -146,14 +146,13 @@ export interface IVector<T, D extends IValueTypeDesc> extends IHistAbleDataType<
    * similar to groups() but returns a stratification --> don't add this because otherwise there is a cycle between stratification and vector
    * @deprecated use asStratification instead
    */
-//  stratification(): Promise<IStratification>;
+  //  stratification(): Promise<IStratification>;
 
   /**
    * similar to groups() but returns a stratification --> don't add this because otherwise there is a cycle between stratification and vector
    */
-//  asStratification(): Promise<IStratification>;
+  //  asStratification(): Promise<IStratification>;
 }
-
 
 export declare type INumericalVector = IVector<number, INumberValueTypeDesc>;
 export declare type ICategoricalVector = IVector<string, ICategoricalValueTypeDesc>;

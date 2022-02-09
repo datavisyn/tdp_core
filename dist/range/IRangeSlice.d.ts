@@ -6,3 +6,4 @@ export interface IRangeSlice {
     to?: number;
     step?: number;
 }
+//# sourceMappingURL=IRangeSlice.d.ts.map

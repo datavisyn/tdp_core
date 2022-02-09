@@ -6,20 +6,21 @@ import { UserSession } from '../app';
  */
 export class AStartList extends ARankingView {
     constructor(context, selection, parent, options = {}) {
-        super(context, selection, parent, Object.assign({
+        super(context, selection, parent, {
             additionalScoreParameter: options.namedSet,
             additionalComputeScoreParameter: options.namedSet,
             subType: {
                 key: options.namedSet ? options.namedSet.subTypeKey : '',
-                value: options.namedSet ? options.namedSet.subTypeValue : ''
-            }
-        }, options));
+                value: options.namedSet ? options.namedSet.subTypeValue : '',
+            },
+            ...options,
+        });
     }
     get namedSet() {
         return this.options.namedSet || null;
     }
     buildNamedSetFilters(namedSetIdFilterKey = 'namedset4id', validFilterKey = () => true) {
-        const namedSet = this.namedSet;
+        const { namedSet } = this;
         if (!namedSet) {
             return {};
         }
@@ -33,6 +34,8 @@ export class AStartList extends ARankingView {
                 break;
             case ENamedSetType.FILTER:
                 Object.assign(filter, namedSet.filter);
+                break;
+            default:
                 break;
         }
         // TODO can't remember why the all exception

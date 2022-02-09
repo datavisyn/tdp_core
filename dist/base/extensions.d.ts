@@ -49,3 +49,4 @@ export interface ICustomizedLoginFormPlugin extends IPlugin {
     readonly desc: ICustomizedLoginFormPluginDesc;
     factory(loginMenu: HTMLElement, loginDialog: HTMLElement): void;
 }
+//# sourceMappingURL=extensions.d.ts.map

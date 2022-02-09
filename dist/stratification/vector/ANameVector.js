@@ -10,16 +10,16 @@ export class ANameVector extends AVector {
             name: base.desc.name,
             fqname: base.desc.fqname,
             description: base.desc.description,
-            id: base.desc.id + '_names',
+            id: `${base.desc.id}_names`,
             value: {
-                type: 'string'
+                type: 'string',
             },
             idtype: this.idtype.id,
             size: this.length,
             ts: base.desc.ts,
             creator: base.desc.creator,
             group: base.desc.group,
-            permissions: base.desc.permissions
+            permissions: base.desc.permissions,
         };
     }
     get valuetype() {
@@ -27,7 +27,7 @@ export class ANameVector extends AVector {
     }
     // TODO This method should be abstract. However, it results in a compile error with Typescript v2.7.2:
     // `TS2715: Abstract property 'idtype' in class 'ANameVector' cannot be accessed in the constructor.`
-    /*abstract*/ get idtype() {
+    /* abstract */ get idtype() {
         return null;
     }
     get idtypes() {
@@ -36,12 +36,14 @@ export class ANameVector extends AVector {
     persist() {
         return {
             root: this.base.persist(),
-            names: true
+            names: true,
         };
     }
     restore(persisted) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
         let r = this;
-        if (persisted && persisted.range) { //some view onto it
+        if (persisted && persisted.range) {
+            // some view onto it
             r = r.view(ParseRangeUtils.parseRangeLike(persisted.range));
         }
         return r;
