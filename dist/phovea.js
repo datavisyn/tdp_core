@@ -147,70 +147,15 @@ export default function (registry) {
         matches: 'select',
     });
     /// #endif
-    /// #if include('clue', 'multiform')
-    registry.push('actionFunction', 'transform', function () {
-        return import('./base/Multiform').then((m) => m.Multiform);
-    }, {
-        factory: 'transform',
-    });
-    registry.push('actionFunction', 'changeVis', function () {
-        return import('./base/Multiform').then((m) => m.Multiform);
-    }, {
-        factory: 'changeVis',
-    });
-    registry.push('actionFunction', 'select', function () {
-        return import('./base/Multiform').then((m) => m.Multiform);
-    }, {
-        factory: 'select',
-    });
-    /// #endif
     registry.push(EP_PHOVEA_CORE_LOCALE, 'phoveaClueLocaleEN', function () {
         return import('./locales/en/phovea.json').then(PluginRegistry.getInstance().asResource);
     }, {
         ns: 'phovea',
     });
     /* phovea_core */
-    /// #if include('datatype', 'matrix')
-    registry.push('datatype', 'matrix', function () {
-        return import('./matrix/Matrix').then((m) => m.Matrix);
-    }, {
-        factory: 'create',
-        static: true,
-    });
-    /// #endif
-    /// #if include('datatype', 'table')
-    registry.push('datatype', 'table', function () {
-        return import('./table/Table').then((m) => m.Table);
-    }, {
-        factory: 'create',
-        static: true,
-    });
-    /// #endif
-    /// #if include('datatype', 'vector')
-    registry.push('datatype', 'vector', function () {
-        return import('./vector/Vector').then((m) => m.Vector);
-    }, {
-        factory: 'create',
-        static: true,
-    });
-    /// #endif
-    /// #if include('datatype', 'stratification')
-    registry.push('datatype', 'stratification', function () {
-        return import('./stratification/Stratification').then((m) => m.Stratification);
-    }, {
-        factory: 'create',
-    });
-    /// #endif
     /// #if include('datatype', 'graph')
     registry.push('datatype', 'graph', function () {
         return import('./graph/GraphProxy').then((m) => m.GraphProxy);
-    }, {
-        factory: 'create',
-    });
-    /// #endif
-    /// #if include('datatype', 'atom')
-    registry.push('datatype', 'atom', function () {
-        return import('./atom/Atom').then((m) => m.Atom);
     }, {
         factory: 'create',
     });

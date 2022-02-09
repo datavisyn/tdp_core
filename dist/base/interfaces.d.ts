@@ -2,21 +2,20 @@ import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
 import { AppHeader } from '../components';
 import { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
-import { IDType } from '../idtype';
-import { ProvenanceGraph, IObjectRef } from '../provenance';
-import { RangeLike, Range } from '../range';
-import { IUser } from '../security';
 import { IPluginDesc, IPlugin } from './plugin';
 import { IEventHandler } from './event';
+import { IDType } from '../idtype';
+import type { ProvenanceGraph, IObjectRef } from '../provenance';
+import { IUser } from '../security';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * used internally to match selections to column
-     * @default -1
+     * @default undefined
      */
-    selectedId: number;
+    selectedId: string;
     /**
      * used internally to match selections to multiple columns
-     * @default: undefined
+     * @default undefined
      */
     selectedSubtype?: string;
     /**
@@ -74,12 +73,12 @@ export interface IScore<T> {
     };
     /**
      * start the computation of the score for the given ids
-     * @param {RangeLike} ids the currently visible ids
+     * @param {string[]} ids the currently visible ids
      * @param {IDType} idtype of this idtype
      * @param {Object} extras extra arguments
      * @returns {Promise<IScoreRow<T>[]>} the scores
      */
-    compute(ids: RangeLike, idtype: IDType, extras?: object): Promise<IScoreRow<T>[]>;
+    compute(ids: string[], idtype: IDType, extras?: object): Promise<IScoreRow<T>[]>;
     /**
      * Hook to override returning which authorizations are required for this score.
      * @returns ID(s) or authorization configurations(s) which are required.
@@ -219,12 +218,18 @@ export interface IViewGroupExtensionDesc extends IPluginDesc {
     groups: IGroupData[];
 }
 export interface ISelection {
+    /**
+     * TODO:
+     */
     readonly idtype: IDType;
-    readonly range: Range;
+    /**
+     * TODO:
+     */
+    ids: string[];
     /**
      * other selections floating around in a multi selection environment
      */
-    readonly all?: Map<IDType, Range>;
+    readonly all?: Map<IDType, string[]>;
 }
 export interface IViewContext {
     readonly graph: ProvenanceGraph;
@@ -391,7 +396,6 @@ export interface IInstantViewOptions {
 }
 export interface IItemSelection extends ISelection {
     readonly items: {
-        _id: number;
         id: string;
         text: string;
     }[];

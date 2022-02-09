@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumn, NumericalColumn, Scales } from '../interfaces';
-import { IVisConfig } from '../interfaces';
-import { IBarConfig } from './utils';
+import { CategoricalColumn, IBarConfig, NumericalColumn, Scales, IVisConfig } from '../interfaces';
 interface BarVisProps {
     config: IBarConfig;
     optionsConfig?: {

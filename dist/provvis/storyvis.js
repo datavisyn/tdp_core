@@ -108,9 +108,6 @@ export class VerticalStoryVis extends AVisInstance {
         this.options[name] = val;
         return undefined;
     }
-    locateImpl(range) {
-        return Promise.resolve(null);
-    }
     transform(scale, rotate = 0) {
         const bak = {
             scale: this.options.scale || [1, 1],

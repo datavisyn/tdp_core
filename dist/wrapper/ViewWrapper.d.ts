@@ -1,13 +1,3 @@
-/** *******************************************************
- * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
- *
- * This file is property of datavisyn.
- * Code and any other files associated with this project
- * may not be copied and/or distributed without permission.
- *
- * Proprietary and confidential. No warranty.
- *
- ******************************************************** */
 import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
 import { AView } from '../views/AView';

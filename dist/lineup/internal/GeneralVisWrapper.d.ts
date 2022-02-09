@@ -11,7 +11,7 @@ export declare class GeneralVisWrapper extends EventHandler {
     private data;
     constructor(provider: LocalDataProvider, idType: IDType, lineupSelectionHelper: LineUpSelectionHelper, doc?: Document);
     getAllData(): any[];
-    selectCallback(selected: number[]): void;
+    selectCallback(selected: string[]): void;
     filterCallback(s: string): void;
     updateCustomVis(): void;
     toggleCustomVis(): void;

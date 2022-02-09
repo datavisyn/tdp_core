@@ -1,7 +1,6 @@
 import { LocalDataProvider } from 'lineupjs';
 import { EventHandler } from '../../base';
 import { LineupUtils } from '../utils';
-import { Range } from '../../range';
 export class LineUpSelectionHelper extends EventHandler {
     constructor(provider, idType) {
         super();
@@ -20,15 +19,8 @@ export class LineUpSelectionHelper extends EventHandler {
         this.uid2index.clear();
         // create lookup cache
         this._rows.forEach((row, i) => {
-            this.uid2index.set(row._id, i);
+            this.uid2index.set(row.id, i);
         });
-        // fill up id cache for faster mapping
-        const idType = this.idType();
-        if (!idType) {
-            console.error('no idType defined for this view');
-            return;
-        }
-        idType.fillMapCache(this._rows.map((r) => r._id), this._rows.map((r) => String(r.id)));
     }
     addEventListener() {
         this.provider.on(LocalDataProvider.EVENT_SELECTION_CHANGED, (indices) => {
@@ -50,14 +42,12 @@ export class LineUpSelectionHelper extends EventHandler {
         diffAdded.forEach((d) => {
             this.orderedSelectedIndices.push(d);
         });
-        const uids = Range.list(this.orderedSelectedIndices.map((i) => this._rows[i]._id));
-        // console.log(this.orderedSelectionIndicies, ids.toString(), diffAdded, diffRemoved);
         const idType = this.idType();
         if (!idType) {
             console.warn('no idType defined for this ranking view');
             return;
         }
-        const selection = { idtype: idType, range: uids };
+        const selection = { idtype: idType, ids: this.orderedSelectedIndices.map((i) => this._rows[i].id) };
         // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
         this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
     }
@@ -72,30 +62,21 @@ export class LineUpSelectionHelper extends EventHandler {
      * gets the rows ids as a set, i.e. the order doesn't mean anything
      */
     rowIdsAsSet(indices) {
-        let ids;
-        if (indices.length === this._rows.length) {
-            // all
-            ids = this._rows.map((d) => d._id);
-        }
-        else {
-            ids = indices.map((i) => this._rows[i]._id);
-        }
-        ids.sort((a, b) => a - b); // sort by number
-        return Range.list(ids);
+        return (indices.length === this._rows.length ? this._rows.map((d) => d.id) : indices.map((i) => this._rows[i].id)).sort();
     }
     setItemSelection(sel) {
         if (!this.provider) {
             return;
         }
-        const old = this.provider.getSelection().sort((a, b) => a - b);
+        const old = this.provider.getSelection().sort();
         const indices = [];
-        sel.range.dim(0).forEach((uid) => {
+        sel.ids.forEach((uid) => {
             const index = this.uid2index.get(uid);
             if (typeof index === 'number') {
                 indices.push(index);
             }
         });
-        indices.sort((a, b) => a - b);
+        indices.sort();
         if (old.length === indices.length && indices.every((v, j) => old[j] === v)) {
             return; // no change
         }
@@ -109,7 +90,7 @@ export class LineUpSelectionHelper extends EventHandler {
         }
         const old = this.provider.getSelection().sort((a, b) => a - b);
         const indices = [];
-        sel.range.dim(0).forEach((uid) => {
+        sel.ids.forEach((uid) => {
             const index = this.uid2index.get(uid);
             if (typeof index === 'number') {
                 indices.push(index);
@@ -123,17 +104,18 @@ export class LineUpSelectionHelper extends EventHandler {
     }
     getSelection() {
         if (!this.provider) {
-            return;
+            return [];
         }
-        const sel = this.provider.getSelection();
-        const indices = [];
-        sel.forEach((uid) => {
-            const index = this.uid2index.get(uid);
-            if (typeof index === 'number') {
-                indices.push(index);
-            }
-        });
-        return indices;
+        // const sel = this.provider.getSelection();
+        // const indices: number[] = [];
+        // sel.forEach((uid) => {
+        //   const index = this.uid2index.get(uid);
+        //   if (typeof index === 'number') {
+        //     indices.push(index);
+        //   }
+        // });
+        // return indices;
+        return this.provider.getSelection();
     }
 }
 LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION = 'setItemSelection';

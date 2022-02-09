@@ -5,7 +5,6 @@ import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
 import { EventHandler } from '../../base/event';
 import { IDTypeManager } from '../../idtype/IDTypeManager';
-import { Range } from '../../range/Range';
 export class GeneralVisWrapper extends EventHandler {
     constructor(provider, idType, lineupSelectionHelper, doc = document) {
         super();
@@ -58,10 +57,9 @@ export class GeneralVisWrapper extends EventHandler {
         return newData;
     }
     selectCallback(selected) {
-        const r = Range.list(selected);
         // ???
         const id = IDTypeManager.getInstance().resolveIdType(this.idType.id);
-        this.lineupSelectionHelper.setGeneralVisSelection({ idtype: id, range: r });
+        this.lineupSelectionHelper.setGeneralVisSelection({ idtype: id, ids: selected });
     }
     filterCallback(s) {
         const selectedIds = this.provider.getSelection();
@@ -86,7 +84,6 @@ export class GeneralVisWrapper extends EventHandler {
         for (const i of selectedIndeces) {
             selectedMap[i] = true;
         }
-        console.log(data);
         for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
             cols.push({
                 info: {

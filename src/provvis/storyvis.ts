@@ -15,7 +15,6 @@ import { SelectionUtils, SelectOperation } from '../idtype';
 import { ArrayUtils, BaseUtils } from '../base';
 import { AppContext, DnDUtils } from '../app';
 import { I18nextManager } from '../i18n';
-import { Range } from '../range';
 
 interface ISlideNodeRepr {
   id: number | string;
@@ -140,10 +139,6 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
     this.fire(`option.${name}`, val, this.options[name]);
     this.options[name] = val;
     return undefined;
-  }
-
-  locateImpl(range: Range) {
-    return Promise.resolve(null);
   }
 
   transform(scale?: [number, number], rotate = 0) {

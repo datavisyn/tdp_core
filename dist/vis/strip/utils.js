@@ -36,8 +36,8 @@ export function createStripTraces(columns, config, scales) {
             plots.push({
                 data: {
                     y: numCurr.values.map((v) => v.val),
-                    xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                    yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                    xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                    yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                     showlegend: false,
                     type: 'box',
                     boxpoints: 'all',
@@ -45,14 +45,14 @@ export function createStripTraces(columns, config, scales) {
                     mode: 'none',
                     pointpos: 0,
                     box: {
-                        visible: true
+                        visible: true,
                     },
                     line: {
                         color: 'rgba(255,255,255,0)',
                     },
                     marker: {
-                        color: '#337ab7'
-                    }
+                        color: '#337ab7',
+                    },
                 },
                 xLabel: numCurr.info.name,
                 yLabel: numCurr.info.name,
@@ -66,8 +66,8 @@ export function createStripTraces(columns, config, scales) {
                 data: {
                     x: catCurr.values.map((v) => v.val),
                     y: numCurr.values.map((v) => v.val),
-                    xaxis: plotCounter === 1 ? 'x' : 'x' + plotCounter,
-                    yaxis: plotCounter === 1 ? 'y' : 'y' + plotCounter,
+                    xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                    yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                     showlegend: false,
                     type: 'box',
                     boxpoints: 'all',
@@ -75,24 +75,26 @@ export function createStripTraces(columns, config, scales) {
                     mode: 'none',
                     pointpos: 0,
                     box: {
-                        visible: true
+                        visible: true,
                     },
                     line: {
                         color: 'rgba(255,255,255,0)',
                     },
                     meanline: {
-                        visible: true
+                        visible: true,
                     },
-                    transforms: [{
+                    transforms: [
+                        {
                             type: 'groupby',
                             groups: catCurr.values.map((v) => v.val),
                             styles: [...new Set(catCurr.values.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { marker: { color: scales.color(c) } } };
-                            })
-                        }]
+                            }),
+                        },
+                    ],
                 },
                 xLabel: catCurr.info.name,
-                yLabel: numCurr.info.name
+                yLabel: numCurr.info.name,
             });
             plotCounter += 1;
         }

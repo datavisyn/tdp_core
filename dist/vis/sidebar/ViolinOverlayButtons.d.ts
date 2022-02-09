@@ -1,4 +1,4 @@
-import { EViolinOverlay } from '../bar/utils';
+import { EViolinOverlay } from '../interfaces';
 interface ViolinOverlayProps {
     callback: (s: EViolinOverlay) => void;
     currentSelected: EViolinOverlay;

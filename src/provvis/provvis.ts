@@ -1,17 +1,15 @@
 // TODO: Why?
 import '../webpack/_bootstrap';
 import * as d3 from 'd3';
-import { ModeWrapper } from '../base/mode';
-import { Dialog } from '../components';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { ActionMetaData, ActionNode, ProvenanceGraph, SlideNode, StateNode } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
 import { SelectionUtils, SelectOperation } from '../idtype';
-import { BaseUtils } from '../base';
+import { BaseUtils, ModeWrapper } from '../base';
 import { AppContext, DnDUtils } from '../app';
 import { I18nextManager } from '../i18n';
-import { Range } from '../range';
+import { Dialog } from '../components/dialogs';
 
 const DOI_LARGE = 0.9;
 const DOI_MEDIUM = 0.7;
@@ -361,7 +359,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     state.on('setAttr', this.trigger);
   };
 
-  private onSelectionChanged = (event: any, type: string, act: Range) => {
+  private onSelectionChanged = (event: any, type: string, act: number[]) => {
     const selectedStates = this.data.selectedStates(type);
     this.$node.selectAll('div.state').classed(`phovea-select-${type}`, function (d: StateRepr) {
       const isSelected = selectedStates.indexOf(d.s) >= 0;
@@ -470,10 +468,6 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     this.fire(`option.${name}`, val, this.options[name]);
     this.options[name] = val;
     return undefined;
-  }
-
-  locateImpl(range: Range) {
-    return Promise.resolve(null);
   }
 
   private build($parent: d3.Selection<any>) {

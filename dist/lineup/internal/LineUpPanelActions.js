@@ -154,7 +154,7 @@ export class LineUpPanelActions extends EventHandler {
             const customVis = new PanelButton(buttons, {
                 title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'),
                 faIcon: 'fas fa-chart-bar',
-                onClick: () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS)
+                onClick: () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS),
             });
             this.header.addButton(customVis, EPanelHeaderToolbar.END);
         }

@@ -46,15 +46,6 @@
     "encryptUserName": false
   },
   "--phovea_data_redis": "comment",
-  "assigner": {
-    "hostname": "redis",
-    "port": 6379,
-    "db": 3,
-    "extras": {
-
-    },
-    "cache": 262144
-  },
   "mapping": {
     "hostname": "redis",
     "port": 6379,

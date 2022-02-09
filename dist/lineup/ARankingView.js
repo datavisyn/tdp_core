@@ -211,8 +211,9 @@ export class ARankingView extends AView {
                 this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
             }
         }
-        this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, itemSelection) => {
-            this.setItemSelection(itemSelection);
+        this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
+        this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
+            this.setItemSelection(sel);
             this.generalVis.updateCustomVis();
         });
         this.selectionAdapter = this.createSelectionAdapter();
@@ -290,8 +291,8 @@ export class ARankingView extends AView {
             columns,
             selection: this.selection,
             freeColor: (id) => this.colors.freeColumnColor(id),
-            add: (addedColumns) => addedColumns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-            remove: (removedColumns) => removedColumns.forEach((c) => c.removeMe()),
+            add: (selectionColumns) => selectionColumns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
+            remove: (removeColumns) => removeColumns.forEach((c) => c.removeMe()),
         };
     }
     /**
@@ -349,7 +350,7 @@ export class ARankingView extends AView {
         NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
         this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
     }
-    addColumn(colDesc, data, id = -1, position) {
+    addColumn(colDesc, data, id = null, position) {
         // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
         colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : this.colors.getColumnColor(id);
         return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
@@ -448,7 +449,7 @@ export class ARankingView extends AView {
                 }
             })();
         });
-        const r = this.addColumn(colDesc, data, -1, position);
+        const r = this.addColumn(colDesc, data, null, position);
         columnResolve(r.col);
         // use _score function to reload the score
         colDesc._score = () => {
@@ -538,7 +539,7 @@ export class ARankingView extends AView {
             .then(() => {
             this.builtLineUp(this.provider);
             // record after the initial one
-            LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+            // LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
             this.setBusy(false);
             this.update();
         })

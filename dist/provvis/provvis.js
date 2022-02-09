@@ -1,16 +1,15 @@
 // TODO: Why?
 import '../webpack/_bootstrap';
 import * as d3 from 'd3';
-import { ModeWrapper } from '../base/mode';
-import { Dialog } from '../components';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { ActionMetaData, SlideNode } from '../provenance';
 import { AVisInstance } from './visInstance';
 import { SelectionUtils, SelectOperation } from '../idtype';
-import { BaseUtils } from '../base';
+import { BaseUtils, ModeWrapper } from '../base';
 import { AppContext, DnDUtils } from '../app';
 import { I18nextManager } from '../i18n';
+import { Dialog } from '../components/dialogs';
 const DOI_LARGE = 0.9;
 const DOI_MEDIUM = 0.7;
 const DOI_SMALL = 0.4;
@@ -395,9 +394,6 @@ export class LayoutedProvVis extends AVisInstance {
         this.fire(`option.${name}`, val, this.options[name]);
         this.options[name] = val;
         return undefined;
-    }
-    locateImpl(range) {
-        return Promise.resolve(null);
     }
     build($parent) {
         //  scale = this.options.scale;

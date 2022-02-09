@@ -1,9 +1,4 @@
 import { Data } from 'plotly.js';
-import { IBarConfig } from './bar/utils';
-import { IPCPConfig } from './pcp/utils';
-import { IScatterConfig } from './scatter/utils';
-import { IStripConfig } from './strip/utils';
-import { IViolinConfig } from './violin/utils';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter",
     PCP = "Parallel Coordinates",
@@ -64,4 +59,66 @@ export declare type ColumnInfo = {
 export declare type Scales = {
     color: any;
 };
+/**
+ * Bar chart enums
+ */
+export declare enum EBarDisplayType {
+    DEFAULT = "Default",
+    NORMALIZED = "Normalized"
+}
+export declare enum EBarDirection {
+    VERTICAL = "Vertical",
+    HORIZONTAL = "Horizontal"
+}
+export declare enum EViolinOverlay {
+    NONE = "None",
+    STRIP = "Strip",
+    BOX = "Box"
+}
+export declare enum EBarGroupingType {
+    STACK = "Stacked",
+    GROUP = "Grouped"
+}
+/**
+ * Scatter chart enums
+ */
+export declare enum ENumericalColorScaleType {
+    SEQUENTIAL = "Sequential",
+    DIVERGENT = "Divergent"
+}
+export interface IBarConfig {
+    type: ESupportedPlotlyVis.BAR;
+    multiples: ColumnInfo | null;
+    group: ColumnInfo | null;
+    direction: EBarDirection;
+    display: EBarDisplayType;
+    groupType: EBarGroupingType;
+    numColumnsSelected: ColumnInfo[];
+    catColumnsSelected: ColumnInfo[];
+}
+export interface IPCPConfig {
+    type: ESupportedPlotlyVis.PCP;
+    numColumnsSelected: ColumnInfo[];
+    catColumnsSelected: ColumnInfo[];
+}
+export interface IScatterConfig {
+    type: ESupportedPlotlyVis.SCATTER;
+    numColumnsSelected: ColumnInfo[];
+    color: ColumnInfo | null;
+    numColorScaleType: ENumericalColorScaleType;
+    shape: ColumnInfo | null;
+    isRectBrush: boolean;
+    alphaSliderVal: number;
+}
+export interface IStripConfig {
+    type: ESupportedPlotlyVis.STRIP;
+    numColumnsSelected: ColumnInfo[];
+    catColumnsSelected: ColumnInfo[];
+}
+export interface IViolinConfig {
+    type: ESupportedPlotlyVis.VIOLIN;
+    numColumnsSelected: ColumnInfo[];
+    catColumnsSelected: ColumnInfo[];
+    violinOverlay: EViolinOverlay;
+}
 //# sourceMappingURL=interfaces.d.ts.map

@@ -6,11 +6,11 @@ export class FindViewUtils {
     /**
      * finds for the given IDType and selection matching views
      * @param {IDType} idType the idtype to lookfor
-     * @param {Range} selection the current input selection
+     * @param {string[]} selection the current input selection
      * @returns {Promise<IDiscoveredView[]>} list of views and whether the current selection count matches their requirements
      */
     static findViews(idType, selection) {
-        const selectionLength = selection.isNone ? 0 : selection.dim(0).length;
+        const selectionLength = selection.length;
         function bySelection(p) {
             return ViewUtils.matchLength(p.selection, selectionLength) || (ViewUtils.showAsSmallMultiple(p) && selectionLength > 1);
         }

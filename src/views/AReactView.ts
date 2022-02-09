@@ -14,7 +14,6 @@ import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
 import { Errors } from '../components';
 import { IDTypeLike, IDTypeManager } from '../idtype';
-import { Range } from '../range';
 
 /**
  * definition how to select elements within the react view
@@ -64,49 +63,37 @@ export abstract class AReactView extends AView {
     return this.update();
   }
 
-  private selectImpl(name: string | string[], op: 'add' | 'set' | 'remove' | 'toggle' = 'set') {
-    const names = Array.isArray(name) ? name : [name];
+  private selectImpl(name: string | string[], op: 'add' | 'set' | 'remove' | 'toggle' = 'set'): string[] {
+    const ids = Array.isArray(name) ? name : [name];
     const idtype = this.itemIDType;
-    return idtype.map(names).then((ids) => {
-      const range = Range.list(ids);
-      const act = this.getItemSelection();
-      let r: number[] = [];
-      switch (op) {
-        case 'add': {
-          const union = act.range.union(range);
-          this.setItemSelection({ idtype, range: union });
-          r = union.dim(0).asList();
-          break;
-        }
-        case 'remove': {
-          const without = act.range.without(range);
-          this.setItemSelection({ idtype, range: without });
-          r = without.dim(0).asList();
-          break;
-        }
-        case 'toggle': {
-          r = act.range.dim(0).asList();
-          ids.forEach((id) => {
-            const index = r.indexOf(id);
-            if (index >= 0) {
-              r.splice(index, 1);
-            } else {
-              r.push(id);
-            }
-          });
-          r.sort((a, b) => a - b);
-          const result = Range.list(r);
-          this.setItemSelection({ idtype, range: result });
-          break;
-        }
-        default:
-          this.setItemSelection({ idtype, range });
-          r = range.dim(0).asList();
-          break;
-      }
-      this.update();
-      return r;
-    });
+    const act = this.getItemSelection();
+    let sel: string[] = [];
+    switch (op) {
+      case 'add':
+        sel = Array.from(new Set([...act.ids, ...ids]));
+        break;
+      case 'remove':
+        sel = act.ids.filter((actId) => !ids.includes(actId));
+        break;
+      case 'toggle':
+        // eslint-disable-next-line no-case-declarations
+        const toggling = new Set(act.ids);
+        ids.forEach((id) => {
+          if (toggling.has(id)) {
+            toggling.delete(id);
+          } else {
+            toggling.add(id);
+          }
+        });
+        sel = Array.from(toggling);
+        break;
+      default:
+        sel = ids;
+        break;
+    }
+    this.setItemSelection({ idtype, ids: sel });
+    this.update();
+    return sel;
   }
 
   get itemIDType() {
@@ -123,7 +110,7 @@ export abstract class AReactView extends AView {
     console.assert(!this.handler);
     this.setBusy(true);
     const item = this.getItemSelection();
-    return Promise.all([this.resolveSelection(), item.idtype ? item.idtype.unmap(item.range) : []])
+    return Promise.all([this.resolveSelection(), item.idtype ? item.ids : []])
       .then((names: string[][]) => {
         const inputSelection = names[0];
         const itemSelection = names[1];

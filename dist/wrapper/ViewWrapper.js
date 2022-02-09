@@ -1,13 +1,3 @@
-/** *******************************************************
- * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
- *
- * This file is property of datavisyn.
- * Code and any other files associated with this project
- * may not be copied and/or distributed without permission.
- *
- * Proprietary and confidential. No warranty.
- *
- ******************************************************** */
 import { FindViewUtils } from '../views/FindViewUtils';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
@@ -15,7 +5,6 @@ import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
 import { EventHandler, ResolveNow } from '../base';
 import { NodeUtils, ObjectRefUtils } from '../provenance';
-import { Range } from '../range';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { Dialog } from '../components';
@@ -34,7 +23,7 @@ export class ViewWrapper extends EventHandler {
         this.preInstanceItemSelections = new Map();
         this.preInstanceParameter = new Map();
         this.inputSelections = new Map();
-        this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, range: Range.none() });
+        this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
         this.node = document.createElement('article');
         this.node.classList.add('tdp-view-wrapper');
         this.allowed = FindViewUtils.canAccess(plugin);
@@ -159,7 +148,7 @@ export class ViewWrapper extends EventHandler {
                     else {
                         this.instance.setItemSelection({
                             idtype: idType,
-                            range: idType.selections(),
+                            ids: idType.selections(),
                         });
                     }
                 }
@@ -273,7 +262,7 @@ export class ViewWrapper extends EventHandler {
         return undefined;
     }
     match(selection) {
-        return ViewUtils.matchLength(this.plugin.selection, selection.range.dim(0).length);
+        return ViewUtils.matchLength(this.plugin.selection, selection.ids.length);
     }
     /**
      * @deprecated use getInputSelection instead

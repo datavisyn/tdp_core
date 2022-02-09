@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import d3 from 'd3';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
-import { ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { ESupportedPlotlyVis } from './interfaces';
+import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
+import { ENumericalColorScaleType, ESupportedPlotlyVis } from './interfaces';
 import { ScatterVis } from './scatter/ScatterVis';
 import { ViolinVis } from './violin/ViolinVis';
 import { isViolin, violinMergeDefaultConfig } from './violin/utils';

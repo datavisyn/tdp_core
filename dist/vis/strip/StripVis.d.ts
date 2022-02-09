@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { CategoricalColumn, NumericalColumn, Scales } from '../interfaces';
-import { IVisConfig } from '../interfaces';
-import { IStripConfig } from './utils';
+import { CategoricalColumn, IVisConfig, IStripConfig, NumericalColumn, Scales } from '../interfaces';
 interface StripVisProps {
     config: IStripConfig;
-    optionsConfig?: {};
+    optionsConfig?: unknown;
     extensions?: {
         prePlot?: React.ReactNode;
         postPlot?: React.ReactNode;

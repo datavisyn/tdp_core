@@ -9,8 +9,8 @@
  *
  ******************************************************** */
 import * as React from 'react';
-import { IReactHandler } from './AReactView';
 import { IViewPluginDesc } from '../base';
+import { IReactHandler } from './AReactView';
 export interface ITDPViewProps {
     viewId: string;
     inputSelection?: string[];

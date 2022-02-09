@@ -1,4 +1,4 @@
-import { EBarDisplayType } from '../bar/utils';
+import { EBarDisplayType } from '../interfaces';
 interface BarDisplayProps {
     callback: (s: EBarDisplayType) => void;
     currentSelected: EBarDisplayType;

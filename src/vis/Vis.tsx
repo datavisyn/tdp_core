@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import d3 from 'd3';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
-import { ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { CategoricalColumn, NumericalColumn, ESupportedPlotlyVis, IVisConfig, Scales } from './interfaces';
+import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
+import { CategoricalColumn, NumericalColumn, ENumericalColorScaleType, ESupportedPlotlyVis, IVisConfig, Scales } from './interfaces';
 import { ScatterVis } from './scatter/ScatterVis';
 import { ViolinVis } from './violin/ViolinVis';
 import { isViolin, violinMergeDefaultConfig } from './violin/utils';
@@ -34,7 +35,7 @@ export interface VisProps {
   /**
    * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
    */
-  selectionCallback?: (s: number[]) => void;
+  selectionCallback?: (s: string[]) => void;
   /**
    * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
    */
