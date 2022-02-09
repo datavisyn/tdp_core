@@ -13,7 +13,7 @@ import { StripVis } from './strip/StripVis';
 import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
 import { PCPVis } from './pcp/PCPVis';
 import { BarVis } from './bar/BarVis';
-import { getCssValue } from '../utils';
+import { getCssValue } from '../utils/getCssValue';
 export function Vis({ columns, selected = {}, colors = [
     getCssValue('visyn-c1').slice(1),
     getCssValue('visyn-c2').slice(1),

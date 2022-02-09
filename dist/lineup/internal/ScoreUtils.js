@@ -42,27 +42,9 @@ export class ScoreUtils {
         });
     }
     static async pushScoreAsync(graph, provider, scoreName, scoreId, params) {
-        console.log(provider);
         const storedParams = await AttachemntUtils.externalize(params);
         const toStoreParams = { id: scoreId, params: storedParams };
         return ScoreUtils.addScoreImpl([provider], toStoreParams);
-        // const currentParams = { id: scoreId, params, storedParams };
-        // const result = await ScoreUtils.addScoreAsync([provider], currentParams);
-        // const toStoreParams = { id: scoreId, params: storedParams };
-        // return graph.pushWithResult(
-        //   ActionUtils.action(
-        //     ActionMetaData.actionMeta(
-        //       I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', { scoreName }),
-        //       ObjectRefUtils.category.data,
-        //       ObjectRefUtils.operation.create,
-        //     ),
-        //     ScoreUtils.CMD_ADD_SCORE,
-        //     ScoreUtils.addScoreImpl,
-        //     [provider],
-        //     toStoreParams,
-        //   ),
-        //   result,
-        // );
     }
     static removeScore(provider, scoreName, scoreId, params, columnId) {
         return ActionUtils.action(ActionMetaData.actionMeta(I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.remove', { scoreName }), ObjectRefUtils.category.data, ObjectRefUtils.operation.remove), ScoreUtils.CMD_REMOVE_SCORE, ScoreUtils.removeScoreImpl, [provider], {

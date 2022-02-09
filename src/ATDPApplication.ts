@@ -8,7 +8,7 @@ import { IAppExtensionExtension } from './base/interfaces';
 import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
 import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
-import { ACLUEWrapper } from './wrapper';
+import { ACLUEWrapper } from './wrapper/ACLUEWrapper';
 import { LoginMenu, Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager } from './base';
 import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';

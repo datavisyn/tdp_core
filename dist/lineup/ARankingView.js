@@ -14,11 +14,11 @@ import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
-import { BaseUtils, debounceAsync } from '../base';
+import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
+import { BaseUtils } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
-// eslint-disable-next-line import/no-cycle
-import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
+import { debounceAsync } from '../base/BaseUtils';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -171,7 +171,7 @@ export class ARankingView extends AView {
         this.node.appendChild(luBackdrop);
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-        this.generalVis = new GeneralVisWrapper(this.provider, this, this.selectionHelper, this.node.ownerDocument);
+        this.generalVis = new GeneralVisWrapper(this.provider, this.idType, this.selectionHelper, this.node.ownerDocument);
         // When a new column desc is added to the provider, update the panel chooser
         this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
         // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338

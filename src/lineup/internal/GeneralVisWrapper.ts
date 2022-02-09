@@ -1,13 +1,12 @@
 import { LocalDataProvider, Ranking } from 'lineupjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { IDTypeManager } from '../../idtype';
-import { EventHandler } from '../../base';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
 import { LineUpSelectionHelper } from './LineUpSelectionHelper';
-// eslint-disable-next-line import/no-cycle
-import { ARankingView } from '../ARankingView';
+import { EventHandler } from '../../base/event';
+import { IDTypeManager } from '../../idtype/IDTypeManager';
+import { IDType } from '../../idtype/IDType';
 
 export class GeneralVisWrapper extends EventHandler {
   readonly node: HTMLElement; // wrapper node
@@ -16,18 +15,18 @@ export class GeneralVisWrapper extends EventHandler {
 
   private provider: LocalDataProvider;
 
-  private selectionHelper: LineUpSelectionHelper;
+  private idType: IDType;
 
-  private view: ARankingView;
+  private lineupSelectionHelper: LineUpSelectionHelper;
 
   private data: any[];
 
-  constructor(provider: LocalDataProvider, view: ARankingView, selectionHelper: LineUpSelectionHelper, doc = document) {
+  constructor(provider: LocalDataProvider, idType: IDType, lineupSelectionHelper: LineUpSelectionHelper, doc = document) {
     super();
 
-    this.view = view;
     this.provider = provider;
-    this.selectionHelper = selectionHelper;
+    this.idType = idType;
+    this.lineupSelectionHelper = lineupSelectionHelper;
     this.node = doc.createElement('div');
     this.node.id = 'customVisDiv';
     this.node.classList.add('custom-vis-panel');
@@ -84,9 +83,9 @@ export class GeneralVisWrapper extends EventHandler {
 
   selectCallback(selected: string[]) {
     // ???
-    const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
+    const id = IDTypeManager.getInstance().resolveIdType(this.idType.id);
 
-    this.view.selectionHelper.setGeneralVisSelection({ idtype: id, ids: selected });
+    this.lineupSelectionHelper.setGeneralVisSelection({ idtype: id, ids: selected });
   }
 
   filterCallback(s: string) {
@@ -107,7 +106,7 @@ export class GeneralVisWrapper extends EventHandler {
     const data = this.getAllData();
     const colDescriptions = this.provider.getColumns();
     // need some way to convert these to _ids.
-    const selectedIndeces = this.selectionHelper.getSelection();
+    const selectedIndeces = this.lineupSelectionHelper.getSelection();
     const cols: any[] = [];
 
     const selectedMap: { [key: number]: boolean } = {};
@@ -119,8 +118,6 @@ export class GeneralVisWrapper extends EventHandler {
     for (const i of selectedIndeces) {
       selectedMap[i] = true;
     }
-
-    console.log(data);
 
     for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
       cols.push({

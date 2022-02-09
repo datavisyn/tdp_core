@@ -1,16 +1,16 @@
 import { Ranking } from 'lineupjs';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { IDTypeManager } from '../../idtype';
-import { EventHandler } from '../../base';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
+import { EventHandler } from '../../base/event';
+import { IDTypeManager } from '../../idtype/IDTypeManager';
 export class GeneralVisWrapper extends EventHandler {
-    constructor(provider, view, selectionHelper, doc = document) {
+    constructor(provider, idType, lineupSelectionHelper, doc = document) {
         super();
-        this.view = view;
         this.provider = provider;
-        this.selectionHelper = selectionHelper;
+        this.idType = idType;
+        this.lineupSelectionHelper = lineupSelectionHelper;
         this.node = doc.createElement('div');
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
@@ -58,8 +58,8 @@ export class GeneralVisWrapper extends EventHandler {
     }
     selectCallback(selected) {
         // ???
-        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
-        this.view.selectionHelper.setGeneralVisSelection({ idtype: id, ids: selected });
+        const id = IDTypeManager.getInstance().resolveIdType(this.idType.id);
+        this.lineupSelectionHelper.setGeneralVisSelection({ idtype: id, ids: selected });
     }
     filterCallback(s) {
         const selectedIds = this.provider.getSelection();
@@ -75,7 +75,7 @@ export class GeneralVisWrapper extends EventHandler {
         const data = this.getAllData();
         const colDescriptions = this.provider.getColumns();
         // need some way to convert these to _ids.
-        const selectedIndeces = this.selectionHelper.getSelection();
+        const selectedIndeces = this.lineupSelectionHelper.getSelection();
         const cols = [];
         const selectedMap = {};
         for (const i of data) {
@@ -84,7 +84,6 @@ export class GeneralVisWrapper extends EventHandler {
         for (const i of selectedIndeces) {
             selectedMap[i] = true;
         }
-        console.log(data);
         for (const c of colDescriptions.filter((d) => d.type === 'number' || d.type === 'categorical')) {
             cols.push({
                 info: {

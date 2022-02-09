@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
 import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { CategoricalColumn, ENumericalColorScaleType, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales } from './interfaces';
+import { CategoricalColumn, NumericalColumn, ENumericalColorScaleType, ESupportedPlotlyVis, IVisConfig, Scales } from './interfaces';
 import { ScatterVis } from './scatter/ScatterVis';
 import { ViolinVis } from './violin/ViolinVis';
 import { isViolin, violinMergeDefaultConfig } from './violin/utils';
@@ -13,7 +13,7 @@ import { StripVis } from './strip/StripVis';
 import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
 import { PCPVis } from './pcp/PCPVis';
 import { BarVis } from './bar/BarVis';
-import { getCssValue } from '../utils';
+import { getCssValue } from '../utils/getCssValue';
 
 export interface VisProps {
   /**

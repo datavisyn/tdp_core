@@ -7,7 +7,7 @@ import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
 import { TDPTokenManager } from './auth';
-import { ACLUEWrapper } from './wrapper';
+import { ACLUEWrapper } from './wrapper/ACLUEWrapper';
 import { LoginMenu, Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager } from './base';
 import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';

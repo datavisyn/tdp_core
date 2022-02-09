@@ -8,13 +8,13 @@ import * as d3 from 'd3';
 import { MixedStorageProvenanceGraphManager, ProvenanceGraph } from '../provenance';
 import { SelectionRecorder } from '../base/Selection';
 import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
-import { VisLoader } from '../provvis/VisLoader';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { ProvenanceGraphMenu } from '../provenance/ProvenanceGraphMenu';
 import { LoginMenu } from '../base/LoginMenu';
 import { ACLUEWrapper } from './ACLUEWrapper';
 import { AppHeader, AppHeaderLink } from '../components';
 import { BaseUtils, ResolveNow } from '../base';
+import { VisLoader } from '../provvis/VisLoader';
 export class CLUEWrapper extends ACLUEWrapper {
     constructor(body, options = {}) {
         super();
