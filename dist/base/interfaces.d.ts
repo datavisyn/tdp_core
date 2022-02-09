@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
 import { AppHeader } from '../components';
 import { IAuthorizationConfiguration } from '../auth';
@@ -306,7 +307,13 @@ export interface IView extends IEventHandler {
 export interface IViewClass {
     new (context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
-export interface IViewPluginDesc extends IPluginDesc {
+export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
+    load(): Promise<IViewPlugin>;
+}
+export interface IVisynViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
+    load(): Promise<IVisynViewPlugin>;
+}
+export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 'id' | 'load'>> {
     /**
      * how many selection this view can handle and requires
      */
@@ -315,7 +322,6 @@ export interface IViewPluginDesc extends IPluginDesc {
      * idType regex that is required by this view
      */
     idtype?: string;
-    load(): Promise<IViewPlugin>;
     /**
      * view group hint
      */
@@ -376,10 +382,13 @@ export interface IViewPlugin {
     factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 export interface IVisynViewPlugin {
-    readonly desc: IViewPluginDesc;
-    factory(prop: IVisynViewProps<any, any>): JSX.Element;
-    headerFactory(prop: IVisynViewProps<any, any>): JSX.Element;
-    tabFactory(prop: IVisynViewProps<any, any>): JSX.Element;
+    readonly desc: IVisynViewPluginDesc;
+    factory(): IVisynViewPluginFactory;
+}
+export interface IVisynViewPluginFactory {
+    view: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
+    header?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
+    tab?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
 }
 export interface IInstantView {
     readonly node: HTMLElement;

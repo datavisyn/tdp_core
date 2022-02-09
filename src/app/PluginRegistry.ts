@@ -1,11 +1,14 @@
 import {IPluginDesc, IRegistry, IPlugin} from '../base/plugin';
 import {UniqueIdManager} from './UniqueIdManager';
 import {BaseUtils} from '../base/BaseUtils';
-import {EXTENSION_POINT_VISYN_VIEW} from '..';
+import {EXTENSION_POINT_VISYN_VIEW, IBaseViewPluginDesc, IVisynViewPluginDesc} from '..';
 
 export class PluginRegistry implements IRegistry {
-
   private registry: IPluginDesc[] = [];
+
+  public pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc) {
+    return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, desc);
+  }
 
   public push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any) {
     const id = typeof idOrLoader === 'string' ? <string>idOrLoader : UniqueIdManager.getInstance().uniqueString(type);
@@ -19,16 +22,6 @@ export class PluginRegistry implements IRegistry {
       version: '1.0.0',
       load: async (): Promise<IPlugin> => {
         const instance = await Promise.resolve(loader());
-        if(type === EXTENSION_POINT_VISYN_VIEW && p.headerFactory && p.tabFactory) {
-          //@ts-ignore
-          return {desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), headerFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.headerFactory), tabFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.tabFactory)};
-        } else if(type === EXTENSION_POINT_VISYN_VIEW && p.headerFactory) {
-          //@ts-ignore
-          return {desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), headerFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.headerFactory)};
-        } else if(type === EXTENSION_POINT_VISYN_VIEW && p.tabFactory) {
-          //@ts-ignore
-          return {desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), tabFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.tabFactory)};
-        }
         return {desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory)};
       }
     }, typeof descOrLoader === 'function' ? desc : descOrLoader);
@@ -70,6 +63,7 @@ export class PluginRegistry implements IRegistry {
    * @param id
    * @returns {IPluginDesc}
    */
+  public getPlugin(type: 'visynView', id: string): IVisynViewPluginDesc;
   public getPlugin(type: string, id: string): IPluginDesc {
     return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id);
   }

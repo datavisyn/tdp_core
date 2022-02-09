@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
 import {AppHeader} from '../components';
 import {IAuthorizationConfiguration} from '../auth';
@@ -359,65 +360,73 @@ export interface IViewClass {
   new(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
-export interface IViewPluginDesc extends IPluginDesc {
-  /**
-   * how many selection this view can handle and requires
-   */
-  selection: 'none' | '0' | 'any' | 'single' | '1' | 'small_multiple' | 'multiple' | 'chooser' | 'some' | '2';
-  /**
-   * idType regex that is required by this view
-   */
-  idtype?: string;
-
+export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
   load(): Promise<IViewPlugin>;
-
-  /**
-   * view group hint
-   */
-  group: {name: string, order: number};
-
-  /**
-   * optional preview callback function returning a url promise, the preview image should have 320x180 px
-   * @returns {Promise<string>}
-   */
-  preview?(): Promise<string>;
-
-  /**
-   * optional security check to show only certain views
-   */
-  security?: string | ((user: IUser) => boolean);
-
-  /**
-   * optional authorization configuration ensuring authorization exists before loading the view.
-   * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
-   */
-  authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
-
-  /**
-   * a lot of topics/tags describing this view
-   */
-  topics?: string[];
-
-  /**
-   * a link to an external help page
-   */
-  helpUrl?: string | {url: string, linkText: string, title: string};
-  /**
-   * as an alternative an help text shown as pop up
-   */
-  helpText?: string;
-
-  /**
-   * a tour id to start a tour
-   */
-  helpTourId?: string;
-
-  /**
-   * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
-   * @default false
-   */
-  securityNotAllowedText?: string | boolean;
 }
+
+export interface IVisynViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
+  load(): Promise<IVisynViewPlugin>;
+}
+
+//TODO:: refactor the Omit here to Partial<Pick<.. in ts 4
+export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 'id' | 'load'>> {
+    /**
+     * how many selection this view can handle and requires
+     */
+     selection: 'none' | '0' | 'any' | 'single' | '1' | 'small_multiple' | 'multiple' | 'chooser' | 'some' | '2';
+     /**
+      * idType regex that is required by this view
+      */
+     idtype?: string;
+
+     /**
+      * view group hint
+      */
+     group: {name: string, order: number};
+
+     /**
+      * optional preview callback function returning a url promise, the preview image should have 320x180 px
+      * @returns {Promise<string>}
+      */
+     preview?(): Promise<string>;
+
+     /**
+      * optional security check to show only certain views
+      */
+     security?: string | ((user: IUser) => boolean);
+
+     /**
+      * optional authorization configuration ensuring authorization exists before loading the view.
+      * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
+      */
+     authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
+
+     /**
+      * a lot of topics/tags describing this view
+      */
+     topics?: string[];
+
+     /**
+      * a link to an external help page
+      */
+     helpUrl?: string | {url: string, linkText: string, title: string};
+     /**
+      * as an alternative an help text shown as pop up
+      */
+     helpText?: string;
+
+     /**
+      * a tour id to start a tour
+      */
+     helpTourId?: string;
+
+     /**
+      * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
+      * @default false
+      */
+     securityNotAllowedText?: string | boolean;
+}
+
 
 export interface IViewPlugin {
   readonly desc: IViewPluginDesc;
@@ -434,12 +443,15 @@ export interface IViewPlugin {
 }
 
 export interface IVisynViewPlugin {
-  readonly desc: IViewPluginDesc;
+  readonly desc: IVisynViewPluginDesc;
 
-  factory(prop: IVisynViewProps<any, any>): JSX.Element;
-  headerFactory(prop: IVisynViewProps<any, any>): JSX.Element;
-  tabFactory(prop: IVisynViewProps<any, any>): JSX.Element;
+  factory(): IVisynViewPluginFactory;
+}
 
+export interface IVisynViewPluginFactory {
+  view: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
+  header?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
+  tab?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>>| React.ComponentType<IVisynViewProps<any, any>>;
 }
 
 export interface IInstantView {

@@ -1,6 +1,8 @@
 import { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
+import { IBaseViewPluginDesc, IVisynViewPluginDesc } from '..';
 export declare class PluginRegistry implements IRegistry {
     private registry;
+    pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc): void;
     push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any): void;
     private knownPlugins;
     register(plugin: string, generator?: (registry: IRegistry) => void): void;
@@ -16,7 +18,7 @@ export declare class PluginRegistry implements IRegistry {
      * @param id
      * @returns {IPluginDesc}
      */
-    getPlugin(type: string, id: string): IPluginDesc;
+    getPlugin(type: 'visynView', id: string): IVisynViewPluginDesc;
     loadPlugin(desc: IPluginDesc[]): Promise<IPlugin[]>;
     /**
      * Helper function to simplify importing of  resource files (e.g., JSON).

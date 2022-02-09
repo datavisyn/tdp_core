@@ -1,15 +1,13 @@
-export interface IVisynViewProps<C, P> {
-    desc: C;
-    entityId: string;
-    data: {
-        [key: string]: any;
-    };
-    dataDesc: any[];
+import { IServerColumn, IVisynViewPlugin } from '../base';
+export interface IVisynViewProps<Desc extends IVisynViewPlugin, Param extends Record<string, any>> {
+    desc: Desc;
+    data: Record<string, any>;
+    dataDesc: IServerColumn[] | any[];
     selection: string[];
-    filters: string[];
-    parameters: P;
+    idFilter: string[];
+    parameters: Param;
     onSelectionChanged: (selection: string[]) => void;
-    onFiltersChanged: (newFilter: string[]) => void;
-    onParametersChanged: (parameters: P) => void;
+    onIdFilterChanged: (idFilter: string[]) => void;
+    onParametersChanged: (parameters: Param) => void;
 }
 //# sourceMappingURL=VisynView.d.ts.map

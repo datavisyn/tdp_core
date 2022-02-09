@@ -6,6 +6,9 @@ export class PluginRegistry {
         this.registry = [];
         this.knownPlugins = new Set();
     }
+    pushVisynView(id, loader, desc) {
+        return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, desc);
+    }
     push(type, idOrLoader, descOrLoader, desc) {
         const id = typeof idOrLoader === 'string' ? idOrLoader : UniqueIdManager.getInstance().uniqueString(type);
         const loader = typeof idOrLoader === 'string' ? descOrLoader : descOrLoader;
@@ -18,18 +21,6 @@ export class PluginRegistry {
             version: '1.0.0',
             load: async () => {
                 const instance = await Promise.resolve(loader());
-                if (type === EXTENSION_POINT_VISYN_VIEW && p.headerFactory && p.tabFactory) {
-                    //@ts-ignore
-                    return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), headerFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.headerFactory), tabFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.tabFactory) };
-                }
-                else if (type === EXTENSION_POINT_VISYN_VIEW && p.headerFactory) {
-                    //@ts-ignore
-                    return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), headerFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.headerFactory) };
-                }
-                else if (type === EXTENSION_POINT_VISYN_VIEW && p.tabFactory) {
-                    //@ts-ignore
-                    return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory), tabFactory: PluginRegistry.getInstance().getFactoryMethod(instance, p.tabFactory) };
-                }
                 return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory) };
             }
         }, typeof descOrLoader === 'function' ? desc : descOrLoader);
@@ -58,12 +49,6 @@ export class PluginRegistry {
         }
         return PluginRegistry.getInstance().registry.filter(filter);
     }
-    /**
-     * returns an extension identified by type and id
-     * @param type
-     * @param id
-     * @returns {IPluginDesc}
-     */
     getPlugin(type, id) {
         return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id);
     }
