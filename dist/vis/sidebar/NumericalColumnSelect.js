@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import { useMemo } from 'react';
 import Select, { components } from 'react-select';

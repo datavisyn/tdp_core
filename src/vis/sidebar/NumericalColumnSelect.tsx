@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import { MouseEventHandler, useMemo } from 'react';
 import Select, { components, MultiValueProps, Props } from 'react-select';

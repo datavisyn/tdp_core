@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import d3 from 'd3';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';

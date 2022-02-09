@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
