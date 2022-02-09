@@ -22,7 +22,7 @@ export declare abstract class AFormElement<T extends IFormElementDesc> extends E
      */
     constructor(form: IForm, elementDesc: T, pluginDesc: IPluginDesc);
     protected updateStoredValue(): void;
-    protected getStoredValue<T>(defaultValue: T): T;
+    protected getStoredValue<D>(defaultValue: D): D;
     protected hasStoredValue(): boolean;
     isRequired(): boolean;
     validate(): boolean;

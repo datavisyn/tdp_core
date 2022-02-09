@@ -1,5 +1,5 @@
-import {IPluginDesc, IPlugin} from './plugin';
-import {ProvenanceGraph} from '../provenance';
+import { IPluginDesc, IPlugin } from './plugin';
+import { ProvenanceGraph } from '../provenance';
 
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
@@ -54,7 +54,6 @@ export const EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM = 'securityCustomizedLoginFor
 export interface ICustomizedLoginFormPluginDesc extends IPluginDesc {
   template?: string;
 }
-
 
 export interface ICustomizedLoginFormPlugin extends IPlugin {
   /**

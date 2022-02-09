@@ -1,70 +1,78 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import {CategoricalColumn, EFilterOptions, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
 import {useEffect, useMemo} from 'react';
-import {IVisConfig} from '../interfaces';
 import Plot from 'react-plotly.js';
-import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
-import {createScatterTraces, IScatterConfig} from './utils';
-import {beautifyLayout} from '../layoutUtils';
-import {merge} from 'lodash';
-import {BrushOptionButtons} from '../sidebar/BrushOptionButtons';
-import {OpacitySlider} from '../sidebar/OpacitySlider';
-import {ScatterVisSidebar} from './ScatterVisSidebar';
+import { merge } from 'lodash';
 import Plotly from 'plotly.js';
+import {
+  CategoricalColumn,
+  EFilterOptions,
+  IVisConfig,
+  NumericalColumn,
+  PlotlyInfo,
+  Scales,
+  IScatterConfig,
+} from '../interfaces';
+import { InvalidCols } from '../InvalidCols';
+import { createScatterTraces } from './utils';
+import { beautifyLayout } from '../layoutUtils';
+import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
+import { OpacitySlider } from '../sidebar/OpacitySlider';
+import {ScatterVisSidebar} from './ScatterVisSidebar';
 
 interface ScatterVisProps {
-    config: IScatterConfig;
-    optionsConfig?: {
-        color?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        },
-        shape?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        },
-        filter?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        }
+  config: IScatterConfig;
+  optionsConfig?: {
+    color?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
     };
-    extensions?: {
-        prePlot?: React.ReactNode;
-        postPlot?: React.ReactNode;
-        preSidebar?: React.ReactNode;
-        postSidebar?: React.ReactNode;
+    shape?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
     };
-    shapes?: string[];
-    columns: (NumericalColumn | CategoricalColumn) [];
-    filterCallback?: (s: EFilterOptions) => void;
-    selectionCallback?: (s: string[]) => void;
-    selected?: {[key: number]: boolean};
-    setConfig: (config: IVisConfig) => void;
-    scales: Scales;
-    hideSidebar?: boolean;
+    filter?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+  };
+  extensions?: {
+    prePlot?: React.ReactNode;
+    postPlot?: React.ReactNode;
+    preSidebar?: React.ReactNode;
+    postSidebar?: React.ReactNode;
+  };
+  shapes?: string[];
+  columns: (NumericalColumn | CategoricalColumn) [];
+  filterCallback?: (s: EFilterOptions) => void;
+  selectionCallback?: (s: string[]) => void;
+  selected?: {[key: number]: boolean};
+  setConfig: (config: IVisConfig) => void;
+  scales: Scales;
+  hideSidebar?: boolean;
 }
 
 const defaultConfig = {
-    color: {
-        enable: true,
-        customComponent: null,
-    },
-    shape: {
-        enable: true,
-        customComponent: null,
-    },
-    filter: {
-        enable: true,
-        customComponent: null,
-    }
+  color: {
+    enable: true,
+    customComponent: null,
+  },
+  shape: {
+    enable: true,
+    customComponent: null,
+  },
+  filter: {
+    enable: true,
+    customComponent: null,
+  },
 };
 
 const defaultExtensions = {
-    prePlot: null,
-    postPlot: null,
-    preSidebar: null,
-    postSidebar: null
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
 };
 
 export function ScatterVis({
@@ -80,7 +88,6 @@ export function ScatterVis({
     hideSidebar = false,
     scales
 }: ScatterVisProps) {
-
     const uniqueId = useMemo(() => {
         return Math.random().toString(36).substr(2, 5);
     }, []);
@@ -195,4 +202,3 @@ export function ScatterVis({
             </div> : null}
         </div>);
 }
-

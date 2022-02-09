@@ -1,24 +1,25 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
-import { beautifyLayout } from '../layoutUtils';
-import { createViolinTraces } from './utils';
 import { merge } from 'lodash';
 import Plotly from 'plotly.js';
 import { ViolinVisSidebar } from './ViolinVisSidebar';
+import { InvalidCols } from '../InvalidCols';
+import { beautifyLayout } from '../layoutUtils';
+import { createViolinTraces } from './utils';
 const defaultConfig = {
     overlay: {
         enable: true,
-        customComponent: null
-    }
+        customComponent: null,
+    },
 };
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
-    postSidebar: null
+    postSidebar: null,
 };
 export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false, }) {
     const mergedOptionsConfig = useMemo(() => {

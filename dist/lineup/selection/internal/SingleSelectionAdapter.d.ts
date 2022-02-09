@@ -1,7 +1,6 @@
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
 import { IContext } from '../ISelectionAdapter';
-import { IAdditionalColumnDesc } from '../../../base/interfaces';
-import { IScoreRow } from '../../../base/interfaces';
+import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
 export interface ISingleSelectionAdapter {
     /**
      * create the column description for the given selection

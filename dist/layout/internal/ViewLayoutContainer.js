@@ -1,19 +1,19 @@
+import { LayoutContainerEvents } from '../interfaces';
 import { ALayoutContainer } from './ALayoutContainer';
 import { Dropper } from './Dropper';
-import { LayoutContainerEvents } from '../interfaces';
 export class HTMLView {
     constructor(html, doc) {
         this.minSize = [0, 0];
         this.visible = true;
-        //HTML
+        // HTML
         this.node = doc.createElement('div');
         this.node.innerHTML = html;
     }
     destroy() {
-        //nothing to do
+        // nothing to do
     }
     resized() {
-        //nothing to do
+        // nothing to do
     }
     dumpReference() {
         return -1;
@@ -26,10 +26,10 @@ export class NodeView {
         this.visible = true;
     }
     destroy() {
-        //nothing to do
+        // nothing to do
     }
     resized() {
-        //nothing to do
+        // nothing to do
     }
     dumpReference() {
         return -1;
@@ -61,7 +61,7 @@ export class ViewLayoutContainer extends ALayoutContainer {
     }
     defaultOptions() {
         return Object.assign(super.defaultOptions(), {
-            hideHeader: false
+            hideHeader: false,
         });
     }
     get hideAbleHeader() {
@@ -71,7 +71,7 @@ export class ViewLayoutContainer extends ALayoutContainer {
         return this.view.visible;
     }
     set visible(visible) {
-        this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_VISIBILITY_CHANGED), this.view.visible, this.view.visible = visible);
+        this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_VISIBILITY_CHANGED), this.view.visible, (this.view.visible = visible));
     }
     get minSize() {
         return this.view.minSize ? this.view.minSize : [0, 0];
@@ -90,7 +90,7 @@ export class ViewLayoutContainer extends ALayoutContainer {
     }
     persist() {
         const r = Object.assign(super.persist(), {
-            type: 'view'
+            type: 'view',
         });
         if (this.view instanceof HTMLView) {
             r.html = this.view.node.innerHTML;

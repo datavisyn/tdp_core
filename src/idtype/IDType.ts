@@ -1,17 +1,23 @@
-import {AppContext} from '../app/AppContext';
-import {EventHandler} from '../base/event';
-import {IIDType} from './IIDType';
-import {SelectOperation, SelectionUtils} from './SelectionUtils';
-import {ResolveNow} from '../base/promise';
+import { AppContext } from '../app/AppContext';
+import { EventHandler, IEventHandler } from '../base/event';
+import { IPersistable } from '../base/IPersistable';
+import { SelectOperation, SelectionUtils } from './SelectionUtils';
+
+export interface IPersistedIDType {
+  sel: { [key: string]: string[] };
+  name: string;
+  names: string;
+}
+
 /**
  * An IDType is a semantic aggregation of an entity type, like Patient and Gene.
  *
  * An entity is tracked by a unique identifier (integer) within the system,
  * which is mapped to a common, external identifier or name (string) as well.
  */
-export class IDType extends EventHandler implements IIDType {
-
+export class IDType extends EventHandler implements IEventHandler, IPersistable {
   static readonly EVENT_SELECT = 'select';
+
   /**
    * the current selections
    */
@@ -29,19 +35,23 @@ export class IDType extends EventHandler implements IIDType {
     super();
   }
 
-  persist() {
-    const s: any = {};
-    this.sel.forEach((v, k) => s[k] = v.toString());
+  persist(): IPersistedIDType {
+    const s: { [key: string]: string[] } = {};
+    this.sel.forEach((v, k) => {
+      s[k] = v;
+    });
     return {
       sel: s,
       name: this.name,
-      names: this.names
+      names: this.names,
     };
   }
 
-  restore(persisted: any) {
-    (<any>this).name = persisted.name;
-    (<any>this).names = persisted.names;
+  restore(persisted: IPersistedIDType) {
+    // @ts-ignore
+    this.name = persisted.name;
+    // @ts-ignore
+    this.names = persisted.names;
     Object.keys(persisted.sel).forEach((type) => this.sel.set(type, persisted.sel[type]));
     return this;
   }
@@ -77,10 +87,11 @@ export class IDType extends EventHandler implements IIDType {
   select(type: string, selection: string[]): string[];
   select(type: string, selection: string[], op: SelectOperation): string[];
   select() {
+    // eslint-disable-next-line prefer-rest-params
     const a = Array.from(arguments);
-    const type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType,
-      selection = a[0],
-      op = SelectionUtils.asSelectOperation(a[1]);
+    const type = typeof a[0] === 'string' ? a.shift() : SelectionUtils.defaultSelectionType;
+    const selection = a[0];
+    const op = SelectionUtils.asSelectOperation(a[1]);
     return this.selectImpl(selection, op, type);
   }
 
@@ -89,7 +100,7 @@ export class IDType extends EventHandler implements IIDType {
     const newValue = SelectionUtils.integrateSelection(b, selection, op);
     this.sel.set(type, newValue);
     const added = op !== SelectOperation.REMOVE ? selection : [];
-    const removed = (op === SelectOperation.ADD ? [] : (op === SelectOperation.SET ? b : selection));
+    const removed = op === SelectOperation.ADD ? [] : op === SelectOperation.SET ? b : selection;
     this.fire(IDType.EVENT_SELECT, type, newValue, added, removed, b);
     this.fire(`${IDType.EVENT_SELECT}-${type}`, newValue, added, removed, b);
     return b;
@@ -105,7 +116,13 @@ export class IDType extends EventHandler implements IIDType {
    * @param data
    * @returns {Promise<any>}
    */
-  static chooseRequestMethod(url: string, data: any = {}) {
+  static chooseRequestMethod(
+    url: string,
+    data: {
+      q?: string[];
+      mode?: 'all' | 'first';
+    } = {},
+  ) {
     const dataLengthGuess = JSON.stringify(data);
     const lengthGuess = url.length + dataLengthGuess.length;
 
@@ -114,9 +131,7 @@ export class IDType extends EventHandler implements IIDType {
   }
 }
 
-
-
-export declare type IDTypeLike = string|IDType;
+export declare type IDTypeLike = string | IDType;
 
 export interface IDPair {
   readonly name: string;

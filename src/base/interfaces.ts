@@ -10,9 +10,6 @@ import {IUser} from '../security';
 import {ReactElement, ReactNode} from 'react';
 import {IVisynViewProps} from '../views/VisynView';
 
-
-
-
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
    * used internally to match selections to column
@@ -36,11 +33,11 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * the name of the parent group as defined in the `databaseColumnGroups` of the ranking.
      */
-    parent: string,
+    parent: string;
     /**
      * the rank of the current item in the group
      */
-    order?: number
+    order?: number;
   };
 }
 
@@ -52,7 +49,9 @@ export function isAdditionalColumnDesc(item: IAdditionalColumnDesc | IColumnDesc
  * mode of the view depending on the view state
  */
 export enum EViewMode {
-  FOCUS, CONTEXT, HIDDEN
+  FOCUS,
+  CONTEXT,
+  HIDDEN,
 }
 
 /**
@@ -79,7 +78,7 @@ export interface IScore<T> {
    * creates the LineUp column description
    * @returns {IColumnDesc & {[p: string]: any}}
    */
-  createDesc(extras?: object): IColumnDesc & {[key: string]: any};
+  createDesc(extras?: object): IColumnDesc & { [key: string]: any };
 
   /**
    * start the computation of the score for the given ids
@@ -136,7 +135,7 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
   /**
    * view group hint
    */
-  readonly group?: {name: string, order: number};
+  readonly group?: { name: string; order: number };
 
   load(): Promise<IPlugin & IScoreLoaderExtension>;
 }
@@ -159,8 +158,6 @@ export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
   load(): Promise<IPlugin & IScoreColumnPatcherExtension>;
 }
 
-
-
 export interface IRankingButtonExtension {
   desc: IRankingButtonExtensionDesc;
   factory(desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
@@ -181,7 +178,6 @@ export interface IRankingButtonExtensionDesc extends IPluginDesc {
   faIcon: string;
   load(): Promise<IPlugin & IRankingButtonExtension>;
 }
-
 
 export interface IPanelTabExtension {
   desc: IPanelTabExtensionDesc;
@@ -245,7 +241,6 @@ export interface IGroupData {
   members?: string[];
 }
 
-
 /**
  * helper extension point for grouping views and provide meta data
  */
@@ -253,11 +248,15 @@ export interface IViewGroupExtensionDesc extends IPluginDesc {
   groups: IGroupData[];
 }
 
-
 export interface ISelection {
-  readonly idtype: IDType; // see phovea_core/src/idtype/manager#resolve
-  selectionIds: string[];
-
+  /**
+   * TODO:
+   */
+  readonly idtype: IDType;
+  /**
+   * TODO:
+   */
+  ids: string[];
   /**
    * other selections floating around in a multi selection environment
    */
@@ -355,9 +354,8 @@ export interface IView extends IEventHandler {
   destroy(): void;
 }
 
-
 export interface IViewClass {
-  new(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
+  new (context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
 export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
@@ -465,7 +463,7 @@ export interface IInstantViewOptions {
 }
 
 export interface IItemSelection extends ISelection {
-  readonly items: {_id: number, id: string, text: string}[];
+  readonly items: { id: string; text: string }[];
 }
 
 export interface IInstanceViewExtension {
@@ -498,6 +496,5 @@ export interface IAppExtensionExtension {
 }
 
 export interface IAppExtensionExtensionDesc extends IPluginDesc {
-
   load(): Promise<IPlugin & IAppExtensionExtension>;
 }

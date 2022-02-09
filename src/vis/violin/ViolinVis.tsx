@@ -1,54 +1,63 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
-import {useEffect, useMemo} from 'react';
-import {IVisConfig} from '../interfaces';
-import {VisTypeSelect} from '../sidebar/VisTypeSelect';
-import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
+import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
-import {beautifyLayout} from '../layoutUtils';
-import {createViolinTraces, IViolinConfig} from './utils';
-import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
-import {ViolinOverlayButtons} from '../sidebar/ViolinOverlayButtons';
-import {EViolinOverlay} from '../bar/utils';
-import {merge} from 'lodash';
-import {WarningMessage} from '../sidebar/WarningMessage';
+import { merge } from 'lodash';
 import Plotly from 'plotly.js';
 import {ViolinVisSidebar} from './ViolinVisSidebar';
+import {
+  CategoricalColumn,
+  ColumnInfo,
+  ESupportedPlotlyVis,
+  EViolinOverlay,
+  NumericalColumn,
+  PlotlyInfo,
+  Scales,
+  IVisConfig,
+  IViolinConfig,
+} from '../interfaces';
+import { VisTypeSelect } from '../sidebar/VisTypeSelect';
+import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
+import { InvalidCols } from '../InvalidCols';
+import { beautifyLayout } from '../layoutUtils';
+import { createViolinTraces } from './utils';
+import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
+import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
+import { WarningMessage } from '../sidebar/WarningMessage';
 
 interface ViolinVisProps {
-    config: IViolinConfig;
-    optionsConfig?: {
-        overlay?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        }
+  config: IViolinConfig;
+  optionsConfig?: {
+    overlay?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
     };
-    extensions?: {
-        prePlot?: React.ReactNode;
-        postPlot?: React.ReactNode;
-        preSidebar?: React.ReactNode;
-        postSidebar?: React.ReactNode;
-    };
-    columns: (NumericalColumn | CategoricalColumn) [];
-    setConfig: (config: IVisConfig) => void;
-    scales: Scales;
-    hideSidebar?: boolean;
+  }
+  extensions?: {
+      prePlot?: React.ReactNode;
+      postPlot?: React.ReactNode;
+      preSidebar?: React.ReactNode;
+      postSidebar?: React.ReactNode;
+  };
+  columns: (NumericalColumn | CategoricalColumn) [];
+  setConfig: (config: IVisConfig) => void;
+  scales: Scales;
+  hideSidebar?: boolean;
 }
 
 const defaultConfig = {
-    overlay: {
-        enable: true,
-        customComponent: null
-    }
+  overlay: {
+    enable: true,
+    customComponent: null,
+  },
 };
 
 const defaultExtensions = {
-    prePlot: null,
-    postPlot: null,
-    preSidebar: null,
-    postSidebar: null
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
 };
 
 export function ViolinVis({

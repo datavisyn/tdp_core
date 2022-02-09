@@ -11,7 +11,7 @@ export declare class RestStorageUtils {
     static saveNamedSet(name: string, idType: IDType | string, ids: string[], subType: {
         key: string;
         value: string;
-    }, description: string, sec: Partial<ISecureItem>): Promise<any>;
+    }, description?: string, sec?: Partial<ISecureItem>): Promise<any>;
     static deleteNamedSet(id: string): Promise<any>;
     static editNamedSet(id: string, data: {
         [key: string]: any;

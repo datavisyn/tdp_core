@@ -13,7 +13,7 @@ export declare class AppContext {
      */
     static version: string;
     /**
-     * server prefix ofr api calls
+     * server prefix of api calls
      * @type {string}
      */
     server_url: string;

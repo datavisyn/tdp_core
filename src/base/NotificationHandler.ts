@@ -1,9 +1,8 @@
-import {I18nextManager} from '../i18n';
-
+import { I18nextManager } from '../i18n';
 
 export class NotificationHandler {
-
   public static DEFAULT_SUCCESS_AUTO_HIDE = 5000;
+
   public static DEFAULT_ERROR_AUTO_HIDE = -1; // not
 
   static pushNotification(level: 'success' | 'info' | 'warning' | 'danger' | 'error', msg: string, autoHideInMs = -1) {
@@ -14,9 +13,12 @@ export class NotificationHandler {
     }
 
     parent.classList.add('push');
-    parent.insertAdjacentHTML('afterbegin', `<div class="alert alert-${level === 'error' ? 'danger' : level} alert-dismissible" role="alert">
+    parent.insertAdjacentHTML(
+      'afterbegin',
+      `<div class="alert alert-${level === 'error' ? 'danger' : level} alert-dismissible" role="alert">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    ${msg}</div>`);
+    ${msg}</div>`,
+    );
 
     const alert = parent.firstElementChild!;
     // fix link color
@@ -34,10 +36,18 @@ export class NotificationHandler {
   }
 
   static successfullySaved(type: string, name: string) {
-    NotificationHandler.pushNotification('success', I18nextManager.getInstance().i18n.t('tdp:core.savedNotification', {type, name}), NotificationHandler.DEFAULT_SUCCESS_AUTO_HIDE);
+    NotificationHandler.pushNotification(
+      'success',
+      I18nextManager.getInstance().i18n.t('tdp:core.savedNotification', { type, name }),
+      NotificationHandler.DEFAULT_SUCCESS_AUTO_HIDE,
+    );
   }
 
   static successfullyDeleted(type: string, name: string) {
-    NotificationHandler.pushNotification('success', I18nextManager.getInstance().i18n.t('tdp:core.deletedNotification', {type, name}), NotificationHandler.DEFAULT_SUCCESS_AUTO_HIDE);
+    NotificationHandler.pushNotification(
+      'success',
+      I18nextManager.getInstance().i18n.t('tdp:core.deletedNotification', { type, name }),
+      NotificationHandler.DEFAULT_SUCCESS_AUTO_HIDE,
+    );
   }
 }

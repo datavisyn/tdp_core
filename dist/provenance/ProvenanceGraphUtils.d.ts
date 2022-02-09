@@ -1,6 +1,6 @@
 import { ObjectNode, IObjectRef } from './ObjectNode';
 import { ActionNode } from './ActionNode';
-import { IGraphFactory } from '../graph/GraphBase';
+import type { IGraphFactory } from '../graph/GraphBase';
 export declare class ProvenanceGraphUtils {
     private static removeNoops;
     private static compositeCompressor;

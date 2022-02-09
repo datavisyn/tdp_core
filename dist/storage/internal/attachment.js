@@ -7,7 +7,7 @@ export class AttachemntUtils {
      * @returns {boolean}
      */
     static needToExternalize(data) {
-        //use a JSON file size heuristics
+        // use a JSON file size heuristics
         const size = JSON.stringify(data).length;
         return size >= AttachemntUtils.MAX_INPLACE_SIZE;
     }

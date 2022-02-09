@@ -5,13 +5,15 @@ export class TabSyncer {
     constructor(options) {
         this.options = {
             keyPrefix: 'tab-sync-',
-            storage: localStorage
+            storage: localStorage,
         };
         BaseUtils.mixin(this.options, options);
         this.store = new Store(this.options.storage, this.options.keyPrefix);
         this.store.on(Store.EVENT_CHANGED, TabSyncer.handleChange.bind(this));
         // instantiate plugins
-        PluginRegistry.getInstance().loadPlugin(PluginRegistry.getInstance().listPlugins(TabSyncer.SYNCER_EXTENSION_POINT)).then((instances) => {
+        PluginRegistry.getInstance()
+            .loadPlugin(PluginRegistry.getInstance().listPlugins(TabSyncer.SYNCER_EXTENSION_POINT))
+            .then((instances) => {
             instances.forEach((i) => this.push(i.factory));
         });
         this.registerTab(document.location.href);

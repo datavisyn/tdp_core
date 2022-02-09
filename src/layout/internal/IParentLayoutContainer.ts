@@ -1,14 +1,10 @@
-import {IEventListener} from '../../base';
-import {
-  ILayoutContainer, ILayoutDump, ILayoutParentContainer, IRootLayoutContainer
-} from '../interfaces';
-import {IDropArea} from '../interfaces';
+import { IEventListener } from '../../base';
+import { ILayoutContainer, ILayoutDump, ILayoutParentContainer, IRootLayoutContainer, IDropArea } from '../interfaces';
 
 export interface IParentLayoutContainer extends ILayoutParentContainer {
-
   id: number;
-  on(events: string | {[key: string]: IEventListener}, handler?: IEventListener);
-  off(events: string | {[key: string]: IEventListener}, handler?: IEventListener);
+  on(events: string | { [key: string]: IEventListener }, handler?: IEventListener);
+  off(events: string | { [key: string]: IEventListener }, handler?: IEventListener);
   forEach(callback: (child: ILayoutContainer, index: number) => void);
   canDrop?(area: IDropArea): boolean;
   closest(id: number | ((container: ILayoutParentContainer) => boolean));
@@ -31,6 +27,7 @@ export abstract class IParentLayoutContainerUtils {
   }
 
   static get rootParent(): IRootLayoutContainer & ILayoutParentContainer {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let p: any = this;
     while (p.parent !== null) {
       p = p.parent;
@@ -38,4 +35,3 @@ export abstract class IParentLayoutContainerUtils {
     return <IRootLayoutContainer & ILayoutParentContainer>p;
   }
 }
-

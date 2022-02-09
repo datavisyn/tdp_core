@@ -1,5 +1,6 @@
-import { EventHandler } from '../base/event';
-import { MixedStorageProvenanceGraphManager, IProvenanceGraphDataDescription, ProvenanceGraph } from '../provenance';
+import { EventHandler } from './event';
+import { IProvenanceGraphDataDescription, ProvenanceGraph } from '../provenance';
+import type { MixedStorageProvenanceGraphManager } from '../provenance/MixedStorageProvenanceGraphManager';
 export interface IClueState {
     graph: string;
     slide: number;
@@ -42,7 +43,7 @@ export declare class CLUEGraphManager extends EventHandler {
     chooseLazy(rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     choose(list: IProvenanceGraphDataDescription[], rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     loadOrClone(graph: IProvenanceGraphDataDescription, isSelect: boolean): void;
-    cloneLocal(graph: IProvenanceGraphDataDescription): PromiseLike<ProvenanceGraph>;
+    cloneLocal(graph: IProvenanceGraphDataDescription): Promise<void> | PromiseLike<ProvenanceGraph>;
     /**
      * create the provenance graph selection dropdown and handles the graph selection
      * @param manager

@@ -1,12 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
-import { beautifyLayout } from '../layoutUtils';
 import { merge } from 'lodash';
-import { createBarTraces, EBarGroupingType } from './utils';
 import Plotly from 'plotly.js';
+import { EBarGroupingType, } from '../interfaces';
+import { InvalidCols } from '../InvalidCols';
+import { beautifyLayout } from '../layoutUtils';
+import { createBarTraces } from './utils';
 import { BarVisSidebar } from './BarVisSidebar';
 const defaultConfig = {
     group: {
@@ -28,13 +30,13 @@ const defaultConfig = {
     display: {
         enable: true,
         customComponent: null,
-    }
+    },
 };
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
-    postSidebar: null
+    postSidebar: null,
 };
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false, }) {
     const mergedOptionsConfig = useMemo(() => {

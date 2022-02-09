@@ -1,6 +1,6 @@
-import {FormElementType, IFormElement, IFormElementDesc, IForm} from '../interfaces';
 import * as d3 from 'd3';
-import {EventHandler, IPluginDesc} from '../../base';
+import { FormElementType, IFormElement, IFormElementDesc, IForm } from '../interfaces';
+import { EventHandler, IPluginDesc } from '../../base';
 
 export interface IButtonElementDesc extends IFormElementDesc {
   type: FormElementType.BUTTON;
@@ -10,10 +10,13 @@ export interface IButtonElementDesc extends IFormElementDesc {
 
 export class FormButton extends EventHandler implements IFormElement {
   private $button: d3.Selection<HTMLButtonElement>;
+
   private $node: d3.Selection<any>;
-  private clicked: boolean = false;
+
+  private clicked = false;
 
   readonly type: FormElementType.BUTTON;
+
   readonly id: string;
 
   /**
@@ -54,7 +57,7 @@ export class FormButton extends EventHandler implements IFormElement {
   build($formNode) {
     this.$node = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
     this.$button = this.$node.append('button').classed(this.elementDesc.attributes.clazz, true);
-    this.$button.html(() => this.elementDesc.iconClass? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label);
+    this.$button.html(() => (this.elementDesc.iconClass ? `<i class="${this.elementDesc.iconClass}"></i> ${this.elementDesc.label}` : this.elementDesc.label));
   }
 
   init() {

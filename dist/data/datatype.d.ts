@@ -3,8 +3,8 @@
  */
 import { IPersistable } from '../base/IPersistable';
 import { IDType } from '../idtype/IDType';
-import { ASelectAble } from '../idtype/ASelectAble';
 import { IDataDescription } from './DataDescription';
+import { EventHandler } from '../base/event';
 /**
  * Basic data type interface
  */
@@ -22,11 +22,11 @@ export interface IDataType extends IPersistable {
 /**
  * dummy data type just holding the description
  */
-export declare abstract class ADataType<T extends IDataDescription> extends ASelectAble implements IDataType {
+export declare abstract class ADataType<T extends IDataDescription> extends EventHandler implements IDataType {
     readonly desc: T;
     constructor(desc: T);
     get dim(): number[];
-    idView(selectionIds?: string[]): Promise<ADataType<T>>;
+    idView(ids?: string[]): Promise<ADataType<T>>;
     get idtypes(): IDType[];
     persist(): any;
     restore(persisted: any): this;
@@ -39,6 +39,5 @@ export declare abstract class ADataType<T extends IDataDescription> extends ASel
     static isADataType(v: IDataType): boolean;
 }
 export declare class DummyDataType extends ADataType<IDataDescription> {
-    constructor(desc: IDataDescription);
 }
 //# sourceMappingURL=datatype.d.ts.map

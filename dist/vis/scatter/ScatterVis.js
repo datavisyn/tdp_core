@@ -1,15 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
+import { merge } from 'lodash';
+import Plotly from 'plotly.js';
+import { InvalidCols } from '../InvalidCols';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../layoutUtils';
-import { merge } from 'lodash';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
-import Plotly from 'plotly.js';
 const defaultConfig = {
     color: {
         enable: true,
@@ -22,13 +23,13 @@ const defaultConfig = {
     filter: {
         enable: true,
         customComponent: null,
-    }
+    },
 };
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
-    postSidebar: null
+    postSidebar: null,
 };
 export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, hideSidebar = false, scales }) {
     const uniqueId = useMemo(() => {

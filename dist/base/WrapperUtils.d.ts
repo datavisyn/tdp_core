@@ -1,4 +1,4 @@
-import { IEventHandler } from '.';
+import { IEventHandler } from './event';
 import { ProvenanceGraph } from '../provenance';
 export interface ICLUEWrapper extends IEventHandler {
     jumpToState(state: number): Promise<any>;

@@ -2,7 +2,7 @@ import { SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHe
 import { ISearchOption } from './ISearchOption';
 import { PanelButton, PanelNavButton } from './PanelButton';
 import { IPanelTabDesc } from './IPanelTabDesc';
-import { EventHandler } from '../../base';
+import { EventHandler } from '../../base/event';
 /**
  * The PanelTab creates a tab component that with can be toggled through the PanelNavButton
  */

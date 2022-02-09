@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import d3 from 'd3';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
-import { ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { ESupportedPlotlyVis } from './interfaces';
+import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
+import { ENumericalColorScaleType, ESupportedPlotlyVis } from './interfaces';
 import { ScatterVis } from './scatter/ScatterVis';
 import { ViolinVis } from './violin/ViolinVis';
 import { isViolin, violinMergeDefaultConfig } from './violin/utils';
@@ -12,7 +13,7 @@ import { StripVis } from './strip/StripVis';
 import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
 import { PCPVis } from './pcp/PCPVis';
 import { BarVis } from './bar/BarVis';
-import { getCssValue } from '..';
+import { getCssValue } from '../utils/getCssValue';
 export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
     getCssValue('visyn-c3'),
@@ -52,12 +53,10 @@ export function Vis({ columns, selected = {}, colors = [getCssValue('visyn-c1'),
             setVisConfig(barMergeDefaultConfig(columns, visConfig));
         }
     }, [visConfig.type]);
-    const colorScale = useMemo(() => {
-        return d3.scale.ordinal().range(colors);
-    }, [visConfig]);
     const scales = useMemo(() => {
+        let colorScale = d3.scale.ordinal().range(colors);
         return {
-            color: colorScale
+            color: colorScale,
         };
     }, [visConfig]);
     return (React.createElement(React.Fragment, null,

@@ -70,4 +70,3 @@ export interface IRegistry {
   push(type: Exclude<string, 'visynView'>, id: string, loader: () => any, desc?: any): void;
   push(type: Exclude<string, 'visynView'>, idOrLoader: string | (() => any), descOrLoader: any, desc?: any): void;
 }
-

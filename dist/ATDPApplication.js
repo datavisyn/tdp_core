@@ -7,9 +7,8 @@ import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { TourManager } from './tour/TourManager';
 import { TemporarySessionList } from './utils/SessionList';
 import { TDPTokenManager } from './auth';
-import { ACLUEWrapper } from './wrapper';
-import { LoginMenu } from './base';
-import { Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager } from './base';
+import { ACLUEWrapper } from './wrapper/ACLUEWrapper';
+import { LoginMenu, Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager } from './base';
 import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';
 import { MixedStorageProvenanceGraphManager } from './provenance';
@@ -34,7 +33,7 @@ export class ATDPApplication extends ACLUEWrapper {
             showProvenanceMenu: true,
             showClueModeButtons: true,
             enableProvenanceUrlTracking: true,
-            clientConfig: null
+            clientConfig: null,
         };
         this.app = null;
         BaseUtils.mixin(this.options, options);
@@ -57,7 +56,7 @@ export class ATDPApplication extends ACLUEWrapper {
         this.tourManager = new TourManager({
             doc: document,
             header: () => this.header,
-            app: () => this.app
+            app: () => this.app,
         });
         if (this.options.showTourLink && this.tourManager.hasTours()) {
             const button = this.header.addRightMenu('<i class="fas fa-question-circle fa-fw"></i>', (evt) => {
@@ -93,7 +92,7 @@ export class ATDPApplication extends ACLUEWrapper {
         return options;
     }
     createHeader(parent) {
-        //create the common header
+        // create the common header
         const header = AppHeader.create(parent, {
             showCookieDisclaimer: this.options.showCookieDisclaimer,
             showAboutLink: this.options.showAboutLink,
@@ -104,7 +103,7 @@ export class ATDPApplication extends ACLUEWrapper {
                 event.preventDefault();
                 this.fire(ATDPApplication.EVENT_OPEN_START_MENU);
                 return false;
-            })
+            }),
         });
         if (this.options.showResearchDisclaimer) {
             const aboutDialogBody = header.aboutDialog;
@@ -120,12 +119,12 @@ export class ATDPApplication extends ACLUEWrapper {
     buildImpl(body) {
         this.header = this.createHeader(body.querySelector('div.box'));
         this.on('jumped_to,loaded_graph', () => this.header.ready());
-        //load all available provenance graphs
+        // load all available provenance graphs
         const manager = new MixedStorageProvenanceGraphManager({
             prefix: this.options.prefix,
             storage: localStorage,
             application: this.options.prefix,
-            ...(this.options.provenanceManagerOptions || {})
+            ...(this.options.provenanceManagerOptions || {}),
         });
         this.cleanUpOld(manager);
         const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);
@@ -135,7 +134,7 @@ export class ATDPApplication extends ACLUEWrapper {
         this.loginMenu = new LoginMenu(this.header, {
             insertIntoHeader: true,
             loginForm: this.options.loginForm,
-            watch: true
+            watch: true,
         });
         this.loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
             // reopen after logged out
@@ -147,35 +146,37 @@ export class ATDPApplication extends ACLUEWrapper {
         }
         const main = document.body.querySelector('main');
         const content = body.querySelector('div.content');
-        //wrapper around to better control when the graph will be resolved
+        // wrapper around to better control when the graph will be resolved
         let graphResolver;
-        const graph = new Promise((resolve, reject) => graphResolver = resolve);
+        const graph = new Promise((resolve, reject) => {
+            graphResolver = resolve;
+        });
         graph.catch((error) => {
             DialogUtils.showProveanceGraphNotFoundDialog(clueManager, error.graph);
         });
-        graph.then((graph) => {
+        graph.then((g) => {
             if (this.options.showClueModeButtons) {
                 const phoveaNavbar = document.body.querySelector('.phovea-navbar');
                 const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
                 modeSelector.classList.add('collapsed');
                 modeSelector.classList.add('clue-modeselector');
                 ButtonModeSelector.createButton(modeSelector, {
-                    size: 'sm'
+                    size: 'sm',
                 });
             }
-            provenanceMenu === null || provenanceMenu === void 0 ? void 0 : provenanceMenu.setGraph(graph);
+            provenanceMenu === null || provenanceMenu === void 0 ? void 0 : provenanceMenu.setGraph(g);
         });
         const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {
             thumbnails: false,
             provVisCollapsed: true,
-            hideCLUEButtonsOnCollapse: true
+            hideCLUEButtonsOnCollapse: true,
         });
         const storyVis = VisLoader.loadStoryVis(graph, content, main, {
-            thumbnails: false
+            thumbnails: false,
         });
-        this.app = graph.then((graph) => this.createApp(graph, clueManager, main));
+        this.app = graph.then((g) => this.createApp(g, clueManager, main));
         const initSession = () => {
-            //logged in, so we can resolve the graph for real
+            // logged in, so we can resolve the graph for real
             graphResolver(clueManager.chooseLazy(true));
             this.app.then((appInstance) => this.initSessionImpl(appInstance));
             this.customizeApp(content, main);
@@ -187,7 +188,7 @@ export class ATDPApplication extends ACLUEWrapper {
             initSession();
         });
         if (!UserSession.getInstance().isLoggedIn()) {
-            //wait 1sec before the showing the login dialog to give the auto login mechanism a chance
+            // wait 1sec before the showing the login dialog to give the auto login mechanism a chance
             forceShowLoginDialogTimeout = setTimeout(() => this.loginMenu.forceShowDialog(), 1000);
         }
         else {
@@ -204,13 +205,13 @@ export class ATDPApplication extends ACLUEWrapper {
             return;
         }
         this.app.then((app) => {
-            Promise.all(plugins.map((d) => d.load())).then((plugins) => {
-                for (const plugin of plugins) {
+            Promise.all(plugins.map((d) => d.load())).then((ps) => {
+                for (const plugin of ps) {
                     plugin.factory({
                         header: this.header,
                         content,
                         main,
-                        app
+                        app,
                     });
                 }
             });

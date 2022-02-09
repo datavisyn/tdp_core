@@ -1,13 +1,12 @@
-import {IDTypeLike} from '../idtype';
-import {AReactView} from './AReactView';
-import {ISelectionChooserOptions, SelectionChooser} from './SelectionChooser';
-
+import { IDTypeLike } from '../idtype';
+import { AReactView } from './AReactView';
+import { ISelectionChooserOptions, SelectionChooser } from './SelectionChooser';
 
 /**
  * definition how to select elements within the react view
  */
 export interface IChooserViewSelector {
-  (name: string|string[], op?: 'add' | 'set' | 'remove' | 'toggle'): void;
+  (name: string | string[], op?: 'add' | 'set' | 'remove' | 'toggle'): void;
 }
 
 /**
@@ -33,7 +32,6 @@ export abstract class AReactChooserView extends AReactView {
   }
 
   protected abstract createSelectionChooserOptions(): Partial<ISelectionChooserOptions> & { target: IDTypeLike };
-
 
   protected initReact() {
     return this.chooser.init(this.selection).then(() => {

@@ -1,4 +1,4 @@
-import { EBarDirection } from '../bar/utils';
+import { EBarDirection } from '../interfaces';
 interface BarDirectionProps {
     callback: (s: EBarDirection) => void;
     currentSelected: EBarDirection;

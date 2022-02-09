@@ -1,9 +1,9 @@
-import { SelectionUtils } from '..';
+import { isEqual } from 'lodash';
 export class ViewUtils {
     static toViewPluginDesc(p) {
         const r = p;
         r.selection = r.selection || 'none';
-        r.group = Object.assign({ name: 'Other', order: 99 }, r.group);
+        r.group = { name: 'Other', order: 99, ...r.group };
         r.securityNotAllowedText = r.securityNotAllowedText != null ? r.securityNotAllowedText : false;
         // common typo
         if (r.idType !== undefined) {
@@ -56,19 +56,20 @@ export class ViewUtils {
      * @returns {boolean}
      */
     static isSameSelection(a, b) {
-        const aNull = (a == null || a.idtype == null);
-        const bNull = (b == null || b.idtype == null);
+        var _a, _b;
+        const aNull = a == null || a.idtype == null;
+        const bNull = b == null || b.idtype == null;
         if (aNull || bNull) {
             return aNull === bNull;
         }
-        const base = a.idtype.id === b.idtype.id && SelectionUtils.selectionEq(a.selectionIds, b.selectionIds);
+        const base = a.idtype.id === b.idtype.id && isEqual((_a = a.ids) === null || _a === void 0 ? void 0 : _a.sort(), (_b = b.ids) === null || _b === void 0 ? void 0 : _b.sort());
         if (!base) {
             return false;
         }
         const aAllSize = a.all ? a.all.size : 0;
         const bAllSize = b.all ? b.all.size : 0;
         if (aAllSize !== bAllSize) {
-            return;
+            return undefined;
         }
         if (aAllSize === 0) {
             return true;
@@ -79,14 +80,14 @@ export class ViewUtils {
             if (!other) {
                 return false;
             }
-            return SelectionUtils.selectionEq(value, other);
+            return isEqual(value === null || value === void 0 ? void 0 : value.sort(), other === null || other === void 0 ? void 0 : other.sort());
         });
     }
     static createContext(graph, desc, ref) {
         return {
             graph,
             desc: ViewUtils.toViewPluginDesc(desc),
-            ref
+            ref,
         };
     }
 }

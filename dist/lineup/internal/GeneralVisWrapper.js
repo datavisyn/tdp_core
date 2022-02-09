@@ -1,44 +1,45 @@
 import { Ranking } from 'lineupjs';
-import { EventHandler, IDTypeManager } from '../..';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Vis } from '../../vis/Vis';
 import { EColumnTypes } from '../../vis/interfaces';
+import { EventHandler } from '../../base/event';
+import { IDTypeManager } from '../../idtype/IDTypeManager';
 export class GeneralVisWrapper extends EventHandler {
-    constructor(provider, view, selectionHelper, doc = document) {
+    constructor(provider, idType, lineupSelectionHelper, doc = document) {
         super();
-        this.view = view;
         this.provider = provider;
-        this.selectionHelper = selectionHelper;
+        this.idType = idType;
+        this.lineupSelectionHelper = lineupSelectionHelper;
         this.node = doc.createElement('div');
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
         this.viewable = false;
     }
     getAllData() {
-        //make a real copy at some point
+        // make a real copy at some point
         const globalFilter = this.provider.getFilter();
         // TODO: Think about using this.provider.getFirstRanking().flatColumns instead of the descriptions.
         /* TODO: This is an untested way of resolving the values of all possible ValueColumn variants (could be lazy for example).
-        this.provider.getFirstRanking().flatColumns.forEach((v) => {
-            if(v instanceof ValueColumn) {
-                if(v.isLoaded()) {
-                    return () => this.provider._dataRows.map((row) => v.getValue(row));
-                } else {
-                    let resolve = null;
-                    const promise = new Promise((resolve2) => {
-                        resolve = resolve2;
-                    });
-
-                    v.on(ValueColumn.EVENT_DATA_LOADED, () => {
-                        resolve(this.provider._dataRows.map((row) => v.getValue(row)))
-                    })
-
-                    return () => promise;
+            this.provider.getFirstRanking().flatColumns.forEach((v) => {
+                if(v instanceof ValueColumn) {
+                    if(v.isLoaded()) {
+                        return () => this.provider._dataRows.map((row) => v.getValue(row));
+                    } else {
+                        let resolve = null;
+                        const promise = new Promise((resolve2) => {
+                            resolve = resolve2;
+                        });
+    
+                        v.on(ValueColumn.EVENT_DATA_LOADED, () => {
+                            resolve(this.provider._dataRows.map((row) => v.getValue(row)))
+                        })
+    
+                        return () => promise;
+                    }
                 }
-            }
-        })
-        */
+            })
+            */
         let newData = [];
         if (globalFilter) {
             newData = this.provider.data.filter((d, i) => this.provider.getFirstRanking().filter(this.provider.getRow(i)) && globalFilter(this.provider.getRow(i)));
@@ -56,9 +57,9 @@ export class GeneralVisWrapper extends EventHandler {
         return newData;
     }
     selectCallback(selected) {
-        //???
-        const id = IDTypeManager.getInstance().resolveIdType(this.view.itemIDType.id);
-        this.view.selectionHelper.setGeneralVisSelection({ idtype: id, selectionIds: selected });
+        // ???
+        const id = IDTypeManager.getInstance().resolveIdType(this.idType.id);
+        this.lineupSelectionHelper.setGeneralVisSelection({ idtype: id, ids: selected });
     }
     filterCallback(s) {
         const selectedIds = this.provider.getSelection();

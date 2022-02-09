@@ -1,18 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
 import { merge } from 'lodash';
-import { createPCPTraces } from './utils';
 import Plotly from 'plotly.js';
 import { PCPVisSidebar } from './PCPVisSidebar';
+import { InvalidCols } from '..';
+import { createPCPTraces } from './utils';
 const defaultConfig = {};
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
-    postSidebar: null
+    postSidebar: null,
 };
 export function PCPVis({ config, optionsConfig, extensions, columns, setConfig, hideSidebar = false }) {
     const mergedOptionsConfig = useMemo(() => {

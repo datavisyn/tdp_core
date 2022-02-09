@@ -1,6 +1,6 @@
+import { LocalDataProvider } from 'lineupjs';
 import { ARankingView } from './ARankingView';
 import { BuilderUtils, LayoutContainerEvents } from '../layout';
-import { LocalDataProvider } from 'lineupjs';
 import { OverviewColumn } from './internal/OverviewColumn';
 import { BaseUtils } from '../base';
 import { I18nextManager } from '../i18n';
@@ -20,7 +20,7 @@ export class AOverviewDetailRankingView extends ARankingView {
     }
     showDetailRanking(showRanking = true) {
         const r = this.split.ratios[1];
-        if ((r > 0.1) === showRanking) {
+        if (r > 0.1 === showRanking) {
             return;
         }
         this.setRatio(showRanking ? 0.5 : 1);
@@ -39,13 +39,13 @@ export class AOverviewDetailRankingView extends ARankingView {
             node: lineup,
             destroy: () => undefined,
             dumpReference: () => -1,
-            visible: false
+            visible: false,
         };
         const overviewView = {
             node: this.overview,
             destroy: () => undefined,
             dumpReference: () => -1,
-            visible: true
+            visible: true,
         };
         const r = BuilderUtils.root(BuilderUtils.verticalSplit(1, BuilderUtils.view(overviewView).name(I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewDetailRanking.overview')).hideHeader(), BuilderUtils.view(lineupView).name(I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewDetailRanking.detailTable')).hideHeader()));
         this.node.insertAdjacentElement('afterbegin', r.node);
@@ -65,7 +65,7 @@ export class AOverviewDetailRankingView extends ARankingView {
         this.lineup.columnTypes.overview = OverviewColumn;
         this.overviewColumn = this.lineup.create({
             type: 'overview',
-            label: ''
+            label: '',
         });
         // add our helper column at the beginning
         this.lineup.getRankings()[0].insert(this.overviewColumn, 2);

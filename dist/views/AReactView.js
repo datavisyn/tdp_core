@@ -1,5 +1,5 @@
 import * as ReactDOM from 'react-dom';
-import { AView } from '.';
+import { AView } from './AView';
 import { Errors } from '../components';
 import { IDTypeManager } from '../idtype';
 /**
@@ -20,7 +20,7 @@ export class AReactView extends AView {
     initReact() {
         if (this.handler) {
             // will be handled externally
-            return;
+            return undefined;
         }
         return this.update();
     }
@@ -31,13 +31,14 @@ export class AReactView extends AView {
         let sel = [];
         switch (op) {
             case 'add':
-                sel = Array.from(new Set([...act.selectionIds, ...ids]));
+                sel = Array.from(new Set([...act.ids, ...ids]));
                 break;
             case 'remove':
-                sel = act.selectionIds.filter((actId) => !ids.includes(actId));
+                sel = act.ids.filter((actId) => !ids.includes(actId));
                 break;
             case 'toggle':
-                const toggling = new Set(act.selectionIds);
+                // eslint-disable-next-line no-case-declarations
+                const toggling = new Set(act.ids);
                 ids.forEach((id) => {
                     if (toggling.has(id)) {
                         toggling.delete(id);
@@ -52,7 +53,7 @@ export class AReactView extends AView {
                 sel = ids;
                 break;
         }
-        this.setItemSelection({ idtype, selectionIds: sel });
+        this.setItemSelection({ idtype, ids: sel });
         this.update();
         return sel;
     }
@@ -63,15 +64,17 @@ export class AReactView extends AView {
         console.assert(!this.handler);
         this.setBusy(true);
         const item = this.getItemSelection();
-        return Promise.all([this.resolveSelection(), item.idtype ? item.selectionIds : []])
+        return Promise.all([this.resolveSelection(), item.idtype ? item.ids : []])
             .then((names) => {
             const inputSelection = names[0];
             const itemSelection = names[1];
             return this.render(inputSelection, itemSelection, this.select);
-        }).then((elem) => {
+        })
+            .then((elem) => {
             this.setBusy(false);
             ReactDOM.render(elem, this.node.querySelector('div.react-view-body'));
-        }).catch(Errors.showErrorModalDialog)
+        })
+            .catch(Errors.showErrorModalDialog)
             .catch((r) => {
             console.error(r);
             this.setBusy(false);
@@ -85,6 +88,7 @@ export class AReactView extends AView {
         else {
             return this.update();
         }
+        return undefined;
     }
     selectionChanged() {
         return this.update();

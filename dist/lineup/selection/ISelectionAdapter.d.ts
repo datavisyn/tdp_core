@@ -1,6 +1,5 @@
 import { Column, IColumnDesc } from 'lineupjs';
-import { ISelection } from '../../base/interfaces';
-import { IScoreRow } from '../../base/interfaces';
+import { ISelection, IScoreRow } from '../../base/interfaces';
 export interface ISelectionColumn {
     readonly id: string;
     readonly desc: IColumnDesc;

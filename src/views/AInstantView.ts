@@ -1,4 +1,4 @@
-import {IInstantView, IInstantViewOptions, IItemSelection} from '../base/interfaces';
+import { IInstantView, IInstantViewOptions, IItemSelection } from '../base/interfaces';
 
 export class AInstantView implements IInstantView {
   readonly node: HTMLElement;

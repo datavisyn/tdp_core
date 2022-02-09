@@ -1,7 +1,6 @@
 import { IDType } from '../idtype';
 import { EventHandler } from '../base';
-import { ISelection, IView, IViewContext, IViewPluginDesc } from '../base/interfaces';
-import { EViewMode } from '../base/interfaces';
+import { ISelection, IView, IViewContext, IViewPluginDesc, EViewMode } from '../base/interfaces';
 interface IElementDesc {
     key: string;
     loader: () => any;

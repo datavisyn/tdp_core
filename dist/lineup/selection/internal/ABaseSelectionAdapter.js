@@ -10,7 +10,8 @@ export class ABaseSelectionAdapter {
             // sort new columns to insert them in the correct order
             const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
             flattenedColumns.sort(({ d: a, i: ai }, { d: b, i: bi }) => {
-                if (a.position === b.position) { // equal position, sort latter element of original array to lower position in sorted array
+                if (a.position === b.position) {
+                    // equal position, sort latter element of original array to lower position in sorted array
                     return bi - ai; // the latter in the array the better
                 }
                 return b.position - a.position; // sort descending by default
@@ -18,20 +19,22 @@ export class ABaseSelectionAdapter {
             context.add(flattenedColumns.map((d) => d.d));
         });
     }
-    removeDynamicColumns(context, _ids) {
-        const columns = context.columns;
-        context.remove([].concat(..._ids.map((_id) => {
-            context.freeColor(_id);
-            return columns.filter((d) => d.desc.selectedId === _id);
+    removeDynamicColumns(context, ids) {
+        const { columns } = context;
+        context.remove([].concat(...ids.map((id) => {
+            context.freeColor(id);
+            return columns.filter((d) => d.desc.selectedId === id);
         })));
     }
     selectionChanged(waitForIt, context) {
         if (this.waitingForSelection) {
             return this.waitingForSelection;
         }
-        return this.waitingForSelection = ResolveNow.resolveImmediately(waitForIt).then(() => this.selectionChangedImpl(context())).then(() => {
+        return (this.waitingForSelection = ResolveNow.resolveImmediately(waitForIt)
+            .then(() => this.selectionChangedImpl(context()))
+            .then(() => {
             this.waitingForSelection = null;
-        });
+        }));
     }
     parameterChanged(waitForIt, context) {
         if (this.waitingForSelection) {
@@ -40,17 +43,19 @@ export class ABaseSelectionAdapter {
         if (this.waitingForParameter) {
             return this.waitingForParameter;
         }
-        return this.waitingForParameter = ResolveNow.resolveImmediately(waitForIt).then(() => {
+        return (this.waitingForParameter = ResolveNow.resolveImmediately(waitForIt)
+            .then(() => {
             if (this.waitingForSelection) {
-                return; // abort selection more important
+                return undefined; // abort selection more important
             }
             return this.parameterChangedImpl(context());
-        }).then(() => {
+        })
+            .then(() => {
             this.waitingForParameter = null;
-        });
+        }));
     }
     selectionChangedImpl(context) {
-        const selectedIds = context.selection.selectionIds;
+        const selectedIds = context.selection.ids;
         const usedCols = context.columns.filter((d) => d.desc.selectedId != null);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
         // compute the difference
@@ -58,7 +63,7 @@ export class ABaseSelectionAdapter {
         const diffRemoved = LineupUtils.array_diff(lineupColIds, selectedIds);
         // remove deselected columns
         if (diffRemoved.length > 0) {
-            //console.log('remove columns', diffRemoved);
+            // console.log('remove columns', diffRemoved);
             this.removeDynamicColumns(context, diffRemoved);
         }
         // add new columns to the end

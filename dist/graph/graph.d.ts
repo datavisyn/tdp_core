@@ -1,7 +1,6 @@
-import { ASelectAble } from '../idtype';
 import { IPersistable } from '../base/IPersistable';
 import { EventHandler } from '../base/event';
-import { IDataType, IDataDescription } from '../data';
+import type { IDataType, IDataDescription } from '../data';
 export declare class AttributeContainer extends EventHandler implements IPersistable {
     private attrMap;
     persist(): any;
@@ -76,7 +75,7 @@ export interface IGraph extends IDataType {
     updateEdge(e: GraphEdge): this | PromiseLike<this>;
     removeEdge(e: GraphEdge): this | PromiseLike<this>;
 }
-export declare abstract class AGraph extends ASelectAble {
+export declare abstract class AGraph extends EventHandler {
     static DIM_NODES: number;
     static IDTYPE_NODES: string;
     static DIM_EDGES: number;

@@ -1,6 +1,6 @@
+import { Selection } from 'd3';
 import { ISelection, IViewContext } from '../base/interfaces';
 import { AView } from './AView';
-import { Selection } from 'd3';
 /**
  * utiltity view to work with the node using d3
  * @deprecated

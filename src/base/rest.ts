@@ -1,7 +1,7 @@
-import {Ajax} from '.';
-import {AppContext} from '../app';
-import {IDTypeLike} from '../idtype';
-import {IScoreRow} from './interfaces';
+import { Ajax } from './ajax';
+import { AppContext } from '../app';
+import { IDTypeLike } from '../idtype';
+import { IScoreRow } from './interfaces';
 
 /**
  * common interface for a row as used in LineUp
@@ -15,9 +15,12 @@ export interface IRow {
    * unique internal number id, e.g. 42
    */
   readonly _visyn_id: string;
-
-  // TODO: Remove
-  readonly _id: number;
+  /**
+   * Legacy internal id.
+   * TODO: Remove after all usages are refactored.
+   * @deprecated Use _visyn_id instead.
+   */
+  readonly _id: never;
 
   [key: string]: any;
 }
@@ -37,7 +40,6 @@ export interface IDatabaseDesc {
 }
 
 export interface IServerColumnDesc {
-
   /**
    * idType of the DBView, can be null
    */
@@ -96,15 +98,15 @@ export interface IAllFilters {
  * Define empty filter object for use as function default parameter
  */
 const emptyFilters: IAllFilters = {
-  normal:{},
-  lt:{},
-  lte:{},
-  gt:{},
-  gte:{}
+  normal: {},
+  lt: {},
+  lte: {},
+  gt: {},
+  gte: {},
 };
 
 export interface ILookupItem {
-  _id: number;
+  _id: never;
   id: string;
   text: string;
 }
@@ -113,7 +115,6 @@ export interface ILookupResult {
   items: ILookupItem[];
   more: boolean;
 }
-
 
 export interface IServerColumn {
   /**
@@ -146,15 +147,15 @@ export interface IServerColumn {
 }
 
 export class RestBaseUtils {
-
   public static readonly REST_NAMESPACE = '/tdp';
+
   public static readonly REST_DB_NAMESPACE = `${RestBaseUtils.REST_NAMESPACE}/db`;
 
   private static getTDPDataImpl(database: string, view: string, method: 'none' | 'filter' | 'desc' | 'score' | 'count' | 'lookup', params: IParams = {}) {
     const mmethod = method === 'none' ? '' : `/${method}`;
     const url = `${RestBaseUtils.REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
     const encoded = Ajax.encodeParams(params);
-    if (encoded && (url.length + encoded.length > Ajax.MAX_URL_LENGTH)) {
+    if (encoded && url.length + encoded.length > Ajax.MAX_URL_LENGTH) {
       // use post instead
       return AppContext.getInstance().sendAPI(url, params, 'POST');
     }
@@ -166,9 +167,9 @@ export class RestBaseUtils {
    * @param params URL parameter
    * @param prefix The prefix for the parameter keys (default is `filter`)
    */
-  private static prefixFilter(params: IParams, prefix: string = 'filter') {
+  private static prefixFilter(params: IParams, prefix = 'filter') {
     const r: IParams = {};
-    Object.keys(params).map((key) => r[key.startsWith(`${prefix}_`) ? key : `${prefix}_${key}`] = params[key]);
+    Object.keys(params).map((key) => (r[key.startsWith(`${prefix}_`) ? key : `${prefix}_${key}`] = params[key]));
     return r;
   }
 
@@ -186,7 +187,7 @@ export class RestBaseUtils {
     const gt = RestBaseUtils.prefixFilter(filters.gt, 'filter_gt');
     const gte = RestBaseUtils.prefixFilter(filters.gte, 'filter_gte');
 
-    return Object.assign({}, params, normal, lt, lte, gt, gte);
+    return { ...params, ...normal, ...lt, ...lte, ...gt, ...gte };
   }
 
   /**
@@ -202,6 +203,7 @@ export class RestBaseUtils {
   static getTDPDatabases(): Promise<IDatabaseDesc[]> {
     return AppContext.getInstance().getAPIJSON(`${RestBaseUtils.REST_DB_NAMESPACE}/`);
   }
+
   static getTDPViews(database: string): Promise<Readonly<IDatabaseViewDesc>[]> {
     return AppContext.getInstance().getAPIJSON(`${RestBaseUtils.REST_DB_NAMESPACE}/${database}/`);
   }
@@ -216,7 +218,7 @@ export class RestBaseUtils {
     return AppContext.getInstance().api2absURL(`${RestBaseUtils.REST_NAMESPACE}/proxy/${proxy}`, args);
   }
 
-  static getTDPProxyData(proxy: string, args: any, type: string = 'json') {
+  static getTDPProxyData(proxy: string, args: any, type = 'json') {
     return AppContext.getInstance().getAPIData(`${RestBaseUtils.REST_NAMESPACE}/proxy/${proxy}`, args, type);
   }
 
@@ -242,7 +244,6 @@ export class RestBaseUtils {
     return RestBaseUtils.getTDPDataImpl(database, view, 'none', params);
   }
 
-
   /**
    * Merges the "regular" parameters with filter parameters for the URL.
    * Filter parameters are prefixed accordingly to be accepted by the backend.
@@ -251,7 +252,7 @@ export class RestBaseUtils {
    * @param filters URL filter parameters
    */
   static mergeParamAndFilters(params: IParams, filters: IParams) {
-    return Object.assign({}, params, RestBaseUtils.prefixFilter(filters));
+    return { ...params, ...RestBaseUtils.prefixFilter(filters) };
   }
 
   /**
@@ -329,6 +330,7 @@ export class RestBaseUtils {
   static getTDPLookupUrl(database: string, view: string, params: IParams = {}) {
     return AppContext.getInstance().api2absURL(`${RestBaseUtils.REST_DB_NAMESPACE}/${database}/${view}/lookup`, params);
   }
+
   /**
    * lookup utility function as used for auto completion within select2 form elements
    * @param {string} database the database connector key

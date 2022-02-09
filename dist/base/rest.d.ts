@@ -12,7 +12,12 @@ export interface IRow {
      * unique internal number id, e.g. 42
      */
     readonly _visyn_id: string;
-    readonly _id: number;
+    /**
+     * Legacy internal id.
+     * TODO: Remove after all usages are refactored.
+     * @deprecated Use _visyn_id instead.
+     */
+    readonly _id: never;
     [key: string]: any;
 }
 /**
@@ -77,7 +82,7 @@ export interface IAllFilters {
     gte: IParams;
 }
 export interface ILookupItem {
-    _id: number;
+    _id: never;
     id: string;
     text: string;
 }
@@ -169,7 +174,9 @@ export declare class RestBaseUtils {
      * @param params URL parameters
      * @param filters URL filter parameters
      */
-    static mergeParamAndFilters(params: IParams, filters: IParams): IParams;
+    static mergeParamAndFilters(params: IParams, filters: IParams): {
+        [x: string]: string | number | boolean | string[] | number[] | boolean[];
+    };
     /**
      * query the TDP rest api to read data with additional given filters
      * @param {string} database the database connector key

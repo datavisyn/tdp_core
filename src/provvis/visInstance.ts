@@ -1,8 +1,8 @@
-import {IPersistable} from '../base/IPersistable';
-import {UniqueIdManager} from '../app/UniqueIdManager';
-import {IDataType} from '../data/datatype';
-import {IEventHandler, EventHandler} from '../base/event';
-import {ITransform} from './ITransform';
+import { IPersistable } from '../base/IPersistable';
+import { UniqueIdManager } from '../app/UniqueIdManager';
+import { IDataType } from '../data/datatype';
+import { IEventHandler, EventHandler } from '../base/event';
+import { ITransform } from './ITransform';
 
 export interface IVisInstanceOptions {
   rotate?: number;
@@ -85,13 +85,14 @@ export interface IVisInstance extends IPersistable, IEventHandler {
  */
 export class AVisInstance extends EventHandler {
   readonly id = UniqueIdManager.getInstance().uniqueId('vis');
+
   private _built = false;
 
   option(name: string, value?: any): any {
-    //dummy
-    //if (value) {
+    // dummy
+    // if (value) {
     //  this.fire('option', name, value, null);
-    //}
+    // }
     return null;
   }
 
@@ -103,7 +104,7 @@ export class AVisInstance extends EventHandler {
     return this._built;
   }
 
-  protected markReady(built: boolean = true) {
+  protected markReady(built = true) {
     this._built = built;
     if (built) {
       this.fire('ready');
@@ -115,7 +116,7 @@ export class AVisInstance extends EventHandler {
   }
 
   update() {
-    //do nothing
+    // do nothing
   }
 
   destroy() {
@@ -131,7 +132,7 @@ export class AVisInstance extends EventHandler {
   transform(): ITransform {
     return {
       scale: [1, 1],
-      rotate: 0
+      rotate: 0,
     };
   }
 
@@ -142,7 +143,7 @@ export class AVisInstance extends EventHandler {
   get size(): [number, number] {
     const t = this.transform();
     const r = this.rawSize;
-    //TODO rotation
+    // TODO rotation
     return [r[0] * t.scale[0], r[1] * t.scale[1]];
   }
 }

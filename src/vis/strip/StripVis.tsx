@@ -1,19 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
-import {useEffect, useMemo} from 'react';
-import {IVisConfig} from '../interfaces';
-import {VisTypeSelect} from '../sidebar/VisTypeSelect';
-import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
+import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
-import {beautifyLayout} from '../layoutUtils';
-import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
-import {merge} from 'lodash';
-import {createStripTraces, IStripConfig} from './utils';
-import {WarningMessage} from '../sidebar/WarningMessage';
+import { merge } from 'lodash';
 import Plotly from 'plotly.js';
 import {StripVisSidebar} from './StripVisSidebar';
+import {beautifyLayout, CategoricalColumn, InvalidCols, IStripConfig, IVisConfig, NumericalColumn, PlotlyInfo, Scales} from '..';
+import {createStripTraces} from './utils';
 
 interface StripVisProps {
     config: IStripConfig;
@@ -33,10 +27,10 @@ interface StripVisProps {
 const defaultConfig = {};
 
 const defaultExtensions = {
-    prePlot: null,
-    postPlot: null,
-    preSidebar: null,
-    postSidebar: null
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
 };
 
 export function StripVis({

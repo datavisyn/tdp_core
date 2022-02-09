@@ -8,7 +8,7 @@ import { BaseUtils } from '../base';
 import { UserSession } from '../app';
 export class ImportUtils {
     static commonFields(name) {
-        const prefix = 'i' + BaseUtils.randomId(3);
+        const prefix = `i${BaseUtils.randomId(3)}`;
         return `
       <div class="form-group">
         <label for="${prefix}_name">${I18nextManager.getInstance().i18n.t('phovea:importer.name')}</label>
@@ -22,7 +22,7 @@ export class ImportUtils {
     static extractCommonFields($root) {
         return {
             name: $root.select('input[name="name"]').property('value'),
-            description: $root.select('textarea[name="desc"]').property('value')
+            description: $root.select('textarea[name="desc"]').property('value'),
         };
     }
     static async importTable(editors, $root, header, data, name) {
@@ -37,20 +37,20 @@ export class ImportUtils {
           </tbody>
         </table>
       `);
-        const configPromises = header.map((name, i) => {
-            return PHOVEA_IMPORTER_ValueTypeUtils.guessValueType(editors, name, i, data, (row) => row[i]);
+        const configPromises = header.map((n, i) => {
+            return PHOVEA_IMPORTER_ValueTypeUtils.guessValueType(editors, n, i, data, (row) => row[i]);
         });
         const guessedEditors = await Promise.all(configPromises);
-        const config = await Promise.all(header.map(async (name, i) => {
+        const config = await Promise.all(header.map(async (n, i) => {
             const value = await guessedEditors[i].guessOptions({ type: null }, data, (col) => col[i]);
             const markup = await PHOVEA_IMPORTER_ValueTypeUtils.createTypeEditor(editors, guessedEditors[i], value);
             return {
                 column: i,
-                name,
+                name: n,
                 color: '#DDDDDD',
                 value,
                 editor: guessedEditors[i],
-                markup
+                markup,
             };
         }));
         const $rows = $root.select('tbody').selectAll('tr').data(config);
@@ -63,8 +63,7 @@ export class ImportUtils {
           ${d.markup}
         </td>`;
         }
-        const $rowsEnter = $rows.enter().append('tr')
-            .html(getCellMarkup);
+        const $rowsEnter = $rows.enter().append('tr').html(getCellMarkup);
         $rowsEnter.select('input').on('change', function (d) {
             d.name = this.value;
         });
@@ -76,25 +75,27 @@ export class ImportUtils {
         return () => ({ data, desc: ImportUtils.toTableDataDescription(config, data, common) });
     }
     static toTableDataDescription(config, data, common) {
-        //derive all configs
+        // derive all configs
         config = config.filter((c) => c.editor != null);
         config.forEach((d) => {
-            const editor = d.editor;
+            const { editor } = d;
             editor.parse(d.value, data, (row, value) => {
                 if (typeof value !== 'undefined') {
-                    return row[d.column] = value;
+                    return (row[d.column] = value);
                 }
                 return row[d.column];
             });
         });
-        //generate config
+        // generate config
         let idProperty = config.filter((d) => d.value.type === 'idType')[0];
         if (!idProperty) {
-            //create an artificial one
+            // create an artificial one
             idProperty = { value: { type: 'idType', idType: 'Custom' }, name: 'IDType', column: '_index' };
-            data.forEach((d, i) => d._index = i);
+            data.forEach((d, i) => (d._index = i));
         }
-        const columns = config.filter((c) => c !== idProperty).map((c) => {
+        const columns = config
+            .filter((c) => c !== idProperty)
+            .map((c) => {
             const r = BaseUtils.mixin({}, c);
             delete r.editor;
             return r;
@@ -106,56 +107,63 @@ export class ImportUtils {
             description: common.description,
             creator: UserSession.getInstance().currentUserNameOrAnonymous(),
             ts: Date.now(),
-            fqname: 'upload/' + common.name,
+            fqname: `upload/${common.name}`,
             size: [data.length, columns.length],
             idtype: idProperty.value.idType,
             columns,
-            idcolumn: idProperty.column
+            idcolumn: idProperty.column,
         };
         return desc;
     }
     static async importMatrix(editors, $root, header, data, name) {
-        const prefix = 'a' + BaseUtils.randomId(3);
-        const rows = header.slice(1), cols = data.map((d) => d.shift());
+        const prefix = `a${BaseUtils.randomId(3)}`;
+        const rows = header.slice(1);
+        const cols = data.map((d) => d.shift());
         const dataRange = d3.range(rows.length * cols.length);
         function byIndex(i, v) {
             const m = i % cols.length;
             if (v !== undefined) {
-                return data[(i - m) / cols.length][m] = v;
+                return (data[(i - m) / cols.length][m] = v);
             }
-            else {
-                return data[(i - m) / cols.length][m];
-            }
+            return data[(i - m) / cols.length][m];
         }
         const editor = await PHOVEA_IMPORTER_ValueTypeUtils.guessValueType(editors, 'value', -1, dataRange, byIndex);
-        const configs = [{
+        const configs = [
+            {
                 column: -1,
                 name: I18nextManager.getInstance().i18n.t('phovea:importer.rowName'),
                 value: {
-                    type: 'idType'
+                    type: 'idType',
                 },
-                editor: editors.filter((e) => e.id === 'idType')[0]
-            }, {
+                editor: editors.filter((e) => e.id === 'idType')[0],
+            },
+            {
                 column: -1,
                 name: I18nextManager.getInstance().i18n.t('phovea:importer.columnName'),
                 value: {
-                    type: 'idType'
+                    type: 'idType',
                 },
-                editor: editors.filter((e) => e.id === 'idType')[0]
-            }, {
+                editor: editors.filter((e) => e.id === 'idType')[0],
+            },
+            {
                 column: -1,
                 name: I18nextManager.getInstance().i18n.t('phovea:importer.value'),
                 value: {
-                    type: null
+                    type: null,
                 },
-                editor
-            }];
+                editor,
+            },
+        ];
         const $rows = $root.html(ImportUtils.commonFields(name)).selectAll('div.field').data(configs);
-        $rows.enter().append('div').classed('form-group', true).html((d, i) => `
+        $rows
+            .enter()
+            .append('div')
+            .classed('form-group', true)
+            .html((d, i) => `
           <label for="${prefix}_${i}">${d.name}</label>
           <div class="input-group">
             <select class="form-control" ${i < 2 ? 'disabled="disabled"' : ''} id="${prefix}_${i}">
-              ${editors.map((editor) => `<option value="${editor.id}" ${d.value.type === editor.id ? 'selected="selected"' : ''}>${editor.name}</option>`).join('\n')}
+              ${editors.map((e) => `<option value="${e.id}" ${d.value.type === e.id ? 'selected="selected"' : ''}>${e.name}</option>`).join('\n')}
             </select>
             <span class="input-group-btn"><button class="btn btn-light" ${!d.editor.hasEditor ? 'disabled="disabled' : ''} type="button"><i class="fas fa-cog"></i></button></span>
           </div>`);
@@ -169,8 +177,8 @@ export class ImportUtils {
             }
             d.editor.edit(d.value);
         });
-        //parse data
-        //TODO set rows and cols
+        // parse data
+        // TODO set rows and cols
         configs[0].editor.parse(configs[0].value, rows, BaseUtils.identity);
         configs[1].editor.parse(configs[1].value, cols, BaseUtils.identity);
         configs[2].editor.parse(configs[2].value, dataRange, byIndex);
@@ -179,14 +187,14 @@ export class ImportUtils {
             type: 'matrix',
             id: BaseUtils.fixId(common.name + BaseUtils.randomId(3)),
             name: common.name,
-            fqname: 'upload/' + common.name,
+            fqname: `upload/${common.name}`,
             creator: UserSession.getInstance().currentUserNameOrAnonymous(),
             ts: Date.now(),
             description: common.description,
             size: [rows.length, cols.length],
             rowtype: configs[0].value.idType,
             coltype: configs[1].value.idType,
-            value: configs[1].value
+            value: configs[1].value,
         };
         return () => ({ rows, cols, data, desc });
     }

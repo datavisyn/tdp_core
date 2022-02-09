@@ -1,47 +1,56 @@
 import { EventHandler, GlobalEventHandler } from './event';
 import { AppContext } from '../app';
 import { IDTypeManager, SelectionUtils } from '../idtype';
-import { ActionMetaData, ObjectRefUtils } from '../provenance';
+import { ObjectRefUtils } from '../provenance';
+import { ActionMetaData } from '../provenance/ActionMeta';
 import { Compression } from './Compression';
 import { ResolveNow } from './promise';
 import { BaseUtils } from './BaseUtils';
 const disabler = new EventHandler();
 export class Selection {
     static select(inputs, parameter, graph, within) {
-        const idtype = IDTypeManager.getInstance().resolveIdType(parameter.idtype), selection = parameter.selection, type = parameter.type;
+        const idtype = IDTypeManager.getInstance().resolveIdType(parameter.idtype);
+        const { selection } = parameter;
+        const { type } = parameter;
         const bak = parameter.old || idtype.selections(type);
         if (AppContext.getInstance().hash.has('debug')) {
             console.log('select', selection);
         }
-        disabler.fire('disable-' + idtype.id);
+        disabler.fire(`disable-${idtype.id}`);
         idtype.select(type, selection);
-        disabler.fire('enable-' + idtype.id);
-        return Selection.createSelection(idtype, type, bak, selection, parameter.animated).then((cmd) => ({ inverse: cmd, consumed: parameter.animated ? within : 0 }));
+        disabler.fire(`enable-${idtype.id}`);
+        return Selection.createSelection(idtype, type, bak, selection, parameter.animated).then((cmd) => ({
+            inverse: cmd,
+            consumed: parameter.animated ? within : 0,
+        }));
     }
     static capitalize(s) {
-        return s.split(' ').map((d) => d[0].toUpperCase() + d.slice(1)).join(' ');
+        return s
+            .split(' ')
+            .map((d) => d[0].toUpperCase() + d.slice(1))
+            .join(' ');
     }
     static meta(idtype, type, selection) {
         const l = selection.length;
-        let title = type === SelectionUtils.defaultSelectionType ? '' : (Selection.capitalize(type) + ' ');
+        let title = type === SelectionUtils.defaultSelectionType ? '' : `${Selection.capitalize(type)} `;
         let p;
         if (l === 0) {
-            title += 'no ' + idtype.names;
+            title += `no ${idtype.names}`;
             p = ResolveNow.resolveImmediately(title);
         }
         else if (l === 1) {
-            title += idtype.name + ' ' + selection[0];
+            title += `${idtype.name} ${selection[0]}`;
             p = ResolveNow.resolveImmediately(title);
         }
         else if (l < 3) {
-            title += idtype.names + ' (' + selection.join(', ') + ')';
+            title += `${idtype.names} (${selection.join(', ')})`;
             p = ResolveNow.resolveImmediately(title);
         }
         else {
             title += `${l} ${idtype.names}`;
             p = ResolveNow.resolveImmediately(title);
         }
-        return p.then((title) => ActionMetaData.actionMeta(title, ObjectRefUtils.category.selection));
+        return p.then((t) => ActionMetaData.actionMeta(t, ObjectRefUtils.category.selection));
     }
     /**
      * create a selection command
@@ -62,13 +71,13 @@ export class Selection {
                     selection,
                     type,
                     old,
-                    animated
-                }
+                    animated,
+                },
             };
         });
     }
     static compressSelection(path) {
-        return Compression.lastConsecutive(path, 'select', (p) => p.parameter.idtype + '@' + p.parameter.type);
+        return Compression.lastConsecutive(path, 'select', (p) => `${p.parameter.idtype}@${p.parameter.type}`);
     }
 }
 /**
@@ -95,13 +104,13 @@ class SelectionTypeRecorder {
             });
         }
         this.enable();
-        disabler.on('enable-' + this.idtype.id, this._enable);
-        disabler.on('disable-' + this.idtype.id, this._disable);
+        disabler.on(`enable-${this.idtype.id}`, this._enable);
+        disabler.on(`disable-${this.idtype.id}`, this._disable);
     }
     disable() {
         if (this.type) {
             this.type.split(',').forEach((ttype, i) => {
-                this.idtype.off('select-' + ttype, this.typeRecorders[i]);
+                this.idtype.off(`select-${ttype}`, this.typeRecorders[i]);
             });
         }
         else {
@@ -111,7 +120,7 @@ class SelectionTypeRecorder {
     enable() {
         if (this.type) {
             this.type.split(',').forEach((ttype, i) => {
-                this.idtype.on('select-' + ttype, this.typeRecorders[i]);
+                this.idtype.on(`select-${ttype}`, this.typeRecorders[i]);
             });
         }
         else {
@@ -120,8 +129,8 @@ class SelectionTypeRecorder {
     }
     destroy() {
         this.disable();
-        disabler.off('enable-' + this.idtype.id, this._enable);
-        disabler.off('disable-' + this.idtype.id, this._disable);
+        disabler.off(`enable-${this.idtype.id}`, this._enable);
+        disabler.off(`disable-${this.idtype.id}`, this._disable);
     }
 }
 /**
@@ -140,10 +149,12 @@ export class SelectionRecorder {
         };
         this.options = BaseUtils.mixin({
             filter: BaseUtils.constantTrue,
-            animated: false
+            animated: false,
         }, this.options);
         GlobalEventHandler.getInstance().on('register.idtype', this.adder);
-        IDTypeManager.getInstance().listIdTypes().forEach((d) => {
+        IDTypeManager.getInstance()
+            .listIdTypes()
+            .forEach((d) => {
             this.adder(null, d);
         });
     }

@@ -1,5 +1,5 @@
+import { IEvent, EventHandler } from '../base/event';
 import { IAuthorizationConfiguration, IAuthorizationFlow, IRenderAuthorizationOptions } from './interfaces';
-import { IEvent, EventHandler } from '../base';
 declare type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;
 export declare function authorizationStored(event: IEvent, id: string, token: string): void;
 export declare function authorizationRemoved(event: IEvent, ids: string[]): void;

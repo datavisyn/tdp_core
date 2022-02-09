@@ -1,13 +1,21 @@
-import {IDType, IDTypeManager} from '../idtype';
-import {BaseUtils, EventHandler, IEvent, ResolveNow, WebpackEnv} from '../base';
-import {I18nextManager} from '../i18n';
-import {PluginRegistry} from '../app';
-import {AView} from './AView';
-import {ISelection, IView, IViewContext, IViewPluginDesc} from '../base/interfaces';
-import {EViewMode} from '../base/interfaces';
-import {ViewUtils} from './ViewUtils';
-import {BuilderUtils, IRootLayoutContainer, ISplitLayoutContainer, ITabbingLayoutContainer, IViewLayoutContainer, LayoutContainerEvents, LAYOUT_CONTAINER_WRAPPER, ViewBuilder, PHOVEA_UI_IView} from '../layout';
-
+import { IDType, IDTypeManager } from '../idtype';
+import { BaseUtils, EventHandler, IEvent, ResolveNow, WebpackEnv } from '../base';
+import { I18nextManager } from '../i18n';
+import { PluginRegistry } from '../app';
+import { AView } from './AView';
+import { ISelection, IView, IViewContext, IViewPluginDesc, EViewMode } from '../base/interfaces';
+import { ViewUtils } from './ViewUtils';
+import {
+  BuilderUtils,
+  IRootLayoutContainer,
+  ISplitLayoutContainer,
+  ITabbingLayoutContainer,
+  IViewLayoutContainer,
+  LayoutContainerEvents,
+  LAYOUT_CONTAINER_WRAPPER,
+  ViewBuilder,
+  PHOVEA_UI_IView,
+} from '../layout';
 
 interface IElementDesc {
   key: string;
@@ -44,7 +52,6 @@ export interface IACompositeViewOptions {
   showHeaders: boolean;
 }
 
-
 export interface ICompositeInfo {
   key: string;
 
@@ -70,20 +77,18 @@ function prefix(key: string, rest: string) {
 function unprefix(name: string) {
   const index = name.indexOf('.');
   if (index < 0) {
-    return {key: '', rest: name};
+    return { key: '', rest: name };
   }
   return {
     key: name.slice(0, index),
-    rest: name.slice(index + 1)
+    rest: name.slice(index + 1),
   };
 }
-
 
 class WrapperView implements PHOVEA_UI_IView {
   private _visible = true;
 
-  constructor(public readonly instance: IView, public readonly key: string) {
-  }
+  constructor(public readonly instance: IView, public readonly key: string) {}
 
   get minSize() {
     const given = (<any>this.instance).naturalSize;
@@ -131,14 +136,13 @@ class WrapperView implements PHOVEA_UI_IView {
   }
 }
 
-
 export class CompositeView extends EventHandler implements IView {
-
   public static readonly VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
+
   public static readonly VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB = 'setActiveTab';
 
   private readonly options: Readonly<IACompositeViewOptions> = {
-    showHeaders: false
+    showHeaders: false,
   };
 
   private readonly root: IRootLayoutContainer;
@@ -146,7 +150,9 @@ export class CompositeView extends EventHandler implements IView {
   readonly idType: IDType;
 
   private setup: ICompositeSetup;
+
   private readonly children: WrapperView[] = [];
+
   private readonly childrenLookup = new Map<string, IView>();
 
   private readonly debounceUpdateEntryPoint = BaseUtils.debounce(() => this.fire(AView.EVENT_UPDATE_ENTRY_POINT));
@@ -184,7 +190,7 @@ export class CompositeView extends EventHandler implements IView {
     this.setBusy(true);
     const updateShared = (evt: IEvent, name: string, oldValue: any, newValue: any) => {
       // If a child updates any shared parameters, notify each child except the trigger.
-      this.children.forEach(({instance}) => {
+      this.children.forEach(({ instance }) => {
         if (evt.currentTarget !== instance) {
           instance.off(AView.EVENT_UPDATE_SHARED, updateShared);
           instance.updateShared(name, newValue);
@@ -200,7 +206,7 @@ export class CompositeView extends EventHandler implements IView {
 
     const toParentElement = (evt: IEvent) => {
       const source = evt.currentTarget;
-      const view = this.children.find(({instance}) => instance === source);
+      const view = this.children.find(({ instance }) => instance === source);
       const layout = this.root.find((d) => d.type === 'view' && (<IViewLayoutContainer>d).view === view);
       return layout.parent;
     };
@@ -214,7 +220,7 @@ export class CompositeView extends EventHandler implements IView {
 
     const setActiveTab = (evt: IEvent, tabKey: string) => {
       const parent = toParentElement(evt);
-      const view = this.children.find(({key}) => key === tabKey);
+      const view = this.children.find(({ key }) => key === tabKey);
       const layout = this.root.find((d) => d.type === 'view' && (<IViewLayoutContainer>d).view === view);
       if (parent && parent.type === 'tabbing' && layout) {
         (<ITabbingLayoutContainer>parent).active = layout;
@@ -251,7 +257,7 @@ export class CompositeView extends EventHandler implements IView {
       this.setup.elements.forEach((d) => {
         let s = this.selection;
         if (links.length > 0 && !links.some((l) => l.fromKey === '_input' && l.toKey === d.key)) {
-          s = {idtype: this.selection.idtype, selectionIds: []};
+          s = { idtype: this.selection.idtype, ids: [] };
         }
         // Fix for nested CompositeViews:
         // Previously, nested CompositeViews were not possible, i.e. when using a CompositeView as element of a CompositeView.
@@ -260,7 +266,7 @@ export class CompositeView extends EventHandler implements IView {
         // the children from the parent causing an infinite loop as it receives itself as child.
         // I have to admit that I do not know why we give it the desc of the CompositeView parent, and not its own.
         // The fix is to override the desc with the child desc if it is a CompositeViewDesc, such that it receives the "correct" children.
-        const patchedContext = isCompositeViewPluginDesc(d.desc) ? {...this.context, desc: d.desc} : this.context;
+        const patchedContext = isCompositeViewPluginDesc(d.desc) ? { ...this.context, desc: d.desc } : this.context;
         const instance = d.create(patchedContext, s, helper, d.options);
         if (links.length === 0 || links.some((l) => l.fromKey === d.key && l.toKey === '_item')) {
           instance.on(AView.EVENT_ITEM_SELECT, debounceItemSelection);
@@ -305,19 +311,25 @@ export class CompositeView extends EventHandler implements IView {
       }
 
       const views = new Map(this.children.map((d) => <[string, ViewBuilder]>[d.key, BuilderUtils.view(d).name(d.key).fixed()]));
-      this.buildLayout(views, this.children.map((d) => d.key));
+      this.buildLayout(
+        views,
+        this.children.map((d) => d.key),
+      );
       this.root.on(LayoutContainerEvents.EVENT_LAYOUT_CHANGED, resizedAfterUpdate);
     });
   }
 
   private buildLayout(views: Map<string, ViewBuilder>, keys: string[]) {
-
     const buildImpl = (layout: string | ICompositeLayout) => {
-      const l: string | ICompositeLayout = typeof layout === 'string' ? layout : Object.assign({
-        type: <'vsplit'>'vsplit',
-        ratios: keys.map(() => 1 / keys.length),
-        keys
-      }, layout || {});
+      const l: string | ICompositeLayout =
+        typeof layout === 'string'
+          ? layout
+          : {
+              type: <const>'vsplit',
+              ratios: keys.map(() => 1 / keys.length),
+              keys,
+              ...(layout || {}),
+            };
 
       if (typeof l === 'string') {
         return views.get(l);
@@ -328,7 +340,9 @@ export class CompositeView extends EventHandler implements IView {
       const ratio = l.ratios;
       switch (l.type) {
         case 'hsplit':
+          // eslint-disable-next-line no-case-declarations
           const firstH = buildImpl(l.keys[0]);
+          // eslint-disable-next-line no-case-declarations
           const secondH = buildImpl(l.keys[1]);
           return BuilderUtils.horizontalSplit(ratio[0], firstH, secondH).fixedLayout();
         case 'hstack':
@@ -378,12 +392,12 @@ export class CompositeView extends EventHandler implements IView {
   }
 
   updateShared(name: string, value: any) {
-    this.children.forEach(({instance}) => instance.updateShared(name, value));
+    this.children.forEach(({ instance }) => instance.updateShared(name, value));
   }
 
   getParameter(name: string) {
     // check prefixed
-    const {key, rest} = unprefix(name);
+    const { key, rest } = unprefix(name);
     const child = this.childrenLookup.get(key);
     if (child) {
       return child.getParameter(rest);
@@ -395,7 +409,7 @@ export class CompositeView extends EventHandler implements IView {
   }
 
   setParameter(name: string, value: any) {
-    const {key, rest} = unprefix(name);
+    const { key, rest } = unprefix(name);
     const child = this.childrenLookup.get(key);
     if (child) {
       return child.setParameter(rest, value);
@@ -403,6 +417,7 @@ export class CompositeView extends EventHandler implements IView {
     if (WebpackEnv.__DEBUG__) {
       console.warn('invalid parameter detected', name, this.context.desc);
     }
+    return undefined;
   }
 
   setInputSelection(selection: ISelection) {
@@ -415,45 +430,49 @@ export class CompositeView extends EventHandler implements IView {
       return;
     }
     if (this.setup.linkedSelections.length === 0) {
-      this.children.forEach(({instance}) => instance.setInputSelection(selection));
+      this.children.forEach(({ instance }) => instance.setInputSelection(selection));
       return;
     }
 
-    this.setup.linkedSelections.filter((d) => d.fromKey === '_input').forEach((d) => {
-      const instance = this.childrenLookup.get(d.toKey);
-      if (!instance) {
-        return;
-      }
-      if (d.mode === 'item') {
-        instance.setItemSelection(selection);
-      } else {
-        instance.setInputSelection(selection);
-      }
-    });
+    this.setup.linkedSelections
+      .filter((d) => d.fromKey === '_input')
+      .forEach((d) => {
+        const instance = this.childrenLookup.get(d.toKey);
+        if (!instance) {
+          return;
+        }
+        if (d.mode === 'item') {
+          instance.setItemSelection(selection);
+        } else {
+          instance.setInputSelection(selection);
+        }
+      });
   }
 
   setItemSelection(selection: ISelection) {
     this.itemSelection = selection;
-    const itemIDType = this.itemIDType;
+    const { itemIDType } = this;
     if (this.setup.linkedSelections.length === 0) {
-      this.children.forEach(({instance}) => {
+      this.children.forEach(({ instance }) => {
         if (instance.itemIDType === itemIDType) {
           instance.setItemSelection(selection);
         }
       });
       return;
     }
-    this.setup.linkedSelections.filter((d) => d.fromKey === '_item').forEach((d) => {
-      const instance = this.childrenLookup.get(d.toKey);
-      if (!instance) {
-        return;
-      }
-      if (d.mode === 'input') {
-        instance.setInputSelection(selection);
-      } else {
-        instance.setItemSelection(selection);
-      }
-    });
+    this.setup.linkedSelections
+      .filter((d) => d.fromKey === '_item')
+      .forEach((d) => {
+        const instance = this.childrenLookup.get(d.toKey);
+        if (!instance) {
+          return;
+        }
+        if (d.mode === 'input') {
+          instance.setInputSelection(selection);
+        } else {
+          instance.setItemSelection(selection);
+        }
+      });
   }
 
   getItemSelection() {
@@ -461,31 +480,34 @@ export class CompositeView extends EventHandler implements IView {
   }
 
   modeChanged(mode: EViewMode) {
-    this.children.forEach(({instance}) => instance.modeChanged(mode));
+    this.children.forEach(({ instance }) => instance.modeChanged(mode));
   }
 
   destroy() {
-    this.children.forEach(({instance}) => instance.destroy());
+    this.children.forEach(({ instance }) => instance.destroy());
     this.node.remove();
   }
 
   protected createSetup(): ICompositeSetup | Promise<ICompositeSetup> {
-    const desc = (<ICompositeViewPluginDesc>this.context.desc);
+    const desc = <ICompositeViewPluginDesc>this.context.desc;
 
-    const toEntry = (desc: IElementDesc): Promise<ICompositeInfo> => {
-      const descOptions = desc.options || {};
-      return Promise.resolve(desc.loader()).then((instance) => (<ICompositeInfo>{
-        key: desc.key,
-        desc,
-        options: Object.assign({}, descOptions, this.options), // also pass the view options from the ViewWrapper to all views
-        create: PluginRegistry.getInstance().getFactoryMethod(instance, desc.factory || 'create')
-      }));
+    const toEntry = (d: IElementDesc): Promise<ICompositeInfo> => {
+      const descOptions = d.options || {};
+      return Promise.resolve(d.loader()).then(
+        (instance) =>
+          <ICompositeInfo>{
+            key: d.key,
+            desc: d,
+            options: { ...descOptions, ...this.options }, // also pass the view options from the ViewWrapper to all views
+            create: PluginRegistry.getInstance().getFactoryMethod(instance, d.factory || 'create'),
+          },
+      );
     };
 
     return Promise.all((desc.elements || []).map(toEntry)).then((elements) => ({
       elements,
       layout: desc.layout,
-      linkedSelections: desc.linkedSelections || []
+      linkedSelections: desc.linkedSelections || [],
     }));
   }
 

@@ -1,10 +1,10 @@
 import 'select2';
+import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { ISelectOptions } from './FormSelect';
-import { IFormElement } from '..';
+import type { IFormElement } from '..';
 import { ISelect3Options, IdTextPair } from './Select3';
-import * as d3 from 'd3';
 import { IPluginDesc } from '../../base';
 export interface ISubDesc {
     name: string;
@@ -43,7 +43,7 @@ export interface IFormMapDesc extends IFormElementDesc {
      */
     options?: {
         badgeProvider?: (value: IFormRow[], ...dependent: IFormElement[]) => Promise<string> | string;
-        entries: (ISubDescs[]) | ((...dependent: IFormElement[]) => (ISubDescs[]));
+        entries: ISubDescs[] | ((...dependent: IFormElement[]) => ISubDescs[]);
         /**
          * whether an element can just be selected once
          */
@@ -89,16 +89,16 @@ export declare class FormMap extends AFormElement<IFormMapDesc> {
     private buildMap;
     private buildMapImpl;
     /**
+     * Sets the value
+     * @param v
+     */
+    set value(v: IFormRow[]);
+    /**
      * Returns the value
      * @returns {string}
      */
     get value(): IFormRow[];
     hasValue(): boolean;
-    /**
-     * Sets the value
-     * @param v
-     */
-    set value(v: IFormRow[]);
     focus(): void;
     isEqual(a: IFormRow[], b: IFormRow[]): boolean;
     static convertRow2MultiMap(rows: IFormRow[]): IFormMultiMap;

@@ -1,10 +1,10 @@
 /**
  * This file defines interfaces for various data types and their metadata.
  */
-import {IPersistable} from '../base/IPersistable';
-import {IDType} from '../idtype/IDType';
-import {ASelectAble, ISelectAble} from '../idtype/ASelectAble';
-import {IDataDescription} from './DataDescription';
+import { IPersistable } from '../base/IPersistable';
+import { IDType } from '../idtype/IDType';
+import { IDataDescription } from './DataDescription';
+import { EventHandler } from '../base/event';
 /**
  * Basic data type interface
  */
@@ -22,7 +22,7 @@ export interface IDataType extends IPersistable {
 /**
  * dummy data type just holding the description
  */
-export abstract class ADataType<T extends IDataDescription> extends ASelectAble implements IDataType {
+export abstract class ADataType<T extends IDataDescription> extends EventHandler implements IDataType {
   constructor(public readonly desc: T) {
     super();
   }
@@ -31,7 +31,7 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
     return [];
   }
 
-  idView(selectionIds?: string[]): Promise<ADataType<T>> {
+  idView(ids?: string[]): Promise<ADataType<T>> {
     return Promise.resolve(this);
   }
 
@@ -50,6 +50,7 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
   toString() {
     return this.persist();
   }
+
   /**
    * since there is no instanceOf for interfaces
    * @param v
@@ -62,14 +63,9 @@ export abstract class ADataType<T extends IDataDescription> extends ASelectAble 
     if (v instanceof ADataType) {
       return true;
     }
-    //sounds good
-    return (typeof(v.persist) === 'function' && typeof(v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v));
+    // sounds good
+    return typeof v.persist === 'function' && typeof v.restore === 'function' && 'desc' in v;
   }
 }
 
-export class DummyDataType extends ADataType<IDataDescription> {
-  constructor(desc: IDataDescription) {
-    super(desc);
-  }
-
-}
+export class DummyDataType extends ADataType<IDataDescription> {}

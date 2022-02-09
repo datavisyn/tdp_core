@@ -28,15 +28,19 @@ export class IDType extends EventHandler {
     }
     persist() {
         const s = {};
-        this.sel.forEach((v, k) => s[k] = v.toString());
+        this.sel.forEach((v, k) => {
+            s[k] = v;
+        });
         return {
             sel: s,
             name: this.name,
-            names: this.names
+            names: this.names,
         };
     }
     restore(persisted) {
+        // @ts-ignore
         this.name = persisted.name;
+        // @ts-ignore
         this.names = persisted.names;
         Object.keys(persisted.sel).forEach((type) => this.sel.set(type, persisted.sel[type]));
         return this;
@@ -61,8 +65,11 @@ export class IDType extends EventHandler {
         return v;
     }
     select() {
+        // eslint-disable-next-line prefer-rest-params
         const a = Array.from(arguments);
-        const type = (typeof a[0] === 'string') ? a.shift() : SelectionUtils.defaultSelectionType, selection = a[0], op = SelectionUtils.asSelectOperation(a[1]);
+        const type = typeof a[0] === 'string' ? a.shift() : SelectionUtils.defaultSelectionType;
+        const selection = a[0];
+        const op = SelectionUtils.asSelectOperation(a[1]);
         return this.selectImpl(selection, op, type);
     }
     selectImpl(selection, op = SelectOperation.SET, type = SelectionUtils.defaultSelectionType) {
@@ -70,7 +77,7 @@ export class IDType extends EventHandler {
         const newValue = SelectionUtils.integrateSelection(b, selection, op);
         this.sel.set(type, newValue);
         const added = op !== SelectOperation.REMOVE ? selection : [];
-        const removed = (op === SelectOperation.ADD ? [] : (op === SelectOperation.SET ? b : selection));
+        const removed = op === SelectOperation.ADD ? [] : op === SelectOperation.SET ? b : selection;
         this.fire(IDType.EVENT_SELECT, type, newValue, added, removed, b);
         this.fire(`${IDType.EVENT_SELECT}-${type}`, newValue, added, removed, b);
         return b;

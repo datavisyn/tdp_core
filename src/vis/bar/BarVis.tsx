@@ -1,90 +1,93 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
-import {useEffect, useMemo} from 'react';
-import {IVisConfig} from '../interfaces';
-import {VisTypeSelect} from '../sidebar/VisTypeSelect';
-import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
-
+import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
-import {beautifyLayout} from '../layoutUtils';
-import {merge} from 'lodash';
-import {createBarTraces, EBarDirection, EBarDisplayType, EBarGroupingType, IBarConfig} from './utils';
-import {GroupSelect} from '../sidebar/GroupSelect';
-import {MultiplesSelect} from '../sidebar/MultiplesSelect';
-import {BarDirectionButtons} from '../sidebar/BarDirectionButtons';
-import {BarGroupTypeButtons} from '../sidebar/BarGroupTypeButtons';
-import {BarDisplayButtons} from '../sidebar/BarDisplayTypeButtons';
-import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
-import {WarningMessage} from '../sidebar/WarningMessage';
+import { merge } from 'lodash';
 import Plotly from 'plotly.js';
+import {
+  CategoricalColumn,
+  ColumnInfo,
+  EBarDirection,
+  EBarDisplayType,
+  EBarGroupingType,
+  ESupportedPlotlyVis,
+  IBarConfig,
+  NumericalColumn,
+  PlotlyInfo,
+  Scales,
+  IVisConfig,
+} from '../interfaces';
+
+import { InvalidCols } from '../InvalidCols';
+import { beautifyLayout } from '../layoutUtils';
+import { createBarTraces } from './utils';
 import {BarVisSidebar} from './BarVisSidebar';
 
 interface BarVisProps {
-    config: IBarConfig;
-    optionsConfig?: {
-        group?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        },
-        multiples?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        },
-        direction?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        },
-        groupingType?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        },
-        display?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        }
+  config: IBarConfig;
+  optionsConfig?: {
+    group?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
     };
-    extensions?: {
-        prePlot?: React.ReactNode;
-        postPlot?: React.ReactNode;
-        preSidebar?: React.ReactNode;
-        postSidebar?: React.ReactNode;
+    multiples?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
     };
-    columns: (NumericalColumn | CategoricalColumn) [];
-    setConfig: (config: IVisConfig) => void;
-    scales: Scales;
-    hideSidebar?: boolean;
+    direction?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+    groupingType?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+    display?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+  };
+  extensions?: {
+    prePlot?: React.ReactNode;
+    postPlot?: React.ReactNode;
+    preSidebar?: React.ReactNode;
+    postSidebar?: React.ReactNode;
+  };
+  columns: (NumericalColumn | CategoricalColumn) [];
+  setConfig: (config: IVisConfig) => void;
+  scales: Scales;
+  hideSidebar?: boolean;
 }
 
 const defaultConfig = {
-    group: {
-        enable: true,
-        customComponent: null,
-    },
-    multiples: {
-        enable: true,
-        customComponent: null,
-    },
-    direction: {
-        enable: true,
-        customComponent: null,
-    },
-    groupType: {
-        enable: true,
-        customComponent: null,
-    },
-    display: {
-        enable: true,
-        customComponent: null,
-    }
+  group: {
+    enable: true,
+    customComponent: null,
+  },
+  multiples: {
+    enable: true,
+    customComponent: null,
+  },
+  direction: {
+    enable: true,
+    customComponent: null,
+  },
+  groupType: {
+    enable: true,
+    customComponent: null,
+  },
+  display: {
+    enable: true,
+    customComponent: null,
+  },
 };
 
 const defaultExtensions = {
-    prePlot: null,
-    postPlot: null,
-    preSidebar: null,
-    postSidebar: null
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
 };
 
 export function BarVis({
@@ -190,4 +193,3 @@ export function BarVis({
             </div> : null}
         </div>);
 }
-

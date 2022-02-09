@@ -1,19 +1,14 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, NumericalColumn, PlotlyInfo, Scales} from '../interfaces';
-import {useEffect, useMemo} from 'react';
-import {IVisConfig} from '../interfaces';
-import {VisTypeSelect} from '../sidebar/VisTypeSelect';
-import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
+import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import {InvalidCols} from '../InvalidCols';
 import d3 from 'd3';
-import {CategoricalColumnSelect} from '../sidebar/CategoricalColumnSelect';
-import {merge} from 'lodash';
-import {createPCPTraces, IPCPConfig} from './utils';
-import {WarningMessage} from '../sidebar/WarningMessage';
+import { merge } from 'lodash';
 import Plotly from 'plotly.js';
 import {ScatterVisSidebar} from '../scatter/ScatterVisSidebar';
 import {PCPVisSidebar} from './PCPVisSidebar';
+import {CategoricalColumn, InvalidCols, IPCPConfig, IVisConfig, NumericalColumn, PlotlyInfo} from '..';
+import {createPCPTraces} from './utils';
 
 interface PCPVisProps {
     config: IPCPConfig;
@@ -32,10 +27,10 @@ interface PCPVisProps {
 const defaultConfig = {};
 
 const defaultExtensions = {
-    prePlot: null,
-    postPlot: null,
-    preSidebar: null,
-    postSidebar: null
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
 };
 
 export function PCPVis({

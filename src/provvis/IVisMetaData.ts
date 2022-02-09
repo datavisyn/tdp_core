@@ -10,7 +10,7 @@ export interface IVisMetaData {
    * - width-only - only the width can be scaled
    * - height-only - only the height can be scaled
    */
-  readonly scaling: string; //'free' (default) | 'aspect' | 'width-only' | 'height-only'
+  readonly scaling: string; // 'free' (default) | 'aspect' | 'width-only' | 'height-only'
 
   /**
    * defines the rotation change angles

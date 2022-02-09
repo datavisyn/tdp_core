@@ -42,10 +42,11 @@ export const useAsync = (asyncFunction, immediate = null) => {
             setStatus('success');
             return response;
         })
-            .catch((error) => {
-            setError(error);
+            .catch((e) => {
+            setError(e);
             setStatus('error');
-            throw error;
+            // eslint-disable-next-line @typescript-eslint/no-throw-literal
+            throw e;
         });
     }, [asyncFunction]);
     // Call execute if we want to fire it right away.

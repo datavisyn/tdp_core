@@ -1,6 +1,6 @@
-import {IVisInstance} from './visInstance';
-import {IVisMetaData} from './IVisMetaData';
-import {EventHandler} from '../base/event';
+import { IVisInstance } from './visInstance';
+import { IVisMetaData } from './IVisMetaData';
+import { EventHandler } from '../base/event';
 
 /**
  * utility logic for zooming a vis instance
@@ -29,7 +29,7 @@ export class ZoomLogic extends EventHandler {
       return null;
     }
     function toDelta(x: number) {
-      return x > 0 ? 0.2 : (x < 0 ? -0.2 : 0);
+      return x > 0 ? 0.2 : x < 0 ? -0.2 : 0;
     }
 
     const old = this.v.transform();
@@ -39,15 +39,15 @@ export class ZoomLogic extends EventHandler {
   }
 
   get isWidthFixed() {
-    return (this.meta && this.meta.scaling === 'height-only');
+    return this.meta && this.meta.scaling === 'height-only';
   }
 
   get isHeightFixed() {
-    return (this.meta && this.meta.scaling === 'width-only');
+    return this.meta && this.meta.scaling === 'width-only';
   }
 
   get isFixedAspectRatio() {
-    return (this.meta && this.meta.scaling === 'aspect');
+    return this.meta && this.meta.scaling === 'aspect';
   }
 
   /**
@@ -62,12 +62,14 @@ export class ZoomLogic extends EventHandler {
     }
     const old = this.v.transform();
     const s: [number, number] = [zoomX, zoomY];
-    switch ((this.meta ? this.meta.scaling : 'free')) {
+    switch (this.meta ? this.meta.scaling : 'free') {
       case 'width-only':
         s[1] = old.scale[1];
         break;
       case 'height-only':
         s[0] = old.scale[0];
+        break;
+      default:
         break;
     }
     if (s[0] <= 0) {
@@ -76,13 +78,18 @@ export class ZoomLogic extends EventHandler {
     if (s[1] <= 0) {
       s[1] = 0.001;
     }
-    if ((this.meta && this.meta.scaling === 'aspect')) { //same aspect ratio use min scale
+    if (this.meta && this.meta.scaling === 'aspect') {
+      // same aspect ratio use min scale
       s[0] = s[1] = Math.min(...s);
     }
-    this.fire('zoom', {
-      scale: s,
-      rotate: old.rotate
-    }, old);
+    this.fire(
+      'zoom',
+      {
+        scale: s,
+        rotate: old.rotate,
+      },
+      old,
+    );
     return this.v.transform(s, old.rotate);
   }
 
@@ -111,9 +118,9 @@ export class ZoomBehavior extends ZoomLogic {
       if (!this.v) {
         return;
       }
-      const ctrlKey = event.ctrlKey; //both
-      const shiftKey = event.shiftKey; //y
-      const altKey = event.altKey; //x
+      const { ctrlKey } = event; // both
+      const { shiftKey } = event; // y
+      const { altKey } = event; // x
       const m = event.wheelDelta;
       this.zoom(m * (ctrlKey || altKey ? 1 : 0), m * (ctrlKey || shiftKey ? 1 : 0));
       if (ctrlKey || shiftKey || altKey) {

@@ -1,9 +1,8 @@
-import {EventHandler, ISelection} from '../../base';
-import {IRow} from '../../base/rest';
-import {LocalDataProvider} from 'lineupjs';
-import {LineupUtils} from '../utils';
-import {IDType} from '../../idtype';
-
+import { LocalDataProvider } from 'lineupjs';
+import { EventHandler, ISelection } from '../../base';
+import { IRow } from '../../base/rest';
+import { LineupUtils } from '../utils';
+import { IDType } from '../../idtype';
 
 export class LineUpSelectionHelper extends EventHandler {
   static readonly EVENT_SET_ITEM_SELECTION = 'setItemSelection';
@@ -15,6 +14,7 @@ export class LineUpSelectionHelper extends EventHandler {
    * @type {number[]}
    */
   private readonly orderedSelectedIndices = <number[]>[];
+
   private uid2index = new Map<string, number>();
 
   constructor(private readonly provider: LocalDataProvider, private readonly idType: () => IDType) {
@@ -55,13 +55,12 @@ export class LineUpSelectionHelper extends EventHandler {
       this.orderedSelectedIndices.push(d);
     });
 
-
     const idType = this.idType();
     if (!idType) {
       console.warn('no idType defined for this ranking view');
       return;
     }
-    const selection: ISelection = {idtype: idType, selectionIds: this.orderedSelectedIndices.map((i) => this._rows[i].id)};
+    const selection: ISelection = { idtype: idType, ids: this.orderedSelectedIndices.map((i) => this._rows[i].id) };
     // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
     this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
   }
@@ -90,7 +89,7 @@ export class LineUpSelectionHelper extends EventHandler {
     const old = this.provider.getSelection().sort();
 
     const indices: number[] = [];
-    sel.selectionIds.forEach((uid) => {
+    sel.ids.forEach((uid) => {
       const index = this.uid2index.get(uid);
       if (typeof index === 'number') {
         indices.push(index);
@@ -115,7 +114,7 @@ export class LineUpSelectionHelper extends EventHandler {
     const old = this.provider.getSelection().sort((a, b) => a - b);
 
     const indices: number[] = [];
-    sel.selectionIds.forEach((uid) => {
+    sel.ids.forEach((uid) => {
       const index = this.uid2index.get(uid);
       if (typeof index === 'number') {
         indices.push(index);
@@ -128,5 +127,23 @@ export class LineUpSelectionHelper extends EventHandler {
     }
 
     this.provider.setSelection(indices);
+  }
+
+  getSelection(): number[] {
+    if (!this.provider) {
+      return [];
+    }
+
+    // const sel = this.provider.getSelection();
+
+    // const indices: number[] = [];
+    // sel.forEach((uid) => {
+    //   const index = this.uid2index.get(uid);
+    //   if (typeof index === 'number') {
+    //     indices.push(index);
+    //   }
+    // });
+    // return indices;
+    return this.provider.getSelection();
   }
 }

@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import { useMemo } from 'react';
-import Select, { components, } from 'react-select';
+import Select, { components } from 'react-select';
+import { SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc';
 import { EColumnTypes } from '../interfaces';
 import { formatOptionLabel } from './utils';
-import { SortableContainer, SortableElement, SortableHandle, } from 'react-sortable-hoc';
 function arrayMove(array, from, to) {
     const slicedArray = array.slice();
     slicedArray.splice(to < 0 ? array.length + to : to, 0, slicedArray.splice(from, 1)[0]);

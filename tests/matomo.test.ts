@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import {Matomo} from '../src/app/Matomo';
+import { Matomo } from '../src/app/Matomo';
 
 describe('index', () => {
   it('trackLogin() exists', () => {

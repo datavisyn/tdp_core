@@ -1,19 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
 import Plot from 'react-plotly.js';
-import { InvalidCols } from '../InvalidCols';
 import d3 from 'd3';
-import { beautifyLayout } from '../layoutUtils';
 import { merge } from 'lodash';
-import { createStripTraces } from './utils';
 import Plotly from 'plotly.js';
 import { StripVisSidebar } from './StripVisSidebar';
+import { beautifyLayout, InvalidCols } from '..';
+import { createStripTraces } from './utils';
 const defaultConfig = {};
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
-    postSidebar: null
+    postSidebar: null,
 };
 export function StripVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false, }) {
     const mergedOptionsConfig = useMemo(() => {

@@ -1,7 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumn, NumericalColumn, Scales } from '../interfaces';
-import { IVisConfig } from '../interfaces';
-import { IStripConfig } from './utils';
+import { CategoricalColumn, IStripConfig, IVisConfig, NumericalColumn, Scales } from '..';
 interface StripVisProps {
     config: IStripConfig;
     optionsConfig?: {};

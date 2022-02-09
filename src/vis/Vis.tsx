@@ -1,18 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import d3 from 'd3';
 import * as React from 'react';
-import {useEffect, useMemo, useState} from 'react';
-import {barMergeDefaultConfig, isBar} from './bar/utils';
-import {ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig} from './scatter/utils';
-import {CategoricalColumn, NumericalColumn, ESupportedPlotlyVis, IVisConfig, Scales} from './interfaces';
-import {ScatterVis} from './scatter/ScatterVis';
-import {ViolinVis} from './violin/ViolinVis';
-import {isViolin, violinMergeDefaultConfig} from './violin/utils';
-import {isStrip, stripMergeDefaultConfig} from './strip/utils';
-import {StripVis} from './strip/StripVis';
-import {isPCP, pcpMergeDefaultConfig} from './pcp/utils';
-import {PCPVis} from './pcp/PCPVis';
-import {BarVis} from './bar/BarVis';
-import {getCssValue} from '..';
+import { useEffect, useMemo, useState } from 'react';
+import { barMergeDefaultConfig, isBar } from './bar/utils';
+import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
+import { CategoricalColumn, NumericalColumn, ENumericalColorScaleType, ESupportedPlotlyVis, IVisConfig, Scales } from './interfaces';
+import { ScatterVis } from './scatter/ScatterVis';
+import { ViolinVis } from './violin/ViolinVis';
+import { isViolin, violinMergeDefaultConfig } from './violin/utils';
+import { isStrip, stripMergeDefaultConfig } from './strip/utils';
+import { StripVis } from './strip/StripVis';
+import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
+import { PCPVis } from './pcp/PCPVis';
+import { BarVis } from './bar/BarVis';
+import { getCssValue } from '../utils/getCssValue';
 
 export interface VisProps {
     /**
@@ -62,7 +63,6 @@ export function Vis({
     externalConfig = null,
     hideSidebar = false
 }: VisProps) {
-
     const [visConfig, setVisConfig] = useState<IVisConfig>(externalConfig ? externalConfig : {
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
@@ -85,17 +85,15 @@ export function Vis({
         if(isBar(visConfig)) { setVisConfig(barMergeDefaultConfig(columns, visConfig)); }
     }, [visConfig.type]);
 
-    const colorScale = useMemo(() => {
-        return d3.scale.ordinal().range(colors);
-    }, [visConfig]);
+  const scales: Scales = useMemo(() => {
+    let colorScale = d3.scale.ordinal().range(colors);
+    
+    return {
+      color: colorScale,
+    };
+  }, [visConfig]);
 
-    const scales: Scales = useMemo(() => {
-        return {
-           color: colorScale
-        };
-    }, [visConfig]);
-
-    return (
+  return (
     <>
         {isScatter(visConfig) ?
             <ScatterVis

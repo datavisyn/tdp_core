@@ -21,6 +21,5 @@ export declare class SelectionUtils {
     static toSelectOperation(ctryKey: boolean, altKey: boolean, shiftKey: boolean, metaKey: boolean): SelectOperation;
     static asSelectOperation(v: any): number;
     static integrateSelection(current: string[], next: string[], op?: SelectOperation): string[];
-    static selectionEq(as: string[], bs: string[]): boolean;
 }
 //# sourceMappingURL=SelectionUtils.d.ts.map

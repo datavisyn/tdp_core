@@ -23,7 +23,7 @@ export declare class ValueCache {
      * @param {() => T} creator the function to create in case the values not yet cached
      * @returns {() => T}
      */
-    cachedLazy<T>(key: string, creator: () => T): (() => T);
+    cachedLazy<T>(key: string, creator: () => T): () => T;
     private static instance;
     static getInstance(): ValueCache;
 }

@@ -6,7 +6,13 @@ export class LineUpColors {
          * Map that assigns each selection ID a color, which is used as color for columns
          */
         this.colorMap = new Map();
-        this.colors = scale.category10().range().concat(scale.category20().range().filter((_d, i) => i % 2 === 1));
+        this.colors = scale
+            .category10()
+            .range()
+            .concat(scale
+            .category20()
+            .range()
+            .filter((_d, i) => i % 2 === 1));
     }
     getColumnColor(id) {
         if (id == null) {

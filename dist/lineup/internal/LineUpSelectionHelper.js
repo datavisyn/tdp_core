@@ -1,5 +1,5 @@
-import { EventHandler } from '../../base';
 import { LocalDataProvider } from 'lineupjs';
+import { EventHandler } from '../../base';
 import { LineupUtils } from '../utils';
 export class LineUpSelectionHelper extends EventHandler {
     constructor(provider, idType) {
@@ -47,7 +47,7 @@ export class LineUpSelectionHelper extends EventHandler {
             console.warn('no idType defined for this ranking view');
             return;
         }
-        const selection = { idtype: idType, selectionIds: this.orderedSelectedIndices.map((i) => this._rows[i].id) };
+        const selection = { idtype: idType, ids: this.orderedSelectedIndices.map((i) => this._rows[i].id) };
         // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
         this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
     }
@@ -70,7 +70,7 @@ export class LineUpSelectionHelper extends EventHandler {
         }
         const old = this.provider.getSelection().sort();
         const indices = [];
-        sel.selectionIds.forEach((uid) => {
+        sel.ids.forEach((uid) => {
             const index = this.uid2index.get(uid);
             if (typeof index === 'number') {
                 indices.push(index);
@@ -90,7 +90,7 @@ export class LineUpSelectionHelper extends EventHandler {
         }
         const old = this.provider.getSelection().sort((a, b) => a - b);
         const indices = [];
-        sel.selectionIds.forEach((uid) => {
+        sel.ids.forEach((uid) => {
             const index = this.uid2index.get(uid);
             if (typeof index === 'number') {
                 indices.push(index);
@@ -101,6 +101,21 @@ export class LineUpSelectionHelper extends EventHandler {
             return; // no change
         }
         this.provider.setSelection(indices);
+    }
+    getSelection() {
+        if (!this.provider) {
+            return [];
+        }
+        // const sel = this.provider.getSelection();
+        // const indices: number[] = [];
+        // sel.forEach((uid) => {
+        //   const index = this.uid2index.get(uid);
+        //   if (typeof index === 'number') {
+        //     indices.push(index);
+        //   }
+        // });
+        // return indices;
+        return this.provider.getSelection();
     }
 }
 LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION = 'setItemSelection';

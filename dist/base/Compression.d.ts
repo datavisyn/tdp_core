@@ -1,4 +1,4 @@
-import { ActionNode } from '../provenance';
+import type { ActionNode } from '../provenance/ActionNode';
 export declare class Compression {
     /**
      * Removes all ActionNodes from the given path that matches the given function id and key.
