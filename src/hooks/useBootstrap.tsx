@@ -21,29 +21,26 @@ function useBSClass<T extends SupportedBootstrapClasses>(
 ): [(element: HTMLElement | null) => void, InstanceType<T> | null] {
   const [instance, setInstance] = React.useState<InstanceType<T> | null>(null);
 
-  const setRef = React.useCallback(
-    (ref: HTMLElement | null) => {
-      setInstance((currentInstance) => {
-        // If the element ref did not change, do nothing.
-        // @ts-ignore
-        if (currentInstance && ref && ref === currentInstance._element) {
-          return currentInstance;
-        }
-        // Destroy the old instance
-        currentInstance?.dispose();
-        // Create a new one if there is a ref
-        if (ref) {
-          // @ts-ignore The typings are not perfectly shared among all the bootstrap classes.
-          // eslint-disable-next-line new-cap
-          return new clazz(ref, ...options) as InstanceType<T>;
-        }
-        // Set instance to null if no ref is passed
-        return null;
-      });
-    },
-    // TODO: Check if this causes problems when rerendering
-    [clazz, options],
-  );
+  const setRef = React.useCallback((ref: HTMLElement | null) => {
+    setInstance((currentInstance) => {
+      // If the element ref did not change, do nothing.
+      // @ts-ignore
+      if (currentInstance && ref && ref === currentInstance._element) {
+        return currentInstance;
+      }
+      // Destroy the old instance
+      currentInstance?.dispose();
+      // Create a new one if there is a ref
+      if (ref) {
+        // @ts-ignore The typings are not perfectly shared among all the bootstrap classes.
+        // eslint-disable-next-line new-cap
+        return new clazz(ref, ...options) as InstanceType<T>;
+      }
+      // Set instance to null if no ref is passed
+      return null;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   React.useEffect(() => {
     // Whenever we are unmounting (an instance), destroy it.
@@ -80,7 +77,8 @@ class ReferenceWrapper extends React.Component {
   static displayName = 'BSReferenceWrapper';
 
   render() {
-    return React.Children.only(this.props.children);
+    const { children } = this.props;
+    return React.Children.only(children);
   }
 }
 
@@ -116,7 +114,8 @@ function BSClass<
     // Store the ref to the onInstance callback to avoid putting it into the deps
     React.useEffect(() => {
       instanceRef?.(instance);
-    }, [instanceRef, instance]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [instance]);
 
     // Call the optional additional hook with all options
     additionalHook?.(instance, options);
@@ -217,7 +216,8 @@ export const BSOffcanvas = BSClass(
       } else {
         instance?.hide();
       }
-    }, [show, instance, relatedTarget]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, instance]);
   },
 );
 export const BSTooltip = BSClass(useBSTooltip, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {
