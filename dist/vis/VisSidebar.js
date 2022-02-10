@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
-import { ENumericalColorScaleType, isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { ESupportedPlotlyVis } from './interfaces';
+import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
+import { ESupportedPlotlyVis, ENumericalColorScaleType } from './interfaces';
 import { isViolin, violinMergeDefaultConfig } from './violin/utils';
 import { isStrip, stripMergeDefaultConfig } from './strip/utils';
 import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
