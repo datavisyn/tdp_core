@@ -1,13 +1,9 @@
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, NumericalColumn} from '../interfaces';
+import {CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, IStripConfig, NumericalColumn} from '../interfaces';
 import {useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
 import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
-import {ColorSelect} from '../sidebar/ColorSelect';
-import {ShapeSelect} from '../sidebar/ShapeSelect';
-import {FilterButtons} from '../sidebar/FilterButtons';
-import {IStripConfig} from './utils';
 import {merge} from 'lodash';
 import {WarningMessage} from '../sidebar/WarningMessage';
 import {CategoricalColumnSelect} from '..';

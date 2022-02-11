@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { CategoricalColumn, EFilterOptions, NumericalColumn } from '../interfaces';
+import { CategoricalColumn, EFilterOptions, IScatterConfig, NumericalColumn } from '../interfaces';
 import { IVisConfig } from '../interfaces';
-import { IScatterConfig } from './utils';
 interface ScatterVisSidebarProps {
     config: IScatterConfig;
     optionsConfig?: {

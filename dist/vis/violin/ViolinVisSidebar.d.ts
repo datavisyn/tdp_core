@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { CategoricalColumn, NumericalColumn } from '../interfaces';
+import { CategoricalColumn, IViolinConfig, NumericalColumn } from '../interfaces';
 import { IVisConfig } from '../interfaces';
-import { IViolinConfig } from './utils';
 interface ViolinVisSidebarProps {
     config: IViolinConfig;
     optionsConfig?: {

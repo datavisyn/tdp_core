@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, NumericalColumn} from '../interfaces';
+import {CategoricalColumn, ColumnInfo, EBarDirection, EBarDisplayType, EBarGroupingType, EFilterOptions, ESupportedPlotlyVis, IBarConfig, NumericalColumn} from '../interfaces';
 import {useMemo} from 'react';
 import {IVisConfig} from '../interfaces';
 import {VisTypeSelect} from '../sidebar/VisTypeSelect';
@@ -7,7 +7,6 @@ import {NumericalColumnSelect} from '../sidebar/NumericalColumnSelect';
 import {merge} from 'lodash';
 import {WarningMessage} from '../sidebar/WarningMessage';
 import {BarDirectionButtons, BarDisplayButtons, BarGroupTypeButtons, CategoricalColumnSelect, GroupSelect, MultiplesSelect} from '..';
-import {EBarDirection, EBarDisplayType, EBarGroupingType, IBarConfig} from './utils';
 
 interface BarVisSidebarProps {
     config: IBarConfig;

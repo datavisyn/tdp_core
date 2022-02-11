@@ -47,6 +47,12 @@ export declare enum EViewMode {
     CONTEXT = 1,
     HIDDEN = 2
 }
+export interface IViewWrapperDump {
+    hash: string;
+    plugin: string;
+    dumpReference: number;
+    parameters: object;
+}
 /**
  * a score item
  */
