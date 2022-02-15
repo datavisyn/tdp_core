@@ -229,6 +229,7 @@ export class TourManager {
         };
     }
     showStep(stepNumber, step) {
+        var _a, _b;
         const focus = this.selectHighlight(step.selector);
         this.setFocusElement(focus ? focus.getBoundingClientRect() : null);
         this.backdropBlocker.style.display = step.allowUserInteraction ? null : 'block';
@@ -338,7 +339,10 @@ export class TourManager {
             const base = focus.getBoundingClientRect();
             const scrollOffsetX = window.scrollX;
             const scrollOffsetY = window.scrollY;
-            this.stepCount.style.transform = `translate(${base.left + scrollOffsetX}px, ${base.top + scrollOffsetY}px)`;
+            this.stepCount.style.transform = `translate(
+          ${base.left + scrollOffsetX + (((_a = step === null || step === void 0 ? void 0 : step.iconPlacementOffset) === null || _a === void 0 ? void 0 : _a.x) || 0)}px,
+          ${base.top + scrollOffsetY + (((_b = step === null || step === void 0 ? void 0 : step.iconPlacementOffset) === null || _b === void 0 ? void 0 : _b.y) || 0)}px
+        )`;
         }
         else {
             this.stepCount.style.transform = this.step.style.transform;

@@ -265,6 +265,7 @@ export class LineupTrackingManager {
                     break;
                 case LineUpTrackAndUntrackActions.filter:
                     bak = source[`get${prop}`]();
+                    console.log(parameter.value);
                     // restore serialized regular expression before passing to LineUp
                     // eslint-disable-next-line no-case-declarations
                     const value = LineUpFilterUtils.isSerializedFilter(parameter.value) ? LineUpFilterUtils.restoreLineUpFilter(parameter.value) : parameter.value;

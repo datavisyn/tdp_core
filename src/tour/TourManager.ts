@@ -420,7 +420,10 @@ export class TourManager {
       const base = focus.getBoundingClientRect();
       const scrollOffsetX = window.scrollX;
       const scrollOffsetY = window.scrollY;
-      this.stepCount.style.transform = `translate(${base.left + scrollOffsetX}px, ${base.top + scrollOffsetY}px)`;
+      this.stepCount.style.transform = `translate(
+          ${base.left + scrollOffsetX + (step?.iconPlacementOffset?.x || 0)}px,
+          ${base.top + scrollOffsetY + (step?.iconPlacementOffset?.y || 0)}px
+        )`;
     } else {
       this.stepCount.style.transform = this.step.style.transform;
     }

@@ -79,6 +79,15 @@ export interface IStep {
      */
     placement?: Placement | ((options: PopperOptions) => void) | 'centered';
     /**
+     * Optional property that allows on the fly adjustments of the indicator icon.
+     * The offset can be specified for the x and y direction and is added to the default placement.
+     * @param Object containing the x and y offset values - x: Offset for x direction in px; y: Offset for y direction in px.
+     */
+    iconPlacementOffset?: {
+        x?: number;
+        y?: number;
+    };
+    /**
      * Is executed before the step is shown.
      * @param context
      */

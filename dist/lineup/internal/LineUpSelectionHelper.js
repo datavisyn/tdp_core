@@ -1,6 +1,6 @@
 import { LocalDataProvider } from 'lineupjs';
+import { difference } from 'lodash';
 import { EventHandler } from '../../base';
-import { LineupUtils } from '../utils';
 export class LineUpSelectionHelper extends EventHandler {
     constructor(provider, idType) {
         super();
@@ -32,8 +32,8 @@ export class LineUpSelectionHelper extends EventHandler {
     }
     onMultiSelectionChanged(indices) {
         // compute the difference
-        const diffAdded = LineupUtils.array_diff(indices, this.orderedSelectedIndices);
-        const diffRemoved = LineupUtils.array_diff(this.orderedSelectedIndices, indices);
+        const diffAdded = difference(indices, this.orderedSelectedIndices);
+        const diffRemoved = difference(this.orderedSelectedIndices, indices);
         // remove elements within, but preserve order
         diffRemoved.forEach((d) => {
             this.orderedSelectedIndices.splice(this.orderedSelectedIndices.indexOf(d), 1);
@@ -83,6 +83,25 @@ export class LineUpSelectionHelper extends EventHandler {
         this.removeEventListener();
         this.provider.setSelection(indices);
         this.addEventListener();
+    }
+    // TODO: Refactor to use just indices: number[]?
+    setGeneralVisSelection(sel) {
+        if (!this.provider) {
+            return;
+        }
+        const old = this.provider.getSelection().sort((a, b) => a - b);
+        const indices = [];
+        sel.ids.forEach((uid) => {
+            const index = this.uid2index.get(uid);
+            if (typeof index === 'number') {
+                indices.push(index);
+            }
+        });
+        indices.sort((a, b) => a - b);
+        if (old.length === indices.length && indices.every((v, j) => old[j] === v)) {
+            return; // no change
+        }
+        this.provider.setSelection(indices);
     }
 }
 LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION = 'setItemSelection';

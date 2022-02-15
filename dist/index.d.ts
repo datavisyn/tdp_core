@@ -23,5 +23,6 @@ export * from './tour';
 export * from './utils';
 export * from './valuetype';
 export * from './views';
+export * from './vis';
 export * from './wrapper';
 //# sourceMappingURL=index.d.ts.map
