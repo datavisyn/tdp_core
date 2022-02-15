@@ -44,6 +44,7 @@ export function Vis({ columns, selected = {}, colors = [
         if (isBar(visConfig)) {
             setVisConfig(barMergeDefaultConfig(columns, visConfig));
         }
+        // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visConfig.type]);
     const scales = React.useMemo(() => {
