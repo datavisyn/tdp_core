@@ -206,6 +206,9 @@ export class TemporarySessionList extends ASessionList {
             : (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', { context: 'private' }) as string),
         );
       $tr
+      .select('td:nth-of-type(3)')
+      .attr('data-testid', (d) => (d.id));
+      $tr
         .select('td:nth-of-type(2)')
         .text((d) => (d.ts ? TDPApplicationUtils.fromNow(d.ts) : (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)))
         .attr('title', (d) => (d.ts ? new Date(d.ts).toUTCString() : null));
