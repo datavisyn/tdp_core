@@ -1,7 +1,7 @@
 import { LocalDataProvider } from 'lineupjs';
+import { difference } from 'lodash';
 import { EventHandler, ISelection } from '../../base';
 import { IRow } from '../../base/rest';
-import { LineupUtils } from '../utils';
 import { IDType } from '../../idtype';
 
 export class LineUpSelectionHelper extends EventHandler {
@@ -42,8 +42,8 @@ export class LineUpSelectionHelper extends EventHandler {
 
   private onMultiSelectionChanged(indices: number[]) {
     // compute the difference
-    const diffAdded = LineupUtils.array_diff(indices, this.orderedSelectedIndices);
-    const diffRemoved = LineupUtils.array_diff(this.orderedSelectedIndices, indices);
+    const diffAdded = difference(indices, this.orderedSelectedIndices);
+    const diffRemoved = difference(this.orderedSelectedIndices, indices);
 
     // remove elements within, but preserve order
     diffRemoved.forEach((d) => {
@@ -127,23 +127,5 @@ export class LineUpSelectionHelper extends EventHandler {
     }
 
     this.provider.setSelection(indices);
-  }
-
-  getSelection(): number[] {
-    if (!this.provider) {
-      return [];
-    }
-
-    // const sel = this.provider.getSelection();
-
-    // const indices: number[] = [];
-    // sel.forEach((uid) => {
-    //   const index = this.uid2index.get(uid);
-    //   if (typeof index === 'number') {
-    //     indices.push(index);
-    //   }
-    // });
-    // return indices;
-    return this.provider.getSelection();
   }
 }

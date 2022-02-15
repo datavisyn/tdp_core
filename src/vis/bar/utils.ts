@@ -1,19 +1,22 @@
-import { merge } from 'lodash';
+import { merge, sum } from 'lodash';
+import { I18nextManager } from '../../i18n';
 import {
-  CategoricalColumn,
-  EBarDirection,
-  EBarDisplayType,
-  EBarGroupingType,
-  EColumnTypes,
-  ESupportedPlotlyVis,
-  IBarConfig,
-  IVisConfig,
-  NumericalColumn,
-  Scales,
   PlotlyInfo,
   PlotlyData,
+  VisCategoricalColumn,
+  EColumnTypes,
+  ESupportedPlotlyVis,
+  IVisConfig,
+  Scales,
+  VisColumn,
+  VisCategoricalValue,
+  IBarConfig,
+  EBarGroupingType,
+  EBarDisplayType,
+  EBarDirection,
 } from '../interfaces';
-import { getCol } from '../sidebar/utils';
+import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
+import { getCol } from '../sidebar';
 
 export function isBar(s: IVisConfig): s is IBarConfig {
   return s.type === ESupportedPlotlyVis.BAR;
@@ -30,7 +33,7 @@ const defaultConfig: IBarConfig = {
   direction: EBarDirection.VERTICAL,
 };
 
-export function barMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig): IVisConfig {
+export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig): IVisConfig {
   const merged = merge({}, defaultConfig, config);
 
   const catCols = columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
@@ -42,27 +45,33 @@ export function barMergeDefaultConfig(columns: (NumericalColumn | CategoricalCol
   return merged;
 }
 
-function setPlotsWithGroupsAndMultiples(columns, config, plots, scales, plotCounter): number {
-  const catCols: CategoricalColumn[] = columns.filter(
-    (c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL,
-  ) as CategoricalColumn[];
+async function setPlotsWithGroupsAndMultiples(
+  columns: VisColumn[],
+  catCols: VisCategoricalColumn[],
+  config: IBarConfig,
+  plots: PlotlyData[],
+  scales: Scales,
+  plotCounter: number,
+): Promise<number> {
+  let plotCounterEdit = plotCounter;
+  const catColValues = await resolveColumnValues(catCols);
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
-  const catCurr = catCols[0];
-  const currGroupColumn = getCol(columns, config.group) as CategoricalColumn;
-  const currMultiplesColumn = getCol(columns, config.multiples) as CategoricalColumn;
+  const catCurr = catColValues[0];
+  const currGroupColumn = await resolveSingleColumn(getCol(columns, config.group));
+  const currMultiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
 
-  const uniqueGroupVals = [...new Set(currGroupColumn.values.map((v) => v.val))];
-  const uniqueMultiplesVals = [...new Set(currMultiplesColumn.values.map((v) => v.val))];
+  const uniqueGroupVals: string[] = [...new Set(currGroupColumn.resolvedValues.map((v) => v.val))] as string[];
+  const uniqueMultiplesVals: string[] = [...new Set(currMultiplesColumn.resolvedValues.map((v) => v.val))] as string[];
 
-  const uniqueColVals = [...new Set(catCurr.values.map((v) => v.val))];
+  const uniqueColVals = [...new Set(catCurr.resolvedValues.map((v) => v.val))];
 
   uniqueMultiplesVals.forEach((uniqueMultiples) => {
     uniqueGroupVals.forEach((uniqueGroup) => {
       const groupedLength = uniqueColVals.map((v) => {
-        const allObjs = catCurr.values.filter((c) => c.val === v).map((c) => c.id);
-        const allGroupObjs = currGroupColumn.values.filter((c) => c.val === uniqueGroup).map((c) => c.id);
-        const allMultiplesObjs = currMultiplesColumn.values.filter((c) => c.val === uniqueMultiples).map((c) => c.id);
+        const allObjs = (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v).map((c) => c.id);
+        const allGroupObjs = (currGroupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueGroup).map((c) => c.id);
+        const allMultiplesObjs = (currMultiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueMultiples).map((c) => c.id);
 
         const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c) && allMultiplesObjs.includes(c));
 
@@ -71,8 +80,8 @@ function setPlotsWithGroupsAndMultiples(columns, config, plots, scales, plotCoun
 
       plots.push({
         data: {
-          x: vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
-          y: !vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
+          x: vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
+          y: !vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
           orientation: vertFlag ? 'v' : 'h',
           xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
           yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -87,28 +96,33 @@ function setPlotsWithGroupsAndMultiples(columns, config, plots, scales, plotCoun
         yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
       });
     });
-    plotCounter += 1;
+    plotCounterEdit += 1;
   });
 
-  return plotCounter;
+  return plotCounterEdit;
 }
 
-function setPlotsWithGroups(columns, config, plots, scales, plotCounter): number {
-  const catCols: CategoricalColumn[] = columns.filter(
-    (c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL,
-  ) as CategoricalColumn[];
+async function setPlotsWithGroups(
+  columns: VisColumn[],
+  catCols: VisCategoricalColumn[],
+  config: IBarConfig,
+  plots: PlotlyData[],
+  scales: Scales,
+  plotCounter: number,
+): Promise<number> {
+  const catColValues = await resolveColumnValues(catCols);
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
-  const catCurr = catCols[0];
-  const currColumn = getCol(columns, config.group) as CategoricalColumn;
+  const catCurr = catColValues[0];
+  const groupColumn = await resolveSingleColumn(getCol(columns, config.group));
 
-  const uniqueGroupVals = [...new Set(currColumn.values.map((v) => v.val))];
-  const uniqueColVals = [...new Set(catCurr.values.map((v) => v.val))];
+  const uniqueGroupVals: string[] = [...new Set(groupColumn.resolvedValues.map((v) => v.val))] as string[];
+  const uniqueColVals: string[] = [...new Set(catCurr.resolvedValues.map((v) => v.val))] as string[];
 
   uniqueGroupVals.forEach((uniqueVal) => {
     const groupedLength = uniqueColVals.map((v) => {
-      const allObjs = catCurr.values.filter((c) => c.val === v).map((c) => c.id);
-      const allGroupObjs = currColumn.values.filter((c) => c.val === uniqueVal).map((c) => c.id);
+      const allObjs = (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v).map((c) => c.id);
+      const allGroupObjs = (groupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
       const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
 
       return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
@@ -116,8 +130,8 @@ function setPlotsWithGroups(columns, config, plots, scales, plotCounter): number
 
     plots.push({
       data: {
-        x: vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
-        y: !vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
+        x: vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
+        y: !vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
         orientation: vertFlag ? 'v' : 'h',
         xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
         yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -136,22 +150,27 @@ function setPlotsWithGroups(columns, config, plots, scales, plotCounter): number
   return plotCounter;
 }
 
-function setPlotsWithMultiples(columns, config, plots, scales, plotCounter): number {
-  const catCols: CategoricalColumn[] = columns.filter(
-    (c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL,
-  ) as CategoricalColumn[];
+async function setPlotsWithMultiples(
+  columns: VisColumn[],
+  catCols: VisCategoricalColumn[],
+  config: IBarConfig,
+  plots: PlotlyData[],
+  plotCounter: number,
+): Promise<number> {
+  let plotCounterEdit = plotCounter;
+  const catColValues = await resolveColumnValues(catCols);
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
-  const catCurr = catCols[0];
-  const currColumn = getCol(columns, config.multiples) as CategoricalColumn;
+  const catCurr = catColValues[0];
+  const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
 
-  const uniqueGroupVals = [...new Set(currColumn.values.map((v) => v.val))];
-  const uniqueColVals = [...new Set(catCurr.values.map((v) => v.val))];
+  const uniqueGroupVals: string[] = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))] as string[];
+  const uniqueColVals: string[] = [...new Set(catCurr.resolvedValues.map((v) => v.val))] as string[];
 
   uniqueGroupVals.forEach((uniqueVal) => {
     const groupedLength = uniqueColVals.map((v) => {
-      const allObjs = catCurr.values.filter((c) => c.val === v).map((c) => c.id);
-      const allGroupObjs = currColumn.values.filter((c) => c.val === uniqueVal).map((c) => c.id);
+      const allObjs = (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v).map((c) => c.id);
+      const allGroupObjs = (multiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
       const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
 
       return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
@@ -159,8 +178,8 @@ function setPlotsWithMultiples(columns, config, plots, scales, plotCounter): num
 
     plots.push({
       data: {
-        x: vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
-        y: !vertFlag ? [...new Set(catCurr.values.map((v) => v.val))] : groupedLength,
+        x: vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
+        y: !vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
         orientation: vertFlag ? 'v' : 'h',
         xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
         yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -171,26 +190,35 @@ function setPlotsWithMultiples(columns, config, plots, scales, plotCounter): num
       xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
       yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
     });
-    plotCounter += 1;
+    plotCounterEdit += 1;
   });
 
-  return plotCounter;
+  return plotCounterEdit;
 }
 
-function setPlotsBasic(columns, config, plots, scales, plotCounter): number {
-  const catCols: CategoricalColumn[] = columns.filter(
-    (c) => config.catColumnsSelected.filter((d) => c.info.id === d.id).length > 0 && c.type === EColumnTypes.CATEGORICAL,
-  ) as CategoricalColumn[];
+async function setPlotsBasic(
+  columns: VisColumn[],
+  catCols: VisCategoricalColumn[],
+  config: IBarConfig,
+  plots: PlotlyData[],
+  scales: Scales,
+  plotCounter: number,
+): Promise<number> {
+  let plotCounterEdit = plotCounter;
+  const catColValues = await resolveColumnValues(catCols);
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
-  const catCurr = catCols[0];
+  const catCurr = catColValues[0];
 
-  const count = [...new Set(catCurr.values.map((v) => v.val))].map((curr) => catCurr.values.filter((c) => c.val === curr).length);
-  const valArr = [...new Set(catCurr.values.map((v) => v.val))];
+  const count = [...new Set(catCurr.resolvedValues.map((v) => v.val))].map(
+    (curr) => (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === curr).length,
+  );
+  const countTotal = sum(count);
+  const valArr = [...new Set(catCurr.resolvedValues.map((v) => v.val))];
   plots.push({
     data: {
-      x: vertFlag ? valArr : count,
-      y: !vertFlag ? valArr : count,
+      x: vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
+      y: !vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
       orientation: vertFlag ? 'v' : 'h',
       xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
       yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -200,12 +228,12 @@ function setPlotsBasic(columns, config, plots, scales, plotCounter): number {
     xLabel: vertFlag ? catCurr.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
     yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catCurr.info.name,
   });
-  plotCounter += 1;
+  plotCounterEdit += 1;
 
-  return plotCounter;
+  return plotCounterEdit;
 }
 
-export function createBarTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IBarConfig, scales: Scales): PlotlyInfo {
+export async function createBarTraces(columns: VisColumn[], config: IBarConfig, scales: Scales): Promise<PlotlyInfo> {
   let plotCounter = 1;
 
   if (!config.catColumnsSelected) {
@@ -214,25 +242,23 @@ export function createBarTraces(columns: (NumericalColumn | CategoricalColumn)[]
       legendPlots: [],
       rows: 0,
       cols: 0,
-      errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
+      errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
     };
   }
 
   const plots: PlotlyData[] = [];
 
-  const catCols: CategoricalColumn[] = columns.filter(
-    (c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL,
-  ) as CategoricalColumn[];
+  const catCols: VisCategoricalColumn[] = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisCategoricalColumn);
 
   if (catCols.length > 0) {
     if (config.group && config.multiples) {
-      plotCounter = setPlotsWithGroupsAndMultiples(columns, config, plots, scales, plotCounter);
+      plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, scales, plotCounter);
     } else if (config.group) {
-      plotCounter = setPlotsWithGroups(columns, config, plots, scales, plotCounter);
+      plotCounter = await setPlotsWithGroups(columns, catCols, config, plots, scales, plotCounter);
     } else if (config.multiples) {
-      plotCounter = setPlotsWithMultiples(columns, config, plots, scales, plotCounter);
+      plotCounter = await setPlotsWithMultiples(columns, catCols, config, plots, plotCounter);
     } else {
-      plotCounter = setPlotsBasic(columns, config, plots, scales, plotCounter);
+      plotCounter = await setPlotsBasic(columns, catCols, config, plots, scales, plotCounter);
     }
   }
 
@@ -244,6 +270,6 @@ export function createBarTraces(columns: (NumericalColumn | CategoricalColumn)[]
     legendPlots: [],
     rows,
     cols,
-    errorMessage: 'To create a Bar Chart, please select at least 1 categorical column.',
+    errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
   };
 }

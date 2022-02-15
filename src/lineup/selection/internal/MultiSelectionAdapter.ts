@@ -1,6 +1,6 @@
+import { difference } from 'lodash';
 import { IContext } from '../ISelectionAdapter';
 import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
-import { LineupUtils } from '../../utils';
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
 import { ResolveNow } from '../../../base';
 
@@ -48,20 +48,18 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
       descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, id));
 
       const usedCols = context.columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
-      const dynamicColumnIDs = new Set<string>(
-        usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`),
-      );
+      const dynamicColumnIDs = usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`);
       // Save which columns have been added for a specific element in the selection
-      const selectedElements = new Set<string>(descs.map((desc) => `${id}_${desc.selectedSubtype}`));
+      const selectedElements = descs.map((desc) => `${id}_${desc.selectedSubtype}`);
 
       // Check which items are new and should therefore be added as columns
-      const addedParameters = LineupUtils.set_diff(selectedElements, dynamicColumnIDs);
+      const addedParameters = difference(selectedElements, dynamicColumnIDs);
 
-      if (addedParameters.size <= 0) {
+      if (addedParameters.length <= 0) {
         return [];
       }
       // Filter the descriptions to only leave the new columns and load them
-      const columnsToBeAdded = descs.filter((desc) => addedParameters.has(`${id}_${desc.selectedSubtype}`));
+      const columnsToBeAdded = descs.filter((desc) => addedParameters.indexOf(`${id}_${desc.selectedSubtype}`));
       const data = this.adapter.loadData(id, columnsToBeAdded);
 
       const position = this.computePositionToInsert(context, id);
@@ -76,16 +74,14 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     if (selectedSubTypes.length === 0) {
       ids.forEach((id) => context.freeColor(id));
     }
-    // get currently selected subtypes
-    const selectedElements = new Set<string>(selectedSubTypes);
 
     const usedCols = columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
 
     // get available all current subtypes from lineup
-    const dynamicColumnSubtypes = new Set<string>(usedCols.map((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype));
+    const dynamicColumnSubtypes = usedCols.map((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype);
 
     // check which parameters have been removed
-    const removedParameters = Array.from(LineupUtils.set_diff(dynamicColumnSubtypes, selectedElements));
+    const removedParameters = difference(dynamicColumnSubtypes, selectedSubTypes);
 
     context.remove(
       [].concat(

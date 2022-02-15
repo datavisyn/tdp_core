@@ -7,14 +7,14 @@ interface VisTypeSelectProps {
   currentSelected: ESupportedPlotlyVis;
 }
 
-export function VisTypeSelect(props: VisTypeSelectProps) {
+export function VisTypeSelect({ callback, currentSelected }: VisTypeSelectProps) {
   return (
     <>
       <label className="pt-2 pb-1">Visualization Type</label>
       <Select
         closeMenuOnSelect
         // components={{Option: optionLayout}}
-        onChange={(e) => props.callback(e.value)}
+        onChange={(e) => callback(e.value)}
         name="visTypes"
         options={allVisTypes.map((t) => {
           return {
@@ -22,7 +22,7 @@ export function VisTypeSelect(props: VisTypeSelectProps) {
             label: t,
           };
         })}
-        value={{ value: props.currentSelected, label: props.currentSelected }}
+        value={{ value: currentSelected, label: currentSelected }}
       />
     </>
   );

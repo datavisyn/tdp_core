@@ -1,5 +1,5 @@
-import { CategoricalColumn, IStripConfig, IVisConfig, NumericalColumn, Scales, PlotlyInfo } from '../interfaces';
+import { PlotlyInfo, IVisConfig, Scales, VisColumn, IStripConfig } from '../interfaces';
 export declare function isStrip(s: IVisConfig): s is IStripConfig;
-export declare function stripMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IStripConfig): IVisConfig;
-export declare function createStripTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IStripConfig, scales: Scales): PlotlyInfo;
+export declare function stripMergeDefaultConfig(columns: VisColumn[], config: IStripConfig): IVisConfig;
+export declare function createStripTraces(columns: VisColumn[], config: IStripConfig, scales: Scales): Promise<PlotlyInfo>;
 //# sourceMappingURL=utils.d.ts.map

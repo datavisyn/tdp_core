@@ -6,7 +6,7 @@ interface NumericalColorButtonsProps {
   currentSelected: ENumericalColorScaleType;
 }
 
-export function NumericalColorButtons(props: NumericalColorButtonsProps) {
+export function NumericalColorButtons({ callback, currentSelected }: NumericalColorButtonsProps) {
   const sequentialColors = ['#002245', '#214066', '#3e618a', '#5c84af', '#83a8c9', '#a9cfe4', '#cff6ff'];
   const divergentColors = ['#337ab7', '#7496c1', '#a5b4ca', '#d3d3d3', '#e5b19d', '#ec8e6a', '#ec6836'];
 
@@ -14,8 +14,8 @@ export function NumericalColorButtons(props: NumericalColorButtonsProps) {
     <>
       <div key="numericalColorChooserRadio" className="btn-group w-100 px-2 pt-2" role="group" aria-label="Basic outlined example">
         <input
-          checked={props.currentSelected === ENumericalColorScaleType.SEQUENTIAL}
-          onChange={(e) => props.callback(e.currentTarget.value as ENumericalColorScaleType)}
+          checked={currentSelected === ENumericalColorScaleType.SEQUENTIAL}
+          onChange={(e) => callback(e.currentTarget.value as ENumericalColorScaleType)}
           value={ENumericalColorScaleType.SEQUENTIAL}
           type="checkbox"
           className="btn-check"
@@ -32,8 +32,8 @@ export function NumericalColorButtons(props: NumericalColorButtonsProps) {
         </label>
 
         <input
-          checked={props.currentSelected === ENumericalColorScaleType.DIVERGENT}
-          onChange={(e) => props.callback(e.currentTarget.value as ENumericalColorScaleType)}
+          checked={currentSelected === ENumericalColorScaleType.DIVERGENT}
+          onChange={(e) => callback(e.currentTarget.value as ENumericalColorScaleType)}
           value={ENumericalColorScaleType.DIVERGENT}
           type="checkbox"
           className="btn-check"

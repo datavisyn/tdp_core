@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { CategoricalColumn, EFilterOptions, IVisConfig, NumericalColumn, Scales, IScatterConfig } from '../interfaces';
-interface ScatterVisProps {
+import { IVisConfig, EFilterOptions, Scales, VisColumn, IScatterConfig } from '../interfaces';
+export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, scales, }: {
     config: IScatterConfig;
     optionsConfig?: {
         color?: {
@@ -23,15 +23,13 @@ interface ScatterVisProps {
         postSidebar?: React.ReactNode;
     };
     shapes?: string[];
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     filterCallback?: (s: EFilterOptions) => void;
     selectionCallback?: (s: string[]) => void;
     selected?: {
-        [key: number]: boolean;
+        [id: string]: boolean;
     };
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
-}
-export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, scales, }: ScatterVisProps): JSX.Element;
-export {};
+}): JSX.Element;
 //# sourceMappingURL=ScatterVis.d.ts.map

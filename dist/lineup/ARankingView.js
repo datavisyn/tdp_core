@@ -14,11 +14,11 @@ import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
-import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
 import { BaseUtils } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { debounceAsync } from '../base/BaseUtils';
+import { LineupVisWrapper } from '../vis';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -73,7 +73,7 @@ export class ARankingView extends AView {
             subType: { key: '', value: '' },
             enableOverviewMode: true,
             enableZoom: true,
-            enableCustomVis: true,
+            enableVisPanel: true,
             enableDownload: true,
             enableSaveRanking: true,
             enableAddingColumns: true,
@@ -171,7 +171,14 @@ export class ARankingView extends AView {
         this.node.appendChild(luBackdrop);
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-        this.generalVis = new GeneralVisWrapper(this.provider, this.idType, this.selectionHelper, this.node.ownerDocument);
+        const id = IDTypeManager.getInstance().resolveIdType(this.itemIDType.id);
+        this.generalVis = new LineupVisWrapper({
+            provider: this.provider,
+            selectionCallback: (visynIds) => {
+                this.selectionHelper.setGeneralVisSelection({ idtype: id, ids: visynIds });
+            },
+            doc: this.node.ownerDocument,
+        });
         // When a new column desc is added to the provider, update the panel chooser
         this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
         // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
@@ -211,7 +218,6 @@ export class ARankingView extends AView {
                 this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
             }
         }
-        this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
             this.setItemSelection(sel);
             this.generalVis.updateCustomVis();
