@@ -392,6 +392,7 @@ export abstract class AView extends EventHandler implements IView {
       // the selection has changed when we really have some new values not just another empty one
       this.itemSelectionChanged(name);
     }
+
     this.fire(AView.EVENT_ITEM_SELECT, current, selection, name);
   }
 

@@ -1,4 +1,4 @@
-import { IVisMetaData } from '../../vis/IVisMetaData';
+import { IVisMetaData } from '../../provvis/IVisMetaData';
 /**
  * @internal
  */

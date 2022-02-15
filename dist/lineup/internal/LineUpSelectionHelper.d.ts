@@ -26,5 +26,6 @@ export declare class LineUpSelectionHelper extends EventHandler {
      */
     rowIdsAsSet(indices: number[]): Range;
     setItemSelection(sel: ISelection): void;
+    setGeneralVisSelection(sel: ISelection): void;
 }
 //# sourceMappingURL=LineUpSelectionHelper.d.ts.map

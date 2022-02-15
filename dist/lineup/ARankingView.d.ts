@@ -26,6 +26,7 @@ export declare abstract class ARankingView extends AView {
     private readonly taggle;
     private readonly selectionHelper;
     private readonly panel;
+    private readonly generalVis;
     /**
      * clears and rebuilds this lineup instance from scratch
      * @returns {Promise<any[]>} promise when done

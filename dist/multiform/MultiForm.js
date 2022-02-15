@@ -1,6 +1,6 @@
 import { BaseUtils } from '../base/BaseUtils';
 import { DataUtils } from '../data';
-import { AVisInstance, VisUtils } from '../vis';
+import { AVisInstance, VisUtils } from '../provvis';
 import { VisChooser } from './VisChooser';
 import { FormUtils, ProxyMetaData } from './internal/internal';
 /**

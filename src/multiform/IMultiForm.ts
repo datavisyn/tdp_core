@@ -1,4 +1,4 @@
-import { IVisInstance, IVisPluginDesc } from '../vis';
+import { IVisInstance, IVisPluginDesc } from '../provvis';
 
 export interface IMultiForm extends IVisInstance {
   readonly act: IVisPluginDesc;

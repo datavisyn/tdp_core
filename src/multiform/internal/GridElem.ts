@@ -1,7 +1,7 @@
 import { BaseUtils } from '../../base/BaseUtils';
 import { IPersistable } from '../../base/IPersistable';
 import { IDataType, DataUtils } from '../../data';
-import { IVisInstance, VisUtils, ITransform } from '../../vis';
+import { IVisInstance, VisUtils, ITransform } from '../../provvis';
 import { Range } from '../../range';
 import { IPlugin } from '../../base/plugin';
 import { FormUtils } from './FormUtils';

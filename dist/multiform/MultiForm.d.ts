@@ -1,5 +1,5 @@
 import { IDataType } from '../data';
-import { IVisMetaData, IVisPluginDesc, AVisInstance, ITransform, IVisInstance } from '../vis';
+import { IVisMetaData, IVisPluginDesc, AVisInstance, ITransform, IVisInstance } from '../provvis';
 import { IMultiForm, IMultiFormOptions } from './IMultiForm';
 import { Range } from '../range';
 /**

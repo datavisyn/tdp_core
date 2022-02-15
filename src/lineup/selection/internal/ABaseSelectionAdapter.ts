@@ -1,6 +1,6 @@
+import { difference } from 'lodash';
 import { ResolveNow } from '../../../base';
 import { IAdditionalColumnDesc } from '../../../base/interfaces';
-import { LineupUtils } from '../../utils';
 import { ISelectionColumn, IContext } from '../ISelectionAdapter';
 
 export abstract class ABaseSelectionAdapter {
@@ -75,8 +75,8 @@ export abstract class ABaseSelectionAdapter {
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
     // compute the difference
-    const diffAdded = LineupUtils.array_diff(selectedIds, lineupColIds);
-    const diffRemoved = LineupUtils.array_diff(lineupColIds, selectedIds);
+    const diffAdded = difference(selectedIds, lineupColIds);
+    const diffRemoved = difference(lineupColIds, selectedIds);
 
     // remove deselected columns
     if (diffRemoved.length > 0) {
