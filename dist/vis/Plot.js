@@ -1,3 +1,10 @@
+/* eslint-disable import/first */
+if (typeof window.URL.createObjectURL === 'undefined') {
+    // @ts-ignore
+    window.URL.createObjectURL = () => {
+        // Mock this function for mapbox-gl to work
+    };
+}
 // Use minified bundle: https://github.com/plotly/react-plotly.js#customizing-the-plotlyjs-bundle
 import Plotly from 'plotly.js-dist-min';
 // Use your own `Plotly` object
