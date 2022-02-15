@@ -238,12 +238,11 @@ export abstract class ARankingView extends AView {
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
 
-    const id = IDTypeManager.getInstance().resolveIdType(this.itemIDType.id);
     this.generalVis = new LineupVisWrapper({
       provider: this.provider,
       selectionCallback: (selected: number[]) => {
         const r = Range.list(selected);
-        this.selectionHelper.setGeneralVisSelection({ idtype: id, range: r });
+        this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), range: r });
       },
       doc: this.node.ownerDocument,
     });

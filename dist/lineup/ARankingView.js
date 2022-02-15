@@ -171,12 +171,11 @@ export class ARankingView extends AView {
         this.node.appendChild(luBackdrop);
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-        const id = IDTypeManager.getInstance().resolveIdType(this.itemIDType.id);
         this.generalVis = new LineupVisWrapper({
             provider: this.provider,
             selectionCallback: (selected) => {
                 const r = Range.list(selected);
-                this.selectionHelper.setGeneralVisSelection({ idtype: id, range: r });
+                this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), range: r });
             },
             doc: this.node.ownerDocument,
         });
