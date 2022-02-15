@@ -1,29 +1,13 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
-import Plot from 'react-plotly.js';
 import d3 from 'd3';
-import { merge } from 'lodash';
-import Plotly from 'plotly.js';
-import {
-  CategoricalColumn,
-  ColumnInfo,
-  ESupportedPlotlyVis,
-  EViolinOverlay,
-  NumericalColumn,
-  PlotlyInfo,
-  Scales,
-  IVisConfig,
-  IViolinConfig,
-} from '../interfaces';
-import { VisTypeSelect } from '../sidebar/VisTypeSelect';
-import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
-import { InvalidCols } from '../InvalidCols';
-import { beautifyLayout } from '../layoutUtils';
+import { merge, uniqueId } from 'lodash';
+import { ColumnInfo, ESupportedPlotlyVis, Scales, VisColumn, IVisConfig, IViolinConfig, EViolinOverlay } from '../interfaces';
+import { CategoricalColumnSelect, NumericalColumnSelect, ViolinOverlayButtons, VisTypeSelect, WarningMessage } from '../sidebar';
+import { PlotlyComponent, Plotly } from '../Plot';
+import { InvalidCols } from '../general';
+import { beautifyLayout } from '../general/layoutUtils';
 import { createViolinTraces } from './utils';
-import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
-import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
-import { WarningMessage } from '../sidebar/WarningMessage';
+import { useAsync } from '../../hooks';
 
 interface ViolinVisProps {
   config: IViolinConfig;
@@ -39,7 +23,7 @@ interface ViolinVisProps {
     preSidebar?: React.ReactNode;
     postSidebar?: React.ReactNode;
   };
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
 }
@@ -59,38 +43,39 @@ const defaultExtensions = {
 };
 
 export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales }: ViolinVisProps) {
-  const mergedOptionsConfig = useMemo(() => {
+  const mergedOptionsConfig = React.useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
-  }, []);
+  }, [optionsConfig]);
 
-  const mergedExtensions = useMemo(() => {
+  const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
-  const traces: PlotlyInfo = useMemo(() => {
-    return createViolinTraces(columns, config, scales);
-  }, [columns, config, scales]);
+  const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
 
-  const uniqueId = useMemo(() => {
-    return Math.random().toString(36).substr(2, 5);
-  }, []);
+  const id = React.useMemo(() => uniqueId('ViolinVis'), []);
 
-  useEffect(() => {
-    const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
+  React.useEffect(() => {
+    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
 
     menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, []);
+  }, [id]);
 
-  const layout = useMemo(() => {
-    const scopedLayout = {
+  const layout = React.useMemo(() => {
+    if (!traces) {
+      return null;
+    }
+
+    const innerLayout: Plotly.Layout = {
       showlegend: true,
       legend: {
+        // @ts-ignore
         itemclick: false,
         itemdoubleclick: false,
       },
@@ -100,41 +85,38 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
       violingap: 0,
     };
 
-    return beautifyLayout(traces, scopedLayout);
+    return beautifyLayout(traces, innerLayout);
   }, [traces]);
 
   return (
     <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
-      <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
+      <div
+        className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
+          traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
+        }`}
+      >
         {mergedExtensions.prePlot}
 
-        {traces.plots.length > 0 ? (
-          <Plot
-            divId={`plotlyDiv${uniqueId}`}
+        {traceStatus === 'success' && traces?.plots.length > 0 ? (
+          <PlotlyComponent
+            divId={`plotlyDiv${id}`}
             data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-            layout={layout as any}
+            layout={layout}
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
             // plotly redraws everything on updates, so you need to reappend title and
-            // change opacity on update, instead of just in a use effect
             onUpdate={() => {
               for (const p of traces.plots) {
-                d3.select(`g .${(p.data as any).xaxis}title`)
-                  .style('pointer-events', 'all')
-                  .append('title')
-                  .text(p.xLabel);
+                d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
 
-                d3.select(`g .${(p.data as any).yaxis}title`)
-                  .style('pointer-events', 'all')
-                  .append('title')
-                  .text(p.yLabel);
+                d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
               }
             }}
           />
-        ) : (
-          <InvalidCols message={traces.errorMessage} />
-        )}
+        ) : traceStatus !== 'pending' ? (
+          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+        ) : null}
         {mergedExtensions.postPlot}
       </div>
       <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
@@ -142,13 +124,13 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
           className="btn btn-primary-outline"
           type="button"
           data-bs-toggle="collapse"
-          data-bs-target={`#generalVisBurgerMenu${uniqueId}`}
+          data-bs-target={`#generalVisBurgerMenu${id}`}
           aria-expanded="true"
           aria-controls="generalVisBurgerMenu"
         >
           <i className="fas fa-bars" />
         </button>
-        <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
+        <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
           <div className="container pb-3" style={{ width: '20rem' }}>
             <WarningMessage />
             <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />

@@ -6,7 +6,7 @@ interface BarDisplayProps {
   currentSelected: EBarDisplayType;
 }
 
-export function BarDisplayButtons(props: BarDisplayProps) {
+export function BarDisplayButtons({ callback, currentSelected }: BarDisplayProps) {
   const options = [EBarDisplayType.DEFAULT, EBarDisplayType.NORMALIZED];
   return (
     <div key="barDirectionGroup" className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
@@ -14,8 +14,8 @@ export function BarDisplayButtons(props: BarDisplayProps) {
         return (
           <React.Fragment key={`radioButtonsFilter${opt}`}>
             <input
-              checked={props.currentSelected === opt}
-              onChange={(e) => props.callback(e.currentTarget.value as EBarDisplayType)}
+              checked={currentSelected === opt}
+              onChange={(e) => callback(e.currentTarget.value as EBarDisplayType)}
               value={opt}
               type="checkbox"
               className="btn-check"

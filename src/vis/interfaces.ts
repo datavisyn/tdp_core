@@ -1,4 +1,4 @@
-import { Data } from 'plotly.js';
+import { Plotly } from './Plot';
 
 export enum ESupportedPlotlyVis {
   SCATTER = 'Scatter',
@@ -16,67 +16,6 @@ export const allVisTypes: ESupportedPlotlyVis[] = [
   ESupportedPlotlyVis.PCP,
 ];
 
-export enum EColumnTypes {
-  NUMERICAL = 'Numerical',
-  CATEGORICAL = 'Categorical',
-}
-
-export enum EGeneralFormType {
-  DROPDOWN = 'Dropdown',
-  BUTTON = 'Button',
-  SLIDER = 'Slider',
-}
-
-export enum EFilterOptions {
-  IN = 'Filter In',
-  OUT = 'Filter Out',
-  CLEAR = 'Clear Filter',
-}
-
-export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
-
-export interface NumericalColumn {
-  info: ColumnInfo;
-  values: { id: number; val: number }[];
-  // TODO: Think about making async accessor function:
-  // values: (rows: object[]) => Promise<{id: number, val: number}[]>;
-  type: EColumnTypes.NUMERICAL;
-}
-
-export interface CategoricalColumn {
-  info: ColumnInfo;
-  colors: string[];
-  values: { id: number; val: string }[];
-  type: EColumnTypes.CATEGORICAL;
-}
-
-export type PlotlyInfo = {
-  plots: PlotlyData[];
-  legendPlots: PlotlyData[];
-  rows: number;
-  cols: number;
-  errorMessage: string;
-};
-
-export type PlotlyData = {
-  data: Data;
-  xLabel: string;
-  yLabel: string;
-};
-
-export type ColumnInfo = {
-  name: string;
-  id: string;
-  description: string;
-};
-
-export type Scales = {
-  color: any;
-};
-
-/**
- * Bar chart enums
- */
 export enum EBarDisplayType {
   DEFAULT = 'Default',
   NORMALIZED = 'Normalized',
@@ -98,12 +37,49 @@ export enum EBarGroupingType {
   GROUP = 'Grouped',
 }
 
-/**
- * Scatter chart enums
- */
+export enum EColumnTypes {
+  NUMERICAL = 'Numerical',
+  CATEGORICAL = 'Categorical',
+}
+
+export enum EGeneralFormType {
+  DROPDOWN = 'Dropdown',
+  BUTTON = 'Button',
+  SLIDER = 'Slider',
+}
+
+export enum EFilterOptions {
+  IN = 'Filter In',
+  OUT = 'Filter Out',
+  CLEAR = 'Clear Filter',
+}
+
 export enum ENumericalColorScaleType {
   SEQUENTIAL = 'Sequential',
   DIVERGENT = 'Divergent',
+}
+
+export interface IViolinConfig {
+  type: ESupportedPlotlyVis.VIOLIN;
+  numColumnsSelected: ColumnInfo[];
+  catColumnsSelected: ColumnInfo[];
+  violinOverlay: EViolinOverlay;
+}
+
+export interface IStripConfig {
+  type: ESupportedPlotlyVis.STRIP;
+  numColumnsSelected: ColumnInfo[];
+  catColumnsSelected: ColumnInfo[];
+}
+
+export interface IScatterConfig {
+  type: ESupportedPlotlyVis.SCATTER;
+  numColumnsSelected: ColumnInfo[];
+  color: ColumnInfo | null;
+  numColorScaleType: ENumericalColorScaleType;
+  shape: ColumnInfo | null;
+  isRectBrush: boolean;
+  alphaSliderVal: number;
 }
 
 export interface IBarConfig {
@@ -119,29 +95,63 @@ export interface IBarConfig {
 
 export interface IPCPConfig {
   type: ESupportedPlotlyVis.PCP;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
+  allColumnsSelected: ColumnInfo[];
 }
 
-export interface IScatterConfig {
-  type: ESupportedPlotlyVis.SCATTER;
-  numColumnsSelected: ColumnInfo[];
-  color: ColumnInfo | null;
-  numColorScaleType: ENumericalColorScaleType;
-  shape: ColumnInfo | null;
-  isRectBrush: boolean;
-  alphaSliderVal: number;
+export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
+
+type ValueGetter<T> = () => Promise<T>;
+
+export interface IVisCommonValue<Type extends number | string> {
+  /**
+   * Visyn id of the row.
+   */
+  id: string;
+  /**
+   * Value of a vis column.
+   */
+  val: Type;
 }
 
-export interface IStripConfig {
-  type: ESupportedPlotlyVis.STRIP;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
+export type VisNumericalValue = IVisCommonValue<number>;
+
+export type VisCategoricalValue = IVisCommonValue<string>;
+
+export interface VisCommonColumn {
+  info: ColumnInfo;
+  values: ValueGetter<(VisNumericalValue | VisCategoricalValue)[]>;
 }
 
-export interface IViolinConfig {
-  type: ESupportedPlotlyVis.VIOLIN;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
-  violinOverlay: EViolinOverlay;
+export interface VisNumericalColumn extends VisCommonColumn {
+  type: EColumnTypes.NUMERICAL;
 }
+
+export interface VisCategoricalColumn extends VisCommonColumn {
+  type: EColumnTypes.CATEGORICAL;
+}
+
+export type VisColumn = VisNumericalColumn | VisCategoricalColumn;
+
+export type PlotlyInfo = {
+  plots: PlotlyData[];
+  legendPlots: PlotlyData[];
+  rows: number;
+  cols: number;
+  errorMessage: string;
+};
+
+export type PlotlyData = {
+  data: Partial<Plotly.PlotData>;
+  xLabel: string;
+  yLabel: string;
+};
+
+export type ColumnInfo = {
+  name: string;
+  id: string;
+  description: string;
+};
+
+export type Scales = {
+  color: any;
+};

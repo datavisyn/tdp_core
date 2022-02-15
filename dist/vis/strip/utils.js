@@ -1,5 +1,7 @@
 import { merge } from 'lodash';
-import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
+import { I18nextManager } from '../../i18n';
+import { EColumnTypes, ESupportedPlotlyVis, } from '../interfaces';
+import { resolveColumnValues } from '../general/layoutUtils';
 export function isStrip(s) {
     return s.type === ESupportedPlotlyVis.STRIP;
 }
@@ -16,7 +18,7 @@ export function stripMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
-export function createStripTraces(columns, config, scales) {
+export async function createStripTraces(columns, config, scales) {
     let plotCounter = 1;
     if (!config.numColumnsSelected || !config.catColumnsSelected) {
         return {
@@ -24,18 +26,20 @@ export function createStripTraces(columns, config, scales) {
             legendPlots: [],
             rows: 0,
             cols: 0,
-            errorMessage: 'To create a Strip plot, please select at least 1 numerical column.',
+            errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
         };
     }
-    const numCols = columns.filter((c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL);
-    const catCols = columns.filter((c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL);
+    const numCols = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
+    const catCols = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
     const plots = [];
+    const numColValues = await resolveColumnValues(numCols);
+    const catColValues = await resolveColumnValues(catCols);
     // if we only have numerical columns, add them individually
-    if (catCols.length === 0) {
-        for (const numCurr of numCols) {
+    if (catColValues.length === 0) {
+        for (const numCurr of numColValues) {
             plots.push({
                 data: {
-                    y: numCurr.values.map((v) => v.val),
+                    y: numCurr.resolvedValues.map((v) => v.val),
                     xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
                     yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                     showlegend: false,
@@ -44,6 +48,7 @@ export function createStripTraces(columns, config, scales) {
                     name: 'All points',
                     mode: 'none',
                     pointpos: 0,
+                    // @ts-ignore
                     box: {
                         visible: true,
                     },
@@ -60,12 +65,12 @@ export function createStripTraces(columns, config, scales) {
             plotCounter += 1;
         }
     }
-    for (const numCurr of numCols) {
-        for (const catCurr of catCols) {
+    for (const numCurr of numColValues) {
+        for (const catCurr of catColValues) {
             plots.push({
                 data: {
-                    x: catCurr.values.map((v) => v.val),
-                    y: numCurr.values.map((v) => v.val),
+                    x: catCurr.resolvedValues.map((v) => v.val),
+                    y: numCurr.resolvedValues.map((v) => v.val),
                     xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
                     yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                     showlegend: false,
@@ -74,6 +79,7 @@ export function createStripTraces(columns, config, scales) {
                     name: 'All points',
                     mode: 'none',
                     pointpos: 0,
+                    // @ts-ignore
                     box: {
                         visible: true,
                     },
@@ -86,8 +92,8 @@ export function createStripTraces(columns, config, scales) {
                     transforms: [
                         {
                             type: 'groupby',
-                            groups: catCurr.values.map((v) => v.val),
-                            styles: [...new Set(catCurr.values.map((v) => v.val))].map((c) => {
+                            groups: catCurr.resolvedValues.map((v) => v.val),
+                            styles: [...new Set(catCurr.resolvedValues.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { marker: { color: scales.color(c) } } };
                             }),
                         },
@@ -102,9 +108,9 @@ export function createStripTraces(columns, config, scales) {
     return {
         plots,
         legendPlots: [],
-        rows: numCols.length,
-        cols: catCols.length > 0 ? catCols.length : 1,
-        errorMessage: 'To create a Strip plot, please select at least 1 numerical column',
+        rows: numColValues.length,
+        cols: catColValues.length > 0 ? catColValues.length : 1,
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
     };
 }
 //# sourceMappingURL=utils.js.map

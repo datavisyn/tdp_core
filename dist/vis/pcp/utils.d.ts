@@ -1,5 +1,5 @@
-import { CategoricalColumn, IPCPConfig, IVisConfig, NumericalColumn, PlotlyInfo } from '../interfaces';
+import { PlotlyInfo, IVisConfig, VisColumn, IPCPConfig } from '../interfaces';
 export declare function isPCP(s: IVisConfig): s is IPCPConfig;
-export declare function pcpMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IPCPConfig): IVisConfig;
-export declare function createPCPTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IPCPConfig): PlotlyInfo;
+export declare function pcpMergeDefaultConfig(columns: VisColumn[], config: IPCPConfig): IVisConfig;
+export declare function createPCPTraces(columns: VisColumn[], config: IPCPConfig): Promise<PlotlyInfo>;
 //# sourceMappingURL=utils.d.ts.map

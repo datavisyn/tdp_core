@@ -1,5 +1,18 @@
 import { merge } from 'lodash';
-import { CategoricalColumn, IStripConfig, EColumnTypes, ESupportedPlotlyVis, IVisConfig, NumericalColumn, Scales, PlotlyInfo, PlotlyData } from '../interfaces';
+import { I18nextManager } from '../../i18n';
+import {
+  PlotlyInfo,
+  PlotlyData,
+  VisCategoricalColumn,
+  EColumnTypes,
+  ESupportedPlotlyVis,
+  IVisConfig,
+  VisNumericalColumn,
+  Scales,
+  VisColumn,
+  IStripConfig,
+} from '../interfaces';
+import { resolveColumnValues } from '../general/layoutUtils';
 
 export function isStrip(s: IVisConfig): s is IStripConfig {
   return s.type === ESupportedPlotlyVis.STRIP;
@@ -11,7 +24,7 @@ const defaultConfig: IStripConfig = {
   catColumnsSelected: [],
 };
 
-export function stripMergeDefaultConfig(columns: (NumericalColumn | CategoricalColumn)[], config: IStripConfig): IVisConfig {
+export function stripMergeDefaultConfig(columns: VisColumn[], config: IStripConfig): IVisConfig {
   const merged = merge({}, defaultConfig, config);
 
   const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
@@ -23,7 +36,7 @@ export function stripMergeDefaultConfig(columns: (NumericalColumn | CategoricalC
   return merged;
 }
 
-export function createStripTraces(columns: (NumericalColumn | CategoricalColumn)[], config: IStripConfig, scales: Scales): PlotlyInfo {
+export async function createStripTraces(columns: VisColumn[], config: IStripConfig, scales: Scales): Promise<PlotlyInfo> {
   let plotCounter = 1;
 
   if (!config.numColumnsSelected || !config.catColumnsSelected) {
@@ -32,24 +45,23 @@ export function createStripTraces(columns: (NumericalColumn | CategoricalColumn)
       legendPlots: [],
       rows: 0,
       cols: 0,
-      errorMessage: 'To create a Strip plot, please select at least 1 numerical column.',
+      errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
     };
   }
 
-  const numCols: NumericalColumn[] = columns.filter(
-    (c) => config.numColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.NUMERICAL,
-  ) as NumericalColumn[];
-  const catCols: CategoricalColumn[] = columns.filter(
-    (c) => config.catColumnsSelected.some((d) => c.info.id === d.id) && c.type === EColumnTypes.CATEGORICAL,
-  ) as CategoricalColumn[];
+  const numCols: VisNumericalColumn[] = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
+  const catCols: VisCategoricalColumn[] = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisCategoricalColumn);
   const plots: PlotlyData[] = [];
 
+  const numColValues = await resolveColumnValues(numCols);
+  const catColValues = await resolveColumnValues(catCols);
+
   // if we only have numerical columns, add them individually
-  if (catCols.length === 0) {
-    for (const numCurr of numCols) {
+  if (catColValues.length === 0) {
+    for (const numCurr of numColValues) {
       plots.push({
         data: {
-          y: numCurr.values.map((v) => v.val),
+          y: numCurr.resolvedValues.map((v) => v.val),
           xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
           yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
           showlegend: false,
@@ -58,6 +70,7 @@ export function createStripTraces(columns: (NumericalColumn | CategoricalColumn)
           name: 'All points',
           mode: 'none',
           pointpos: 0,
+          // @ts-ignore
           box: {
             visible: true,
           },
@@ -75,12 +88,12 @@ export function createStripTraces(columns: (NumericalColumn | CategoricalColumn)
     }
   }
 
-  for (const numCurr of numCols) {
-    for (const catCurr of catCols) {
+  for (const numCurr of numColValues) {
+    for (const catCurr of catColValues) {
       plots.push({
         data: {
-          x: catCurr.values.map((v) => v.val),
-          y: numCurr.values.map((v) => v.val),
+          x: catCurr.resolvedValues.map((v) => v.val),
+          y: numCurr.resolvedValues.map((v) => v.val),
           xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
           yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
           showlegend: false,
@@ -89,6 +102,7 @@ export function createStripTraces(columns: (NumericalColumn | CategoricalColumn)
           name: 'All points',
           mode: 'none',
           pointpos: 0,
+          // @ts-ignore
           box: {
             visible: true,
           },
@@ -101,8 +115,8 @@ export function createStripTraces(columns: (NumericalColumn | CategoricalColumn)
           transforms: [
             {
               type: 'groupby',
-              groups: catCurr.values.map((v) => v.val),
-              styles: [...new Set<string>(catCurr.values.map((v) => v.val) as string[])].map((c) => {
+              groups: catCurr.resolvedValues.map((v) => v.val) as string[],
+              styles: [...new Set<string>(catCurr.resolvedValues.map((v) => v.val) as string[])].map((c) => {
                 return { target: c, value: { marker: { color: scales.color(c) } } };
               }),
             },
@@ -118,8 +132,8 @@ export function createStripTraces(columns: (NumericalColumn | CategoricalColumn)
   return {
     plots,
     legendPlots: [],
-    rows: numCols.length,
-    cols: catCols.length > 0 ? catCols.length : 1,
-    errorMessage: 'To create a Strip plot, please select at least 1 numerical column',
+    rows: numColValues.length,
+    cols: catColValues.length > 0 ? catColValues.length : 1,
+    errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
   };
 }

@@ -1,20 +1,18 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import { useMemo } from 'react';
 import Select from 'react-select';
-import { CategoricalColumn, ColumnInfo, EColumnTypes, NumericalColumn } from '../interfaces';
+import { ColumnInfo, EColumnTypes, VisColumn } from '../interfaces';
 import { formatOptionLabel } from './utils';
 
 interface CategoricalColumnSelectProps {
   callback: (s: ColumnInfo[]) => void;
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   currentSelected: ColumnInfo[];
 }
 
-export function CategoricalColumnSelect(props: CategoricalColumnSelectProps) {
-  const selectCatOptions = useMemo(() => {
-    return props.columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
-  }, [props.columns.length]);
+export function CategoricalColumnSelect({ callback, columns, currentSelected }: CategoricalColumnSelectProps) {
+  const selectCatOptions = React.useMemo(() => {
+    return columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
+  }, [columns]);
 
   return (
     <>
@@ -25,10 +23,10 @@ export function CategoricalColumnSelect(props: CategoricalColumnSelectProps) {
         formatOptionLabel={formatOptionLabel}
         getOptionLabel={(option) => option.name}
         getOptionValue={(option) => option.id}
-        onChange={(e) => props.callback(e.map((c) => c))}
+        onChange={(e) => callback(e.map((c) => c))}
         name="numColumns"
         options={selectCatOptions}
-        value={selectCatOptions.filter((c) => props.currentSelected.filter((d) => d.id === c.id).length > 0)}
+        value={selectCatOptions.filter((c) => currentSelected.filter((d) => d.id === c.id).length > 0)}
       />
     </>
   );

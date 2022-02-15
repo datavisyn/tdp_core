@@ -6,7 +6,7 @@ interface BarDirectionProps {
   currentSelected: EBarDirection;
 }
 
-export function BarDirectionButtons(props: BarDirectionProps) {
+export function BarDirectionButtons({ callback, currentSelected }: BarDirectionProps) {
   const options = [EBarDirection.VERTICAL, EBarDirection.HORIZONTAL];
   return (
     <div key="barDirectionGroup" className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
@@ -14,8 +14,8 @@ export function BarDirectionButtons(props: BarDirectionProps) {
         return (
           <React.Fragment key={`radioButtonsFilter${opt}`}>
             <input
-              checked={props.currentSelected === opt}
-              onChange={(e) => props.callback(e.currentTarget.value as EBarDirection)}
+              checked={currentSelected === opt}
+              onChange={(e) => callback(e.currentTarget.value as EBarDirection)}
               value={opt}
               type="checkbox"
               className="btn-check"

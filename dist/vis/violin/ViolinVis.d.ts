@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumn, NumericalColumn, Scales, IVisConfig, IViolinConfig } from '../interfaces';
+import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
 interface ViolinVisProps {
     config: IViolinConfig;
     optionsConfig?: {
@@ -14,7 +14,7 @@ interface ViolinVisProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
 }

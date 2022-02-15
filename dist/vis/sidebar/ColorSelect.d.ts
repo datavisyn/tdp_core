@@ -1,9 +1,10 @@
-import { CategoricalColumn, ColumnInfo, ENumericalColorScaleType, NumericalColumn } from '../interfaces';
+/// <reference types="react" />
+import { ColumnInfo, VisColumn, ENumericalColorScaleType } from '../interfaces';
 interface ColorSelectProps {
     callback: (c: ColumnInfo) => void;
     numTypeCallback?: (c: ENumericalColorScaleType) => void;
     currentNumType?: ENumericalColorScaleType;
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     currentSelected: ColumnInfo | null;
 }
 export declare function ColorSelect({ callback, numTypeCallback, currentNumType, columns, currentSelected }: ColorSelectProps): JSX.Element;

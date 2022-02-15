@@ -13,26 +13,6 @@ export const allVisTypes = [
     ESupportedPlotlyVis.STRIP,
     ESupportedPlotlyVis.PCP,
 ];
-export var EColumnTypes;
-(function (EColumnTypes) {
-    EColumnTypes["NUMERICAL"] = "Numerical";
-    EColumnTypes["CATEGORICAL"] = "Categorical";
-})(EColumnTypes || (EColumnTypes = {}));
-export var EGeneralFormType;
-(function (EGeneralFormType) {
-    EGeneralFormType["DROPDOWN"] = "Dropdown";
-    EGeneralFormType["BUTTON"] = "Button";
-    EGeneralFormType["SLIDER"] = "Slider";
-})(EGeneralFormType || (EGeneralFormType = {}));
-export var EFilterOptions;
-(function (EFilterOptions) {
-    EFilterOptions["IN"] = "Filter In";
-    EFilterOptions["OUT"] = "Filter Out";
-    EFilterOptions["CLEAR"] = "Clear Filter";
-})(EFilterOptions || (EFilterOptions = {}));
-/**
- * Bar chart enums
- */
 export var EBarDisplayType;
 (function (EBarDisplayType) {
     EBarDisplayType["DEFAULT"] = "Default";
@@ -54,9 +34,23 @@ export var EBarGroupingType;
     EBarGroupingType["STACK"] = "Stacked";
     EBarGroupingType["GROUP"] = "Grouped";
 })(EBarGroupingType || (EBarGroupingType = {}));
-/**
- * Scatter chart enums
- */
+export var EColumnTypes;
+(function (EColumnTypes) {
+    EColumnTypes["NUMERICAL"] = "Numerical";
+    EColumnTypes["CATEGORICAL"] = "Categorical";
+})(EColumnTypes || (EColumnTypes = {}));
+export var EGeneralFormType;
+(function (EGeneralFormType) {
+    EGeneralFormType["DROPDOWN"] = "Dropdown";
+    EGeneralFormType["BUTTON"] = "Button";
+    EGeneralFormType["SLIDER"] = "Slider";
+})(EGeneralFormType || (EGeneralFormType = {}));
+export var EFilterOptions;
+(function (EFilterOptions) {
+    EFilterOptions["IN"] = "Filter In";
+    EFilterOptions["OUT"] = "Filter Out";
+    EFilterOptions["CLEAR"] = "Clear Filter";
+})(EFilterOptions || (EFilterOptions = {}));
 export var ENumericalColorScaleType;
 (function (ENumericalColorScaleType) {
     ENumericalColorScaleType["SEQUENTIAL"] = "Sequential";
