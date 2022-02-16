@@ -7,7 +7,7 @@ import { IPluginDesc, IPlugin, IEventHandler } from '.';
 import { IDType } from '../idtype';
 import { ProvenanceGraph, IObjectRef } from '../provenance';
 import { IUser } from '../security';
-import { IVisynViewProps } from '../views/VisynView';
+import { IVisynViewProps } from '../views/interfaces';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * used internally to match selections to column

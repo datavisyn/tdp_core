@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
-import { ReactElement, ReactNode } from 'react';
 import { AppHeader } from '../components';
 import { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
@@ -8,7 +7,7 @@ import { IPluginDesc, IPlugin, IEventHandler } from '.';
 import { IDType } from '../idtype';
 import { ProvenanceGraph, IObjectRef } from '../provenance';
 import { IUser } from '../security';
-import { IVisynViewProps } from '../views/VisynView';
+import {IVisynViewProps} from '../views/interfaces';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
