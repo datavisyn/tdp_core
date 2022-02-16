@@ -3,7 +3,12 @@ import { useMemo } from 'react';
 import { merge } from 'lodash';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { BarDirectionButtons, BarDisplayButtons, BarGroupTypeButtons, CategoricalColumnSelect, GroupSelect, MultiplesSelect } from '..';
+import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
+import { GroupSelect } from '../sidebar/GroupSelect';
+import { MultiplesSelect } from '../sidebar/MultiplesSelect';
+import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
+import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
+import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
 const defaultConfig = {
     group: {
         enable: true,
@@ -33,15 +38,12 @@ const defaultExtensions = {
     postSidebar: null,
 };
 export function BarVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }) {
-    const uniqueId = useMemo(() => {
-        return Math.random().toString(36).substr(2, 5);
-    }, []);
     const mergedOptionsConfig = useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
-    }, []);
+    }, [optionsConfig]);
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
-    }, []);
+    }, [extensions]);
     return (React.createElement("div", { className: "container pb-3 pt-2", style: { width } },
         React.createElement(WarningMessage, null),
         React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),

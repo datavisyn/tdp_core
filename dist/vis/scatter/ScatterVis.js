@@ -8,8 +8,8 @@ import { beautifyLayout } from '../layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
-import { PlotlyComponent, useAsync } from '../..';
-import Plotly from 'plotly.js';
+import { PlotlyComponent, Plotly } from '../Plot';
+import { useAsync } from '../../hooks';
 const defaultConfig = {
     color: {
         enable: true,

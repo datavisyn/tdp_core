@@ -1,22 +1,15 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import {
-  CategoricalColumn,
-  ColumnInfo,
-  EBarDirection,
-  EBarDisplayType,
-  EBarGroupingType,
-  EFilterOptions,
-  ESupportedPlotlyVis,
-  IBarConfig,
-  NumericalColumn,
-  IVisConfig,
-} from '../interfaces';
+import { ColumnInfo, EBarDirection, EBarDisplayType, EBarGroupingType, ESupportedPlotlyVis, IBarConfig, IVisConfig, VisColumn } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
-import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { BarDirectionButtons, BarDisplayButtons, BarGroupTypeButtons, CategoricalColumnSelect, GroupSelect, MultiplesSelect } from '..';
+import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
+import { GroupSelect } from '../sidebar/GroupSelect';
+import { MultiplesSelect } from '../sidebar/MultiplesSelect';
+import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
+import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
+import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
 
 interface BarVisSidebarProps {
   config: IBarConfig;
@@ -48,7 +41,7 @@ interface BarVisSidebarProps {
     preSidebar?: React.ReactNode;
     postSidebar?: React.ReactNode;
   };
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   width?: string;
 }
@@ -84,17 +77,13 @@ const defaultExtensions = {
 };
 
 export function BarVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }: BarVisSidebarProps) {
-  const uniqueId = useMemo(() => {
-    return Math.random().toString(36).substr(2, 5);
-  }, []);
-
   const mergedOptionsConfig = useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
-  }, []);
+  }, [optionsConfig]);
 
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   return (
     <div className="container pb-3 pt-2" style={{ width }}>

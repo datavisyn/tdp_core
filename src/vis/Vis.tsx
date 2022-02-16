@@ -1,6 +1,6 @@
 import * as React from 'react';
 import d3 from 'd3';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { ESupportedPlotlyVis, IVisConfig, Scales, VisColumn, EFilterOptions, ENumericalColorScaleType } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
@@ -88,6 +88,12 @@ export function Vis({
     // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visConfig.type]);
+
+  useEffect(() => {
+    if (externalConfig) {
+      setVisConfig(externalConfig);
+    }
+  }, [externalConfig]);
 
   const scales: Scales = useMemo(() => {
     const colorScale = d3.scale.ordinal().range(colors);

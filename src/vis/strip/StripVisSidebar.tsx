@@ -1,27 +1,24 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, IStripConfig, NumericalColumn, IVisConfig } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, IStripConfig, IVisConfig, VisColumn } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { CategoricalColumnSelect } from '..';
+import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 
 interface StripVisSidebarProps {
   config: IStripConfig;
-  optionsConfig?: {};
   extensions?: {
     prePlot?: React.ReactNode;
     postPlot?: React.ReactNode;
     preSidebar?: React.ReactNode;
     postSidebar?: React.ReactNode;
   };
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   width?: string;
 }
-
-const defaultConfig = {};
 
 const defaultExtensions = {
   prePlot: null,
@@ -29,18 +26,10 @@ const defaultExtensions = {
   preSidebar: null,
   postSidebar: null,
 };
-export function StripVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }: StripVisSidebarProps) {
-  const uniqueId = useMemo(() => {
-    return Math.random().toString(36).substr(2, 5);
-  }, []);
-
-  const mergedOptionsConfig = useMemo(() => {
-    return merge({}, defaultConfig, optionsConfig);
-  }, []);
-
+export function StripVisSidebar({ config, extensions, columns, setConfig, width = '20rem' }: StripVisSidebarProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   return (
     <div className="container pb-3 pt-2" style={{ width }}>

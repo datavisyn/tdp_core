@@ -1,27 +1,23 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { CategoricalColumn, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, IPCPConfig, NumericalColumn, IVisConfig } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, IPCPConfig, IVisConfig, VisColumn } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
-import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { CategoricalColumnSelect } from '..';
+import { AllColumnSelect } from '../sidebar';
 
 interface PCPVisSidebarProps {
   config: IPCPConfig;
-  optionsConfig?: {};
   extensions?: {
     prePlot?: React.ReactNode;
     postPlot?: React.ReactNode;
     preSidebar?: React.ReactNode;
     postSidebar?: React.ReactNode;
   };
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   width?: string;
 }
-
-const defaultConfig = {};
 
 const defaultExtensions = {
   prePlot: null,
@@ -29,33 +25,20 @@ const defaultExtensions = {
   preSidebar: null,
   postSidebar: null,
 };
-export function PCPVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }: PCPVisSidebarProps) {
-  const uniqueId = useMemo(() => {
-    return Math.random().toString(36).substr(2, 5);
-  }, []);
-
-  const mergedOptionsConfig = useMemo(() => {
-    return merge({}, defaultConfig, optionsConfig);
-  }, []);
-
+export function PCPVisSidebar({ config, extensions, columns, setConfig, width = '20rem' }: PCPVisSidebarProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   return (
     <div className="container pb-3 pt-2" style={{ width }}>
       <WarningMessage />
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />
-      <NumericalColumnSelect
-        callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
+      <AllColumnSelect
+        callback={(allColumnsSelected: ColumnInfo[]) => setConfig({ ...config, allColumnsSelected })}
         columns={columns}
-        currentSelected={config.numColumnsSelected || []}
-      />
-      <CategoricalColumnSelect
-        callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
-        columns={columns}
-        currentSelected={config.catColumnsSelected || []}
+        currentSelected={config.allColumnsSelected || []}
       />
       <hr />
       {mergedExtensions.preSidebar}

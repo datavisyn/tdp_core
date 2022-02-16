@@ -7,8 +7,8 @@ import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';
-import {createBarTraces} from './utils';
-import {BarVisSidebar} from './BarVisSidebar';
+import { createBarTraces } from './utils';
+import { BarVisSidebar } from './BarVisSidebar';
 
 interface BarVisProps {
   config: IBarConfig;

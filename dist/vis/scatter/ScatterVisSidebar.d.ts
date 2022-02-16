@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumn, EFilterOptions, IScatterConfig, NumericalColumn, IVisConfig } from '../interfaces';
+import { EFilterOptions, IScatterConfig, IVisConfig, VisColumn } from '../interfaces';
 interface ScatterVisSidebarProps {
     config: IScatterConfig;
     optionsConfig?: {
@@ -22,7 +22,7 @@ interface ScatterVisSidebarProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     filterCallback?: (s: EFilterOptions) => void;
     setConfig: (config: IVisConfig) => void;
     width?: string;

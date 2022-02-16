@@ -1,16 +1,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import {
-  CategoricalColumn,
-  ColumnInfo,
-  EFilterOptions,
-  ENumericalColorScaleType,
-  ESupportedPlotlyVis,
-  IScatterConfig,
-  NumericalColumn,
-  IVisConfig,
-} from '../interfaces';
+import { ColumnInfo, EFilterOptions, ENumericalColorScaleType, ESupportedPlotlyVis, IScatterConfig, IVisConfig, VisColumn } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { ColorSelect } from '../sidebar/ColorSelect';
@@ -40,7 +31,7 @@ interface ScatterVisSidebarProps {
     preSidebar?: React.ReactNode;
     postSidebar?: React.ReactNode;
   };
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
   setConfig: (config: IVisConfig) => void;
   width?: string;
@@ -77,17 +68,13 @@ export function ScatterVisSidebar({
   setConfig,
   width = '20rem',
 }: ScatterVisSidebarProps) {
-  const uniqueId = useMemo(() => {
-    return Math.random().toString(36).substr(2, 5);
-  }, []);
-
   const mergedOptionsConfig = useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
-  }, []);
+  }, [optionsConfig]);
 
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   return (
     <div className="container pb-3 pt-2" style={{ width }}>

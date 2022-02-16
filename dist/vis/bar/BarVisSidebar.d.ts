@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumn, IBarConfig, NumericalColumn, IVisConfig } from '../interfaces';
+import { IBarConfig, IVisConfig, VisColumn } from '../interfaces';
 interface BarVisSidebarProps {
     config: IBarConfig;
     optionsConfig?: {
@@ -30,7 +30,7 @@ interface BarVisSidebarProps {
         preSidebar?: React.ReactNode;
         postSidebar?: React.ReactNode;
     };
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
     width?: string;
 }
