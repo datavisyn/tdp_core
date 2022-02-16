@@ -143,15 +143,16 @@ export abstract class ARankingView extends AView {
         node.classList.toggle('lu-searchbox-summary-entry', Boolean(summary));
         if (summary) {
           const label = node.ownerDocument.createElement('span');
-          label.textContent = item.desc.label;
+          label.innerHTML = item.desc.label;
           node.appendChild(label);
           const desc = node.ownerDocument.createElement('span');
-          desc.textContent = summary;
+          desc.innerHTML = summary;
           node.appendChild(desc);
+          return undefined;
         }
-      } else {
-        node.textContent = item.text;
       }
+      node.innerHTML = item.text;
+      return item.text;
     },
     panelAddColumnBtnOptions: {},
   };
