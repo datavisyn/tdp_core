@@ -6,6 +6,26 @@ import { PlotlyInfo, VisColumn } from '../interfaces';
  * @returns the changed layout
  */
 export declare function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout): import("plotly.js").Layout;
-export declare function resolveColumnValues(columns: VisColumn[]): Promise<any[]>;
-export declare function resolveSingleColumn(column: VisColumn): Promise<any>;
+export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
+    resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
+    type: import("../interfaces").EColumnTypes.NUMERICAL;
+    info: import("../interfaces").ColumnInfo;
+    values: () => Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
+} | {
+    resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
+    type: import("../interfaces").EColumnTypes.CATEGORICAL;
+    info: import("../interfaces").ColumnInfo;
+    values: () => Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
+})[]>;
+export declare function resolveSingleColumn(column: VisColumn): Promise<{
+    resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
+    type: import("../interfaces").EColumnTypes.NUMERICAL;
+    info: import("../interfaces").ColumnInfo;
+    values: () => Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
+} | {
+    resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
+    type: import("../interfaces").EColumnTypes.CATEGORICAL;
+    info: import("../interfaces").ColumnInfo;
+    values: () => Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
+}>;
 //# sourceMappingURL=layoutUtils.d.ts.map

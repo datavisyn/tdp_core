@@ -1,3 +1,4 @@
+export * from './AllColumnSelect';
 export * from './BarDirectionButtons';
 export * from './BarDisplayTypeButtons';
 export * from './BarGroupTypeButtons';
@@ -11,6 +12,7 @@ export * from './NumericalColorButtons';
 export * from './NumericalColumnSelect';
 export * from './OpacitySlider';
 export * from './ShapeSelect';
+export * from './utils';
 export * from './ViolinOverlayButtons';
 export * from './VisTypeSelect';
 export * from './WarningMessage';

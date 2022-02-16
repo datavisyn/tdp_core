@@ -62,7 +62,7 @@ export class ViewUtils {
         if (aNull || bNull) {
             return aNull === bNull;
         }
-        const base = a.idtype.id === b.idtype.id && isEqual((_a = a.ids) === null || _a === void 0 ? void 0 : _a.sort(), (_b = b.ids) === null || _b === void 0 ? void 0 : _b.sort());
+        const base = a.idtype.id === b.idtype.id && isEqual((_a = [...a.ids]) === null || _a === void 0 ? void 0 : _a.sort(), (_b = [...b.ids]) === null || _b === void 0 ? void 0 : _b.sort());
         if (!base) {
             return false;
         }

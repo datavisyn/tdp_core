@@ -1,28 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
-import Plot from 'react-plotly.js';
 import d3 from 'd3';
-import { merge } from 'lodash';
-import Plotly from 'plotly.js';
-import {
-  CategoricalColumn,
-  ColumnInfo,
-  EBarDirection,
-  EBarDisplayType,
-  EBarGroupingType,
-  ESupportedPlotlyVis,
-  IBarConfig,
-  NumericalColumn,
-  PlotlyInfo,
-  Scales,
-  IVisConfig,
-} from '../interfaces';
-
-import { InvalidCols } from '../InvalidCols';
-import { beautifyLayout } from '../layoutUtils';
-import { createBarTraces } from './utils';
-import { BarVisSidebar } from './BarVisSidebar';
+import { merge, uniqueId } from 'lodash';
+import { useEffect } from 'react';
+import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
+import { PlotlyComponent, Plotly } from '../Plot';
+import { InvalidCols } from '../general';
+import { beautifyLayout } from '../general/layoutUtils';
+import { useAsync } from '../../hooks';
+import {createBarTraces} from './utils';
+import {BarVisSidebar} from './BarVisSidebar';
 
 interface BarVisProps {
   config: IBarConfig;
@@ -54,7 +40,7 @@ interface BarVisProps {
     preSidebar?: React.ReactNode;
     postSidebar?: React.ReactNode;
   };
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   hideSidebar?: boolean;
@@ -91,41 +77,42 @@ const defaultExtensions = {
 };
 
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }: BarVisProps) {
-  const mergedOptionsConfig = useMemo(() => {
+  const mergedOptionsConfig = React.useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
-  }, []);
+  }, [optionsConfig]);
 
-  const mergedExtensions = useMemo(() => {
+  const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
-  const traces: PlotlyInfo = useMemo(() => {
-    return createBarTraces(columns, config, scales);
-  }, [columns, config, scales]);
+  const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
 
-  const uniqueId = useMemo(() => {
-    return Math.random().toString(36).substr(2, 5);
-  }, []);
+  const id = React.useMemo(() => uniqueId('BarVis'), []);
 
   useEffect(() => {
     if (hideSidebar) {
       return;
     }
-    const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
+    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
 
     menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [hideSidebar]);
+  }, [id, hideSidebar]);
 
-  const layout = useMemo(() => {
-    const layout = {
+  const layout = React.useMemo(() => {
+    if (!traces) {
+      return null;
+    }
+
+    const innerLayout: Plotly.Layout = {
       showlegend: true,
       legend: {
+        // @ts-ignore
         itemclick: false,
         itemdoubleclick: false,
       },
@@ -136,40 +123,37 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
       barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
     };
 
-    return beautifyLayout(traces, layout);
+    return beautifyLayout(traces, innerLayout);
   }, [traces, config.groupType]);
 
   return (
     <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
-      <div className="position-relative d-flex justify-content-center align-items-center flex-grow-1">
+      <div
+        className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
+          traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
+        }`}
+      >
         {mergedExtensions.prePlot}
-        {traces.plots.length > 0 ? (
-          <Plot
-            divId={`plotlyDiv${uniqueId}`}
+        {traceStatus === 'success' && traces?.plots.length > 0 ? (
+          <PlotlyComponent
+            divId={`plotlyDiv${id}`}
             data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-            layout={layout as any}
+            layout={layout}
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
             // plotly redraws everything on updates, so you need to reappend title and
-            // change opacity on update, instead of just in a use effect
             onUpdate={() => {
               for (const p of traces.plots) {
-                d3.select(`g .${(p.data as any).xaxis}title`)
-                  .style('pointer-events', 'all')
-                  .append('title')
-                  .text(p.xLabel);
+                d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
 
-                d3.select(`g .${(p.data as any).yaxis}title`)
-                  .style('pointer-events', 'all')
-                  .append('title')
-                  .text(p.yLabel);
+                d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
               }
             }}
           />
-        ) : (
-          <InvalidCols message={traces.errorMessage} />
-        )}
+        ) : traceStatus !== 'pending' ? (
+          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+        ) : null}
         {mergedExtensions.postPlot}
       </div>
       {!hideSidebar ? (

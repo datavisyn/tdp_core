@@ -21,9 +21,8 @@ function useBSClass(clazz, ...options) {
             // Set instance to null if no ref is passed
             return null;
         });
-    }, 
-    // TODO: Check if this causes problems when rerendering
-    [clazz, options]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     React.useEffect(() => {
         // Whenever we are unmounting (an instance), destroy it.
         // console.trace("TEST");
@@ -59,7 +58,8 @@ export const useBSDropdown = __useBSClass(Dropdown);
  */
 class ReferenceWrapper extends React.Component {
     render() {
-        return React.Children.only(this.props.children);
+        const { children } = this.props;
+        return React.Children.only(children);
     }
 }
 ReferenceWrapper.displayName = 'BSReferenceWrapper';
@@ -77,7 +77,8 @@ function BSClass(hook, additionalHook) {
         // Store the ref to the onInstance callback to avoid putting it into the deps
         React.useEffect(() => {
             instanceRef === null || instanceRef === void 0 ? void 0 : instanceRef(instance);
-        }, [instanceRef, instance]);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [instance]);
         // Call the optional additional hook with all options
         additionalHook === null || additionalHook === void 0 ? void 0 : additionalHook(instance, options);
         const callbackRef = React.useCallback((wrapperRef) => {
@@ -172,7 +173,8 @@ export const BSOffcanvas = BSClass(useBSOffcanvas, (instance, { show, relatedTar
         else {
             instance === null || instance === void 0 ? void 0 : instance.hide();
         }
-    }, [show, instance, relatedTarget]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, instance]);
 });
 export const BSTooltip = BSClass(useBSTooltip, (instance, { show, setShow }) => {
     useBSListeners(instance, {

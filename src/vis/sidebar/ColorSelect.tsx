@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Select from 'react-select';
-import { CategoricalColumn, ColumnInfo, EColumnTypes, ENumericalColorScaleType, NumericalColumn } from '../interfaces';
+import { ColumnInfo, EColumnTypes, VisColumn, ENumericalColorScaleType } from '../interfaces';
 import { formatOptionLabel, getCol } from './utils';
 import { NumericalColorButtons } from './NumericalColorButtons';
 
@@ -8,7 +8,7 @@ interface ColorSelectProps {
   callback: (c: ColumnInfo) => void;
   numTypeCallback?: (c: ENumericalColorScaleType) => void;
   currentNumType?: ENumericalColorScaleType;
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   currentSelected: ColumnInfo | null;
 }
 

@@ -1,9 +1,9 @@
-import { CategoricalColumn, ColumnInfo, NumericalColumn } from '../interfaces';
+import { ColumnInfo, VisColumn } from '../interfaces';
 interface NumericalColumnSelectProps {
     callback: (s: ColumnInfo[]) => void;
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     currentSelected: ColumnInfo[];
 }
-export declare function NumericalColumnSelect(props: NumericalColumnSelectProps): JSX.Element;
+export declare function NumericalColumnSelect({ callback, columns, currentSelected }: NumericalColumnSelectProps): JSX.Element;
 export {};
 //# sourceMappingURL=NumericalColumnSelect.d.ts.map

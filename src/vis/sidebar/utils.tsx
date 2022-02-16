@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Highlighter from 'react-highlight-words';
-import { CategoricalColumn, ColumnInfo, NumericalColumn } from '../interfaces';
+import { ColumnInfo, VisNumericalColumn, VisCategoricalColumn, VisColumn } from '../interfaces';
 
 export const formatOptionLabel = (option, ctx) => {
   return (
@@ -11,7 +11,7 @@ export const formatOptionLabel = (option, ctx) => {
   );
 };
 
-export function getCol(columns: (NumericalColumn | CategoricalColumn)[], info: ColumnInfo | null): NumericalColumn | CategoricalColumn | null {
+export function getCol(columns: VisColumn[], info: ColumnInfo | null): VisNumericalColumn | VisCategoricalColumn | null {
   if (!info) {
     return null;
   }

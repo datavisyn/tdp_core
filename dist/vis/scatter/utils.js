@@ -1,8 +1,10 @@
 import { merge } from 'lodash';
 import d3 from 'd3';
-import { EColumnTypes, ENumericalColorScaleType, ESupportedPlotlyVis, } from '../interfaces';
-import { getCol } from '../sidebar/utils';
+import { EColumnTypes, ESupportedPlotlyVis, ENumericalColorScaleType, } from '../interfaces';
+import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
+import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
+import { I18nextManager } from '../../i18n';
 export function isScatter(s) {
     return s.type === ESupportedPlotlyVis.SCATTER;
 }
@@ -32,32 +34,35 @@ export function scatterMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
-const emptyVal = {
-    plots: [],
-    legendPlots: [],
-    rows: 0,
-    cols: 0,
-    errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
-    formList: ['color', 'shape', 'bubble', 'opacity'],
-};
-export function createScatterTraces(columns, selected, config, scales, shapes) {
+export async function createScatterTraces(columns, selected, config, scales, shapes) {
     let plotCounter = 1;
+    const emptyVal = {
+        plots: [],
+        legendPlots: [],
+        rows: 0,
+        cols: 0,
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+        formList: ['color', 'shape', 'bubble', 'opacity'],
+    };
     if (!config.numColumnsSelected) {
         return emptyVal;
     }
-    const validCols = config.numColumnsSelected.map((c) => columns.filter((col) => col.type === EColumnTypes.NUMERICAL && col.info.id === c.id)[0]);
+    const numCols = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
     const plots = [];
+    const validCols = await resolveColumnValues(numCols);
+    const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
+    const colorCol = await resolveSingleColumn(getCol(columns, config.color));
     const shapeScale = config.shape
         ? d3.scale
             .ordinal()
-            .domain([...new Set(getCol(columns, config.shape).values.map((v) => v.val))])
+            .domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))])
             .range(shapes)
         : null;
     let min = 0;
     let max = 0;
     if (config.color) {
-        min = d3.min(getCol(columns, config.color).values.map((v) => +v.val).filter((v) => v !== null));
-        max = d3.max(getCol(columns, config.color).values.map((v) => +v.val).filter((v) => v !== null));
+        min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+        max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
     }
     const numericalColorScale = config.color
         ? d3.scale
@@ -76,23 +81,23 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
     if (validCols.length === 2) {
         plots.push({
             data: {
-                x: validCols[0].values.map((v) => v.val),
-                y: validCols[1].values.map((v) => v.val),
-                ids: validCols[0].values.map((v) => v.id.toString()),
+                x: validCols[0].resolvedValues.map((v) => v.val),
+                y: validCols[1].resolvedValues.map((v) => v.val),
+                ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
                 xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
                 yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                 type: 'scattergl',
                 mode: 'markers',
                 showlegend: false,
-                text: validCols[0].values.map((v) => v.id.toString()),
+                text: validCols[0].resolvedValues.map((v) => v.id.toString()),
                 marker: {
                     line: {
                         width: 0,
                     },
-                    symbol: getCol(columns, config.shape) ? getCol(columns, config.shape).values.map((v) => shapeScale(v.val)) : 'circle',
-                    color: getCol(columns, config.color)
-                        ? getCol(columns, config.color).values.map((v) => selected[v.id] ? '#E29609' : getCol(columns, config.color).type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
-                        : validCols[0].values.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
+                    symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
+                    color: colorCol
+                        ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
+                        : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
                     opacity: config.alphaSliderVal,
                     size: 10,
                 },
@@ -106,9 +111,9 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
             for (const xCurr of validCols) {
                 plots.push({
                     data: {
-                        x: xCurr.values.map((v) => v.val),
-                        y: yCurr.values.map((v) => v.val),
-                        ids: xCurr.values.map((v) => v.id.toString()),
+                        x: xCurr.resolvedValues.map((v) => v.val),
+                        y: yCurr.resolvedValues.map((v) => v.val),
+                        ids: xCurr.resolvedValues.map((v) => v.id.toString()),
                         xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
                         yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                         type: 'scattergl',
@@ -117,19 +122,15 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
                             namelength: 5,
                         },
                         showlegend: false,
-                        text: validCols[0].values.map((v) => v.id.toString()),
+                        text: validCols[0].resolvedValues.map((v) => v.id.toString()),
                         marker: {
                             line: {
                                 width: 0,
                             },
-                            symbol: getCol(columns, config.shape) ? getCol(columns, config.shape).values.map((v) => shapeScale(v.val)) : 'circle',
-                            color: getCol(columns, config.color)
-                                ? getCol(columns, config.color).values.map((v) => selected[v.id]
-                                    ? '#E29609'
-                                    : getCol(columns, config.color).type === EColumnTypes.NUMERICAL
-                                        ? numericalColorScale(v.val)
-                                        : scales.color(v.val))
-                                : xCurr.values.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
+                            symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
+                            color: colorCol
+                                ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
+                                : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
                             opacity: config.alphaSliderVal,
                             size: 10,
                         },
@@ -142,18 +143,19 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
         }
     }
     // if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
-    if (getCol(columns, config.color) && getCol(columns, config.color).type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
+    if (colorCol && colorCol.type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
         legendPlots.push({
             data: {
-                x: validCols[0].values.map((v) => v.val),
-                y: validCols[0].values.map((v) => v.val),
-                ids: validCols[0].values.map((v) => v.id),
+                x: validCols[0].resolvedValues.map((v) => v.val),
+                y: validCols[0].resolvedValues.map((v) => v.val),
+                ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
                 xaxis: 'x',
                 yaxis: 'y',
                 type: 'scattergl',
                 mode: 'markers',
                 visible: 'legendonly',
                 legendgroup: 'color',
+                // @ts-ignore
                 legendgrouptitle: {
                     text: 'Color',
                 },
@@ -163,15 +165,15 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
                     },
                     symbol: 'circle',
                     size: 10,
-                    color: getCol(columns, config.color) ? getCol(columns, config.color).values.map((v) => scales.color(v.val)) : '#2e2e2e',
+                    color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
                     opacity: 0.5,
                 },
                 transforms: [
                     {
                         type: 'groupby',
-                        groups: getCol(columns, config.color).values.map((v) => v.val),
+                        groups: colorCol.resolvedValues.map((v) => v.val),
                         styles: [
-                            ...[...new Set(getCol(columns, config.color).values.map((v) => v.val))].map((c) => {
+                            ...[...new Set(colorCol.resolvedValues.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { name: c } };
                             }),
                         ],
@@ -183,12 +185,12 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
         });
     }
     // if we have a column for the shape, add a legendPlot that creates a legend.
-    if (getCol(columns, config.shape)) {
+    if (shapeCol) {
         legendPlots.push({
             data: {
-                x: validCols[0].values.map((v) => v.val),
-                y: validCols[0].values.map((v) => v.val),
-                ids: validCols[0].values.map((v) => v.id.toString()),
+                x: validCols[0].resolvedValues.map((v) => v.val),
+                y: validCols[0].resolvedValues.map((v) => v.val),
+                ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
                 xaxis: 'x',
                 yaxis: 'y',
                 type: 'scattergl',
@@ -196,6 +198,7 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
                 visible: 'legendonly',
                 showlegend: true,
                 legendgroup: 'shape',
+                // @ts-ignore
                 legendgrouptitle: {
                     text: 'Shape',
                 },
@@ -205,15 +208,15 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
                     },
                     opacity: config.alphaSliderVal,
                     size: 10,
-                    symbol: getCol(columns, config.shape) ? getCol(columns, config.shape).values.map((v) => shapeScale(v.val)) : 'circle',
+                    symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
                     color: '#2e2e2e',
                 },
                 transforms: [
                     {
                         type: 'groupby',
-                        groups: getCol(columns, config.shape).values.map((v) => v.val),
+                        groups: shapeCol.resolvedValues.map((v) => v.val),
                         styles: [
-                            ...[...new Set(getCol(columns, config.shape).values.map((v) => v.val))].map((c) => {
+                            ...[...new Set(shapeCol.resolvedValues.map((v) => v.val))].map((c) => {
                                 return { target: c, value: { name: c } };
                             }),
                         ],
@@ -229,7 +232,7 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
         legendPlots,
         rows: Math.sqrt(plots.length),
         cols: Math.sqrt(plots.length),
-        errorMessage: 'To create a Scatterplot, please select at least 2 numerical columns.',
+        errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
     };
 }
 //# sourceMappingURL=utils.js.map

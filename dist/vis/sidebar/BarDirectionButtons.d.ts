@@ -3,6 +3,6 @@ interface BarDirectionProps {
     callback: (s: EBarDirection) => void;
     currentSelected: EBarDirection;
 }
-export declare function BarDirectionButtons(props: BarDirectionProps): JSX.Element;
+export declare function BarDirectionButtons({ callback, currentSelected }: BarDirectionProps): JSX.Element;
 export {};
 //# sourceMappingURL=BarDirectionButtons.d.ts.map

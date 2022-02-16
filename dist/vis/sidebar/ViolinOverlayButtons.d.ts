@@ -3,6 +3,6 @@ interface ViolinOverlayProps {
     callback: (s: EViolinOverlay) => void;
     currentSelected: EViolinOverlay;
 }
-export declare function ViolinOverlayButtons(props: ViolinOverlayProps): JSX.Element;
+export declare function ViolinOverlayButtons({ callback, currentSelected }: ViolinOverlayProps): JSX.Element;
 export {};
 //# sourceMappingURL=ViolinOverlayButtons.d.ts.map

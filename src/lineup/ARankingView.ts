@@ -36,11 +36,12 @@ import { LineupUtils } from './utils';
 import { ISearchOption } from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
-import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
-import { BaseUtils, debounceAsync } from '../base';
+import { BaseUtils } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { ISecureItem } from '../security';
+import { debounceAsync } from '../base/BaseUtils';
+import { LineupVisWrapper } from '../vis';
 
 /**
  * base class for views based on LineUp
@@ -68,7 +69,7 @@ export abstract class ARankingView extends AView {
 
   private readonly panel: LineUpPanelActions;
 
-  private readonly generalVis: GeneralVisWrapper;
+  private readonly generalVis: LineupVisWrapper;
 
   /**
    * clears and rebuilds this lineup instance from scratch
@@ -105,7 +106,7 @@ export abstract class ARankingView extends AView {
     subType: { key: '', value: '' },
     enableOverviewMode: true,
     enableZoom: true,
-    enableCustomVis: true,
+    enableVisPanel: true,
     enableDownload: true,
     enableSaveRanking: true,
     enableAddingColumns: true,
@@ -236,7 +237,15 @@ export abstract class ARankingView extends AView {
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-    this.generalVis = new GeneralVisWrapper(this.provider, this.idType, this.selectionHelper, this.node.ownerDocument);
+
+    const id = IDTypeManager.getInstance().resolveIdType(this.itemIDType.id);
+    this.generalVis = new LineupVisWrapper({
+      provider: this.provider,
+      selectionCallback: (visynIds) => {
+        this.selectionHelper.setGeneralVisSelection({ idtype: id, ids: visynIds });
+      },
+      doc: this.node.ownerDocument,
+    });
 
     // When a new column desc is added to the provider, update the panel chooser
     this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
@@ -281,7 +290,6 @@ export abstract class ARankingView extends AView {
       }
     }
 
-    this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel: ISelection) => {
       this.setItemSelection(sel);
       this.generalVis.updateCustomVis();

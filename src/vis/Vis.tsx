@@ -1,48 +1,13 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import d3 from 'd3';
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { barMergeDefaultConfig, isBar } from './bar/utils';
-import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { CategoricalColumn, NumericalColumn, ENumericalColorScaleType, ESupportedPlotlyVis, IVisConfig, Scales } from './interfaces';
-import { ScatterVis } from './scatter/ScatterVis';
-import { ViolinVis } from './violin/ViolinVis';
-import { isViolin, violinMergeDefaultConfig } from './violin/utils';
-import { isStrip, stripMergeDefaultConfig } from './strip/utils';
-import { StripVis } from './strip/StripVis';
-import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
-import { PCPVis } from './pcp/PCPVis';
-import { BarVis } from './bar/BarVis';
-import { getCssValue } from '../utils/getCssValue';
-
-export interface VisProps {
-  /**
-   * Required data columns which are displayed.
-   */
-  columns: (NumericalColumn | CategoricalColumn)[];
-  /**
-   * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
-   */
-  selected?: { [key: string]: boolean };
-  /**
-   * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme
-   */
-  colors?: string[];
-  /**
-   * Optional Prop for changing the shapes that are used in shape mapping. Defaults to the circle, square, triangle, star.
-   */
-  shapes?: string[];
-  /**
-   * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
-   */
-  selectionCallback?: (s: string[]) => void;
-  /**
-   * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
-   */
-  filterCallback?: (s: string) => void;
-  externalConfig?: IVisConfig;
-  hideSidebar?: boolean;
-}
+import d3 from 'd3';
+import { useMemo } from 'react';
+import { ESupportedPlotlyVis, IVisConfig, Scales, VisColumn, EFilterOptions, ENumericalColorScaleType } from './interfaces';
+import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
+import { barMergeDefaultConfig, isBar, BarVis } from './bar';
+import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
+import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
+import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
+import { getCssValue } from '../utils';
 
 export function Vis({
   columns,
@@ -64,8 +29,35 @@ export function Vis({
   filterCallback = () => null,
   externalConfig = null,
   hideSidebar = false,
-}: VisProps) {
-  const [visConfig, setVisConfig] = useState<IVisConfig>(
+}: {
+  /**
+   * Required data columns which are displayed.
+   */
+  columns: VisColumn[];
+  /**
+   * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
+   */
+  selected?: { [id: string]: boolean };
+  /**
+   * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme
+   */
+  colors?: string[];
+  /**
+   * Optional Prop for changing the shapes that are used in shape mapping. Defaults to the circle, square, triangle, star.
+   */
+  shapes?: string[];
+  /**
+   * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
+   */
+  selectionCallback?: (s: string[]) => void;
+  /**
+   * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
+   */
+  filterCallback?: (s: EFilterOptions) => void;
+  externalConfig?: IVisConfig;
+  hideSidebar?: boolean;
+}) {
+  const [visConfig, setVisConfig] = React.useState<IVisConfig>(
     externalConfig || {
       type: ESupportedPlotlyVis.SCATTER,
       numColumnsSelected: [],
@@ -77,11 +69,7 @@ export function Vis({
     },
   );
 
-  useEffect(() => {
-    setVisConfig(externalConfig);
-  }, [externalConfig]);
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (isScatter(visConfig)) {
       setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
     }
@@ -97,6 +85,8 @@ export function Vis({
     if (isBar(visConfig)) {
       setVisConfig(barMergeDefaultConfig(columns, visConfig));
     }
+    // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visConfig.type]);
 
   const scales: Scales = useMemo(() => {
@@ -105,7 +95,7 @@ export function Vis({
     return {
       color: colorScale,
     };
-  }, [visConfig]);
+  }, [colors]);
 
   return (
     <>

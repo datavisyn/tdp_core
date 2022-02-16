@@ -1,19 +1,13 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import d3 from 'd3';
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { barMergeDefaultConfig, isBar } from './bar/utils';
-import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { ENumericalColorScaleType, ESupportedPlotlyVis } from './interfaces';
-import { ScatterVis } from './scatter/ScatterVis';
-import { ViolinVis } from './violin/ViolinVis';
-import { isViolin, violinMergeDefaultConfig } from './violin/utils';
-import { isStrip, stripMergeDefaultConfig } from './strip/utils';
-import { StripVis } from './strip/StripVis';
-import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
-import { PCPVis } from './pcp/PCPVis';
-import { BarVis } from './bar/BarVis';
-import { getCssValue } from '../utils/getCssValue';
+import d3 from 'd3';
+import { useMemo } from 'react';
+import { ESupportedPlotlyVis, ENumericalColorScaleType } from './interfaces';
+import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
+import { barMergeDefaultConfig, isBar, BarVis } from './bar';
+import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
+import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
+import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
+import { getCssValue } from '../utils';
 export function Vis({ columns, selected = {}, colors = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
@@ -26,7 +20,7 @@ export function Vis({ columns, selected = {}, colors = [
     getCssValue('visyn-c9'),
     getCssValue('visyn-c10'),
 ], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null, hideSidebar = false, }) {
-    const [visConfig, setVisConfig] = useState(externalConfig || {
+    const [visConfig, setVisConfig] = React.useState(externalConfig || {
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
         color: null,
@@ -35,10 +29,7 @@ export function Vis({ columns, selected = {}, colors = [
         isRectBrush: true,
         alphaSliderVal: 1,
     });
-    useEffect(() => {
-        setVisConfig(externalConfig);
-    }, [externalConfig]);
-    useEffect(() => {
+    React.useEffect(() => {
         if (isScatter(visConfig)) {
             setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
         }
@@ -54,13 +45,15 @@ export function Vis({ columns, selected = {}, colors = [
         if (isBar(visConfig)) {
             setVisConfig(barMergeDefaultConfig(columns, visConfig));
         }
+        // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visConfig.type]);
     const scales = useMemo(() => {
         const colorScale = d3.scale.ordinal().range(colors);
         return {
             color: colorScale,
         };
-    }, [visConfig]);
+    }, [colors]);
     return (React.createElement(React.Fragment, null,
         isScatter(visConfig) ? (React.createElement(ScatterVis, { config: visConfig, optionsConfig: {
                 color: {

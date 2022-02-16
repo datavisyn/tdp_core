@@ -1,14 +1,13 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import { useEffect, useMemo } from 'react';
-import Plot from 'react-plotly.js';
 import d3 from 'd3';
-import { merge } from 'lodash';
-import Plotly from 'plotly.js';
-import { ViolinVisSidebar } from './ViolinVisSidebar';
-import { InvalidCols } from '../InvalidCols';
-import { beautifyLayout } from '../layoutUtils';
+import { merge, uniqueId } from 'lodash';
+import { useEffect } from 'react';
+import { PlotlyComponent, Plotly } from '../Plot';
+import { InvalidCols } from '../general';
+import { beautifyLayout } from '../general/layoutUtils';
 import { createViolinTraces } from './utils';
+import { useAsync } from '../../hooks';
+import { ViolinVisSidebar } from './ViolinVisSidebar';
 const defaultConfig = {
     overlay: {
         enable: true,
@@ -22,34 +21,31 @@ const defaultExtensions = {
     postSidebar: null,
 };
 export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }) {
-    const mergedOptionsConfig = useMemo(() => {
-        return merge({}, defaultConfig, optionsConfig);
-    }, []);
-    const mergedExtensions = useMemo(() => {
+    const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
-    }, []);
-    const traces = useMemo(() => {
-        return createViolinTraces(columns, config, scales);
-    }, [columns, config, scales]);
-    const uniqueId = useMemo(() => {
-        return Math.random().toString(36).substr(2, 5);
-    }, []);
+    }, [extensions]);
+    const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
+    const id = React.useMemo(() => uniqueId('ViolinVis'), []);
     useEffect(() => {
         if (hideSidebar) {
             return;
         }
-        const menu = document.getElementById(`generalVisBurgerMenu${uniqueId}`);
+        const menu = document.getElementById(`generalVisBurgerMenu${id}`);
         menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
         menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${uniqueId}`));
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, [hideSidebar]);
-    const layout = useMemo(() => {
-        const layout = {
+    }, [id, hideSidebar]);
+    const layout = React.useMemo(() => {
+        if (!traces) {
+            return null;
+        }
+        const innerLayout = {
             showlegend: true,
             legend: {
+                // @ts-ignore
                 itemclick: false,
                 itemdoubleclick: false,
             },
@@ -58,26 +54,19 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             shapes: [],
             violingap: 0,
         };
-        return beautifyLayout(traces, layout);
+        return beautifyLayout(traces, innerLayout);
     }, [traces]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
-        React.createElement("div", { className: "position-relative d-flex justify-content-center align-items-center flex-grow-1" },
+        React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
-            traces.plots.length > 0 ? (React.createElement(Plot, { divId: `plotlyDiv${uniqueId}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
+            traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
                 // plotly redraws everything on updates, so you need to reappend title and
-                // change opacity on update, instead of just in a use effect
                 onUpdate: () => {
                     for (const p of traces.plots) {
-                        d3.select(`g .${p.data.xaxis}title`)
-                            .style('pointer-events', 'all')
-                            .append('title')
-                            .text(p.xLabel);
-                        d3.select(`g .${p.data.yaxis}title`)
-                            .style('pointer-events', 'all')
-                            .append('title')
-                            .text(p.yLabel);
+                        d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+                        d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
-                } })) : (React.createElement(InvalidCols, { message: traces.errorMessage })),
+                } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { message: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
             mergedExtensions.postPlot),
         !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${uniqueId}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
