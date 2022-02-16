@@ -36,18 +36,18 @@ export enum EFilterOptions {
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 
 export interface NumericalColumn {
-    info: ColumnInfo;
-    values: {id: string, val: number}[];
-    // TODO: Think about making async accessor function:
-    // values: (rows: object[]) => Promise<{id: number, val: number}[]>;
-    type: EColumnTypes.NUMERICAL;
+  info: ColumnInfo;
+  values: { id: string; val: number }[];
+  // TODO: Think about making async accessor function:
+  // values: (rows: object[]) => Promise<{id: number, val: number}[]>;
+  type: EColumnTypes.NUMERICAL;
 }
 
 export interface CategoricalColumn {
-    info: ColumnInfo;
-    colors: string[];
-    values: {id: string, val: string}[];
-    type: EColumnTypes.CATEGORICAL;
+  info: ColumnInfo;
+  colors: string[];
+  values: { id: string; val: string }[];
+  type: EColumnTypes.CATEGORICAL;
 }
 
 export type PlotlyInfo = {

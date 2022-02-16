@@ -90,13 +90,16 @@ export function createScatterTraces(
     max = d3.max((getCol(columns, config.color) as NumericalColumn).values.map((v) => +v.val).filter((v) => v !== null));
   }
 
-    const numericalColorScale = config.color ?
-                d3.scale.linear<string, number>()
-                    .domain([max,
-                        (max + min) / 2,
-                        min])
-                    .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')] : [getCssValue('visyn-c1'),'#d3d3d3', getCssValue('visyn-c2')])
-                : null;
+  const numericalColorScale = config.color
+    ? d3.scale
+        .linear<string, number>()
+        .domain([max, (max + min) / 2, min])
+        .range(
+          config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL
+            ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')]
+            : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')],
+        )
+    : null;
 
   const legendPlots: PlotlyData[] = [];
 

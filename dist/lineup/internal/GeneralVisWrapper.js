@@ -74,7 +74,7 @@ export class GeneralVisWrapper extends EventHandler {
     updateCustomVis() {
         const data = this.getAllData();
         const colDescriptions = this.provider.getColumns();
-        //need some way to convert these to _ids.
+        // need some way to convert these to _ids.
         const selectedIndeces = this.provider.getSelection();
         const cols = [];
         const selectedMap = {};
@@ -90,19 +90,19 @@ export class GeneralVisWrapper extends EventHandler {
                 info: {
                     name: c.label.replace(/(<([^>]+)>)/gi, ''),
                     description: c.summary ? c.summary.replace(/(<([^>]+)>)/gi, '') : '',
-                    id: c.label + c._id
+                    id: c.label + c._id,
                 },
                 values: data.map((d, i) => {
                     return { id: d._id, val: d[c.column] ? d[c.column] : c.type === 'number' ? null : '--' };
                 }),
-                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL
+                type: c.type === 'number' ? EColumnTypes.NUMERICAL : EColumnTypes.CATEGORICAL,
             });
         }
         ReactDOM.render(React.createElement(Vis, {
             columns: cols,
             selected: selectedMap,
             selectionCallback: (s) => this.selectCallback(s),
-            filterCallback: (s) => this.filterCallback(s)
+            filterCallback: (s) => this.filterCallback(s),
         }), this.node);
     }
     toggleCustomVis() {

@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumn, IPCPConfig, NumericalColumn } from '../interfaces';
-import { IVisConfig } from '../interfaces';
+import { CategoricalColumn, IPCPConfig, NumericalColumn, IVisConfig } from '../interfaces';
 interface PCPVisSidebarProps {
     config: IPCPConfig;
     optionsConfig?: {};

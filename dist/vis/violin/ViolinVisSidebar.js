@@ -1,21 +1,21 @@
 import * as React from 'react';
 import { useMemo } from 'react';
+import { merge } from 'lodash';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
-import { merge } from 'lodash';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { CategoricalColumnSelect, ViolinOverlayButtons } from '..';
 const defaultConfig = {
     overlay: {
         enable: true,
-        customComponent: null
-    }
+        customComponent: null,
+    },
 };
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
-    postSidebar: null
+    postSidebar: null,
 };
 export function ViolinVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }) {
     const uniqueId = useMemo(() => {
@@ -35,8 +35,9 @@ export function ViolinVisSidebar({ config, optionsConfig, extensions, columns, s
         React.createElement(CategoricalColumnSelect, { callback: (catColumnsSelected) => setConfig({ ...config, catColumnsSelected }), columns: columns, currentSelected: config.catColumnsSelected || [] }),
         React.createElement("hr", null),
         mergedExtensions.preSidebar,
-        mergedOptionsConfig.overlay.enable ? mergedOptionsConfig.overlay.customComponent
-            || React.createElement(ViolinOverlayButtons, { callback: (violinOverlay) => setConfig({ ...config, violinOverlay }), currentSelected: config.violinOverlay }) : null,
+        mergedOptionsConfig.overlay.enable
+            ? mergedOptionsConfig.overlay.customComponent || (React.createElement(ViolinOverlayButtons, { callback: (violinOverlay) => setConfig({ ...config, violinOverlay }), currentSelected: config.violinOverlay }))
+            : null,
         mergedExtensions.postSidebar));
 }
 //# sourceMappingURL=ViolinVisSidebar.js.map

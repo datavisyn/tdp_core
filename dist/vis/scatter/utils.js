@@ -59,12 +59,13 @@ export function createScatterTraces(columns, selected, config, scales, shapes) {
         min = d3.min(getCol(columns, config.color).values.map((v) => +v.val).filter((v) => v !== null));
         max = d3.max(getCol(columns, config.color).values.map((v) => +v.val).filter((v) => v !== null));
     }
-    const numericalColorScale = config.color ?
-        d3.scale.linear()
-            .domain([max,
-            (max + min) / 2,
-            min])
-            .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')] : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')])
+    const numericalColorScale = config.color
+        ? d3.scale
+            .linear()
+            .domain([max, (max + min) / 2, min])
+            .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL
+            ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')]
+            : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')])
         : null;
     const legendPlots = [];
     // cant currently do 1d scatterplots

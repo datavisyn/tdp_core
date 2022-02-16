@@ -33,6 +33,6 @@ interface ScatterVisProps {
     scales: Scales;
     hideSidebar?: boolean;
 }
-export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, hideSidebar, scales }: ScatterVisProps): JSX.Element;
+export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, hideSidebar, scales, }: ScatterVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=ScatterVis.d.ts.map

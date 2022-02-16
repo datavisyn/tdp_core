@@ -1,8 +1,8 @@
 import * as React from 'react';
 import { useMemo } from 'react';
+import { merge } from 'lodash';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
-import { merge } from 'lodash';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { CategoricalColumnSelect } from '..';
 const defaultConfig = {};
@@ -10,7 +10,7 @@ const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
-    postSidebar: null
+    postSidebar: null,
 };
 export function StripVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }) {
     const uniqueId = useMemo(() => {

@@ -14,6 +14,6 @@ interface StripVisProps {
     scales: Scales;
     hideSidebar?: boolean;
 }
-export declare function StripVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar, }: StripVisProps): JSX.Element;
+export declare function StripVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar }: StripVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=StripVis.d.ts.map

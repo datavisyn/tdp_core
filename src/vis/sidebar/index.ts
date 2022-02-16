@@ -14,4 +14,3 @@ export * from './ShapeSelect';
 export * from './ViolinOverlayButtons';
 export * from './VisTypeSelect';
 export * from './WarningMessage';
-

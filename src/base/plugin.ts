@@ -1,4 +1,4 @@
-import {IBaseViewPluginDesc, IVisynViewPluginDesc} from './interfaces';
+import { IBaseViewPluginDesc, IVisynViewPluginDesc } from './interfaces';
 
 /**
  * basic interface of a plugin

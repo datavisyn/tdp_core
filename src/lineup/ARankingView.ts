@@ -35,12 +35,12 @@ import { IARankingViewOptions } from './IARankingViewOptions';
 import { LineupUtils } from './utils';
 import { ISearchOption } from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
-import {ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager} from '../auth';
-import {GeneralVisWrapper} from './internal/GeneralVisWrapper';
-import {BaseUtils, debounceAsync} from '../base';
-import {I18nextManager} from '../i18n';
-import {IDTypeManager} from '../idtype';
-import {ISecureItem} from '../security';
+import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
+import { GeneralVisWrapper } from './internal/GeneralVisWrapper';
+import { BaseUtils, debounceAsync } from '../base';
+import { I18nextManager } from '../i18n';
+import { IDTypeManager } from '../idtype';
+import { ISecureItem } from '../security';
 
 /**
  * base class for views based on LineUp
@@ -300,7 +300,6 @@ export abstract class ARankingView extends AView {
       // base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
       // const container = <HTMLElement>base.lastElementChild!;
       // container.appendChild(this.stats);
-
       // if (this.options.enableSidePanel === 'top') {
       //   container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
       //   container.insertAdjacentElement('afterbegin', this.panel.node);
@@ -373,7 +372,7 @@ export abstract class ARankingView extends AView {
       selection: this.selection,
       freeColor: (id: string) => this.colors.freeColumnColor(id),
       add: (columns: ISelectionColumn[]) => columns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-      remove: (columns: Column[]) => columns.forEach((c) => c.removeMe())
+      remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
     };
   }
 
@@ -594,8 +593,8 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<boolean>}
    */
   removeTrackedScoreColumn(columnId: string): Promise<boolean> {
-      const column = this.provider.find(columnId);
-      return Promise.resolve(column.removeMe());
+    const column = this.provider.find(columnId);
+    return Promise.resolve(column.removeMe());
   }
 
   /**

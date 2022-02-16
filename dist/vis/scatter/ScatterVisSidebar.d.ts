@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { CategoricalColumn, EFilterOptions, IScatterConfig, NumericalColumn } from '../interfaces';
-import { IVisConfig } from '../interfaces';
+import { CategoricalColumn, EFilterOptions, IScatterConfig, NumericalColumn, IVisConfig } from '../interfaces';
 interface ScatterVisSidebarProps {
     config: IScatterConfig;
     optionsConfig?: {
@@ -28,6 +27,6 @@ interface ScatterVisSidebarProps {
     setConfig: (config: IVisConfig) => void;
     width?: string;
 }
-export declare function ScatterVisSidebar({ config, optionsConfig, extensions, columns, filterCallback, setConfig, width }: ScatterVisSidebarProps): JSX.Element;
+export declare function ScatterVisSidebar({ config, optionsConfig, extensions, columns, filterCallback, setConfig, width, }: ScatterVisSidebarProps): JSX.Element;
 export {};
 //# sourceMappingURL=ScatterVisSidebar.d.ts.map

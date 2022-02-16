@@ -29,5 +29,5 @@ export interface VisProps {
     externalConfig?: IVisConfig;
     hideSidebar?: boolean;
 }
-export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, externalConfig, hideSidebar }: VisProps): JSX.Element;
+export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, externalConfig, hideSidebar, }: VisProps): JSX.Element;
 //# sourceMappingURL=Vis.d.ts.map

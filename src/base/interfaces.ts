@@ -1,14 +1,14 @@
 import * as React from 'react';
-import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
-import {AppHeader} from '../components';
-import {IAuthorizationConfiguration} from '../auth';
-import {PanelTab} from '../lineup/panel';
-import {IPluginDesc, IPlugin, IEventHandler} from '.';
-import {IDType} from '../idtype';
-import {ProvenanceGraph, IObjectRef} from '../provenance';
-import {IUser} from '../security';
-import {ReactElement, ReactNode} from 'react';
-import {IVisynViewProps} from '../views/VisynView';
+import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
+import { ReactElement, ReactNode } from 'react';
+import { AppHeader } from '../components';
+import { IAuthorizationConfiguration } from '../auth';
+import { PanelTab } from '../lineup/panel';
+import { IPluginDesc, IPlugin, IEventHandler } from '.';
+import { IDType } from '../idtype';
+import { ProvenanceGraph, IObjectRef } from '../provenance';
+import { IUser } from '../security';
+import { IVisynViewProps } from '../views/VisynView';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
@@ -373,65 +373,64 @@ export interface IVisynViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
   load(): Promise<IVisynViewPlugin>;
 }
 
-//TODO:: refactor the Omit here to Partial<Pick<.. in ts 4
+// TODO:: refactor the Omit here to Partial<Pick<.. in ts 4
 export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 'id' | 'load'>> {
-    /**
-     * how many selection this view can handle and requires
-     */
-     selection: 'none' | '0' | 'any' | 'single' | '1' | 'small_multiple' | 'multiple' | 'chooser' | 'some' | '2';
-     /**
-      * idType regex that is required by this view
-      */
-     idtype?: string;
+  /**
+   * how many selection this view can handle and requires
+   */
+  selection: 'none' | '0' | 'any' | 'single' | '1' | 'small_multiple' | 'multiple' | 'chooser' | 'some' | '2';
+  /**
+   * idType regex that is required by this view
+   */
+  idtype?: string;
 
-     /**
-      * view group hint
-      */
-     group: {name: string, order: number};
+  /**
+   * view group hint
+   */
+  group: { name: string; order: number };
 
-     /**
-      * optional preview callback function returning a url promise, the preview image should have 320x180 px
-      * @returns {Promise<string>}
-      */
-     preview?(): Promise<string>;
+  /**
+   * optional preview callback function returning a url promise, the preview image should have 320x180 px
+   * @returns {Promise<string>}
+   */
+  preview?(): Promise<string>;
 
-     /**
-      * optional security check to show only certain views
-      */
-     security?: string | ((user: IUser) => boolean);
+  /**
+   * optional security check to show only certain views
+   */
+  security?: string | ((user: IUser) => boolean);
 
-     /**
-      * optional authorization configuration ensuring authorization exists before loading the view.
-      * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
-      */
-     authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
+  /**
+   * optional authorization configuration ensuring authorization exists before loading the view.
+   * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
+   */
+  authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
 
-     /**
-      * a lot of topics/tags describing this view
-      */
-     topics?: string[];
+  /**
+   * a lot of topics/tags describing this view
+   */
+  topics?: string[];
 
-     /**
-      * a link to an external help page
-      */
-     helpUrl?: string | {url: string, linkText: string, title: string};
-     /**
-      * as an alternative an help text shown as pop up
-      */
-     helpText?: string;
+  /**
+   * a link to an external help page
+   */
+  helpUrl?: string | { url: string; linkText: string; title: string };
+  /**
+   * as an alternative an help text shown as pop up
+   */
+  helpText?: string;
 
-     /**
-      * a tour id to start a tour
-      */
-     helpTourId?: string;
+  /**
+   * a tour id to start a tour
+   */
+  helpTourId?: string;
 
-     /**
-      * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
-      * @default false
-      */
-     securityNotAllowedText?: string | boolean;
+  /**
+   * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
+   * @default false
+   */
+  securityNotAllowedText?: string | boolean;
 }
-
 
 export interface IViewPlugin {
   readonly desc: IViewPluginDesc;
@@ -456,7 +455,7 @@ export interface IVisynViewPlugin {
 export interface IVisynViewPluginFactory {
   view: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
   header?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
-  tab?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>>| React.ComponentType<IVisynViewProps<any, any>>;
+  tab?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
 }
 
 export interface IInstantView {
