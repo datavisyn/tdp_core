@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { CategoricalColumn, ColumnInfo, ESupportedPlotlyVis, EViolinOverlay, IViolinConfig, NumericalColumn, IVisConfig } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, EViolinOverlay, IViolinConfig, IVisConfig, VisColumn } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { CategoricalColumnSelect, ViolinOverlayButtons } from '..';
+import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
+import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
 
 interface ViolinVisSidebarProps {
   config: IViolinConfig;
@@ -21,7 +22,7 @@ interface ViolinVisSidebarProps {
     preSidebar?: React.ReactNode;
     postSidebar?: React.ReactNode;
   };
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   width?: string;
 }
@@ -39,17 +40,13 @@ const defaultExtensions = {
   postSidebar: null,
 };
 export function ViolinVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }: ViolinVisSidebarProps) {
-  const uniqueId = useMemo(() => {
-    return Math.random().toString(36).substr(2, 5);
-  }, []);
-
   const mergedOptionsConfig = useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
-  }, []);
+  }, [optionsConfig]);
 
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
-  }, []);
+  }, [extensions]);
 
   return (
     <div className="container pb-3 pt-2" style={{ width }}>

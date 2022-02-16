@@ -1,7 +1,7 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';

@@ -4,7 +4,8 @@ import { merge } from 'lodash';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { CategoricalColumnSelect, ViolinOverlayButtons } from '..';
+import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
+import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
 const defaultConfig = {
     overlay: {
         enable: true,
@@ -18,15 +19,12 @@ const defaultExtensions = {
     postSidebar: null,
 };
 export function ViolinVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }) {
-    const uniqueId = useMemo(() => {
-        return Math.random().toString(36).substr(2, 5);
-    }, []);
     const mergedOptionsConfig = useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
-    }, []);
+    }, [optionsConfig]);
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
-    }, []);
+    }, [extensions]);
     return (React.createElement("div", { className: "container pb-3 pt-2", style: { width } },
         React.createElement(WarningMessage, null),
         React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
