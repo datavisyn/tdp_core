@@ -1,15 +1,15 @@
 import { LocalDataProvider } from 'lineupjs';
+import { EventHandler } from '../..';
+import { ARankingView } from '..';
 import { LineUpSelectionHelper } from './LineUpSelectionHelper';
-import { EventHandler } from '../../base/event';
-import { IDType } from '../../idtype/IDType';
 export declare class GeneralVisWrapper extends EventHandler {
     readonly node: HTMLElement;
     private viewable;
     private provider;
-    private idType;
-    private lineupSelectionHelper;
+    private selectionHelper;
+    private view;
     private data;
-    constructor(provider: LocalDataProvider, idType: IDType, lineupSelectionHelper: LineUpSelectionHelper, doc?: Document);
+    constructor(provider: LocalDataProvider, view: ARankingView, selectionHelper: LineUpSelectionHelper, doc?: Document);
     getAllData(): any[];
     selectCallback(selected: string[]): void;
     filterCallback(s: string): void;
