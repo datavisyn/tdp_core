@@ -1,1 +1,1 @@
-{"version":3,"file":"Plot.d.ts","sourceRoot":"","sources":["../../src/vis/Plot.tsx"],"names":[],"mappings":";AACA,OAAO,MAAM,MAAM,oBAAoB,CAAC;AAKxC,eAAO,MAAM,eAAe,qEAAgC,CAAC;AAE7D,OAAO,EAAE,MAAM,EAAE,CAAC"}
+{"version":3,"file":"Plot.d.ts","sourceRoot":"","sources":["../../src/vis/Plot.tsx"],"names":[],"mappings":";AASA,OAAO,MAAM,MAAM,oBAAoB,CAAC;AAKxC,eAAO,MAAM,eAAe,qEAAgC,CAAC;AAE7D,OAAO,EAAE,MAAM,EAAE,CAAC"}
