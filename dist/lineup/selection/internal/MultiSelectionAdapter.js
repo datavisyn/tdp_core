@@ -18,6 +18,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
                 return [];
             }
             descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, id));
+            console.log(descs, context);
             const usedCols = context.columns.filter((col) => col.desc.selectedSubtype !== undefined);
             const dynamicColumnIDs = usedCols.map((col) => `${col.desc.selectedId}_${col.desc.selectedSubtype}`);
             // Save which columns have been added for a specific element in the selection
@@ -27,9 +28,11 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
             if (addedParameters.length <= 0) {
                 return [];
             }
+            console.log(addedParameters);
             // Filter the descriptions to only leave the new columns and load them
-            const columnsToBeAdded = descs.filter((desc) => addedParameters.indexOf(`${id}_${desc.selectedSubtype}`));
+            const columnsToBeAdded = descs.filter((desc) => addedParameters.includes(`${id}_${desc.selectedSubtype}`));
             const data = this.adapter.loadData(id, columnsToBeAdded);
+            console.log(data);
             const position = this.computePositionToInsert(context, id);
             return columnsToBeAdded.map((desc, i) => ({ desc, data: data[i], id, position }));
         });
@@ -44,7 +47,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
         // get available all current subtypes from lineup
         const dynamicColumnSubtypes = usedCols.map((col) => col.desc.selectedSubtype);
         // check which parameters have been removed
-        const removedParameters = difference(dynamicColumnSubtypes, selectedSubTypes);
+        const removedParameters = difference(dynamicColumnSubtypes, selectedSubTypes.map((s) => s.columnSelection));
         context.remove([].concat(...removedParameters.map((param) => {
             return usedCols.filter((d) => d.desc.selectedSubtype === param);
         })));

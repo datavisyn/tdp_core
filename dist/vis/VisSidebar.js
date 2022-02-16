@@ -40,6 +40,7 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
         if (isBar(visConfig)) {
             setVisConfig(barMergeDefaultConfig(columns, visConfig));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visConfig.type]);
     return (React.createElement(React.Fragment, null,
         isScatter(visConfig) ? (React.createElement(ScatterVisSidebar, { config: visConfig, optionsConfig: {
