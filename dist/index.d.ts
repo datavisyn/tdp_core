@@ -10,6 +10,7 @@ export * from './lineup';
 export * from './views';
 export * from './wrapper';
 export * from './ATDPApplication';
+export * from './provvis';
 export * from './vis';
 export * from './menu';
 export * from './layout';

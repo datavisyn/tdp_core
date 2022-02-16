@@ -42,6 +42,11 @@ export interface IARankingViewOptions {
      */
     enableZoom: boolean;
     /**
+     * enable custom plotly vis
+     * @default true
+     */
+    enableVisPanel: boolean;
+    /**
      * enable download data button
      * @default true
      */

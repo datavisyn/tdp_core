@@ -1,6 +1,6 @@
 import { IDataType } from '../data';
 import { AShape, Rect } from '../geom';
-import { IVisMetaData, IVisInstance, IVisPluginDesc, AVisInstance, ITransform } from '../vis';
+import { IVisMetaData, IVisInstance, IVisPluginDesc, AVisInstance, ITransform } from '../provvis';
 import { IMultiForm, IMultiFormOptions } from './IMultiForm';
 import { Range } from '../range';
 export interface IViewFactory {

@@ -150,6 +150,14 @@ export class LineUpPanelActions extends EventHandler {
             });
             this.header.addButton(zoomOutButton, EPanelHeaderToolbar.CENTER);
         }
+        if (this.options.enableVisPanel) {
+            const customVis = new PanelButton(buttons, {
+                title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'),
+                faIcon: 'fas fa-chart-bar',
+                onClick: () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS),
+            });
+            this.header.addButton(customVis, EPanelHeaderToolbar.END);
+        }
         if (this.options.enableOverviewMode) {
             const overviewButton = new PanelButton(buttons, {
                 title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.toggleOverview'),
@@ -459,6 +467,7 @@ export class LineUpPanelActions extends EventHandler {
 }
 LineUpPanelActions.EVENT_ZOOM_OUT = 'zoomOut';
 LineUpPanelActions.EVENT_ZOOM_IN = 'zoomIn';
+LineUpPanelActions.EVENT_OPEN_VIS = 'openVis';
 LineUpPanelActions.EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
 LineUpPanelActions.EVENT_SAVE_NAMED_SET = 'saveNamedSet';
 /**

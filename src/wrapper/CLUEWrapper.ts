@@ -8,7 +8,7 @@ import * as d3 from 'd3';
 import { MixedStorageProvenanceGraphManager, IObjectRef, ProvenanceGraph } from '../provenance';
 import { SelectionRecorder } from '../base/Selection';
 import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
-import { VisLoader } from '../vis/VisLoader';
+import { VisLoader } from '../provvis/VisLoader';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { ProvenanceGraphMenu } from '../menu/ProvenanceGraphMenu';
 import { LoginMenu } from '../base/LoginMenu';
