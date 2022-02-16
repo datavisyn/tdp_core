@@ -1,6 +1,6 @@
 import { UniqueIdManager } from './UniqueIdManager';
 import { BaseUtils } from '../base/BaseUtils';
-import { EXTENSION_POINT_VISYN_VIEW } from '..';
+import { EXTENSION_POINT_VISYN_VIEW } from '../base/extensions';
 export class PluginRegistry {
     constructor() {
         this.registry = [];

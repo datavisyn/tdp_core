@@ -15,4 +15,4 @@ export * from './AReactView';
 export * from './AReactChooserView';
 export * from './ReactViewWrapper';
 export * from './TDPView';
-export * from './VisynView';
+export * from './interfaces';

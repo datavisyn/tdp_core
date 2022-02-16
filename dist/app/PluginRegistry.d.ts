@@ -1,5 +1,5 @@
 import { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
-import { IBaseViewPluginDesc, IVisynViewPluginDesc } from '..';
+import { IBaseViewPluginDesc, IVisynViewPluginDesc } from '../base/interfaces';
 export declare class PluginRegistry implements IRegistry {
     private registry;
     pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc): void;

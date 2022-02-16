@@ -1,7 +1,8 @@
 import { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
 import { UniqueIdManager } from './UniqueIdManager';
 import { BaseUtils } from '../base/BaseUtils';
-import { EXTENSION_POINT_VISYN_VIEW, IBaseViewPluginDesc, IVisynViewPluginDesc } from '..';
+import {IBaseViewPluginDesc, IVisynViewPluginDesc} from '../base/interfaces';
+import {EXTENSION_POINT_VISYN_VIEW} from '../base/extensions';
 
 export class PluginRegistry implements IRegistry {
   private registry: IPluginDesc[] = [];
