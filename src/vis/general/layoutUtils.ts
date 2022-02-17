@@ -1,4 +1,5 @@
 import { PlotlyInfo, VisColumn } from '../interfaces';
+import { Plotly } from '../Plot';
 
 /**
  * Truncate long texts (e.g., to use as axes title)
