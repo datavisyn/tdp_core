@@ -45,10 +45,8 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
       if (descs.length <= 0) {
         return [];
       }
-      
-      descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, id));
 
-      console.log(descs, context);
+      descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, id));
 
       const usedCols = context.columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
       const dynamicColumnIDs = usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`);
@@ -62,12 +60,9 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
         return [];
       }
 
-      console.log(addedParameters);
       // Filter the descriptions to only leave the new columns and load them
       const columnsToBeAdded = descs.filter((desc) => addedParameters.includes(`${id}_${desc.selectedSubtype}`));
       const data = this.adapter.loadData(id, columnsToBeAdded);
-
-      console.log(data);
 
       const position = this.computePositionToInsert(context, id);
 
