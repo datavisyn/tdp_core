@@ -22,8 +22,3 @@ declare module '*.xml' {
   const content: string;
   export default content;
 }
-
-declare module "plotly.js-dist-min" {
-  import * as Plotly from "plotly.js";
-  export default Plotly;
-}
