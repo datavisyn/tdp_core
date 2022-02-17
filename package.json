@@ -88,7 +88,7 @@
     "d3": "~3.5.17",
     "i18next": "^19.8.4",
     "jquery": "~3.5.1",
-    "lineupjs": "github:lineupjs/lineupjs#release/v4.5.0",
+    "lineupjs": "github:lineupjs/lineupjs#develop",
     "lodash": "~4.17.20",
     "marked": "~3.0.2",
     "md5": "^2.3.0",
