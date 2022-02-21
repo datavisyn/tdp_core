@@ -30,13 +30,6 @@ interface ViolinVisProps {
   hideSidebar?: boolean;
 }
 
-const defaultConfig = {
-  overlay: {
-    enable: true,
-    customComponent: null,
-  },
-};
-
 const defaultExtensions = {
   prePlot: null,
   postPlot: null,
@@ -126,13 +119,13 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             className="btn btn-primary-outline"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target={`#generalVisBurgerMenu${uniqueId}`}
+            data-bs-target={`#generalVisBurgerMenu${id}`}
             aria-expanded="true"
             aria-controls="generalVisBurgerMenu"
           >
             <i className="fas fa-bars" />
           </button>
-          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
+          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
             <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
           </div>
         </div>
