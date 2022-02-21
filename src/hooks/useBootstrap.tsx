@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Modal, Toast, Popover, Alert, Offcanvas, Tooltip, Tab, Collapse, Dropdown } from 'bootstrap';
+import { useSyncedRef } from './useSyncedRef';
 
 type SupportedBootstrapClasses =
   | typeof Modal
@@ -189,23 +190,26 @@ function useBSShowHide(instance: Modal | Toast | Popover | Tooltip | Dropdown, s
 }
 
 export const BSModal = BSClass(useBSModal, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {
+  const setShowRef = useSyncedRef(setShow);
   useBSListeners(instance, {
-    'shown.bs.modal': () => setShow?.(true),
-    'hidden.bs.modal': () => setShow?.(false),
+    'shown.bs.modal': () => setShowRef.current?.(true),
+    'hidden.bs.modal': () => setShowRef.current?.(false),
   });
   useBSShowHide(instance, show);
 });
 export const BSToast = BSClass(useBSToast, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {
+  const setShowRef = useSyncedRef(setShow);
   useBSListeners(instance, {
-    'shown.bs.toast': () => setShow?.(true),
-    'hidden.bs.toast': () => setShow?.(false),
+    'shown.bs.toast': () => setShowRef.current?.(true),
+    'hidden.bs.toast': () => setShowRef.current?.(false),
   });
   useBSShowHide(instance, show);
 });
 export const BSPopover = BSClass(useBSPopover, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {
+  const setShowRef = useSyncedRef(setShow);
   useBSListeners(instance, {
-    'shown.bs.popover': () => setShow?.(true),
-    'hidden.bs.popover': () => setShow?.(false),
+    'shown.bs.popover': () => setShowRef.current?.(true),
+    'hidden.bs.popover': () => setShowRef.current?.(false),
   });
   useBSShowHide(instance, show);
 });
@@ -213,9 +217,10 @@ export const BSAlert = BSClass(useBSAlert);
 export const BSOffcanvas = BSClass(
   useBSOffcanvas,
   (instance, { show, relatedTarget, setShow }: { show?: boolean; relatedTarget?: HTMLElement; setShow?: (show: boolean) => void }): void => {
+    const setShowRef = useSyncedRef(setShow);
     useBSListeners(instance, {
-      'shown.bs.offcanvas': () => setShow?.(true),
-      'hidden.bs.offcanvas': () => setShow?.(false),
+      'shown.bs.offcanvas': () => setShowRef.current?.(true),
+      'hidden.bs.offcanvas': () => setShowRef.current?.(false),
     });
     React.useEffect(() => {
       if (show) {
@@ -228,24 +233,27 @@ export const BSOffcanvas = BSClass(
   },
 );
 export const BSTooltip = BSClass(useBSTooltip, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {
+  const setShowRef = useSyncedRef(setShow);
   useBSListeners(instance, {
-    'shown.bs.tooltip': () => setShow?.(true),
-    'hidden.bs.tooltip': () => setShow?.(false),
+    'shown.bs.tooltip': () => setShowRef.current?.(true),
+    'hidden.bs.tooltip': () => setShowRef.current?.(false),
   });
   useBSShowHide(instance, show);
 });
 export const BSTab = BSClass(useBSTab);
 export const BSCollapse = BSClass(useBSCollapse, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {
+  const setShowRef = useSyncedRef(setShow);
   useBSListeners(instance, {
-    'shown.bs.collapse': () => setShow?.(true),
-    'hidden.bs.collapse': () => setShow?.(false),
+    'shown.bs.collapse': () => setShowRef.current?.(true),
+    'hidden.bs.collapse': () => setShowRef.current?.(false),
   });
   useBSShowHide(instance, show);
 });
 export const BSDropdown = BSClass(useBSDropdown, (instance, { show, setShow }: { show?: boolean; setShow?: (show: boolean) => void }): void => {
+  const setShowRef = useSyncedRef(setShow);
   useBSListeners(instance, {
-    'shown.bs.dropdown': () => setShow?.(true),
-    'hidden.bs.dropdown': () => setShow?.(false),
+    'shown.bs.dropdown': () => setShowRef.current?.(true),
+    'hidden.bs.dropdown': () => setShowRef.current?.(false),
   });
   useBSShowHide(instance, show);
 });
