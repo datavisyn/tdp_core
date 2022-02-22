@@ -1,1 +1,0 @@
-{"version":3,"file":"PhoveaDataAdapter.d.ts","sourceRoot":"","sources":["../../src/utils/PhoveaDataAdapter.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,IAAI,EAAE,iBAAiB,EAAC,MAAM,cAAc,CAAC;AAIrD,qBAAa,iBAAiB;IAGhB,OAAO,CAAC,QAAQ,CAAC,SAAS;IAFtC,OAAO,CAAC,QAAQ,CAAC,IAAI,CAAkB;gBAEV,SAAS,EAAE,MAAM;IAIxC,OAAO,IAAI,OAAO,CAAC,iBAAiB,CAAC;IAWrC,OAAO,IAAI,OAAO,CAAC,IAAI,EAAE,CAAC;CAOjC"}

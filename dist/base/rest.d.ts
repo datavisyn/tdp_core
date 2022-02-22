@@ -1,5 +1,5 @@
-import { IDTypeLike } from '../idtype';
-import { IScoreRow } from './interfaces';
+import type { IScoreRow } from './interfaces';
+import { IDTypeLike } from '../idtype/IDType';
 /**
  * common interface for a row as used in LineUp
  */
@@ -175,7 +175,7 @@ export declare class RestBaseUtils {
      * @param filters URL filter parameters
      */
     static mergeParamAndFilters(params: IParams, filters: IParams): {
-        [x: string]: string | number | boolean | string[] | number[] | boolean[];
+        [x: string]: string | number | boolean | number[] | string[] | boolean[];
     };
     /**
      * query the TDP rest api to read data with additional given filters

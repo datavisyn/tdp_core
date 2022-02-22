@@ -1,14 +1,13 @@
-import { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
+import type { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
 import { UniqueIdManager } from './UniqueIdManager';
 import { BaseUtils } from '../base/BaseUtils';
-import {IBaseViewPluginDesc, IVisynViewPluginDesc} from '../base/interfaces';
-import {EXTENSION_POINT_VISYN_VIEW} from '../base/extensions';
+import type { IBaseViewPluginDesc, IVisynViewPluginDesc } from '../base/interfaces';
 
 export class PluginRegistry implements IRegistry {
   private registry: IPluginDesc[] = [];
 
   public pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc) {
-    return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, desc);
+    return this.push('visynView', id, loader, desc);
   }
 
   public push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any) {

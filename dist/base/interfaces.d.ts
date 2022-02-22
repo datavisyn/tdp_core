@@ -1,13 +1,15 @@
 import * as React from 'react';
 import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
-import { AppHeader } from '../components';
 import { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
-import { IPluginDesc, IPlugin, IEventHandler } from '.';
-import { IDType } from '../idtype';
-import { ProvenanceGraph, IObjectRef } from '../provenance';
+import { IDType } from '../idtype/IDType';
 import { IUser } from '../security';
-import { IVisynViewProps } from '../views/interfaces';
+import type { IPlugin, IPluginDesc } from './plugin';
+import { IEventHandler } from './event';
+import type { IServerColumn } from './rest';
+import { ProvenanceGraph } from '../provenance/ProvenanceGraph';
+import { IObjectRef } from '../provenance/ObjectNode';
+import { AppHeader } from '../components/header';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * used internally to match selections to column
@@ -392,6 +394,17 @@ export interface IViewPlugin {
      * @returns {IView}
      */
     factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
+}
+export interface IVisynViewProps<Desc extends IVisynViewPlugin, Param extends Record<string, any>> {
+    desc: Desc;
+    data: Record<string, any>;
+    dataDesc: IServerColumn[] | any[];
+    selection: string[];
+    idFilter: string[];
+    parameters: Param;
+    onSelectionChanged: (selection: string[]) => void;
+    onIdFilterChanged: (idFilter: string[]) => void;
+    onParametersChanged: (parameters: Param) => void;
 }
 export interface IVisynViewPlugin {
     readonly desc: IVisynViewPluginDesc;

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
 import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { CategoricalColumn, NumericalColumn, ESupportedPlotlyVis, IVisConfig, ENumericalColorScaleType } from './interfaces';
+import { ESupportedPlotlyVis, IVisConfig, ENumericalColorScaleType, VisColumn } from './interfaces';
 import { isViolin, violinMergeDefaultConfig } from './violin/utils';
 import { isStrip, stripMergeDefaultConfig } from './strip/utils';
 import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
@@ -16,7 +16,7 @@ export interface VisSidebarProps {
   /**
    * Required data columns which are displayed.
    */
-  columns: (NumericalColumn | CategoricalColumn)[];
+  columns: VisColumn[];
   /**
    * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
    */
@@ -41,7 +41,7 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
 
   useEffect(() => {
     setExternalConfig(visConfig);
-  }, [visConfig]);
+  }, [visConfig, setExternalConfig]);
 
   useEffect(() => {
     if (isScatter(visConfig)) {
@@ -59,6 +59,8 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
     if (isBar(visConfig)) {
       setVisConfig(barMergeDefaultConfig(columns, visConfig));
     }
+    // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visConfig.type]);
   return (
     <>

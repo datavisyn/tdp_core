@@ -1,9 +1,9 @@
-import { CategoricalColumn, NumericalColumn, IVisConfig } from './interfaces';
+import { IVisConfig, VisColumn } from './interfaces';
 export interface VisSidebarProps {
     /**
      * Required data columns which are displayed.
      */
-    columns: (NumericalColumn | CategoricalColumn)[];
+    columns: VisColumn[];
     /**
      * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired, either "Filter In", "Filter Out", or "Clear". This logic will be simplified in the future.
      */
