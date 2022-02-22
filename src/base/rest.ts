@@ -1,7 +1,7 @@
 import { Ajax } from './ajax';
-import { AppContext } from '../app';
-import { IDTypeLike } from '../idtype';
-import { IScoreRow } from './interfaces';
+import { AppContext } from '../app/AppContext';
+import type { IScoreRow } from './interfaces';
+import { IDTypeLike } from '../idtype/IDType';
 
 /**
  * common interface for a row as used in LineUp

@@ -1,5 +1,5 @@
-import { IDTypeLike } from '../idtype';
-import { IScoreRow } from './interfaces';
+import type { IScoreRow } from './interfaces';
+import { IDTypeLike } from '../idtype/IDType';
 /**
  * common interface for a row as used in LineUp
  */

@@ -41,7 +41,7 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
 
   useEffect(() => {
     setExternalConfig(visConfig);
-  }, [visConfig]);
+  }, [visConfig, setExternalConfig]);
 
   useEffect(() => {
     if (isScatter(visConfig)) {
@@ -59,7 +59,8 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
     if (isBar(visConfig)) {
       setVisConfig(barMergeDefaultConfig(columns, visConfig));
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visConfig.type]);
   return (
     <>
