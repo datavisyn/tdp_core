@@ -1,10 +1,10 @@
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
-    SCATTER = "Scatter",
-    PCP = "Parallel Coordinates",
-    VIOLIN = "Violin",
-    STRIP = "Strip",
-    BAR = "Bar"
+    SCATTER = "Scatter Plot",
+    PCP = "Parallel Coordinates Plot",
+    VIOLIN = "Violin Plot",
+    STRIP = "Strip Plot",
+    BAR = "Bar Chart"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EBarDisplayType {
