@@ -27,7 +27,7 @@ export function pcpMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
-export async function createPCPTraces(columns, config) {
+export async function createPCPTraces(columns, config, selectedMap) {
     if (!config.allColumnsSelected) {
         return {
             plots: [],
@@ -53,6 +53,15 @@ export async function createPCPTraces(columns, config) {
         yLabel: null,
         data: {
             type: 'parcoords',
+            // leaving this code here to show how you could change the colors of selected values.
+            // But this is useless without opacity, and the colorscale does not support alpha values.
+            // line: {
+            //   color: allColValues[0].resolvedValues.map((v) => (selectedMap[v.id] ? 0 : 1)),
+            //   colorscale: [
+            //     [0, 'rgba(215, 212, 206, 1)'],
+            //     [1, 'rgba(215, 212, 206, 0.32)'],
+            //   ],
+            // },
             // @ts-ignore
             dimensions: allColValues.map((c) => {
                 if (c.type === EColumnTypes.NUMERICAL) {

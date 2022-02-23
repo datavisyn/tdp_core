@@ -30,7 +30,7 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = [], setConfig, hideSidebar = false, scales, }) {
+export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, hideSidebar = false, scales, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
     useEffect(() => {
         if (hideSidebar) {

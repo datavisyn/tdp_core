@@ -95,6 +95,16 @@ export function Vis({
     }
   }, [externalConfig]);
 
+  const selectedMap = useMemo(() => {
+    const currMap = {};
+
+    selected.forEach((s) => {
+      currMap[s] = true;
+    });
+
+    return currMap;
+  }, [selected]);
+
   const scales: Scales = useMemo(() => {
     const colorScale = d3.scale.ordinal().range(colors);
 
@@ -117,7 +127,7 @@ export function Vis({
           setConfig={setVisConfig}
           filterCallback={filterCallback}
           selectionCallback={selectionCallback}
-          selected={selected}
+          selected={selectedMap}
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}
@@ -141,7 +151,7 @@ export function Vis({
 
       {isStrip(visConfig) ? <StripVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
 
-      {isPCP(visConfig) ? <PCPVis config={visConfig} setConfig={setVisConfig} columns={columns} hideSidebar={hideSidebar} /> : null}
+      {isPCP(visConfig) ? <PCPVis config={visConfig} selected={selectedMap} setConfig={setVisConfig} columns={columns} hideSidebar={hideSidebar} /> : null}
 
       {isBar(visConfig) ? <BarVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
     </>
