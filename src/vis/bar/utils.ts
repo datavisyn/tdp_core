@@ -83,9 +83,9 @@ async function setPlotsWithGroupsAndMultiples(
           x: vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
           y: !vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
           orientation: vertFlag ? 'v' : 'h',
-          xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
-          yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-          showlegend: plotCounter === 1,
+          xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
+          yaxis: plotCounterEdit === 1 ? 'y' : `y${plotCounterEdit}`,
+          showlegend: plotCounterEdit === 1,
           type: 'bar',
           name: uniqueGroup,
           marker: {
@@ -158,32 +158,33 @@ async function setPlotsWithMultiples(
   plotCounter: number,
 ): Promise<number> {
   let plotCounterEdit = plotCounter;
+  console.log('in multiples');
   const catColValues = await resolveColumnValues(catCols);
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
   const catCurr = catColValues[0];
   const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
 
-  const uniqueGroupVals: string[] = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))] as string[];
+  const uniqueMultiplesVals: string[] = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))] as string[];
   const uniqueColVals: string[] = [...new Set(catCurr.resolvedValues.map((v) => v.val))] as string[];
 
-  uniqueGroupVals.forEach((uniqueVal) => {
-    const groupedLength = uniqueColVals.map((v) => {
+  uniqueMultiplesVals.forEach((uniqueVal) => {
+    const multiplesLength = uniqueColVals.map((v) => {
       const allObjs = (catCurr.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v).map((c) => c.id);
-      const allGroupObjs = (multiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
-      const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
+      const allMultiplesObjs = (multiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
+      const joinedObjs = allObjs.filter((c) => allMultiplesObjs.includes(c));
 
       return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
     });
 
     plots.push({
       data: {
-        x: vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
-        y: !vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : groupedLength,
+        x: vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : multiplesLength,
+        y: !vertFlag ? [...new Set(catCurr.resolvedValues.map((v) => v.val))] : multiplesLength,
         orientation: vertFlag ? 'v' : 'h',
-        xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
-        yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-        showlegend: plotCounter === 1,
+        xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
+        yaxis: plotCounterEdit === 1 ? 'y' : `y${plotCounterEdit}`,
+        showlegend: plotCounterEdit === 1,
         type: 'bar',
         name: uniqueVal,
       },
@@ -250,6 +251,7 @@ export async function createBarTraces(columns: VisColumn[], config: IBarConfig, 
 
   const catCols: VisCategoricalColumn[] = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisCategoricalColumn);
 
+  console.log(config);
   if (catCols.length > 0) {
     if (config.group && config.multiples) {
       plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, scales, plotCounter);
