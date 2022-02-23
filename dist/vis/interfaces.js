@@ -15,7 +15,7 @@ export const allVisTypes = [
 ];
 export var EBarDisplayType;
 (function (EBarDisplayType) {
-    EBarDisplayType["DEFAULT"] = "Default";
+    EBarDisplayType["ABSOLUTE"] = "Absolute";
     EBarDisplayType["NORMALIZED"] = "Normalized";
 })(EBarDisplayType || (EBarDisplayType = {}));
 export var EBarDirection;

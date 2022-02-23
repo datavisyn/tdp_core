@@ -29,7 +29,7 @@ const defaultConfig: IBarConfig = {
   group: null,
   groupType: EBarGroupingType.STACK,
   multiples: null,
-  display: EBarDisplayType.DEFAULT,
+  display: EBarDisplayType.ABSOLUTE,
   direction: EBarDirection.VERTICAL,
 };
 
