@@ -27,7 +27,7 @@ export function Vis({ columns, selected = [], colors = [
         numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
         shape: null,
         isRectBrush: true,
-        alphaSliderVal: 1,
+        alphaSliderVal: 0.5,
     });
     React.useEffect(() => {
         if (isScatter(visConfig)) {

@@ -162,7 +162,7 @@ export async function createScatterTraces(
                 selectedMap[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
               )
             : validCols[0].resolvedValues.map((v) => (selectedMap[v.id] ? '#E29609' : '#2e2e2e')),
-          opacity: config.alphaSliderVal,
+          opacity: validCols[0].resolvedValues.map((v) => (selectedMap[v.id] ? 1 : config.alphaSliderVal)),
           size: 10,
         },
       },
@@ -196,7 +196,7 @@ export async function createScatterTraces(
                     selectedMap[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
                   )
                 : xCurr.resolvedValues.map((v) => (selectedMap[v.id] ? '#E29609' : '#2e2e2e')),
-              opacity: config.alphaSliderVal,
+              opacity: xCurr.resolvedValues.map((v) => (selectedMap[v.id] ? 1 : config.alphaSliderVal)),
               size: 10,
             },
           },
@@ -233,7 +233,7 @@ export async function createScatterTraces(
           symbol: 'circle',
           size: 10,
           color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
-          opacity: 0.5,
+          opacity: config.alphaSliderVal,
         },
         transforms: [
           {

@@ -65,7 +65,7 @@ export function Vis({
       numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
       shape: null,
       isRectBrush: true,
-      alphaSliderVal: 1,
+      alphaSliderVal: 0.5,
     },
   );
 
