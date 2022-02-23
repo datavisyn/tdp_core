@@ -77,7 +77,7 @@ export function Vis({ columns, selected = [], colors = [
                     enable: true,
                 },
             }, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar })) : null,
-        isStrip(visConfig) ? React.createElement(StripVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar }) : null,
+        isStrip(visConfig) ? (React.createElement(StripVis, { config: visConfig, selectionCallback: selectionCallback, setConfig: setVisConfig, selected: selectedMap, columns: columns, scales: scales, hideSidebar: hideSidebar })) : null,
         isPCP(visConfig) ? React.createElement(PCPVis, { config: visConfig, selected: selectedMap, setConfig: setVisConfig, columns: columns, hideSidebar: hideSidebar }) : null,
         isBar(visConfig) ? React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar }) : null));
 }

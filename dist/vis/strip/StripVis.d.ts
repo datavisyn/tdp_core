@@ -11,8 +11,12 @@ interface StripVisProps {
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
+    selectionCallback?: (s: string[]) => void;
+    selected?: {
+        [key: string]: boolean;
+    };
     hideSidebar?: boolean;
 }
-export declare function StripVis({ config, extensions, columns, setConfig, scales, hideSidebar }: StripVisProps): JSX.Element;
+export declare function StripVis({ config, extensions, columns, setConfig, selectionCallback, selected, scales, hideSidebar, }: StripVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=StripVis.d.ts.map
