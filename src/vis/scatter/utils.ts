@@ -13,6 +13,7 @@ import {
   ENumericalColorScaleType,
   VisCategoricalValue,
   VisCategoricalColumn,
+  VisNumericalValue,
 } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
@@ -52,7 +53,17 @@ export function scatterMergeDefaultConfig(columns: VisColumn[], config: IScatter
   return merged;
 }
 
-export function moveSelectedToFront(col: VisCategoricalValue | VisCategoricalColumn, selectedMap: { [key: string]: boolean }) {}
+export function moveSelectedToFront(
+  col: (VisCategoricalValue | VisNumericalValue)[],
+  selectedMap: { [key: string]: boolean },
+): (VisCategoricalValue | VisNumericalValue)[] {
+  const selectedVals = col.filter((v) => selectedMap[v.id]);
+  const remainingVals = col.filter((v) => !selectedMap[v.id]);
+
+  const sortedCol = [...remainingVals, ...selectedVals];
+
+  return sortedCol;
+}
 
 export async function createScatterTraces(
   columns: VisColumn[],
@@ -88,6 +99,12 @@ export async function createScatterTraces(
   const validCols = await resolveColumnValues(numCols);
   const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
   const colorCol = await resolveSingleColumn(getCol(columns, config.color));
+
+  validCols.forEach((c) => {
+    c.resolvedValues = moveSelectedToFront(c.resolvedValues, selectedMap);
+  });
+
+  console.log(validCols);
 
   const shapeScale = config.shape
     ? d3.scale

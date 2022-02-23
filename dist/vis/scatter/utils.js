@@ -34,7 +34,12 @@ export function scatterMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
-export function moveSelectedToFront(col, selectedMap) { }
+export function moveSelectedToFront(col, selectedMap) {
+    const selectedVals = col.filter((v) => selectedMap[v.id]);
+    const remainingVals = col.filter((v) => !selectedMap[v.id]);
+    const sortedCol = [...remainingVals, ...selectedVals];
+    return sortedCol;
+}
 export async function createScatterTraces(columns, selected, config, scales, shapes) {
     let plotCounter = 1;
     const emptyVal = {
@@ -57,6 +62,10 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     const validCols = await resolveColumnValues(numCols);
     const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
     const colorCol = await resolveSingleColumn(getCol(columns, config.color));
+    validCols.forEach((c) => {
+        c.resolvedValues = moveSelectedToFront(c.resolvedValues, selectedMap);
+    });
+    console.log(validCols);
     const shapeScale = config.shape
         ? d3.scale
             .ordinal()
