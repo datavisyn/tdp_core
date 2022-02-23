@@ -102,19 +102,24 @@ export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripCon
 
 type ValueGetter<T> = () => Promise<T>;
 
+export interface IVisCommonValue<Type extends number | string> {
+  /**
+   * Visyn id of the row.
+   */
+  id: string;
+  /**
+   * Value of a vis column.
+   */
+  val: Type;
+}
+
+export type VisNumericalValue = IVisCommonValue<number>;
+
+export type VisCategoricalValue = IVisCommonValue<string>;
+
 export interface VisCommonColumn {
   info: ColumnInfo;
-  values: ValueGetter<{ id: number; val: string | number }[]>;
-}
-
-export interface VisNumericalValue {
-  id: number;
-  val: number;
-}
-
-export interface VisCategoricalValue {
-  id: number;
-  val: string;
+  values: ValueGetter<(VisNumericalValue | VisCategoricalValue)[]>;
 }
 
 export interface VisNumericalColumn extends VisCommonColumn {

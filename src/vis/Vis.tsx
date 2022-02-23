@@ -1,5 +1,6 @@
 import * as React from 'react';
 import d3 from 'd3';
+import { useMemo, useEffect } from 'react';
 import { ESupportedPlotlyVis, IVisConfig, Scales, VisColumn, EFilterOptions, ENumericalColorScaleType } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
@@ -7,33 +8,6 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
-
-export interface VisProps {
-  /**
-   * Required data columns which are displayed.
-   */
-  columns: VisColumn[];
-  /**
-   * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
-   */
-  selected?: { [key: number]: boolean };
-  /**
-   * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme
-   */
-  colors?: string[];
-  /**
-   * Optional Prop for changing the shapes that are used in shape mapping. Defaults to the circle, square, triangle, star.
-   */
-  shapes?: string[];
-  /**
-   * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
-   */
-  selectionCallback?: (s: number[]) => void;
-  /**
-   * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
-   */
-  filterCallback?: (s: EFilterOptions) => void;
-}
 
 export function Vis({
   columns,
@@ -53,16 +27,47 @@ export function Vis({
   shapes = ['circle', 'square', 'triangle-up', 'star'],
   selectionCallback = () => null,
   filterCallback = () => null,
-}: VisProps) {
-  const [visConfig, setVisConfig] = React.useState<IVisConfig>({
-    type: ESupportedPlotlyVis.SCATTER,
-    numColumnsSelected: [],
-    color: null,
-    numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
-    shape: null,
-    isRectBrush: true,
-    alphaSliderVal: 1,
-  });
+  externalConfig = null,
+  hideSidebar = false,
+}: {
+  /**
+   * Required data columns which are displayed.
+   */
+  columns: VisColumn[];
+  /**
+   * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
+   */
+  selected?: { [id: string]: boolean };
+  /**
+   * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme
+   */
+  colors?: string[];
+  /**
+   * Optional Prop for changing the shapes that are used in shape mapping. Defaults to the circle, square, triangle, star.
+   */
+  shapes?: string[];
+  /**
+   * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
+   */
+  selectionCallback?: (s: string[]) => void;
+  /**
+   * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
+   */
+  filterCallback?: (s: EFilterOptions) => void;
+  externalConfig?: IVisConfig;
+  hideSidebar?: boolean;
+}) {
+  const [visConfig, setVisConfig] = React.useState<IVisConfig>(
+    externalConfig || {
+      type: ESupportedPlotlyVis.SCATTER,
+      numColumnsSelected: [],
+      color: null,
+      numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+      shape: null,
+      isRectBrush: true,
+      alphaSliderVal: 1,
+    },
+  );
 
   React.useEffect(() => {
     if (isScatter(visConfig)) {
@@ -84,8 +89,15 @@ export function Vis({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visConfig.type]);
 
-  const scales: Scales = React.useMemo(() => {
+  useEffect(() => {
+    if (externalConfig) {
+      setVisConfig(externalConfig);
+    }
+  }, [externalConfig]);
+
+  const scales: Scales = useMemo(() => {
     const colorScale = d3.scale.ordinal().range(colors);
+
     return {
       color: colorScale,
     };
@@ -108,6 +120,7 @@ export function Vis({
           selected={selected}
           columns={columns}
           scales={scales}
+          hideSidebar={hideSidebar}
         />
       ) : null}
 
@@ -122,14 +135,15 @@ export function Vis({
           setConfig={setVisConfig}
           columns={columns}
           scales={scales}
+          hideSidebar={hideSidebar}
         />
       ) : null}
 
-      {isStrip(visConfig) ? <StripVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} /> : null}
+      {isStrip(visConfig) ? <StripVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
 
-      {isPCP(visConfig) ? <PCPVis config={visConfig} setConfig={setVisConfig} columns={columns} /> : null}
+      {isPCP(visConfig) ? <PCPVis config={visConfig} setConfig={setVisConfig} columns={columns} hideSidebar={hideSidebar} /> : null}
 
-      {isBar(visConfig) ? <BarVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} /> : null}
+      {isBar(visConfig) ? <BarVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
     </>
   );
 }

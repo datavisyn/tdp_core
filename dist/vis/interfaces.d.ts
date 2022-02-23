@@ -78,20 +78,21 @@ export interface IPCPConfig {
 }
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 declare type ValueGetter<T> = () => Promise<T>;
+export interface IVisCommonValue<Type extends number | string> {
+    /**
+     * Visyn id of the row.
+     */
+    id: string;
+    /**
+     * Value of a vis column.
+     */
+    val: Type;
+}
+export declare type VisNumericalValue = IVisCommonValue<number>;
+export declare type VisCategoricalValue = IVisCommonValue<string>;
 export interface VisCommonColumn {
     info: ColumnInfo;
-    values: ValueGetter<{
-        id: number;
-        val: string | number;
-    }[]>;
-}
-export interface VisNumericalValue {
-    id: number;
-    val: number;
-}
-export interface VisCategoricalValue {
-    id: number;
-    val: string;
+    values: ValueGetter<(VisNumericalValue | VisCategoricalValue)[]>;
 }
 export interface VisNumericalColumn extends VisCommonColumn {
     type: EColumnTypes.NUMERICAL;

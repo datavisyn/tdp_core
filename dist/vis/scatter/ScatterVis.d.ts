@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IVisConfig, EFilterOptions, Scales, VisColumn, IScatterConfig } from '../interfaces';
+import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn } from '../interfaces';
 interface ScatterVisProps {
     config: IScatterConfig;
     optionsConfig?: {
@@ -25,13 +25,14 @@ interface ScatterVisProps {
     shapes?: string[];
     columns: VisColumn[];
     filterCallback?: (s: EFilterOptions) => void;
-    selectionCallback?: (s: number[]) => void;
+    selectionCallback?: (s: string[]) => void;
     selected?: {
         [key: number]: boolean;
     };
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
+    hideSidebar?: boolean;
 }
-export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, scales, }: ScatterVisProps): JSX.Element;
+export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selected, setConfig, hideSidebar, scales, }: ScatterVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=ScatterVis.d.ts.map

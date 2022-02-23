@@ -1,13 +1,14 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { IVisConfig, ColumnInfo, ESupportedPlotlyVis, VisColumn, IStripConfig, Scales } from '../interfaces';
-import { CategoricalColumnSelect, NumericalColumnSelect, VisTypeSelect, WarningMessage } from '../sidebar';
+import { useMemo, useEffect } from 'react';
+import { IVisConfig, VisColumn, IStripConfig, Scales } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { createStripTraces } from './utils';
 import { useAsync } from '../../hooks';
+import { StripVisSidebar } from './StripVisSidebar';
 
 interface StripVisProps {
   config: IStripConfig;
@@ -20,6 +21,7 @@ interface StripVisProps {
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
+  hideSidebar?: boolean;
 }
 
 const defaultExtensions = {
@@ -29,8 +31,8 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function StripVis({ config, extensions, columns, setConfig, scales }: StripVisProps) {
-  const mergedExtensions = React.useMemo(() => {
+export function StripVis({ config, extensions, columns, setConfig, scales, hideSidebar = false }: StripVisProps) {
+  const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
@@ -38,7 +40,10 @@ export function StripVis({ config, extensions, columns, setConfig, scales }: Str
 
   const id = React.useMemo(() => uniqueId('StripVis'), []);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (hideSidebar) {
+      return;
+    }
     const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
@@ -48,7 +53,7 @@ export function StripVis({ config, extensions, columns, setConfig, scales }: Str
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [id]);
+  }, [id, hideSidebar]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -102,38 +107,23 @@ export function StripVis({ config, extensions, columns, setConfig, scales }: Str
         ) : null}
         {mergedExtensions.postPlot}
       </div>
-      <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
-        <button
-          className="btn btn-primary-outline"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target={`#generalVisBurgerMenu${id}`}
-          aria-expanded="true"
-          aria-controls="generalVisBurgerMenu"
-        >
-          <i className="fas fa-bars" />
-        </button>
-        <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
-          <div className="container pb-3" style={{ width: '20rem' }}>
-            <WarningMessage />
-            <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
-            <hr />
-            <NumericalColumnSelect
-              callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
-              columns={columns}
-              currentSelected={config.numColumnsSelected || []}
-            />
-            <CategoricalColumnSelect
-              callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
-              columns={columns}
-              currentSelected={config.catColumnsSelected || []}
-            />
-            <hr />
-            {mergedExtensions.preSidebar}
-            {mergedExtensions.postSidebar}
+      {!hideSidebar ? (
+        <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
+          <button
+            className="btn btn-primary-outline"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target={`#generalVisBurgerMenu${id}`}
+            aria-expanded="true"
+            aria-controls="generalVisBurgerMenu"
+          >
+            <i className="fas fa-bars" />
+          </button>
+          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
+            <StripVisSidebar config={config} extensions={extensions} columns={columns} setConfig={setConfig} />
           </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
