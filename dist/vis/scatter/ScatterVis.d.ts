@@ -26,9 +26,7 @@ interface ScatterVisProps {
     columns: VisColumn[];
     filterCallback?: (s: EFilterOptions) => void;
     selectionCallback?: (s: string[]) => void;
-    selected?: {
-        [key: number]: boolean;
-    };
+    selected?: string[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
     hideSidebar?: boolean;

@@ -32,15 +32,10 @@ export class LineupVisWrapper {
     this.viewable = false;
   }
 
-  getSelectionMap = (): { [id: string]: boolean } => {
-    const selectedMap: { [id: string]: boolean } = {};
+  getSelectedList = (): string[] => {
     const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection()) as IRow[];
 
-    selectedRows.forEach((row) => {
-      selectedMap[row.id] = true;
-    });
-
-    return selectedMap;
+    return selectedRows.map((r) => r._id.toString());
   };
 
   filterCallback = (s: string) => {
@@ -64,7 +59,7 @@ export class LineupVisWrapper {
 
     const cols: VisColumn[] = [];
 
-    const selectedMap = this.getSelectionMap();
+    const selectedList = this.getSelectedList();
 
     const getColumnInfo = (column: Column): ColumnInfo => {
       return {
@@ -77,7 +72,7 @@ export class LineupVisWrapper {
 
     const mapData = <T extends ValueColumn<number | string>>(innerData: IDataRow[], column: T) => {
       // TODO: This should be _visyn_id?
-      return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: d.v.id, val: column.getRaw(d) });
+      return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: d.v._id, val: column.getRaw(d) });
     };
 
     const getColumnValue = async <T extends ValueColumn<number | string>>(column: T) => {
@@ -117,7 +112,7 @@ export class LineupVisWrapper {
     ReactDOM.render(
       React.createElement(Vis, {
         columns: cols,
-        selected: selectedMap,
+        selected: selectedList,
         selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
         filterCallback: (s: string) => this.filterCallback(s),
       }),

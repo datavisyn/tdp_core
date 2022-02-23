@@ -24,9 +24,7 @@ export declare class LineupVisWrapper {
         selectionCallback(visynIds: string[]): void;
         doc: Document;
     });
-    getSelectionMap: () => {
-        [id: string]: boolean;
-    };
+    getSelectedList: () => string[];
     filterCallback: (s: string) => void;
     updateCustomVis: () => void;
     toggleCustomVis: () => void;

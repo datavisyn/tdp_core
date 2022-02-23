@@ -11,6 +11,8 @@ import {
   VisColumn,
   IScatterConfig,
   ENumericalColorScaleType,
+  VisCategoricalValue,
+  VisCategoricalColumn,
 } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
@@ -50,9 +52,11 @@ export function scatterMergeDefaultConfig(columns: VisColumn[], config: IScatter
   return merged;
 }
 
+export function moveSelectedToFront(col: VisCategoricalValue | VisCategoricalColumn, selectedMap: { [key: string]: boolean }) {}
+
 export async function createScatterTraces(
   columns: VisColumn[],
-  selected: { [id: string]: boolean },
+  selected: string[],
   config: IScatterConfig,
   scales: Scales,
   shapes: string[] | null,
@@ -71,6 +75,12 @@ export async function createScatterTraces(
   if (!config.numColumnsSelected) {
     return emptyVal;
   }
+
+  const selectedMap = {};
+
+  selected.forEach((s) => {
+    selectedMap[s] = true;
+  });
 
   const numCols: VisNumericalColumn[] = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
   const plots: PlotlyData[] = [];
@@ -132,9 +142,9 @@ export async function createScatterTraces(
           symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
           color: colorCol
             ? colorCol.resolvedValues.map((v) =>
-                selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
+                selectedMap[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
               )
-            : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
+            : validCols[0].resolvedValues.map((v) => (selectedMap[v.id] ? '#E29609' : '#2e2e2e')),
           opacity: config.alphaSliderVal,
           size: 10,
         },
@@ -166,9 +176,9 @@ export async function createScatterTraces(
               symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
               color: colorCol
                 ? colorCol.resolvedValues.map((v) =>
-                    selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
+                    selectedMap[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
                   )
-                : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
+                : xCurr.resolvedValues.map((v) => (selectedMap[v.id] ? '#E29609' : '#2e2e2e')),
               opacity: config.alphaSliderVal,
               size: 10,
             },

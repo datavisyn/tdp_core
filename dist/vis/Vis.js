@@ -8,7 +8,7 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
-export function Vis({ columns, selected = {}, colors = [
+export function Vis({ columns, selected = [], colors = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
     getCssValue('visyn-c3'),
