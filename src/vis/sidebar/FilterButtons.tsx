@@ -21,7 +21,7 @@ export function FilterButtons({ callback }: FilterButtonsProps) {
               id={`formButton${opt}`}
               autoComplete="off"
             />
-            <label style={{ zIndex: 0 }} className="btn btn-outline-primary w-100" htmlFor={`formButton${opt}`}>
+            <label className="align-items-center justify-content-center d-flex btn btn-outline-primary w-100" htmlFor={`formButton${opt}`}>
               {opt}
             </label>
           </React.Fragment>

@@ -36,7 +36,7 @@ export declare enum EGeneralFormType {
 export declare enum EFilterOptions {
     IN = "Filter In",
     OUT = "Filter Out",
-    CLEAR = "Clear Filter"
+    CLEAR = "Clear"
 }
 export declare enum ENumericalColorScaleType {
     SEQUENTIAL = "Sequential",

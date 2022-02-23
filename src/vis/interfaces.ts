@@ -51,7 +51,7 @@ export enum EGeneralFormType {
 export enum EFilterOptions {
   IN = 'Filter In',
   OUT = 'Filter Out',
-  CLEAR = 'Clear Filter',
+  CLEAR = 'Clear',
 }
 
 export enum ENumericalColorScaleType {
