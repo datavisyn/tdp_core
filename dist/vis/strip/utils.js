@@ -111,7 +111,7 @@ export async function createStripTraces(columns, config, selected, scales) {
                     },
                     unselected: {
                         marker: {
-                            color: '2e2e2e',
+                            color: '#2e2e2e',
                             opacity: 0.5,
                         },
                     },

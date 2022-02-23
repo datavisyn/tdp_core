@@ -175,7 +175,6 @@ export class ARankingView extends AView {
             provider: this.provider,
             selectionCallback: (selected) => {
                 const r = Range.list(selected.map((s) => +s));
-                console.log(selected, r);
                 this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), range: r });
             },
             doc: this.node.ownerDocument,

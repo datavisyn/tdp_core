@@ -135,7 +135,7 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
           },
           unselected: {
             marker: {
-              color: '2e2e2e',
+              color: '#2e2e2e',
               opacity: 0.5,
             },
           },
