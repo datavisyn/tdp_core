@@ -77,10 +77,6 @@ const defaultExtensions = {
 };
 
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }: BarVisProps) {
-  const mergedOptionsConfig = React.useMemo(() => {
-    return merge({}, defaultConfig, optionsConfig);
-  }, [optionsConfig]);
-
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -139,6 +135,11 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             divId={`plotlyDiv${id}`}
             data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
             layout={layout}
+            onClick={(e) => {
+              if (e) {
+                console.log(e);
+              }
+            }}
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}

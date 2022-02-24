@@ -3,12 +3,12 @@ import { useMemo } from 'react';
 import { merge } from 'lodash';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { GroupSelect } from '../sidebar/GroupSelect';
 import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
 import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
 import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
+import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
 const defaultConfig = {
     group: {
         enable: true,
@@ -48,7 +48,7 @@ export function BarVisSidebar({ config, optionsConfig, extensions, columns, setC
         React.createElement(WarningMessage, null),
         React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
         React.createElement("hr", null),
-        React.createElement(CategoricalColumnSelect, { callback: (catColumnsSelected) => setConfig({ ...config, catColumnsSelected }), columns: columns, currentSelected: config.catColumnsSelected || [] }),
+        React.createElement(CategoricalColumnSingleSelect, { callback: (catColumnSelected) => setConfig({ ...config, catColumnSelected }), columns: columns, currentSelected: config.catColumnSelected }),
         React.createElement("hr", null),
         mergedExtensions.preSidebar,
         mergedOptionsConfig.group.enable
