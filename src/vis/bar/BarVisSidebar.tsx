@@ -91,7 +91,14 @@ export function BarVisSidebar({ config, optionsConfig, extensions, columns, setC
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />
       <CategoricalColumnSingleSelect
-        callback={(catColumnSelected: ColumnInfo) => setConfig({ ...config, catColumnSelected })}
+        callback={(catColumnSelected: ColumnInfo) =>
+          setConfig({
+            ...config,
+            catColumnSelected,
+            multiples: config.multiples && config.multiples.id === catColumnSelected.id ? null : config.multiples,
+            group: config.group && config.group.id === catColumnSelected.id ? null : config.group,
+          })
+        }
         columns={columns}
         currentSelected={config.catColumnSelected}
       />
@@ -100,12 +107,20 @@ export function BarVisSidebar({ config, optionsConfig, extensions, columns, setC
 
       {mergedOptionsConfig.group.enable
         ? mergedOptionsConfig.group.customComponent || (
-            <GroupSelect callback={(group: ColumnInfo) => setConfig({ ...config, group })} columns={columns} currentSelected={config.group} />
+            <GroupSelect
+              callback={(group: ColumnInfo) => setConfig({ ...config, group })}
+              columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
+              currentSelected={config.group}
+            />
           )
         : null}
       {mergedOptionsConfig.multiples.enable
         ? mergedOptionsConfig.multiples.customComponent || (
-            <MultiplesSelect callback={(multiples: ColumnInfo) => setConfig({ ...config, multiples })} columns={columns} currentSelected={config.multiples} />
+            <MultiplesSelect
+              callback={(multiples: ColumnInfo) => setConfig({ ...config, multiples })}
+              columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
+              currentSelected={config.multiples}
+            />
           )
         : null}
       <hr />
