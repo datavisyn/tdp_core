@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import d3 from 'd3';
-import { EColumnTypes, ESupportedPlotlyVis, ENumericalColorScaleType, } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
@@ -14,7 +14,7 @@ const defaultConfig = {
     color: null,
     numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
     shape: null,
-    isRectBrush: true,
+    dragMode: EScatterSelectSettings.RECTANGLE,
     alphaSliderVal: 0.5,
 };
 export function scatterMergeDefaultConfig(columns, config) {

@@ -13,6 +13,7 @@ import {
   ENumericalColorScaleType,
   VisCategoricalValue,
   VisNumericalValue,
+  EScatterSelectSettings,
 } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
@@ -29,7 +30,7 @@ const defaultConfig: IScatterConfig = {
   color: null,
   numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
   shape: null,
-  isRectBrush: true,
+  dragMode: EScatterSelectSettings.RECTANGLE,
   alphaSliderVal: 0.5,
 };
 

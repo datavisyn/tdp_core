@@ -42,6 +42,12 @@ export declare enum ENumericalColorScaleType {
     SEQUENTIAL = "Sequential",
     DIVERGENT = "Divergent"
 }
+export declare enum EScatterSelectSettings {
+    RECTANGLE = "select",
+    LASSO = "lasso",
+    ZOOM = "zoom",
+    PAN = "pan"
+}
 export interface IViolinConfig {
     type: ESupportedPlotlyVis.VIOLIN;
     numColumnsSelected: ColumnInfo[];
@@ -59,7 +65,7 @@ export interface IScatterConfig {
     color: ColumnInfo | null;
     numColorScaleType: ENumericalColorScaleType;
     shape: ColumnInfo | null;
-    isRectBrush: boolean;
+    dragMode: EScatterSelectSettings;
     alphaSliderVal: number;
 }
 export interface IBarConfig {

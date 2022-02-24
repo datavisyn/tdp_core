@@ -56,4 +56,11 @@ export var ENumericalColorScaleType;
     ENumericalColorScaleType["SEQUENTIAL"] = "Sequential";
     ENumericalColorScaleType["DIVERGENT"] = "Divergent";
 })(ENumericalColorScaleType || (ENumericalColorScaleType = {}));
+export var EScatterSelectSettings;
+(function (EScatterSelectSettings) {
+    EScatterSelectSettings["RECTANGLE"] = "select";
+    EScatterSelectSettings["LASSO"] = "lasso";
+    EScatterSelectSettings["ZOOM"] = "zoom";
+    EScatterSelectSettings["PAN"] = "pan";
+})(EScatterSelectSettings || (EScatterSelectSettings = {}));
 //# sourceMappingURL=interfaces.js.map
