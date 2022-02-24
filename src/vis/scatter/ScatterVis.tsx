@@ -44,21 +44,6 @@ interface ScatterVisProps {
   hideSidebar?: boolean;
 }
 
-const defaultConfig = {
-  color: {
-    enable: true,
-    customComponent: null,
-  },
-  shape: {
-    enable: true,
-    customComponent: null,
-  },
-  filter: {
-    enable: true,
-    customComponent: null,
-  },
-};
-
 const defaultExtensions = {
   prePlot: null,
   postPlot: null,
@@ -80,6 +65,8 @@ export function ScatterVis({
   scales,
 }: ScatterVisProps) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
+
+  console.log(config);
 
   useEffect(() => {
     if (hideSidebar) {
