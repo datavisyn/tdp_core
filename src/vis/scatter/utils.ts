@@ -164,37 +164,60 @@ export async function createScatterTraces(
   } else {
     for (const yCurr of validCols) {
       for (const xCurr of validCols) {
-        plots.push({
-          data: {
-            x: xCurr.resolvedValues.map((v) => v.val),
-            y: yCurr.resolvedValues.map((v) => v.val),
-            ids: xCurr.resolvedValues.map((v) => v.id.toString()),
-            xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
-            yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-            type: 'scattergl',
-            mode: 'markers',
-            hoverlabel: {
-              namelength: 5,
-            },
-            showlegend: false,
-            text: validCols[0].resolvedValues.map((v) => v.id.toString()),
-            marker: {
-              line: {
-                width: 0,
+        // if on the diagonal, make a histogram.
+        if (xCurr.info.id === yCurr.info.id) {
+          plots.push({
+            data: {
+              x: xCurr.resolvedValues.map((v) => v.val),
+              xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+              yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+              type: 'histogram',
+              hoverlabel: {
+                namelength: 5,
               },
-              symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-              color: colorCol
-                ? colorCol.resolvedValues.map((v) =>
-                    selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
-                  )
-                : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
-              opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
-              size: 10,
+              showlegend: false,
+              marker: {
+                color: '#2e2e2e',
+              },
+              opacity: config.alphaSliderVal,
             },
-          },
-          xLabel: xCurr.info.name,
-          yLabel: yCurr.info.name,
-        });
+            xLabel: xCurr.info.name,
+            yLabel: yCurr.info.name,
+          });
+          // otherwise, make a scatterplot
+        } else {
+          plots.push({
+            data: {
+              x: xCurr.resolvedValues.map((v) => v.val),
+              y: yCurr.resolvedValues.map((v) => v.val),
+              ids: xCurr.resolvedValues.map((v) => v.id.toString()),
+              xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+              yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+              type: 'scattergl',
+              mode: 'markers',
+              hoverlabel: {
+                namelength: 5,
+              },
+              showlegend: false,
+              text: validCols[0].resolvedValues.map((v) => v.id.toString()),
+              marker: {
+                line: {
+                  width: 0,
+                },
+                symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+                color: colorCol
+                  ? colorCol.resolvedValues.map((v) =>
+                      selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
+                    )
+                  : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
+                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
+                size: 10,
+              },
+            },
+            xLabel: xCurr.info.name,
+            yLabel: yCurr.info.name,
+          });
+        }
 
         plotCounter += 1;
       }
