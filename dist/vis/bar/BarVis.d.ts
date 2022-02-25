@@ -33,7 +33,8 @@ interface BarVisProps {
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
+    hideSidebar?: boolean;
 }
-export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales }: BarVisProps): JSX.Element;
+export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar }: BarVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=BarVis.d.ts.map

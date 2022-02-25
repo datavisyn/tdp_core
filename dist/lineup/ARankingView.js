@@ -18,7 +18,6 @@ import { BaseUtils, debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { LineupVisWrapper } from '../vis';
-import { Range } from '../range';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -173,9 +172,9 @@ export class ARankingView extends AView {
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
         this.generalVis = new LineupVisWrapper({
             provider: this.provider,
-            selectionCallback: (selected) => {
-                const r = Range.list(selected);
-                this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), range: r });
+            selectionCallback: (ids) => {
+                // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
             },
             doc: this.node.ownerDocument,
         });

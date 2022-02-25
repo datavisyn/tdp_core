@@ -52,7 +52,7 @@ export function scatterMergeDefaultConfig(columns: VisColumn[], config: IScatter
 
 export async function createScatterTraces(
   columns: VisColumn[],
-  selected: { [key: number]: boolean },
+  selected: { [id: string]: boolean },
   config: IScatterConfig,
   scales: Scales,
   shapes: string[] | null,

@@ -1,23 +1,27 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
-import { AllColumnSelect, VisTypeSelect, WarningMessage } from '../sidebar';
+import { useMemo, useEffect } from 'react';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { createPCPTraces } from './utils';
 import { useAsync } from '../../hooks';
+import { PCPVisSidebar } from './PCPVisSidebar';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
     postSidebar: null,
 };
-export function PCPVis({ config, extensions, columns, setConfig }) {
-    const mergedExtensions = React.useMemo(() => {
+export function PCPVis({ config, extensions, columns, setConfig, hideSidebar = false }) {
+    const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createPCPTraces, [columns, config]);
     const id = React.useMemo(() => uniqueId('PCPVis'), []);
-    React.useEffect(() => {
+    useEffect(() => {
+        if (hideSidebar) {
+            return;
+        }
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
         menu.addEventListener('hidden.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
@@ -25,7 +29,7 @@ export function PCPVis({ config, extensions, columns, setConfig }) {
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, [id]);
+    }, [hideSidebar, id]);
     const layout = React.useMemo(() => {
         return traces
             ? {
@@ -42,19 +46,10 @@ export function PCPVis({ config, extensions, columns, setConfig }) {
             mergedExtensions.prePlot,
             traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { message: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
             mergedExtensions.postPlot),
-        React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto" },
+        !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${id}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
                 React.createElement("i", { className: "fas fa-bars" })),
             React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${id}` },
-                React.createElement("div", { className: "container pb-3", style: { width: '20rem' } },
-                    React.createElement(WarningMessage, null),
-                    React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
-                    React.createElement("hr", null),
-                    React.createElement(AllColumnSelect, { callback: (allCols) => {
-                            setConfig({ ...config, allColumnsSelected: allCols });
-                        }, columns: columns, currentSelected: config.allColumnsSelected || [] }),
-                    React.createElement("hr", null),
-                    mergedExtensions.preSidebar,
-                    mergedExtensions.postSidebar)))));
+                React.createElement(PCPVisSidebar, { config: config, extensions: extensions, columns: columns, setConfig: setConfig })))) : null));
 }
 //# sourceMappingURL=PCPVis.js.map
