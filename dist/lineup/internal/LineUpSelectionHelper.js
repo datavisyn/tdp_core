@@ -81,9 +81,9 @@ export class LineUpSelectionHelper extends EventHandler {
             return; // no change
         }
         // What are these remove and add event listeners doing ? They mess with my event listeners as well
-        // this.removeEventListener();
+        this.removeEventListener();
         this.provider.setSelection(indices);
-        // this.addEventListener();
+        this.addEventListener();
     }
     setGeneralVisSelection(sel) {
         if (!this.provider) {

@@ -18,7 +18,7 @@ import {
   IColumnDesc,
   UIntTypedArray,
 } from 'lineupjs';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ISearchOption, IContext, ISelectionColumn, ColumnDescUtils, LineupUtils, IARankingViewOptions, IRankingWrapper, ISelectionAdapter } from '.';
 import {
   BaseUtils,
@@ -56,7 +56,15 @@ import { AttachemntUtils } from '../storage/internal/internal';
 
 export interface IRankingProps {
   data: any[];
-  selection: ISelection;
+  /**
+   * Selection of the previous view
+   */
+  selection?: ISelection;
+
+  /**
+   * Own selection
+   */
+  itemSelection: ISelection;
   columnDesc: IAdditionalColumnDesc[];
   selectionAdapter?: ISelectionAdapter;
   options: Partial<IRankingOptions>;
@@ -135,6 +143,7 @@ const defaults = {
 export function Ranking({
   data = [],
   selection,
+  itemSelection,
   columnDesc = [],
   selectionAdapter = null,
   options: opts = {},
@@ -573,8 +582,40 @@ export function Ranking({
 
   const { status } = useAsync(build, []);
 
+  /**
+   * Writes the number of total, selected and shown items in the parameter area
+   */
+  const updateLineUpStats = useMemo(
+    () => () => {
+      const showStats = (total: number, selected = 0, shown = 0) => {
+        const name = shown === 1 ? options.itemName : options.itemNamePlural;
+        return `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.showing')} ${shown} ${
+          total > 0 ? `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.of')} ${total}` : ''
+        } ${typeof name === 'function' ? name() : name}${
+          selected > 0 ? `; ${selected} ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.selected')}` : ''
+        }`;
+      };
+
+      const selected = providerRef.current.getSelection().length;
+      const total = providerRef.current.data.length;
+
+      const r = providerRef.current.getRankings()[0];
+      const shown = r && r.getOrder() ? r.getOrder().length : 0;
+      // TODO: Where do the stats fit into the new views
+      // const stats.textContent = showStats(total, selected, shown);
+    },
+    [],
+  );
+
+  React.useEffect(() => {
+    if (selectionHelperRef.current && !busy) {
+      selectionHelperRef.current.setItemSelection(itemSelection);
+      updateLineUpStats();
+    }
+  }, [busy, itemSelection, updateLineUpStats]);
+
   return (
-    <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${busy ? 'tdp-busy' : ''}`}>
+    <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}`}>
       <div className="lineup-container" />
     </div>
   );

@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils, AView, IDTypeManager, useSyncedRef, TDPTokenManager, ERenderAuthorizationStatus, I18nextManager, RestStorageUtils, NotificationHandler, ViewUtils, SelectionUtils, TokenManager, ErrorAlertHandler, EViewMode, useAsync, EXTENSION_POINT_TDP_SCORE_IMPL, PluginRegistry, InvalidTokenError, } from '..';
 import { LazyColumn } from './internal/column';
@@ -68,7 +68,7 @@ const defaults = {
     panelAddColumnBtnOptions: {},
     mode: null,
 };
-export function Ranking({ data = [], selection, columnDesc = [], selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }) {
+export function Ranking({ data = [], selection, itemSelection, columnDesc = [], selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }) {
     // TODO: CUSTOM SELECTION ADAPTER FOR DRILLDOWN
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
@@ -436,7 +436,28 @@ export function Ranking({ data = [], selection, columnDesc = [], selectionAdapte
         });
     }, [options.mode, built]);
     const { status } = useAsync(build, []);
-    return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${busy ? 'tdp-busy' : ''}` },
+    /**
+     * Writes the number of total, selected and shown items in the parameter area
+     */
+    const updateLineUpStats = useMemo(() => () => {
+        const showStats = (total, selected = 0, shown = 0) => {
+            const name = shown === 1 ? options.itemName : options.itemNamePlural;
+            return `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.showing')} ${shown} ${total > 0 ? `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.of')} ${total}` : ''} ${typeof name === 'function' ? name() : name}${selected > 0 ? `; ${selected} ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.selected')}` : ''}`;
+        };
+        const selected = providerRef.current.getSelection().length;
+        const total = providerRef.current.data.length;
+        const r = providerRef.current.getRankings()[0];
+        const shown = r && r.getOrder() ? r.getOrder().length : 0;
+        // TODO: Where do the stats fit into the new views
+        // const stats.textContent = showStats(total, selected, shown);
+    }, []);
+    React.useEffect(() => {
+        if (selectionHelperRef.current && !busy) {
+            selectionHelperRef.current.setItemSelection(itemSelection);
+            updateLineUpStats();
+        }
+    }, [busy, itemSelection, updateLineUpStats]);
+    return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}` },
         React.createElement("div", { className: "lineup-container" })));
 }
 //# sourceMappingURL=Ranking.js.map

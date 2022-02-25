@@ -3,7 +3,14 @@ import { IARankingViewOptions, IRankingWrapper, ISelectionAdapter } from '.';
 import { ISelection, EViewMode, IAdditionalColumnDesc, IAuthorizationConfiguration } from '..';
 export interface IRankingProps {
     data: any[];
-    selection: ISelection;
+    /**
+     * Selection of the previous view
+     */
+    selection?: ISelection;
+    /**
+     * Own selection
+     */
+    itemSelection: ISelection;
     columnDesc: IAdditionalColumnDesc[];
     selectionAdapter?: ISelectionAdapter;
     options: Partial<IRankingOptions>;
@@ -17,5 +24,5 @@ export interface IRankingProps {
 export interface IRankingOptions extends IARankingViewOptions {
     mode: EViewMode;
 }
-export declare function Ranking({ data, selection, columnDesc, selectionAdapter, options: opts, authorization, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }: IRankingProps): JSX.Element;
+export declare function Ranking({ data, selection, itemSelection, columnDesc, selectionAdapter, options: opts, authorization, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }: IRankingProps): JSX.Element;
 //# sourceMappingURL=Ranking.d.ts.map
