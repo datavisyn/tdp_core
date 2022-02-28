@@ -1,1 +1,0 @@
-{"version":3,"file":"IIntersectionParam.d.ts","sourceRoot":"","sources":["../../src/2D/IIntersectionParam.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,kBAAkB;IACjC,QAAQ,CAAC,IAAI,EAAE,MAAM,CAAC;IACtB,QAAQ,CAAC,MAAM,EAAE,GAAG,EAAE,CAAC;CACxB;AAED,qBAAa,sBAAsB;IAEjC,MAAM,CAAC,uBAAuB,CAAC,IAAI,EAAE,MAAM,EAAE,MAAM,EAAE,GAAG,EAAE,GAAG,kBAAkB;CAGhF"}
