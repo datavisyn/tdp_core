@@ -129,6 +129,14 @@ export class IDTypeManager {
     return idType.canBeMappedTo;
   }
 
+  public async mapOneNameToFirstName(idType: IDType, name: string, toIDtype: IDTypeLike): Promise<string> {
+    return this.mapNameToFirstName(idType, [name], toIDtype).then((names) => names[0]);
+  }
+
+  public async mapOneNameToName(idType: IDType, name: string, toIDtype: IDTypeLike): Promise<string[]> {
+    return this.mapNameToName(idType, [name], toIDtype).then((names) => names[0]);
+  }
+
   public async mapNameToFirstName(idType: IDType, names: string[], toIDtype: IDTypeLike): Promise<string[]> {
     const target = IDTypeManager.getInstance().resolveIdType(toIDtype);
     if (idType.id === target.id) {
