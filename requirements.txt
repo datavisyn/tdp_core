@@ -12,7 +12,6 @@ openpyxl~=3.0.5
 pyjwt==2.1.0
 python-memcached==1.59
 flask-login==0.5.0
-redis~=3.5.3
 cachelib==0.1.1
 docutils==0.17.1
 -e git+https://github.com/phovea/phovea_server.git@develop#egg=phovea_server
