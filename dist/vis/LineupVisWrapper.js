@@ -4,19 +4,14 @@ import { CategoricalColumn, LocalDataProvider, NumberColumn, Ranking, ValueColum
 import { Vis } from './Vis';
 import { EColumnTypes, EFilterOptions } from './interfaces';
 export class LineupVisWrapper {
-    // tslint:disable-next-line:variable-name
     constructor(props) {
         this.props = props;
         this.getSelectionMap = () => {
-            const sel = this.props.provider.getSelection();
             const selectedMap = {};
-            const allData = this.props.provider.data;
-            for (const i of allData) {
-                selectedMap[i._id] = false;
-            }
-            for (const i of sel) {
-                selectedMap[allData[i]._id] = true;
-            }
+            const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection());
+            selectedRows.forEach((row) => {
+                selectedMap[row.id] = true;
+            });
             return selectedMap;
         };
         this.filterCallback = (s) => {
@@ -44,8 +39,7 @@ export class LineupVisWrapper {
                 };
             };
             const mapData = (innerData, column) => {
-                // TODO: Refactor to use _visyn_id instead.
-                return innerData.map((d) => ({ id: d.v._id, val: column.getRaw(d) }));
+                return innerData.map((d) => ({ id: d.v.id, val: column.getRaw(d) }));
             };
             const getColumnValue = async (column) => {
                 if (column.isLoaded()) {
@@ -81,7 +75,7 @@ export class LineupVisWrapper {
             ReactDOM.render(React.createElement(Vis, {
                 columns: cols,
                 selected: selectedMap,
-                selectionCallback: (s) => this.props.selectionCallback(s),
+                selectionCallback: (ids) => this.props.selectionCallback(ids),
                 filterCallback: (s) => this.filterCallback(s),
             }), this.node);
         };

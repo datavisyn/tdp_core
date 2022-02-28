@@ -10,7 +10,8 @@ interface PCPVisProps {
     };
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
+    hideSidebar?: boolean;
 }
-export declare function PCPVis({ config, extensions, columns, setConfig }: PCPVisProps): JSX.Element;
+export declare function PCPVis({ config, extensions, columns, setConfig, hideSidebar }: PCPVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=PCPVis.d.ts.map

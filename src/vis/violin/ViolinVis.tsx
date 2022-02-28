@@ -1,13 +1,14 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, Scales, VisColumn, IVisConfig, IViolinConfig, EViolinOverlay } from '../interfaces';
-import { CategoricalColumnSelect, NumericalColumnSelect, ViolinOverlayButtons, VisTypeSelect, WarningMessage } from '../sidebar';
+import { useEffect } from 'react';
+import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { createViolinTraces } from './utils';
 import { useAsync } from '../../hooks';
+import { ViolinVisSidebar } from './ViolinVisSidebar';
 
 interface ViolinVisProps {
   config: IViolinConfig;
@@ -26,6 +27,7 @@ interface ViolinVisProps {
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
+  hideSidebar?: boolean;
 }
 
 const defaultConfig = {
@@ -42,11 +44,7 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales }: ViolinVisProps) {
-  const mergedOptionsConfig = React.useMemo(() => {
-    return merge({}, defaultConfig, optionsConfig);
-  }, [optionsConfig]);
-
+export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }: ViolinVisProps) {
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -55,7 +53,10 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
 
   const id = React.useMemo(() => uniqueId('ViolinVis'), []);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (hideSidebar) {
+      return;
+    }
     const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
@@ -65,7 +66,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [id]);
+  }, [id, hideSidebar]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -119,48 +120,23 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         ) : null}
         {mergedExtensions.postPlot}
       </div>
-      <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
-        <button
-          className="btn btn-primary-outline"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target={`#generalVisBurgerMenu${id}`}
-          aria-expanded="true"
-          aria-controls="generalVisBurgerMenu"
-        >
-          <i className="fas fa-bars" />
-        </button>
-        <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
-          <div className="container pb-3" style={{ width: '20rem' }}>
-            <WarningMessage />
-            <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
-            <hr />
-            <NumericalColumnSelect
-              callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
-              columns={columns}
-              currentSelected={config.numColumnsSelected || []}
-            />
-            <CategoricalColumnSelect
-              callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
-              columns={columns}
-              currentSelected={config.catColumnsSelected || []}
-            />
-            <hr />
-            {mergedExtensions.preSidebar}
-
-            {mergedOptionsConfig.overlay.enable
-              ? mergedOptionsConfig.overlay.customComponent || (
-                  <ViolinOverlayButtons
-                    callback={(violinOverlay: EViolinOverlay) => setConfig({ ...config, violinOverlay })}
-                    currentSelected={config.violinOverlay}
-                  />
-                )
-              : null}
-
-            {mergedExtensions.postSidebar}
+      {!hideSidebar ? (
+        <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
+          <button
+            className="btn btn-primary-outline"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target={`#generalVisBurgerMenu${id}`}
+            aria-expanded="true"
+            aria-controls="generalVisBurgerMenu"
+          >
+            <i className="fas fa-bars" />
+          </button>
+          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
+            <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
           </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, VisColumn, IVisConfig, IPCPConfig } from '../interfaces';
-import { AllColumnSelect, VisTypeSelect, WarningMessage } from '../sidebar';
+import { useMemo, useEffect } from 'react';
+import { VisColumn, IVisConfig, IPCPConfig } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { createPCPTraces } from './utils';
 import { useAsync } from '../../hooks';
+import { PCPVisSidebar } from './PCPVisSidebar';
 
 interface PCPVisProps {
   config: IPCPConfig;
@@ -17,6 +18,7 @@ interface PCPVisProps {
   };
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
+  hideSidebar?: boolean;
 }
 
 const defaultExtensions = {
@@ -26,8 +28,8 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function PCPVis({ config, extensions, columns, setConfig }: PCPVisProps) {
-  const mergedExtensions = React.useMemo(() => {
+export function PCPVis({ config, extensions, columns, setConfig, hideSidebar = false }: PCPVisProps) {
+  const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
@@ -35,7 +37,10 @@ export function PCPVis({ config, extensions, columns, setConfig }: PCPVisProps) 
 
   const id = React.useMemo(() => uniqueId('PCPVis'), []);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (hideSidebar) {
+      return;
+    }
     const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
@@ -45,7 +50,7 @@ export function PCPVis({ config, extensions, columns, setConfig }: PCPVisProps) 
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [id]);
+  }, [hideSidebar, id]);
 
   const layout = React.useMemo<Partial<Plotly.Layout> | null>(() => {
     return traces
@@ -83,35 +88,23 @@ export function PCPVis({ config, extensions, columns, setConfig }: PCPVisProps) 
         ) : null}
         {mergedExtensions.postPlot}
       </div>
-      <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
-        <button
-          className="btn btn-primary-outline"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target={`#generalVisBurgerMenu${id}`}
-          aria-expanded="true"
-          aria-controls="generalVisBurgerMenu"
-        >
-          <i className="fas fa-bars" />
-        </button>
-        <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
-          <div className="container pb-3" style={{ width: '20rem' }}>
-            <WarningMessage />
-            <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
-            <hr />
-            <AllColumnSelect
-              callback={(allCols: ColumnInfo[]) => {
-                setConfig({ ...config, allColumnsSelected: allCols });
-              }}
-              columns={columns}
-              currentSelected={config.allColumnsSelected || []}
-            />
-            <hr />
-            {mergedExtensions.preSidebar}
-            {mergedExtensions.postSidebar}
+      {!hideSidebar ? (
+        <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
+          <button
+            className="btn btn-primary-outline"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target={`#generalVisBurgerMenu${id}`}
+            aria-expanded="true"
+            aria-controls="generalVisBurgerMenu"
+          >
+            <i className="fas fa-bars" />
+          </button>
+          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
+            <PCPVisSidebar config={config} extensions={extensions} columns={columns} setConfig={setConfig} />
           </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
