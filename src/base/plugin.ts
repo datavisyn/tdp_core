@@ -65,8 +65,8 @@ export interface IPlugin {
 }
 
 export interface IRegistry {
+  push(type: string, loader: () => any, desc?: any): void;
+  push(type: string, id: string, loader: () => any, desc?: any): void;
+  push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any): void;
   pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc): void;
-  push(type: Exclude<string, 'visynView'>, loader: () => any, desc?: any): void;
-  push(type: Exclude<string, 'visynView'>, id: string, loader: () => any, desc?: any): void;
-  push(type: Exclude<string, 'visynView'>, idOrLoader: string | (() => any), descOrLoader: any, desc?: any): void;
 }

@@ -6,10 +6,10 @@ import { IDType } from '../idtype/IDType';
 import { IUser } from '../security';
 import type { IPlugin, IPluginDesc } from './plugin';
 import { IEventHandler } from './event';
-import type { IServerColumn } from './rest';
 import { ProvenanceGraph } from '../provenance/ProvenanceGraph';
 import { IObjectRef } from '../provenance/ObjectNode';
 import { AppHeader } from '../components/header';
+import type { IServerColumn } from './rest';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
@@ -370,8 +370,12 @@ export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
   load(): Promise<IViewPlugin>;
 }
 
-export interface IVisynViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
+export interface IVisynViewPluginDesc<Param extends Record<string, any> = Record<string, any>> extends IBaseViewPluginDesc, IPluginDesc {
   load(): Promise<IVisynViewPlugin>;
+  /**
+   * Default parameters used for `parameters` of the actual `IVisynViewProps`.
+   */
+  defaultParameters?: Param;
 }
 
 // TODO:: refactor the Omit here to Partial<Pick<.. in ts 4
@@ -447,17 +451,20 @@ export interface IViewPlugin {
   factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
-export interface IVisynViewProps<Desc extends IVisynViewPlugin, Param extends Record<string, any>> {
+export interface IVisynViewProps<Desc extends IVisynViewPluginDesc = IVisynViewPluginDesc, Param extends Record<string, any> = Record<string, any>> {
   desc: Desc;
-  data: Record<string, any>;
-  // TODO:: Type to IReprovisynServerColumn when we merge that into tdp_core
-  dataDesc: IServerColumn[] | any[];
   selection: string[];
-  idFilter: string[];
   parameters: Param;
   onSelectionChanged: (selection: string[]) => void;
-  onIdFilterChanged: (idFilter: string[]) => void;
   onParametersChanged: (parameters: Param) => void;
+
+  // TODO: All these props are specific to workbenches which give you data.
+  // TODO: These properties only apply to actual workspaces with data, i.e. coming from a ranking. These should be enabled then (maybe optional?) or a specific subtype of views?
+  data: Record<string, any>;
+  // TODO:: Type to IReprovisynServerColumn when we merge that into tdp_core.
+  dataDesc: IServerColumn[] | any[];
+  idFilter: string[];
+  onIdFilterChanged: (idFilter: string[]) => void;
 }
 
 export interface IVisynViewPlugin {

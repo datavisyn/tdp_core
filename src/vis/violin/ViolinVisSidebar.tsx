@@ -1,14 +1,34 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, EViolinOverlay, IViolinConfig, IVisConfig, VisColumn } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, EViolinOverlay, IViolinConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
 
-interface ViolinVisSidebarProps {
+const defaultConfig = {
+  overlay: {
+    enable: true,
+    customComponent: null,
+  },
+};
+const defaultExtensions = {
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
+};
+export function ViolinVisSidebar({
+  config,
+  optionsConfig,
+  extensions,
+  columns,
+  setConfig,
+  className = '',
+  style: { width = '20em', ...style } = {},
+}: {
   config: IViolinConfig;
   optionsConfig?: {
     overlay?: {
@@ -24,22 +44,7 @@ interface ViolinVisSidebarProps {
   };
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
-  width?: string;
-}
-
-const defaultConfig = {
-  overlay: {
-    enable: true,
-    customComponent: null,
-  },
-};
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-export function ViolinVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }: ViolinVisSidebarProps) {
+} & ICommonVisSideBarProps) {
   const mergedOptionsConfig = useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
   }, [optionsConfig]);
@@ -49,7 +54,7 @@ export function ViolinVisSidebar({ config, optionsConfig, extensions, columns, s
   }, [extensions]);
 
   return (
-    <div className="container pb-3 pt-2" style={{ width }}>
+    <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
       <WarningMessage />
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />

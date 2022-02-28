@@ -49,7 +49,7 @@ export class FindViewUtils {
     static findVisynViews(idType) {
         return FindViewUtils.findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_VISYN_VIEW), true).then((r) => {
             return r
-                .map(ViewUtils.toViewPluginDesc)
+                .map((v) => ViewUtils.toViewPluginDesc(v))
                 .map((v) => {
                 const access = FindViewUtils.canAccess(v);
                 const hasAccessHint = !access && Boolean(v.securityNotAllowedText);

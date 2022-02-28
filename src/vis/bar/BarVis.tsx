@@ -162,13 +162,13 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             className="btn btn-primary-outline"
             type="button"
             data-bs-toggle="collapse"
-            data-bs-target={`#generalVisBurgerMenu${uniqueId}`}
+            data-bs-target={`#generalVisBurgerMenu${id}`}
             aria-expanded="true"
             aria-controls="generalVisBurgerMenu"
           >
             <i className="fas fa-bars" />
           </button>
-          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${uniqueId}`}>
+          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
             <BarVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
           </div>
         </div>

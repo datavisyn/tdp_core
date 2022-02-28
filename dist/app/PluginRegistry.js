@@ -1,12 +1,10 @@
 import { UniqueIdManager } from './UniqueIdManager';
 import { BaseUtils } from '../base/BaseUtils';
+import { EXTENSION_POINT_VISYN_VIEW } from '../base/extensions';
 export class PluginRegistry {
     constructor() {
         this.registry = [];
         this.knownPlugins = new Set();
-    }
-    pushVisynView(id, loader, desc) {
-        return this.push('visynView', id, loader, desc);
     }
     push(type, idOrLoader, descOrLoader, desc) {
         const id = typeof idOrLoader === 'string' ? idOrLoader : UniqueIdManager.getInstance().uniqueString(type);
@@ -24,6 +22,9 @@ export class PluginRegistry {
             },
         }, typeof descOrLoader === 'function' ? desc : descOrLoader);
         PluginRegistry.getInstance().registry.push(p);
+    }
+    pushVisynView(id, loader, desc) {
+        return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, desc);
     }
     register(plugin, generator) {
         if (typeof generator !== 'function') {
@@ -54,9 +55,6 @@ export class PluginRegistry {
      * @param id
      * @returns {IPluginDesc}
      */
-    getVisynPlugin(type, id) {
-        return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id);
-    }
     getPlugin(type, id) {
         return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id);
     }

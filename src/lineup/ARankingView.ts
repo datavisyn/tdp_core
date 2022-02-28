@@ -240,8 +240,9 @@ export abstract class ARankingView extends AView {
 
     this.generalVis = new LineupVisWrapper({
       provider: this.provider,
-      selectionCallback: (visynIds) => {
-        this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids: visynIds });
+      selectionCallback: (ids: string[]) => {
+        // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+        this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
       },
       doc: this.node.ownerDocument,
     });
@@ -378,8 +379,8 @@ export abstract class ARankingView extends AView {
       columns,
       selection: this.selection,
       freeColor: (id: string) => this.colors.freeColumnColor(id),
-      add: (innerColumns: ISelectionColumn[]) => innerColumns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-      remove: (innerColumns: Column[]) => innerColumns.forEach((c) => c.removeMe()),
+      add: (selectionColumns: ISelectionColumn[]) => selectionColumns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
+      remove: (removeColumns: Column[]) => removeColumns.forEach((c) => c.removeMe()),
     };
   }
 
@@ -599,9 +600,11 @@ export abstract class ARankingView extends AView {
    * @param {string} columnId
    * @returns {Promise<boolean>}
    */
-  removeTrackedScoreColumn(columnId: string): Promise<boolean> {
+  async removeTrackedScoreColumn(columnId: string): Promise<boolean> {
+    // return this.withoutTracking(() => {
     const column = this.provider.find(columnId);
-    return Promise.resolve(column.removeMe());
+    return column.removeMe();
+    // });
   }
 
   /**

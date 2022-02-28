@@ -1,9 +1,9 @@
 import type { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
-import type { IBaseViewPluginDesc, IVisynViewPluginDesc } from '../base/interfaces';
+import type { IBaseViewPluginDesc } from '../base/interfaces';
 export declare class PluginRegistry implements IRegistry {
     private registry;
-    pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc): void;
     push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any): void;
+    pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc): void;
     private knownPlugins;
     register(plugin: string, generator?: (registry: IRegistry) => void): void;
     /**
@@ -18,7 +18,6 @@ export declare class PluginRegistry implements IRegistry {
      * @param id
      * @returns {IPluginDesc}
      */
-    getVisynPlugin(type: 'visynView', id: string): IVisynViewPluginDesc;
     getPlugin(type: string, id: string): IPluginDesc;
     loadPlugin(desc: IPluginDesc[]): Promise<IPlugin[]>;
     /**

@@ -1,14 +1,11 @@
 import type { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
+import type { IBaseViewPluginDesc, IVisynViewPluginDesc } from '../base/interfaces';
 import { UniqueIdManager } from './UniqueIdManager';
 import { BaseUtils } from '../base/BaseUtils';
-import type { IBaseViewPluginDesc, IVisynViewPluginDesc } from '../base/interfaces';
+import { EXTENSION_POINT_VISYN_VIEW } from '../base/extensions';
 
 export class PluginRegistry implements IRegistry {
   private registry: IPluginDesc[] = [];
-
-  public pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc) {
-    return this.push('visynView', id, loader, desc);
-  }
 
   public push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any) {
     const id = typeof idOrLoader === 'string' ? <string>idOrLoader : UniqueIdManager.getInstance().uniqueString(type);
@@ -30,6 +27,10 @@ export class PluginRegistry implements IRegistry {
     );
 
     PluginRegistry.getInstance().registry.push(p);
+  }
+
+  public pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc) {
+    return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, desc);
   }
 
   private knownPlugins = new Set<string>();
@@ -66,10 +67,6 @@ export class PluginRegistry implements IRegistry {
    * @param id
    * @returns {IPluginDesc}
    */
-  public getVisynPlugin(type: 'visynView', id: string): IVisynViewPluginDesc {
-    return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id) as IVisynViewPluginDesc;
-  }
-
   public getPlugin(type: string, id: string): IPluginDesc {
     return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id);
   }

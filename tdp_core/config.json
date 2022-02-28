@@ -45,16 +45,6 @@
     "site": "1",
     "encryptUserName": false
   },
-  "--phovea_data_redis": "comment",
-  "mapping": {
-    "hostname": "redis",
-    "port": 6379,
-    "db": 4,
-    "extras": {
-
-    },
-    "bulk": false
-  },
   "--phovea_data_mongo": "comment",
   "mongo": {
     "host": "mongo",

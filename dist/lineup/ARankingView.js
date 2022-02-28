@@ -173,8 +173,9 @@ export class ARankingView extends AView {
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
         this.generalVis = new LineupVisWrapper({
             provider: this.provider,
-            selectionCallback: (visynIds) => {
-                this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids: visynIds });
+            selectionCallback: (ids) => {
+                // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
             },
             doc: this.node.ownerDocument,
         });
@@ -296,8 +297,8 @@ export class ARankingView extends AView {
             columns,
             selection: this.selection,
             freeColor: (id) => this.colors.freeColumnColor(id),
-            add: (innerColumns) => innerColumns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-            remove: (innerColumns) => innerColumns.forEach((c) => c.removeMe()),
+            add: (selectionColumns) => selectionColumns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
+            remove: (removeColumns) => removeColumns.forEach((c) => c.removeMe()),
         };
     }
     /**
@@ -494,9 +495,11 @@ export class ARankingView extends AView {
      * @param {string} columnId
      * @returns {Promise<boolean>}
      */
-    removeTrackedScoreColumn(columnId) {
+    async removeTrackedScoreColumn(columnId) {
+        // return this.withoutTracking(() => {
         const column = this.provider.find(columnId);
-        return Promise.resolve(column.removeMe());
+        return column.removeMe();
+        // });
     }
     /**
      * generates the column descriptions based on the given server columns by default they are mapped
