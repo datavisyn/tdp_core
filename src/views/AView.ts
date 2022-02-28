@@ -351,18 +351,18 @@ export abstract class AView extends EventHandler implements IView {
     // propagate
     if (selection.idtype) {
       if (name === AView.DEFAULT_SELECTION_NAME) {
-        if (selection.ids.length === 0) {
+        if ((selection.ids?.length || 0) === 0) {
           selection.idtype.clear(SelectionUtils.defaultSelectionType);
         } else {
           selection.idtype.select(selection.ids);
         }
-      } else if (selection.ids.length === 0) {
+      } else if ((selection.ids?.length || 0) === 0) {
         selection.idtype.clear(name);
       } else {
         selection.idtype.select(name, selection.ids);
       }
     }
-    const isEmpty = selection == null || selection.idtype == null || selection.ids.length === 0;
+    const isEmpty = selection == null || selection.idtype == null || (selection.ids?.length || 0) === 0;
     if (!(wasEmpty && isEmpty)) {
       // the selection has changed when we really have some new values not just another empty one
       this.itemSelectionChanged(name);

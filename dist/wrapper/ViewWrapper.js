@@ -262,7 +262,8 @@ export class ViewWrapper extends EventHandler {
         return undefined;
     }
     match(selection) {
-        return ViewUtils.matchLength(this.plugin.selection, selection.ids.length);
+        var _a;
+        return ViewUtils.matchLength(this.plugin.selection, ((_a = selection.ids) === null || _a === void 0 ? void 0 : _a.length) || 0);
     }
     /**
      * @deprecated use getInputSelection instead

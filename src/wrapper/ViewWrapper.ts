@@ -349,7 +349,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   private match(selection: ISelection) {
-    return ViewUtils.matchLength(this.plugin.selection, selection.ids.length);
+    return ViewUtils.matchLength(this.plugin.selection, selection.ids?.length || 0);
   }
 
   /**
