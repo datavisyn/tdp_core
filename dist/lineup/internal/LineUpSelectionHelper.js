@@ -91,7 +91,7 @@ export class LineUpSelectionHelper extends EventHandler {
         const old = this.provider.getSelection().sort((a, b) => a - b);
         const indices = [];
         sel.ids.forEach((uid) => {
-            const index = this.uid2index.get(uid);
+            const index = this.uid2index.get(String(uid));
             if (typeof index === 'number') {
                 indices.push(index);
             }
