@@ -1,6 +1,6 @@
-import { IServerColumn, IVisynViewPlugin } from '../base';
+import { IServerColumn, IVisynViewPluginDesc } from '../base';
 
-export interface IVisynViewProps<Desc extends IVisynViewPlugin, Param extends Record<string, any>> {
+export interface IVisynViewProps<Desc extends IVisynViewPluginDesc, Param extends Record<string, any>> {
   desc: Desc;
   data: Record<string, any>;
   // TODO:: Type to IReprovisynServerColumn when we merge that into tdp_core

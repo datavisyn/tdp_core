@@ -68,12 +68,13 @@ const defaults = {
     panelAddColumnBtnOptions: {},
     mode: null,
 };
-export function Ranking({ data = [], selection: inputSelection, itemSelection, columnDesc = [], selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }) {
+export function Ranking({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }) {
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
     const options = BaseUtils.mixin({}, defaults, opts);
     const itemSelections = new Map();
     const selections = new Map();
+    console.log(itemSelection);
     const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
     const [selection, setSelection] = React.useState(inputSelection);
     const viewRef = React.useRef(null);
@@ -86,14 +87,11 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection, c
     const panelRef = React.useRef(null);
     const generalVisRef = React.useRef(null);
     React.useEffect(() => {
-        if (busy) {
-            return;
-        }
         selections.set(AView.DEFAULT_SELECTION_NAME, inputSelection);
         const sel = (itemSelection === null || itemSelection === void 0 ? void 0 : itemSelection.ids) ? itemSelection : { idtype: null, ids: [] };
         itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [busy]);
+    }, []);
     const addColumn = (colDesc, d, id = null, position) => {
         // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
         colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : colorsRef.current.getColumnColor(id);
@@ -333,7 +331,7 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection, c
             }
             selectionHelperRef.current.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection) => {
                 const name = AView.DEFAULT_SELECTION_NAME;
-                const current = itemSelections.get(name);
+                const current = itemSelections.get(name) || { idtype: null, ids: [] };
                 if (current && ViewUtils.isSameSelection(current, selection)) {
                     return;
                 }
@@ -459,7 +457,9 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection, c
         const shown = r && r.getOrder() ? r.getOrder().length : 0;
         // TODO: Where do the stats fit into the new views
         // const stats.textContent = showStats(total, selected, shown);
-    }, []);
+    }, 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []);
     React.useEffect(() => {
         if (selectionHelperRef.current && !busy) {
             selectionHelperRef.current.setItemSelection(itemSelection);

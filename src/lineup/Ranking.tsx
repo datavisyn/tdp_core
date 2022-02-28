@@ -143,7 +143,7 @@ const defaults = {
 export function Ranking({
   data = [],
   selection: inputSelection,
-  itemSelection,
+  itemSelection = { idtype: null, ids: [] },
   columnDesc = [],
   selectionAdapter = null,
   options: opts = {},
@@ -159,7 +159,7 @@ export function Ranking({
   const options = BaseUtils.mixin({}, defaults, opts) as Readonly<IRankingOptions>;
   const itemSelections = new Map<string, ISelection>();
   const selections = new Map<string, ISelection>();
-
+  console.log(itemSelection);
   const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
   const [selection, setSelection] = React.useState(inputSelection);
   const viewRef = React.useRef<HTMLDivElement | null>(null);
@@ -174,14 +174,11 @@ export function Ranking({
   const generalVisRef = React.useRef<LineupVisWrapper>(null);
 
   React.useEffect(() => {
-    if (busy) {
-      return;
-    }
     selections.set(AView.DEFAULT_SELECTION_NAME, inputSelection);
     const sel = itemSelection?.ids ? itemSelection : { idtype: null, ids: [] };
     itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [busy]);
+  }, []);
 
   const addColumn = (colDesc: any, d: Promise<IScoreRow<any>[]>, id: string = null, position?: number) => {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
@@ -466,7 +463,7 @@ export function Ranking({
 
       selectionHelperRef.current.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
         const name = AView.DEFAULT_SELECTION_NAME;
-        const current = itemSelections.get(name);
+        const current = itemSelections.get(name) || { idtype: null, ids: [] };
         if (current && ViewUtils.isSameSelection(current, selection)) {
           return;
         }
@@ -615,6 +612,7 @@ export function Ranking({
       // TODO: Where do the stats fit into the new views
       // const stats.textContent = showStats(total, selected, shown);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 
