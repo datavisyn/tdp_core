@@ -54,6 +54,7 @@ import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
 import { AttachemntUtils } from '../storage/internal/internal';
 
+// TODO: view related logic to a view component
 export interface IRankingProps {
   data: any[];
   /**
@@ -65,6 +66,8 @@ export interface IRankingProps {
    * Own selection
    */
   itemSelection: ISelection;
+
+  parameter: any;
   columnDesc: IAdditionalColumnDesc[];
   selectionAdapter?: ISelectionAdapter;
   options: Partial<IRankingOptions>;
@@ -72,6 +75,7 @@ export interface IRankingProps {
   onUpdateEntryPoint?: (namedSet: unknown) => void;
   onItemSelectionChanged?: () => void;
   onItemSelect?: (current: ISelection, selection: ISelection, name: string) => void;
+  onParameterChanged?: (parameter: string) => void;
   onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
   onBuiltLineUp?: (provider: LocalDataProvider) => void;
 }
@@ -145,12 +149,14 @@ export function Ranking({
   selection: inputSelection,
   itemSelection = { idtype: null, ids: [] },
   columnDesc = [],
+  parameter = null,
   selectionAdapter = null,
   options: opts = {},
   authorization = null,
   onUpdateEntryPoint,
   onItemSelect,
   onItemSelectionChanged,
+  onParameterChanged,
   onCustomizeRanking,
   onBuiltLineUp,
 }: IRankingProps) {
@@ -640,6 +646,16 @@ export function Ranking({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [busy, inputSelection]);
+
+  // TODO: fix parameter changes
+  // React.useEffect(() => {
+  //   if (!busy) {
+  //     if (selectionAdapter) {
+  //       selectionAdapter.parameterChanged(null, () => createContext(inputSelection));
+  //     }
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [busy, parameter]);
 
   return (
     <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}`}>

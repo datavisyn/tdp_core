@@ -68,7 +68,7 @@ const defaults = {
     panelAddColumnBtnOptions: {},
     mode: null,
 };
-export function Ranking({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }) {
+export function Ranking({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameter = null, selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onParameterChanged, onCustomizeRanking, onBuiltLineUp, }) {
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
     const options = BaseUtils.mixin({}, defaults, opts);
@@ -483,6 +483,15 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [busy, inputSelection]);
+    // TODO: fix parameter changes
+    // React.useEffect(() => {
+    //   if (!busy) {
+    //     if (selectionAdapter) {
+    //       selectionAdapter.parameterChanged(null, () => createContext(inputSelection));
+    //     }
+    //   }
+    //   // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [busy, parameter]);
     return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}` },
         React.createElement("div", { className: "lineup-container" })));
 }

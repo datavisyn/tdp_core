@@ -11,6 +11,7 @@ export interface IRankingProps {
      * Own selection
      */
     itemSelection: ISelection;
+    parameter: any;
     columnDesc: IAdditionalColumnDesc[];
     selectionAdapter?: ISelectionAdapter;
     options: Partial<IRankingOptions>;
@@ -18,11 +19,12 @@ export interface IRankingProps {
     onUpdateEntryPoint?: (namedSet: unknown) => void;
     onItemSelectionChanged?: () => void;
     onItemSelect?: (current: ISelection, selection: ISelection, name: string) => void;
+    onParameterChanged?: (parameter: string) => void;
     onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
     onBuiltLineUp?: (provider: LocalDataProvider) => void;
 }
 export interface IRankingOptions extends IARankingViewOptions {
     mode: EViewMode;
 }
-export declare function Ranking({ data, selection: inputSelection, itemSelection, columnDesc, selectionAdapter, options: opts, authorization, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }: IRankingProps): JSX.Element;
+export declare function Ranking({ data, selection: inputSelection, itemSelection, columnDesc, parameter, selectionAdapter, options: opts, authorization, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onParameterChanged, onCustomizeRanking, onBuiltLineUp, }: IRankingProps): JSX.Element;
 //# sourceMappingURL=Ranking.d.ts.map
