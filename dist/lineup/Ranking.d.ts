@@ -24,5 +24,5 @@ export interface IRankingProps {
 export interface IRankingOptions extends IARankingViewOptions {
     mode: EViewMode;
 }
-export declare function Ranking({ data, selection, itemSelection, columnDesc, selectionAdapter, options: opts, authorization, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }: IRankingProps): JSX.Element;
+export declare function Ranking({ data, selection: inputSelection, itemSelection, columnDesc, selectionAdapter, options: opts, authorization, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }: IRankingProps): JSX.Element;
 //# sourceMappingURL=Ranking.d.ts.map

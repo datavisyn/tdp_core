@@ -142,7 +142,7 @@ const defaults = {
 
 export function Ranking({
   data = [],
-  selection,
+  selection: inputSelection,
   itemSelection,
   columnDesc = [],
   selectionAdapter = null,
@@ -154,13 +154,14 @@ export function Ranking({
   onCustomizeRanking,
   onBuiltLineUp,
 }: IRankingProps) {
-  // TODO: CUSTOM SELECTION ADAPTER FOR DRILLDOWN
   const [busy, setBusy] = React.useState<boolean>(false);
   const [built, setBuilt] = React.useState<boolean>(false);
   const options = BaseUtils.mixin({}, defaults, opts) as Readonly<IRankingOptions>;
   const itemSelections = new Map<string, ISelection>();
-  itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
+  const selections = new Map<string, ISelection>();
+
   const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
+  const [selection, setSelection] = React.useState(inputSelection);
   const viewRef = React.useRef<HTMLDivElement | null>(null);
 
   // Stores the ranking data when collapsing columns when mode changes
@@ -171,6 +172,16 @@ export function Ranking({
   const selectionHelperRef = React.useRef<LineUpSelectionHelper>(null);
   const panelRef = React.useRef<LineUpPanelActions>(null);
   const generalVisRef = React.useRef<LineupVisWrapper>(null);
+
+  React.useEffect(() => {
+    if (busy) {
+      return;
+    }
+    selections.set(AView.DEFAULT_SELECTION_NAME, inputSelection);
+    const sel = itemSelection?.ids ? itemSelection : { idtype: null, ids: [] };
+    itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busy]);
 
   const addColumn = (colDesc: any, d: Promise<IScoreRow<any>[]>, id: string = null, position?: number) => {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
@@ -289,12 +300,12 @@ export function Ranking({
     return r;
   };
 
-  const createContext = (): IContext => {
+  const createContext = (sel: ISelection): IContext => {
     const ranking = providerRef.current.getLastRanking();
     const columns = ranking ? ranking.flatColumns : [];
     return {
       columns,
-      selection,
+      selection: sel,
       freeColor: (id: string) => colorsRef.current.freeColumnColor(id),
       add: (columns: ISelectionColumn[]) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
       remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
@@ -514,7 +525,7 @@ export function Ranking({
 
       return Promise.resolve()
         .then(async () => {
-          return selectionAdapter?.selectionChanged(null, createContext);
+          return selectionAdapter?.selectionChanged(null, () => createContext(selection));
         })
         .then(() => {
           onBuiltLineUp?.(providerRef.current);
@@ -613,6 +624,24 @@ export function Ranking({
       updateLineUpStats();
     }
   }, [busy, itemSelection, updateLineUpStats]);
+
+  React.useEffect(() => {
+    if (!busy) {
+      const name = AView.DEFAULT_SELECTION_NAME;
+      const current = selections.get(name);
+      if (current && ViewUtils.isSameSelection(current, inputSelection)) {
+        return;
+      }
+      selections.set(name, inputSelection);
+      if (name === AView.DEFAULT_SELECTION_NAME) {
+        setSelection(inputSelection);
+        if (selectionAdapter) {
+          selectionAdapter.selectionChanged(null, () => createContext(inputSelection));
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busy, inputSelection]);
 
   return (
     <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}`}>

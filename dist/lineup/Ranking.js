@@ -68,14 +68,14 @@ const defaults = {
     panelAddColumnBtnOptions: {},
     mode: null,
 };
-export function Ranking({ data = [], selection, itemSelection, columnDesc = [], selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }) {
-    // TODO: CUSTOM SELECTION ADAPTER FOR DRILLDOWN
+export function Ranking({ data = [], selection: inputSelection, itemSelection, columnDesc = [], selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, }) {
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
     const options = BaseUtils.mixin({}, defaults, opts);
     const itemSelections = new Map();
-    itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
+    const selections = new Map();
     const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
+    const [selection, setSelection] = React.useState(inputSelection);
     const viewRef = React.useRef(null);
     // Stores the ranking data when collapsing columns when mode changes
     const dump = React.useRef(null);
@@ -85,6 +85,15 @@ export function Ranking({ data = [], selection, itemSelection, columnDesc = [], 
     const selectionHelperRef = React.useRef(null);
     const panelRef = React.useRef(null);
     const generalVisRef = React.useRef(null);
+    React.useEffect(() => {
+        if (busy) {
+            return;
+        }
+        selections.set(AView.DEFAULT_SELECTION_NAME, inputSelection);
+        const sel = (itemSelection === null || itemSelection === void 0 ? void 0 : itemSelection.ids) ? itemSelection : { idtype: null, ids: [] };
+        itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [busy]);
     const addColumn = (colDesc, d, id = null, position) => {
         // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
         colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : colorsRef.current.getColumnColor(id);
@@ -194,12 +203,12 @@ export function Ranking({ data = [], selection, itemSelection, columnDesc = [], 
         };
         return r;
     };
-    const createContext = () => {
+    const createContext = (sel) => {
         const ranking = providerRef.current.getLastRanking();
         const columns = ranking ? ranking.flatColumns : [];
         return {
             columns,
-            selection,
+            selection: sel,
             freeColor: (id) => colorsRef.current.freeColumnColor(id),
             add: (columns) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
             remove: (columns) => columns.forEach((c) => c.removeMe()),
@@ -379,7 +388,7 @@ export function Ranking({ data = [], selection, itemSelection, columnDesc = [], 
         onCustomizeRanking === null || onCustomizeRanking === void 0 ? void 0 : onCustomizeRanking(LineupUtils.wrapRanking(providerRef.current, ranking));
         return Promise.resolve()
             .then(async () => {
-            return selectionAdapter === null || selectionAdapter === void 0 ? void 0 : selectionAdapter.selectionChanged(null, createContext);
+            return selectionAdapter === null || selectionAdapter === void 0 ? void 0 : selectionAdapter.selectionChanged(null, () => createContext(selection));
         })
             .then(() => {
             onBuiltLineUp === null || onBuiltLineUp === void 0 ? void 0 : onBuiltLineUp(providerRef.current);
@@ -457,6 +466,23 @@ export function Ranking({ data = [], selection, itemSelection, columnDesc = [], 
             updateLineUpStats();
         }
     }, [busy, itemSelection, updateLineUpStats]);
+    React.useEffect(() => {
+        if (!busy) {
+            const name = AView.DEFAULT_SELECTION_NAME;
+            const current = selections.get(name);
+            if (current && ViewUtils.isSameSelection(current, inputSelection)) {
+                return;
+            }
+            selections.set(name, inputSelection);
+            if (name === AView.DEFAULT_SELECTION_NAME) {
+                setSelection(inputSelection);
+                if (selectionAdapter) {
+                    selectionAdapter.selectionChanged(null, () => createContext(inputSelection));
+                }
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [busy, inputSelection]);
     return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}` },
         React.createElement("div", { className: "lineup-container" })));
 }
