@@ -5,7 +5,7 @@ import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
-import { EventHandler, IEvent, IEventListener, ResolveNow } from '../base';
+import { EventHandler, IEvent, IEventListener, ResolveNow, IBaseViewPluginDesc } from '../base';
 import { NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph } from '../provenance';
 import { I18nextManager } from '../i18n';
 import { IDType, IDTypeManager } from '../idtype';
@@ -349,7 +349,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
   }
 
   private match(selection: ISelection) {
-    return ViewUtils.matchLength(this.plugin.selection, selection.ids.length);
+    return ViewUtils.matchLength(this.plugin.selection, selection.ids?.length || 0);
   }
 
   /**
@@ -430,7 +430,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     }
   }
 
-  static guessIDType(v: IViewPluginDesc): IDType | null {
-    return v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype);
+  static guessIDType(v: IBaseViewPluginDesc): IDType | null {
+    return v.idtype ? (v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype)) : null;
   }
 }

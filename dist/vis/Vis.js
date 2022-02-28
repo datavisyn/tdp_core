@@ -1,5 +1,6 @@
 import * as React from 'react';
 import d3 from 'd3';
+import { useMemo, useEffect } from 'react';
 import { ESupportedPlotlyVis, ENumericalColorScaleType } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
@@ -18,8 +19,8 @@ export function Vis({ columns, selected = {}, colors = [
     getCssValue('visyn-c8'),
     getCssValue('visyn-c9'),
     getCssValue('visyn-c10'),
-], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, }) {
-    const [visConfig, setVisConfig] = React.useState({
+], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null, hideSidebar = false, }) {
+    const [visConfig, setVisConfig] = React.useState(externalConfig || {
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
         color: null,
@@ -47,7 +48,12 @@ export function Vis({ columns, selected = {}, colors = [
         // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visConfig.type]);
-    const scales = React.useMemo(() => {
+    useEffect(() => {
+        if (externalConfig) {
+            setVisConfig(externalConfig);
+        }
+    }, [externalConfig]);
+    const scales = useMemo(() => {
         const colorScale = d3.scale.ordinal().range(colors);
         return {
             color: colorScale,
@@ -58,14 +64,14 @@ export function Vis({ columns, selected = {}, colors = [
                 color: {
                     enable: true,
                 },
-            }, shapes: shapes, setConfig: setVisConfig, filterCallback: filterCallback, selectionCallback: selectionCallback, selected: selected, columns: columns, scales: scales })) : null,
+            }, shapes: shapes, setConfig: setVisConfig, filterCallback: filterCallback, selectionCallback: selectionCallback, selected: selected, columns: columns, scales: scales, hideSidebar: hideSidebar })) : null,
         isViolin(visConfig) ? (React.createElement(ViolinVis, { config: visConfig, optionsConfig: {
                 overlay: {
                     enable: true,
                 },
-            }, setConfig: setVisConfig, columns: columns, scales: scales })) : null,
-        isStrip(visConfig) ? React.createElement(StripVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales }) : null,
-        isPCP(visConfig) ? React.createElement(PCPVis, { config: visConfig, setConfig: setVisConfig, columns: columns }) : null,
-        isBar(visConfig) ? React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales }) : null));
+            }, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar })) : null,
+        isStrip(visConfig) ? React.createElement(StripVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar }) : null,
+        isPCP(visConfig) ? React.createElement(PCPVis, { config: visConfig, setConfig: setVisConfig, columns: columns, hideSidebar: hideSidebar }) : null,
+        isBar(visConfig) ? React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar }) : null));
 }
 //# sourceMappingURL=Vis.js.map

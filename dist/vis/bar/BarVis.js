@@ -1,13 +1,14 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
+import { useEffect } from 'react';
 import { EBarGroupingType } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
-import { createBarTraces } from './utils';
 import { useAsync } from '../../hooks';
-import { BarDirectionButtons, BarDisplayButtons, BarGroupTypeButtons, CategoricalColumnSelect, GroupSelect, MultiplesSelect, VisTypeSelect, WarningMessage, } from '../sidebar';
+import { createBarTraces } from './utils';
+import { BarVisSidebar } from './BarVisSidebar';
 const defaultConfig = {
     group: {
         enable: true,
@@ -36,7 +37,7 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales }) {
+export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }) {
     const mergedOptionsConfig = React.useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
     }, [optionsConfig]);
@@ -45,7 +46,10 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
     }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
     const id = React.useMemo(() => uniqueId('BarVis'), []);
-    React.useEffect(() => {
+    useEffect(() => {
+        if (hideSidebar) {
+            return;
+        }
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
         menu.addEventListener('hidden.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
@@ -53,7 +57,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, [id]);
+    }, [id, hideSidebar]);
     const layout = React.useMemo(() => {
         if (!traces) {
             return null;
@@ -85,33 +89,10 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { message: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
             mergedExtensions.postPlot),
-        React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto" },
+        !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${id}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
                 React.createElement("i", { className: "fas fa-bars" })),
             React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${id}` },
-                React.createElement("div", { className: "container pb-3", style: { width: '20rem' } },
-                    React.createElement(WarningMessage, null),
-                    React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
-                    React.createElement("hr", null),
-                    React.createElement(CategoricalColumnSelect, { callback: (catColumnsSelected) => setConfig({ ...config, catColumnsSelected }), columns: columns, currentSelected: config.catColumnsSelected || [] }),
-                    React.createElement("hr", null),
-                    mergedExtensions.preSidebar,
-                    mergedOptionsConfig.group.enable
-                        ? mergedOptionsConfig.group.customComponent || (React.createElement(GroupSelect, { callback: (group) => setConfig({ ...config, group }), columns: columns, currentSelected: config.group }))
-                        : null,
-                    mergedOptionsConfig.multiples.enable
-                        ? mergedOptionsConfig.multiples.customComponent || (React.createElement(MultiplesSelect, { callback: (multiples) => setConfig({ ...config, multiples }), columns: columns, currentSelected: config.multiples }))
-                        : null,
-                    React.createElement("hr", null),
-                    mergedOptionsConfig.direction.enable
-                        ? mergedOptionsConfig.direction.customComponent || (React.createElement(BarDirectionButtons, { callback: (direction) => setConfig({ ...config, direction }), currentSelected: config.direction }))
-                        : null,
-                    mergedOptionsConfig.groupType.enable
-                        ? mergedOptionsConfig.groupType.customComponent || (React.createElement(BarGroupTypeButtons, { callback: (groupType) => setConfig({ ...config, groupType }), currentSelected: config.groupType }))
-                        : null,
-                    mergedOptionsConfig.display.enable
-                        ? mergedOptionsConfig.display.customComponent || (React.createElement(BarDisplayButtons, { callback: (display) => setConfig({ ...config, display }), currentSelected: config.display }))
-                        : null,
-                    mergedExtensions.postSidebar)))));
+                React.createElement(BarVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, setConfig: setConfig })))) : null));
 }
 //# sourceMappingURL=BarVis.js.map

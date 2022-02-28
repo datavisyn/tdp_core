@@ -1,6 +1,6 @@
 /// <reference types="react" />
-import { VisColumn, EFilterOptions } from './interfaces';
-export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, }: {
+import { IVisConfig, VisColumn, EFilterOptions } from './interfaces';
+export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, externalConfig, hideSidebar, }: {
     /**
      * Required data columns which are displayed.
      */
@@ -22,10 +22,12 @@ export declare function Vis({ columns, selected, colors, shapes, selectionCallba
     /**
      * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
      */
-    selectionCallback?: (s: string[]) => void;
+    selectionCallback?: (ids: string[]) => void;
     /**
      * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
      */
     filterCallback?: (s: EFilterOptions) => void;
+    externalConfig?: IVisConfig;
+    hideSidebar?: boolean;
 }): JSX.Element;
 //# sourceMappingURL=Vis.d.ts.map

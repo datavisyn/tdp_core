@@ -1,28 +1,16 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { IVisConfig, ColumnInfo, EFilterOptions, ESupportedPlotlyVis, Scales, VisColumn, IScatterConfig, ENumericalColorScaleType } from '../interfaces';
-import { BrushOptionButtons, ColorSelect, FilterButtons, NumericalColumnSelect, OpacitySlider, ShapeSelect, VisTypeSelect, WarningMessage } from '../sidebar';
-import { PlotlyComponent, Plotly } from '../Plot';
-import { InvalidCols } from '../general';
+import { useEffect } from 'react';
+import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn } from '../interfaces';
+import { InvalidCols } from '../InvalidCols';
 import { createScatterTraces } from './utils';
-import { beautifyLayout } from '../general/layoutUtils';
+import { beautifyLayout } from '../layoutUtils';
+import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
+import { OpacitySlider } from '../sidebar/OpacitySlider';
+import { ScatterVisSidebar } from './ScatterVisSidebar';
+import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
-
-const defaultConfig = {
-  color: {
-    enable: true,
-    customComponent: null,
-  },
-  shape: {
-    enable: true,
-    customComponent: null,
-  },
-  filter: {
-    enable: true,
-    customComponent: null,
-  },
-};
 
 const defaultExtensions = {
   prePlot: null,
@@ -41,6 +29,7 @@ export function ScatterVis({
   selectionCallback = () => null,
   selected = {},
   setConfig,
+  hideSidebar = false,
   scales,
 }: {
   config: IScatterConfig;
@@ -67,14 +56,19 @@ export function ScatterVis({
   shapes?: string[];
   columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
-  selectionCallback?: (s: string[]) => void;
-  selected?: { [id: string]: boolean };
+  selectionCallback?: (ids: string[]) => void;
+  selected?: { [key: number]: boolean };
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
+  hideSidebar?: boolean;
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (hideSidebar) {
+      return;
+    }
+
     const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
@@ -84,11 +78,7 @@ export function ScatterVis({
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [id]);
-
-  const mergedOptionsConfig = React.useMemo(() => {
-    return merge({}, defaultConfig, optionsConfig);
-  }, [optionsConfig]);
+  }, [id, hideSidebar]);
 
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
@@ -163,53 +153,30 @@ export function ScatterVis({
         </div>
         {mergedExtensions.postPlot}
       </div>
-      <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
-        <button
-          className="btn btn-primary-outline"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target={`#generalVisBurgerMenu${id}`}
-          aria-expanded="true"
-          aria-controls="generalVisBurgerMenu"
-        >
-          <i className="fas fa-bars" />
-        </button>
-        <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
-          <div className="container pb-3" style={{ width: '20rem' }}>
-            <WarningMessage />
-            <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
-            <hr />
-            <NumericalColumnSelect
-              callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
+      {!hideSidebar ? (
+        <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
+          <button
+            className="btn btn-primary-outline"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target={`#generalVisBurgerMenu${id}`}
+            aria-expanded="true"
+            aria-controls="generalVisBurgerMenu"
+          >
+            <i className="fas fa-bars" />
+          </button>
+          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
+            <ScatterVisSidebar
+              config={config}
+              optionsConfig={optionsConfig}
+              extensions={extensions}
               columns={columns}
-              currentSelected={config.numColumnsSelected || []}
+              filterCallback={filterCallback}
+              setConfig={setConfig}
             />
-            <hr />
-            {mergedExtensions.preSidebar}
-
-            {mergedOptionsConfig.color.enable
-              ? mergedOptionsConfig.color.customComponent || (
-                  <ColorSelect
-                    callback={(color: ColumnInfo) => setConfig({ ...config, color })}
-                    numTypeCallback={(numColorScaleType: ENumericalColorScaleType) => setConfig({ ...config, numColorScaleType })}
-                    currentNumType={config.numColorScaleType}
-                    columns={columns}
-                    currentSelected={config.color}
-                  />
-                )
-              : null}
-            {mergedOptionsConfig.shape.enable
-              ? mergedOptionsConfig.shape.customComponent || (
-                  <ShapeSelect callback={(shape: ColumnInfo) => setConfig({ ...config, shape })} columns={columns} currentSelected={config.shape} />
-                )
-              : null}
-            <hr />
-            {mergedOptionsConfig.filter.enable ? mergedOptionsConfig.filter.customComponent || <FilterButtons callback={filterCallback} /> : null}
-
-            {mergedExtensions.postSidebar}
           </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

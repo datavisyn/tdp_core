@@ -1,22 +1,14 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType, EBarDirection, EBarDisplayType } from '../interfaces';
+import { useEffect } from 'react';
+import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
-import { createBarTraces } from './utils';
 import { useAsync } from '../../hooks';
-import {
-  BarDirectionButtons,
-  BarDisplayButtons,
-  BarGroupTypeButtons,
-  CategoricalColumnSelect,
-  GroupSelect,
-  MultiplesSelect,
-  VisTypeSelect,
-  WarningMessage,
-} from '../sidebar';
+import { createBarTraces } from './utils';
+import { BarVisSidebar } from './BarVisSidebar';
 
 interface BarVisProps {
   config: IBarConfig;
@@ -51,6 +43,7 @@ interface BarVisProps {
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
+  hideSidebar?: boolean;
 }
 
 const defaultConfig = {
@@ -83,7 +76,7 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales }: BarVisProps) {
+export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }: BarVisProps) {
   const mergedOptionsConfig = React.useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
   }, [optionsConfig]);
@@ -96,7 +89,10 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
 
   const id = React.useMemo(() => uniqueId('BarVis'), []);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (hideSidebar) {
+      return;
+    }
     const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
@@ -106,7 +102,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [id]);
+  }, [id, hideSidebar]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -160,67 +156,23 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         ) : null}
         {mergedExtensions.postPlot}
       </div>
-      <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto">
-        <button
-          className="btn btn-primary-outline"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target={`#generalVisBurgerMenu${id}`}
-          aria-expanded="true"
-          aria-controls="generalVisBurgerMenu"
-        >
-          <i className="fas fa-bars" />
-        </button>
-        <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
-          <div className="container pb-3" style={{ width: '20rem' }}>
-            <WarningMessage />
-            <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
-            <hr />
-            <CategoricalColumnSelect
-              callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
-              columns={columns}
-              currentSelected={config.catColumnsSelected || []}
-            />
-            <hr />
-            {mergedExtensions.preSidebar}
-
-            {mergedOptionsConfig.group.enable
-              ? mergedOptionsConfig.group.customComponent || (
-                  <GroupSelect callback={(group: ColumnInfo) => setConfig({ ...config, group })} columns={columns} currentSelected={config.group} />
-                )
-              : null}
-            {mergedOptionsConfig.multiples.enable
-              ? mergedOptionsConfig.multiples.customComponent || (
-                  <MultiplesSelect
-                    callback={(multiples: ColumnInfo) => setConfig({ ...config, multiples })}
-                    columns={columns}
-                    currentSelected={config.multiples}
-                  />
-                )
-              : null}
-            <hr />
-            {mergedOptionsConfig.direction.enable
-              ? mergedOptionsConfig.direction.customComponent || (
-                  <BarDirectionButtons callback={(direction: EBarDirection) => setConfig({ ...config, direction })} currentSelected={config.direction} />
-                )
-              : null}
-
-            {mergedOptionsConfig.groupType.enable
-              ? mergedOptionsConfig.groupType.customComponent || (
-                  <BarGroupTypeButtons callback={(groupType: EBarGroupingType) => setConfig({ ...config, groupType })} currentSelected={config.groupType} />
-                )
-              : null}
-
-            {mergedOptionsConfig.display.enable
-              ? mergedOptionsConfig.display.customComponent || (
-                  <BarDisplayButtons callback={(display: EBarDisplayType) => setConfig({ ...config, display })} currentSelected={config.display} />
-                )
-              : null}
-
-            {mergedExtensions.postSidebar}
+      {!hideSidebar ? (
+        <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
+          <button
+            className="btn btn-primary-outline"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target={`#generalVisBurgerMenu${id}`}
+            aria-expanded="true"
+            aria-controls="generalVisBurgerMenu"
+          >
+            <i className="fas fa-bars" />
+          </button>
+          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
+            <BarVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
           </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }

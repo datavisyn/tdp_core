@@ -173,8 +173,9 @@ export class ARankingView extends AView {
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
         this.generalVis = new LineupVisWrapper({
             provider: this.provider,
-            selectionCallback: (visynIds) => {
-                this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids: visynIds });
+            selectionCallback: (ids) => {
+                // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
             },
             doc: this.node.ownerDocument,
         });
