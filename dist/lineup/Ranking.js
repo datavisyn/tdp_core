@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils, AView, IDTypeManager, useSyncedRef, TDPTokenManager, ERenderAuthorizationStatus, I18nextManager, RestStorageUtils, NotificationHandler, ViewUtils, SelectionUtils, TokenManager, ErrorAlertHandler, EViewMode, useAsync, EXTENSION_POINT_TDP_SCORE_IMPL, PluginRegistry, InvalidTokenError, } from '..';
 import { LazyColumn } from './internal/column';
@@ -68,13 +68,13 @@ const defaults = {
     panelAddColumnBtnOptions: {},
     mode: null,
 };
-export function Ranking({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameter = null, selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onParameterChanged, onCustomizeRanking, onBuiltLineUp, }) {
+export function Ranking({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = false, selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onParameterChanged, onCustomizeRanking, onBuiltLineUp, }) {
+    const isMounted = useRef(false);
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
     const options = BaseUtils.mixin({}, defaults, opts);
     const itemSelections = new Map();
     const selections = new Map();
-    console.log(itemSelection);
     const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
     const [selection, setSelection] = React.useState(inputSelection);
     const viewRef = React.useRef(null);
@@ -483,15 +483,16 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [busy, inputSelection]);
-    // TODO: fix parameter changes
-    // React.useEffect(() => {
-    //   if (!busy) {
-    //     if (selectionAdapter) {
-    //       selectionAdapter.parameterChanged(null, () => createContext(inputSelection));
-    //     }
-    //   }
-    //   // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [busy, parameter]);
+    React.useEffect(() => {
+        // ignore first time parameter are passed since there is no change
+        if (!busy && parameters && isMounted.current) {
+            if (selectionAdapter) {
+                selectionAdapter.parameterChanged(null, () => createContext(inputSelection));
+            }
+        }
+        isMounted.current = true;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [busy, parameters]);
     return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}` },
         React.createElement("div", { className: "lineup-container" })));
 }

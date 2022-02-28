@@ -18,7 +18,7 @@ import {
   IColumnDesc,
   UIntTypedArray,
 } from 'lineupjs';
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { ISearchOption, IContext, ISelectionColumn, ColumnDescUtils, LineupUtils, IARankingViewOptions, IRankingWrapper, ISelectionAdapter } from '.';
 import {
   BaseUtils,
@@ -67,7 +67,8 @@ export interface IRankingProps {
    */
   itemSelection: ISelection;
 
-  parameter: any;
+  // TODO: We need to trigger an update when parameters
+  parameters: any;
   columnDesc: IAdditionalColumnDesc[];
   selectionAdapter?: ISelectionAdapter;
   options: Partial<IRankingOptions>;
@@ -149,7 +150,7 @@ export function Ranking({
   selection: inputSelection,
   itemSelection = { idtype: null, ids: [] },
   columnDesc = [],
-  parameter = null,
+  parameters = false,
   selectionAdapter = null,
   options: opts = {},
   authorization = null,
@@ -160,12 +161,12 @@ export function Ranking({
   onCustomizeRanking,
   onBuiltLineUp,
 }: IRankingProps) {
+  const isMounted = useRef(false);
   const [busy, setBusy] = React.useState<boolean>(false);
   const [built, setBuilt] = React.useState<boolean>(false);
   const options = BaseUtils.mixin({}, defaults, opts) as Readonly<IRankingOptions>;
   const itemSelections = new Map<string, ISelection>();
   const selections = new Map<string, ISelection>();
-  console.log(itemSelection);
   const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
   const [selection, setSelection] = React.useState(inputSelection);
   const viewRef = React.useRef<HTMLDivElement | null>(null);
@@ -647,15 +648,16 @@ export function Ranking({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [busy, inputSelection]);
 
-  // TODO: fix parameter changes
-  // React.useEffect(() => {
-  //   if (!busy) {
-  //     if (selectionAdapter) {
-  //       selectionAdapter.parameterChanged(null, () => createContext(inputSelection));
-  //     }
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [busy, parameter]);
+  React.useEffect(() => {
+    // ignore first time parameter are passed since there is no change
+    if (!busy && parameters && isMounted.current) {
+      if (selectionAdapter) {
+        selectionAdapter.parameterChanged(null, () => createContext(inputSelection));
+      }
+    }
+    isMounted.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [busy, parameters]);
 
   return (
     <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}`}>
