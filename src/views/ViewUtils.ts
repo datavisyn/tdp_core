@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash';
-import { IPluginDesc } from '../base';
+import { IPluginDesc, IVisynViewPluginDesc } from '../base';
 import { IViewPluginDesc, IViewContext, ISelection } from '../base/interfaces';
 import { IObjectRef, ProvenanceGraph } from '../provenance';
 
@@ -17,7 +17,7 @@ export class ViewUtils {
 
   public static readonly VIEW_EVENT_UPDATE_SHARED = 'updateShared';
 
-  static toViewPluginDesc(p: IPluginDesc): IViewPluginDesc {
+  static toViewPluginDesc<ReturnType extends IViewPluginDesc | IVisynViewPluginDesc = IViewPluginDesc>(p: IPluginDesc): ReturnType {
     const r: any = p;
     r.selection = r.selection || 'none';
     r.group = { name: 'Other', order: 99, ...r.group };

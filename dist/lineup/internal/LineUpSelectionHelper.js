@@ -84,7 +84,6 @@ export class LineUpSelectionHelper extends EventHandler {
         this.provider.setSelection(indices);
         this.addEventListener();
     }
-    // TODO: Refactor to use just indices: number[]?
     setGeneralVisSelection(sel) {
         if (!this.provider) {
             return;
@@ -92,7 +91,7 @@ export class LineUpSelectionHelper extends EventHandler {
         const old = this.provider.getSelection().sort((a, b) => a - b);
         const indices = [];
         sel.ids.forEach((uid) => {
-            const index = this.uid2index.get(uid);
+            const index = this.uid2index.get(String(uid));
             if (typeof index === 'number') {
                 indices.push(index);
             }

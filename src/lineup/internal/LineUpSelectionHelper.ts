@@ -2,7 +2,6 @@ import { LocalDataProvider } from 'lineupjs';
 import { difference } from 'lodash';
 import { EventHandler, ISelection } from '../../base';
 import { IRow } from '../../base/rest';
-import { LineupUtils } from '../utils';
 import { IDType } from '../../idtype';
 
 export class LineUpSelectionHelper extends EventHandler {
@@ -107,7 +106,6 @@ export class LineUpSelectionHelper extends EventHandler {
     this.addEventListener();
   }
 
-  // TODO: Refactor to use just indices: number[]?
   setGeneralVisSelection(sel: ISelection) {
     if (!this.provider) {
       return;
@@ -117,7 +115,7 @@ export class LineUpSelectionHelper extends EventHandler {
 
     const indices: number[] = [];
     sel.ids.forEach((uid) => {
-      const index = this.uid2index.get(uid);
+      const index = this.uid2index.get(String(uid));
       if (typeof index === 'number') {
         indices.push(index);
       }

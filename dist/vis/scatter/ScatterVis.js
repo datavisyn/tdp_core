@@ -1,35 +1,27 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { BrushOptionButtons, ColorSelect, FilterButtons, NumericalColumnSelect, OpacitySlider, ShapeSelect, VisTypeSelect, WarningMessage } from '../sidebar';
-import { PlotlyComponent, Plotly } from '../Plot';
-import { InvalidCols } from '../general';
+import { useEffect } from 'react';
+import { InvalidCols } from '../InvalidCols';
 import { createScatterTraces } from './utils';
-import { beautifyLayout } from '../general/layoutUtils';
+import { beautifyLayout } from '../layoutUtils';
+import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
+import { OpacitySlider } from '../sidebar/OpacitySlider';
+import { ScatterVisSidebar } from './ScatterVisSidebar';
+import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
-const defaultConfig = {
-    color: {
-        enable: true,
-        customComponent: null,
-    },
-    shape: {
-        enable: true,
-        customComponent: null,
-    },
-    filter: {
-        enable: true,
-        customComponent: null,
-    },
-};
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
     postSidebar: null,
 };
-export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, scales, }) {
+export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, hideSidebar = false, scales, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
-    React.useEffect(() => {
+    useEffect(() => {
+        if (hideSidebar) {
+            return;
+        }
         const menu = document.getElementById(`generalVisBurgerMenu${id}`);
         menu.addEventListener('hidden.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
@@ -37,10 +29,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, [id]);
-    const mergedOptionsConfig = React.useMemo(() => {
-        return merge({}, defaultConfig, optionsConfig);
-    }, [optionsConfig]);
+    }, [id, hideSidebar]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
@@ -87,25 +76,10 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 React.createElement(BrushOptionButtons, { callback: (e) => setConfig({ ...config, isRectBrush: e }), isRectBrush: config.isRectBrush }),
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
             mergedExtensions.postPlot),
-        React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto" },
+        !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${id}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
                 React.createElement("i", { className: "fas fa-bars" })),
             React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${id}` },
-                React.createElement("div", { className: "container pb-3", style: { width: '20rem' } },
-                    React.createElement(WarningMessage, null),
-                    React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
-                    React.createElement("hr", null),
-                    React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),
-                    React.createElement("hr", null),
-                    mergedExtensions.preSidebar,
-                    mergedOptionsConfig.color.enable
-                        ? mergedOptionsConfig.color.customComponent || (React.createElement(ColorSelect, { callback: (color) => setConfig({ ...config, color }), numTypeCallback: (numColorScaleType) => setConfig({ ...config, numColorScaleType }), currentNumType: config.numColorScaleType, columns: columns, currentSelected: config.color }))
-                        : null,
-                    mergedOptionsConfig.shape.enable
-                        ? mergedOptionsConfig.shape.customComponent || (React.createElement(ShapeSelect, { callback: (shape) => setConfig({ ...config, shape }), columns: columns, currentSelected: config.shape }))
-                        : null,
-                    React.createElement("hr", null),
-                    mergedOptionsConfig.filter.enable ? mergedOptionsConfig.filter.customComponent || React.createElement(FilterButtons, { callback: filterCallback }) : null,
-                    mergedExtensions.postSidebar)))));
+                React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig })))) : null));
 }
 //# sourceMappingURL=ScatterVis.js.map

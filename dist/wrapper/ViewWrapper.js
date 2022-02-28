@@ -335,7 +335,7 @@ export class ViewWrapper extends EventHandler {
         }
     }
     static guessIDType(v) {
-        return v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype);
+        return v.idtype ? (v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype)) : null;
     }
 }
 ViewWrapper.EVENT_VIEW_INITIALIZED = 'viewInitialized';
