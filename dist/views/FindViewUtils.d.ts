@@ -1,6 +1,6 @@
-import { IGroupData, IInstanceViewExtensionDesc, IViewPluginDesc } from '../base/interfaces';
+import type { IGroupData, IInstanceViewExtensionDesc, IViewPluginDesc } from '../base/interfaces';
 import { IDType } from '../idtype';
-import { IVisynViewPluginDesc } from '../base';
+import type { IVisynViewPluginDesc } from '../base';
 interface IBaseDiscoveryView {
     enabled: boolean;
     disabledReason?: 'selection' | 'security' | 'invalid';

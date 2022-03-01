@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash';
-import { IPluginDesc, IVisynViewPluginDesc } from '../base';
-import { IViewPluginDesc, IViewContext, ISelection } from '../base/interfaces';
-import { IObjectRef, ProvenanceGraph } from '../provenance';
+import type { IViewPluginDesc, IViewContext, ISelection, IVisynViewPluginDesc } from '../base/interfaces';
+import type { IPluginDesc } from '../base/plugin';
+import type { IObjectRef, ProvenanceGraph } from '../provenance';
 
 export class ViewUtils {
   /**

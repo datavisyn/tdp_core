@@ -10,17 +10,14 @@ export interface IRow {
   /**
    * id, e.g. ESNGxxxx
    */
+  // TODO: Maybe use _visyn_id to avoid conflicts.
   readonly id: string;
-  /**
-   * unique internal number id, e.g. 42
-   */
-  readonly _visyn_id: string;
   /**
    * Legacy internal id.
    * TODO: Remove after all usages are refactored.
-   * @deprecated Use _visyn_id instead.
+   * @deprecated Use id instead.
    */
-  readonly _id: never;
+  readonly _id?: never;
 
   [key: string]: any;
 }

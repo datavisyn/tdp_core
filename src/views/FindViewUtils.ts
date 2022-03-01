@@ -6,10 +6,10 @@ import {
   EXTENSION_POINT_TDP_VIEW_GROUPS,
   EXTENSION_POINT_VISYN_VIEW,
 } from '../base/extensions';
-import { IGroupData, IInstanceViewExtensionDesc, IViewGroupExtensionDesc, IViewPluginDesc } from '../base/interfaces';
+import type { IGroupData, IInstanceViewExtensionDesc, IViewGroupExtensionDesc, IViewPluginDesc } from '../base/interfaces';
 import { IDType, IDTypeManager } from '../idtype';
 import { PluginRegistry, UserSession } from '../app';
-import { IPluginDesc, IVisynViewPluginDesc } from '../base';
+import type { IPluginDesc, IVisynViewPluginDesc } from '../base';
 
 interface IBaseDiscoveryView {
   enabled: boolean;

@@ -9,15 +9,11 @@ export interface IRow {
      */
     readonly id: string;
     /**
-     * unique internal number id, e.g. 42
-     */
-    readonly _visyn_id: string;
-    /**
      * Legacy internal id.
      * TODO: Remove after all usages are refactored.
-     * @deprecated Use _visyn_id instead.
+     * @deprecated Use id instead.
      */
-    readonly _id: never;
+    readonly _id?: never;
     [key: string]: any;
 }
 /**
@@ -175,7 +171,7 @@ export declare class RestBaseUtils {
      * @param filters URL filter parameters
      */
     static mergeParamAndFilters(params: IParams, filters: IParams): {
-        [x: string]: string | number | boolean | string[] | boolean[] | number[];
+        [x: string]: string | number | boolean | string[] | number[] | boolean[];
     };
     /**
      * query the TDP rest api to read data with additional given filters
