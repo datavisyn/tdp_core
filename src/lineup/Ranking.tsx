@@ -79,6 +79,7 @@ export interface IRankingProps {
   onParameterChanged?: (parameter: string) => void;
   onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
   onBuiltLineUp?: (provider: LocalDataProvider) => void;
+  onStatsChanged?: (total: number, shown: number, selected: number) => void;
 }
 
 export interface IRankingOptions extends IARankingViewOptions {
