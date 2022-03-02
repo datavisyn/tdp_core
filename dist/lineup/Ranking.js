@@ -74,7 +74,6 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
     const options = BaseUtils.mixin({}, defaults, opts);
     const itemSelections = new Map();
     const selections = new Map();
-    console.log(itemSelection);
     const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
     const [selection, setSelection] = React.useState(inputSelection);
     const viewRef = React.useRef(null);

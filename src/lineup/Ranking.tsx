@@ -165,7 +165,6 @@ export function Ranking({
   const options = BaseUtils.mixin({}, defaults, opts) as Readonly<IRankingOptions>;
   const itemSelections = new Map<string, ISelection>();
   const selections = new Map<string, ISelection>();
-  console.log(itemSelection);
   const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
   const [selection, setSelection] = React.useState(inputSelection);
   const viewRef = React.useRef<HTMLDivElement | null>(null);
