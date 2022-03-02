@@ -1,6 +1,6 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
+import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, Ranking as LineUpRanking, } from 'lineupjs';
 import React, { useMemo, useRef } from 'react';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils, AView, IDTypeManager, useSyncedRef, TDPTokenManager, ERenderAuthorizationStatus, I18nextManager, RestStorageUtils, NotificationHandler, ViewUtils, SelectionUtils, TokenManager, ErrorAlertHandler, EViewMode, useAsync, EXTENSION_POINT_TDP_SCORE_IMPL, PluginRegistry, InvalidTokenError, } from '..';
@@ -68,7 +68,7 @@ const defaults = {
     panelAddColumnBtnOptions: {},
     mode: null,
 };
-export function Ranking({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = false, selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onParameterChanged, onCustomizeRanking, onBuiltLineUp, }) {
+export function Ranking({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = false, selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onFilterChanged, onParameterChanged, onCustomizeRanking, onBuiltLineUp, onStatsChanged, }) {
     const isMounted = useRef(false);
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
@@ -247,7 +247,7 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
     };
     React.useEffect(() => {
         const initialized = taggleRef.current != null;
-        if (viewRef.current && !initialized) {
+        if (!initialized) {
             providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
             providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
             const taggleOptions = BaseUtils.mixin(defaultOptions(), options.customOptions, {
@@ -362,7 +362,7 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
                 onItemSelect === null || onItemSelect === void 0 ? void 0 : onItemSelect(current, selection, name);
             });
         }
-    }, [viewRef.current]);
+    }, []);
     const build = React.useMemo(() => async () => {
         TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
             // If a authorization is removed, rerun the registered authorizations
@@ -444,19 +444,15 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
     }, [options.mode, built]);
     const { status } = useAsync(build, []);
     /**
-     * Writes the number of total, selected and shown items in the parameter area
+     * TODO: what should the ranking do with the stats
+     * For now just let the parents know when there is a change
      */
     const updateLineUpStats = useMemo(() => () => {
-        const showStats = (total, selected = 0, shown = 0) => {
-            const name = shown === 1 ? options.itemName : options.itemNamePlural;
-            return `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.showing')} ${shown} ${total > 0 ? `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.of')} ${total}` : ''} ${typeof name === 'function' ? name() : name}${selected > 0 ? `; ${selected} ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.selected')}` : ''}`;
-        };
         const selected = providerRef.current.getSelection().length;
         const total = providerRef.current.data.length;
         const r = providerRef.current.getRankings()[0];
         const shown = r && r.getOrder() ? r.getOrder().length : 0;
-        // TODO: Where do the stats fit into the new views
-        // const stats.textContent = showStats(total, selected, shown);
+        onStatsChanged === null || onStatsChanged === void 0 ? void 0 : onStatsChanged(total, shown, selected);
     }, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []);
@@ -493,7 +489,21 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
         isMounted.current = true;
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [busy, parameters]);
-    return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}` },
+    React.useEffect(() => {
+        if (providerRef.current) {
+            providerRef.current.on(`${LocalDataProvider.EVENT_ADD_RANKING}`, (ranking, index) => {
+                ranking.on(LineUpRanking.EVENT_FILTER_CHANGED, () => {
+                    onFilterChanged === null || onFilterChanged === void 0 ? void 0 : onFilterChanged(providerRef.current, ranking);
+                });
+            });
+        }
+        return () => {
+            if (providerRef.current) {
+                providerRef.current.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}`, (ranking, index) => { });
+            }
+        };
+    }, [providerRef]);
+    return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : 'not busy'}` },
         React.createElement("div", { className: "lineup-container" })));
 }
 //# sourceMappingURL=Ranking.js.map

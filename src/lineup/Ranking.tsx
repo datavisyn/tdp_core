@@ -16,6 +16,7 @@ import {
   spaceFillingRule,
   updateLodRules,
   IColumnDesc,
+  Ranking as LineUpRanking,
   UIntTypedArray,
 } from 'lineupjs';
 import React, { useMemo, useRef, useState } from 'react';
@@ -54,7 +55,13 @@ import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
 import { AttachemntUtils } from '../storage/internal/internal';
 
-// TODO: view related logic to a view component
+/**
+ * // TODO / QUESTIONS
+ * 1. Maybe separate the parameter and input selection logic to a different component that can be customized by the ranking?
+ * 2. What should we do with the stats text (Showing 25 of 100 cell lines:5 selected)?
+ * 3. How do we propagate the add score event to the parent in a way that i do not have to load the data twice?
+ * 4. How to trigger an update when a parameter changes without passing useless parameters that are not used in the ranking?
+ */
 export interface IRankingProps {
   data: any[];
   /**
@@ -73,10 +80,13 @@ export interface IRankingProps {
   selectionAdapter?: ISelectionAdapter;
   options: Partial<IRankingOptions>;
   authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
-  onUpdateEntryPoint?: (namedSet: unknown) => void;
+
   onItemSelectionChanged?: () => void;
   onItemSelect?: (current: ISelection, selection: ISelection, name: string) => void;
   onParameterChanged?: (parameter: string) => void;
+  onFilterChanged?: (provider: LocalDataProvider, ranking: LineUpRanking) => void;
+
+  onUpdateEntryPoint?: (namedSet: unknown) => void;
   onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
   onBuiltLineUp?: (provider: LocalDataProvider) => void;
   onStatsChanged?: (total: number, shown: number, selected: number) => void;
@@ -158,9 +168,11 @@ export function Ranking({
   onUpdateEntryPoint,
   onItemSelect,
   onItemSelectionChanged,
+  onFilterChanged,
   onParameterChanged,
   onCustomizeRanking,
   onBuiltLineUp,
+  onStatsChanged,
 }: IRankingProps) {
   const isMounted = useRef(false);
   const [busy, setBusy] = React.useState<boolean>(false);
@@ -361,7 +373,7 @@ export function Ranking({
 
   React.useEffect(() => {
     const initialized = taggleRef.current != null;
-    if (viewRef.current && !initialized) {
+    if (!initialized) {
       providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
       providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
 
@@ -500,7 +512,7 @@ export function Ranking({
         onItemSelect?.(current, selection, name);
       });
     }
-  }, [viewRef.current]);
+  }, []);
 
   const build = React.useMemo(
     () => async () => {
@@ -599,26 +611,16 @@ export function Ranking({
   const { status } = useAsync(build, []);
 
   /**
-   * Writes the number of total, selected and shown items in the parameter area
+   * TODO: what should the ranking do with the stats
+   * For now just let the parents know when there is a change
    */
   const updateLineUpStats = useMemo(
     () => () => {
-      const showStats = (total: number, selected = 0, shown = 0) => {
-        const name = shown === 1 ? options.itemName : options.itemNamePlural;
-        return `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.showing')} ${shown} ${
-          total > 0 ? `${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.of')} ${total}` : ''
-        } ${typeof name === 'function' ? name() : name}${
-          selected > 0 ? `; ${selected} ${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.selected')}` : ''
-        }`;
-      };
-
       const selected = providerRef.current.getSelection().length;
       const total = providerRef.current.data.length;
-
       const r = providerRef.current.getRankings()[0];
       const shown = r && r.getOrder() ? r.getOrder().length : 0;
-      // TODO: Where do the stats fit into the new views
-      // const stats.textContent = showStats(total, selected, shown);
+      onStatsChanged?.(total, shown, selected);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
@@ -660,8 +662,23 @@ export function Ranking({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [busy, parameters]);
 
+  React.useEffect(() => {
+    if (providerRef.current) {
+      providerRef.current.on(`${LocalDataProvider.EVENT_ADD_RANKING}`, (ranking: LineUpRanking, index: number) => {
+        ranking.on(LineUpRanking.EVENT_FILTER_CHANGED, () => {
+          onFilterChanged?.(providerRef.current, ranking);
+        });
+      });
+    }
+    return () => {
+      if (providerRef.current) {
+        providerRef.current.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}`, (ranking: LineUpRanking, index: number) => {});
+      }
+    };
+  }, [providerRef]);
+
   return (
-    <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : ''}`}>
+    <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : 'not busy'}`}>
       <div className="lineup-container" />
     </div>
   );
