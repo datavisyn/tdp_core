@@ -84,7 +84,10 @@ export function ScatterVis({
 
   useEffect(() => {
     const ro = new ResizeObserver(() => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+      const plotDiv = document.getElementById(`plotlyDiv${id}`);
+      if (plotDiv) {
+        Plotly.Plots.resize(plotDiv);
+      }
     });
 
     if (plotlyDivRef) {

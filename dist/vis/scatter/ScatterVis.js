@@ -35,7 +35,10 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     const plotlyDivRef = React.useRef(null);
     useEffect(() => {
         const ro = new ResizeObserver(() => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+            const plotDiv = document.getElementById(`plotlyDiv${id}`);
+            if (plotDiv) {
+                Plotly.Plots.resize(plotDiv);
+            }
         });
         if (plotlyDivRef) {
             ro.observe(plotlyDivRef.current);
