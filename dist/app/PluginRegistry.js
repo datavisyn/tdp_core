@@ -1,13 +1,12 @@
 import { UniqueIdManager } from './UniqueIdManager';
 import { BaseUtils } from '../base/BaseUtils';
-import { EXTENSION_POINT_VISYN_VIEW } from '..';
 export class PluginRegistry {
     constructor() {
         this.registry = [];
         this.knownPlugins = new Set();
     }
     pushVisynView(id, loader, desc) {
-        return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, desc);
+        return this.push('visynView', id, loader, desc);
     }
     push(type, idOrLoader, descOrLoader, desc) {
         const id = typeof idOrLoader === 'string' ? idOrLoader : UniqueIdManager.getInstance().uniqueString(type);

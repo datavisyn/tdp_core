@@ -1,1 +1,0 @@
-{"version":3,"file":"VectorUtils.d.ts","sourceRoot":"","sources":["../../src/vector/VectorUtils.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,sBAAsB,EAAC,MAAM,WAAW,CAAC;AACjD,OAAO,EAAC,cAAc,EAAC,MAAM,mBAAmB,CAAC;AAIjD,qBAAa,WAAW;IACtB,MAAM,CAAC,uBAAuB,IAAI,sBAAsB,CAAC,cAAc,CAAC;CAUzE"}
