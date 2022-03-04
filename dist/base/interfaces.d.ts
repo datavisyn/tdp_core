@@ -225,17 +225,20 @@ export interface IGroupData {
 export interface IViewGroupExtensionDesc extends IPluginDesc {
     groups: IGroupData[];
 }
+/**
+ * Selections including an idtype and the corresponding selected ids.
+ */
 export interface ISelection {
     /**
-     * TODO:
+     * ID type of the selection, i.e. `IDTypeManager.getInstance().resolveIdType('Ensembl')`.
      */
     readonly idtype: IDType;
     /**
-     * TODO:
+     * IDs of the selection matching the idtype, i.e. `['ENSG...', 'ENSG...']`.
      */
     ids: string[];
     /**
-     * other selections floating around in a multi selection environment
+     * Other selections floating around in a multi selection environment
      */
     readonly all?: Map<IDType, string[]>;
 }
