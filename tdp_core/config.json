@@ -11,12 +11,6 @@
   "--phovea_security_flask": "comment",
   "users": [
     {
-      "name": "ordino",
-      "salt": "18cab1fce2a04e6093bf6ab3fdcbca08",
-      "password": "068e5da0c19e2e453a65dd872ebc718c32d05dd448425bc1a10de06b8160d019d0d5395fab3d13ce9b1ec46a28c7d61d0da21499e0129c3e37d9a02ffd72f964",
-      "roles": []
-    },
-    {
       "name": "admin",
       "salt": "dcf46ce914154a44b1557eba91c1f50d",
       "password": "e464485eeeca97927191bd77e38137cc5870c53efb05c8ec027faa8d47f0c0ee23e733ea5e494cb045ca46b0f3b6f695b7261a34f46ba3797cde67724d78522a",
