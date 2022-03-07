@@ -97,7 +97,7 @@ const emptyFilters: IAllFilters = {
 };
 
 export interface ILookupItem {
-  _id: never;
+  _id?: never;
   id: string;
   text: string;
 }
