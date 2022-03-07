@@ -1,14 +1,16 @@
-from . import flask_login_impl
+from phovea_server.security import User as PhoveaServerUser
 import hashlib
+import logging
 
-__author__ = 'Samuel Gratzl'
+
+_log = logging.getLogger(__name__)
 
 
 def hash_password(password, salt):
   return hashlib.sha512((password + salt).encode('utf-8')).hexdigest()
 
 
-class User(flask_login_impl.User):
+class User(PhoveaServerUser):
   def __init__(self, id, password, salt, roles):
     super(User, self).__init__(id)
     self.name = id
@@ -68,4 +70,5 @@ class UserStore(object):
 
 
 def create():
+  _log.info('using dummy store')
   return UserStore()

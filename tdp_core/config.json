@@ -30,6 +30,14 @@
   ],
   "alwaysAppendDummyStore": false,
   "security": {
+    "jwt": {
+      "JWT_ACCESS_COOKIE_NAME": "dv_access_token",
+      "JWT_ACCESS_CSRF_COOKIE_NAME": "dv_csrf_access_token",
+      "JWT_SECRET_KEY": "super-secret-key",
+      "JWT_TOKEN_LOCATION": ["headers", "cookies"],
+      "JWT_COOKIE_SECURE": false,
+      "JWT_ACCESS_TOKEN_EXPIRES": 3600
+    },
     "store": {
       "alb_security_store": {
         "enable": false,
