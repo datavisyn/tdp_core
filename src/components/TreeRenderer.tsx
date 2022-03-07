@@ -50,7 +50,7 @@ function GroupHeader(props: IGroupHeaderProps) {
       aria-expanded="true"
       aria-controls={`collapse-${props.index}`}
     >
-      <h6>{props.name}</h6>
+      <h6 className="mt-1 mb-1">{props.name}</h6>
     </header>
   );
 }

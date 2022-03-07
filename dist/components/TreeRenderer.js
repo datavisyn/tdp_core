@@ -19,7 +19,7 @@ function inputNameArrayConventionForm(name) {
 }
 function GroupHeader(props) {
     return (React.createElement("header", { className: props.defaultOpen ? '' : 'collapsed', "data-bs-toggle": "collapse", "data-bs-target": `#collapse-${props.index}-${props.randomIdSuffix}`, "data-group": props.name, "aria-expanded": "true", "aria-controls": `collapse-${props.index}` },
-        React.createElement("h6", null, props.name)));
+        React.createElement("h6", { className: "mt-1 mb-1" }, props.name)));
 }
 // TODO: implement Toolbar
 function Toolbar(props) {
