@@ -25,7 +25,7 @@ export class SelectionSyncerOptionUtils {
     static create(store, options) {
         options = BaseUtils.mixin({
             filter: () => true,
-            selectionTypes: [SelectionUtils.defaultSelectionType],
+            selectionTypes: [SelectionUtils.defaultSelectionType], // by default just selections
         }, options);
         // store existing
         const toSync = IDTypeManager.getInstance()

@@ -317,7 +317,7 @@ export class ViewWrapper extends EventHandler {
             hash: this.ref.hash,
             dumpReference: this.dumpReference(),
             plugin: this.plugin.id,
-            parameters: [],
+            parameters: [], // TODO:
         };
     }
     selectionText(selection, idType) {

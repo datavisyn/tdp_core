@@ -18,10 +18,10 @@ const SortableMultiValue = SortableElement((props) => {
         e.stopPropagation();
     };
     const innerProps = { ...props.innerProps, onMouseDown };
-    return React.createElement(components.MultiValue, Object.assign({}, props, { innerProps: innerProps }));
+    return React.createElement(components.MultiValue, { ...props, innerProps: innerProps });
 });
 // tslint:disable-next-line:variable-name
-const SortableMultiValueLabel = SortableHandle((props) => React.createElement(components.MultiValueLabel, Object.assign({}, props)));
+const SortableMultiValueLabel = SortableHandle((props) => React.createElement(components.MultiValueLabel, { ...props }));
 // tslint:disable-next-line:variable-name
 const SortableSelect = SortableContainer(Select);
 export function NumericalColumnSelect({ callback, columns, currentSelected }) {

@@ -51,7 +51,7 @@ export declare class CompositeView extends EventHandler implements IView {
     private readonly debounceUpdateEntryPoint;
     private itemSelection;
     constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: Partial<IACompositeViewOptions>);
-    init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): PromiseLike<Promise<any[]>>;
+    init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): PromiseLike<any[]>;
     get node(): HTMLElement;
     private setBusy;
     private build;

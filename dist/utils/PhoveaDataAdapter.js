@@ -14,7 +14,7 @@ function mapType(v) {
             const vc = v;
             return {
                 type: 'categorical',
-                categories: vc.categories,
+                categories: vc.categories, // internally both are valid
             };
         }
         default:

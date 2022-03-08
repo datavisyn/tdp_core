@@ -248,14 +248,49 @@ export class SingleIterator<T> extends AIterator<T> implements IIterator<T> {
   }
 }
 
+/**
+ * @deprecated use native iterator concept
+ */
 export class EmptyIterator<T> extends AIterator<T> implements IIterator<T> {
-  isIncreasing = false;
+  private _isIncreasing = false;
 
-  isDecreasing = false;
+  public get isIncreasing() {
+    return this._isIncreasing;
+  }
 
-  byOne = false;
+  public set isIncreasing(value) {
+    this._isIncreasing = value;
+  }
 
-  byMinusOne = false;
+  private _isDecreasing = false;
+
+  public get isDecreasing() {
+    return this._isDecreasing;
+  }
+
+  public set isDecreasing(value) {
+    this._isDecreasing = value;
+  }
+
+  private _byOne = false;
+
+  public get byOne() {
+    return this._byOne;
+  }
+
+  public set byOne(value) {
+    this._byOne = value;
+  }
+
+  private _byMinusOne = false;
+
+  public get byMinusOne() {
+    return this._byMinusOne;
+  }
+
+  public set byMinusOne(value) {
+    this._byMinusOne = value;
+  }
 
   /**
    * whether more items are available

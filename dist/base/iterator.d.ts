@@ -111,11 +111,22 @@ export declare class SingleIterator<T> extends AIterator<T> implements IIterator
     get byMinusOne(): boolean;
     static create(value: number): SingleIterator<number>;
 }
+/**
+ * @deprecated use native iterator concept
+ */
 export declare class EmptyIterator<T> extends AIterator<T> implements IIterator<T> {
-    isIncreasing: boolean;
-    isDecreasing: boolean;
-    byOne: boolean;
-    byMinusOne: boolean;
+    private _isIncreasing;
+    get isIncreasing(): boolean;
+    set isIncreasing(value: boolean);
+    private _isDecreasing;
+    get isDecreasing(): boolean;
+    set isDecreasing(value: boolean);
+    private _byOne;
+    get byOne(): boolean;
+    set byOne(value: boolean);
+    private _byMinusOne;
+    get byMinusOne(): boolean;
+    set byMinusOne(value: boolean);
     /**
      * whether more items are available
      */
@@ -152,6 +163,6 @@ export declare class ConcatIterator<T> extends AIterator<T> implements IIterator
     get isDecreasing(): boolean;
     get byOne(): boolean;
     get byMinusOne(): boolean;
-    static concatIterators<T>(...its: IIterator<T>[]): EmptyIterator<unknown> | ConcatIterator<T>;
+    static concatIterators<T>(...its: IIterator<T>[]): IIterator<T> | EmptyIterator<unknown> | ConcatIterator<T>;
 }
 //# sourceMappingURL=iterator.d.ts.map

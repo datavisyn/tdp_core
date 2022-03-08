@@ -102,7 +102,7 @@ export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescr
     removeFullSlide(node: SlideNode): void;
     setSlideJumpToTarget(node: SlideNode, state: StateNode): void;
     static createDummy(): ProvenanceGraph;
-    static getOrCreateInverse(node: ActionNode, graph: ProvenanceGraph): ActionNode;
+    static getOrCreateInverse(node: ActionNode, graph: ProvenanceGraph): any;
     static updateInverse(node: ActionNode, graph: ProvenanceGraph, inverter: IInverseActionCreator): void;
     static execute(node: ActionNode, graph: ProvenanceGraph, withinMilliseconds: number): PromiseLike<ICmdResult>;
 }

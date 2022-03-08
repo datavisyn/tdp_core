@@ -185,13 +185,40 @@ export class SingleIterator extends AIterator {
         return new SingleIterator(value);
     }
 }
+/**
+ * @deprecated use native iterator concept
+ */
 export class EmptyIterator extends AIterator {
     constructor() {
         super(...arguments);
-        this.isIncreasing = false;
-        this.isDecreasing = false;
-        this.byOne = false;
-        this.byMinusOne = false;
+        this._isIncreasing = false;
+        this._isDecreasing = false;
+        this._byOne = false;
+        this._byMinusOne = false;
+    }
+    get isIncreasing() {
+        return this._isIncreasing;
+    }
+    set isIncreasing(value) {
+        this._isIncreasing = value;
+    }
+    get isDecreasing() {
+        return this._isDecreasing;
+    }
+    set isDecreasing(value) {
+        this._isDecreasing = value;
+    }
+    get byOne() {
+        return this._byOne;
+    }
+    set byOne(value) {
+        this._byOne = value;
+    }
+    get byMinusOne() {
+        return this._byMinusOne;
+    }
+    set byMinusOne(value) {
+        this._byMinusOne = value;
     }
     /**
      * whether more items are available
