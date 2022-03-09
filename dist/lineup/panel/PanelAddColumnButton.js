@@ -30,8 +30,7 @@ export class PanelAddColumnButton {
             },
         };
         const button = new PanelButton(this.node, btnOptions);
-        const clone = button.node;
-        this.node.appendChild(clone);
+        this.node.appendChild(button.node);
         this.node.appendChild(this.search.node);
     }
 }
