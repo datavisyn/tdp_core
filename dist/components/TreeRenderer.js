@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { BaseUtils } from '../base/BaseUtils';
-import { FindViewUtils } from '../views/FindViewUtils';
+import { ViewUtils } from '../views/ViewUtils';
 // convert a view plugin description (i.e. of detail views) to the form we need for the renderer
 export function viewPluginDescToTreeElementHelper(views, openGroups = []) {
     const normalizedGroups = openGroups.map((g) => g.toLowerCase());
-    return FindViewUtils.groupByCategory(views).map((g) => ({
+    return ViewUtils.groupByCategory(views).map((g) => ({
         name: g.name,
         items: g.views.map(({ v }) => ({
             name: v.name,

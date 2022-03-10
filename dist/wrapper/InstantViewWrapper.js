@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useAsync } from '../hooks';
-import { FindViewUtils } from '../views';
+import { ViewUtils } from '../views';
 const loadInstantView = (view, selection) => view.load().then((r) => r.factory(selection, { document }));
 /**
  * Component rendering a navigation of all registered Instant-Views for the given selection idtype.
  */
 export function InstantViewWrapper({ selection, style, }) {
-    const { value: views } = useAsync((selection === null || selection === void 0 ? void 0 : selection.idtype) ? FindViewUtils.findInstantViews : () => [], (selection === null || selection === void 0 ? void 0 : selection.idtype) ? [selection.idtype] : undefined);
+    const { value: views } = useAsync((selection === null || selection === void 0 ? void 0 : selection.idtype) ? ViewUtils.findInstantViews : () => [], (selection === null || selection === void 0 ? void 0 : selection.idtype) ? [selection.idtype] : undefined);
     const [activeView, setActiveView] = React.useState(null);
     const hasViewAndSelection = activeView && selection;
     const { value: activeViewNode, status } = useAsync(hasViewAndSelection ? loadInstantView : () => null, hasViewAndSelection ? [activeView, selection] : undefined);

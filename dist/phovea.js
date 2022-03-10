@@ -229,6 +229,33 @@ export default function (registry) {
         priority: 50,
         implicit: true,
     });
+    /*
+    registry.pushVisynView('LazyVisynDemoView', wrapVisynViewLoader(import('./views/visyn/demo/index').then((m) => m.createLazyVisynDemoView)), {
+      visynViewType: 'simple',
+      selection: 'any',
+      idtype: '.*',
+      name: 'Vis Demo (Lazy)',
+      description: 'Demo view showcasing Vis with randomly generated data',
+      includeInDashboardView: true,
+      group: {
+        name: 'Demo',
+        order: 99,
+      },
+    });
+  
+    registry.pushVisynView('VisynDemoView', wrapVisynViewLoader(import('./views/visyn/demo/VisynDemoView').then((m) => m.createVisynDemoView)), {
+      visynViewType: 'simple',
+      selection: 'any',
+      idtype: '.*',
+      name: 'Vis Demo',
+      description: 'Demo view showcasing Vis with randomly generated data',
+      includeInDashboardView: true,
+      group: {
+        name: 'Demo',
+        order: 99,
+      },
+    });
+    */
     /// #endif
 }
 //# sourceMappingURL=phovea.js.map

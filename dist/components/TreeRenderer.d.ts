@@ -1,5 +1,5 @@
 import * as React from 'react';
-import type { IDiscoveredView } from '../views/FindViewUtils';
+import { IBaseViewPluginDesc } from '../base/interfaces';
 export interface ITreeGroup {
     name: string;
     items: ITreeElement[];
@@ -10,7 +10,7 @@ export interface ITreeElement {
     group: string;
     id: string;
 }
-export declare function viewPluginDescToTreeElementHelper(views: IDiscoveredView[], openGroups?: string[]): ITreeGroup[];
+export declare function viewPluginDescToTreeElementHelper(views: IBaseViewPluginDesc[], openGroups?: string[]): ITreeGroup[];
 export interface ITreeRendererProps {
     groups: ITreeGroup[];
     selection: {

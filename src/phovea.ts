@@ -2,6 +2,7 @@ import { FormElementType } from './form/interfaces';
 import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH, EP_TDP_CORE_FORM_ELEMENT } from './base/extensions';
 import { EP_PHOVEA_CORE_LOCALE, PluginRegistry, ILocaleEPDesc, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT } from './app';
 import { IRegistry } from './base';
+import { wrapVisynViewLoader } from './views/visyn/utils';
 
 export default function (registry: IRegistry) {
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -327,5 +328,32 @@ export default function (registry: IRegistry) {
     },
   );
 
+  /*
+  registry.pushVisynView('LazyVisynDemoView', wrapVisynViewLoader(import('./views/visyn/demo/index').then((m) => m.createLazyVisynDemoView)), {
+    visynViewType: 'simple',
+    selection: 'any',
+    idtype: '.*',
+    name: 'Vis Demo (Lazy)',
+    description: 'Demo view showcasing Vis with randomly generated data',
+    includeInDashboardView: true,
+    group: {
+      name: 'Demo',
+      order: 99,
+    },
+  });
+
+  registry.pushVisynView('VisynDemoView', wrapVisynViewLoader(import('./views/visyn/demo/VisynDemoView').then((m) => m.createVisynDemoView)), {
+    visynViewType: 'simple',
+    selection: 'any',
+    idtype: '.*',
+    name: 'Vis Demo',
+    description: 'Demo view showcasing Vis with randomly generated data',
+    includeInDashboardView: true,
+    group: {
+      name: 'Demo',
+      order: 99,
+    },
+  });
+  */
   /// #endif
 }
