@@ -230,7 +230,7 @@ export default function (registry) {
         implicit: true,
     });
     /*
-    registry.pushVisynView('LazyVisynDemoView', wrapVisynViewLoader(import('./views/visyn/demo/index').then((m) => m.createLazyVisynDemoView)), {
+    registry.pushVisynView<DemoVisynViewPluginType>('LazyVisynDemoView', () => import('./views/visyn/demo/index').then((m) => m.createLazyVisynDemoView), {
       visynViewType: 'simple',
       selection: 'any',
       idtype: '.*',
@@ -243,7 +243,7 @@ export default function (registry) {
       },
     });
   
-    registry.pushVisynView('VisynDemoView', wrapVisynViewLoader(import('./views/visyn/demo/VisynDemoView').then((m) => m.createVisynDemoView)), {
+    registry.pushVisynView<DemoVisynViewPluginType>('VisynDemoView', () => import('./views/visyn/demo/VisynDemoView').then((m) => m.createVisynDemoView), {
       visynViewType: 'simple',
       selection: 'any',
       idtype: '.*',

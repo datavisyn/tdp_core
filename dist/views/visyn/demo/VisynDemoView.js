@@ -112,6 +112,7 @@ export function createVisynDemoView() {
         viewType: 'simple',
         defaultParameters: {
             columns: null,
+            config: null,
             dataLength: 100,
         },
         view: VisynDemoView,

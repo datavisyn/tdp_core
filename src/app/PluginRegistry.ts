@@ -2,7 +2,7 @@ import { merge, isObject } from 'lodash';
 import type { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
 import { UniqueIdManager } from './UniqueIdManager';
 import { EXTENSION_POINT_VISYN_VIEW } from '../base/extensions';
-import type { IVisynViewPluginDesc, IBaseVisynViewPluginDesc, IVisynViewPluginDefinition } from '../views/visyn/interfaces';
+import type { VisynViewPluginDesc, VisynViewPluginType } from '../views/visyn/interfaces';
 
 export class PluginRegistry implements IRegistry {
   private registry: IPluginDesc[] = [];
@@ -43,7 +43,7 @@ export class PluginRegistry implements IRegistry {
   /**
    * Push a visyn view to the registry.
    */
-  public pushVisynView<Plugin extends IVisynViewPluginDefinition>(
+  public pushVisynView<Plugin extends VisynViewPluginType>(
     /**
      * Unique ID of the visyn view.
      */
@@ -51,22 +51,13 @@ export class PluginRegistry implements IRegistry {
     /**
      * Loader function for the module.
      */
-    loader: () => Promise<Plugin>,
+    loader: () => Promise<(...args: any[]) => Plugin['definition']>,
     /**
      * View description of the visyn view plugin.
      */
-    desc: IBaseVisynViewPluginDesc & {
-      /**
-       * View type of the registered view.
-       * This property could be inferred by the `viewType` in the actual factory, BUT then we would have to load
-       * the plugin to know this, and the desc is known without loading the plugin. Therefore, it is more efficient
-       * to define it twice.
-       * See `IBaseVisynViewPluginDesc#visynViewType` for details.
-       */
-      visynViewType: Plugin['viewType'];
-    },
+    desc: Plugin['partialDesc'],
   ): void {
-    return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, {
+    return this.push(EXTENSION_POINT_VISYN_VIEW, id, (...args: any[]) => loader().then((callable) => callable(...args)), {
       ...desc,
       // Override the load to return the plugin directly instead of the factory function
       factory: null,
@@ -107,7 +98,7 @@ export class PluginRegistry implements IRegistry {
    * @param id
    * @returns {IPluginDesc}
    */
-  public getPlugin(type: 'visynView', id: string): IVisynViewPluginDesc;
+  public getPlugin(type: 'visynView', id: string): VisynViewPluginDesc;
   public getPlugin(type: string, id: string): IPluginDesc;
   public getPlugin(type: string, id: string): IPluginDesc {
     return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id);

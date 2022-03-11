@@ -1,12 +1,5 @@
 import * as React from 'react';
-import { IVisynViewPluginDefinition, IVisynViewPluginDesc } from './interfaces';
-import { IPluginDesc } from '../../base/plugin';
-/**
- * Utility function to create a plugin loader function from a module and the plugin location.
- * Returns a function passing all parameters to the resolved property.
- * @param pluginLoader Plugin loader function to be wrapped, i.e. `import('./View').then((m) => m.createView)`
- */
-export declare function wrapVisynViewLoader<Plugin extends (...args: any[]) => IVisynViewPluginDefinition>(pluginLoader: Promise<Plugin>): (...args: any[]) => Promise<IVisynViewPluginDefinition<import("./interfaces").IVisynViewProps<any, any>>>;
+import { VisynViewPluginDesc, VisynSimpleViewPluginType, VisynDataViewPluginType } from './interfaces';
 /**
  * Resolves the current value of a setStateAction by calling it with the current value if it is a function,
  * or by simply returning the value otherwise.
@@ -14,5 +7,9 @@ export declare function wrapVisynViewLoader<Plugin extends (...args: any[]) => I
  * @param currentValue Current value passed to the function to receive the new value.
  */
 export declare function setStateActionCaller<T>(valueOrFunction: React.SetStateAction<T>, currentValue: T): T;
-export declare function isVisynViewPluginDesc(desc: IPluginDesc): desc is IVisynViewPluginDesc;
+export declare function isVisynViewPluginDesc(desc: unknown): desc is VisynViewPluginDesc;
+export declare function isVisynSimpleViewDesc(desc: unknown): desc is VisynSimpleViewPluginType['desc'];
+export declare function isVisynSimpleView(plugin: unknown): plugin is VisynSimpleViewPluginType['plugin'];
+export declare function isVisynDataViewDesc(desc: unknown): desc is VisynDataViewPluginType['desc'];
+export declare function isVisynDataView(plugin: unknown): plugin is VisynDataViewPluginType['plugin'];
 //# sourceMappingURL=utils.d.ts.map

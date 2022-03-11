@@ -1,5 +1,5 @@
 import type { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
-import type { IVisynViewPluginDesc, IBaseVisynViewPluginDesc, IVisynViewPluginDefinition } from '../views/visyn/interfaces';
+import type { VisynViewPluginDesc, VisynViewPluginType } from '../views/visyn/interfaces';
 export declare class PluginRegistry implements IRegistry {
     private registry;
     push(type: string, loader: () => any, desc?: any): void;
@@ -8,7 +8,7 @@ export declare class PluginRegistry implements IRegistry {
     /**
      * Push a visyn view to the registry.
      */
-    pushVisynView<Plugin extends IVisynViewPluginDefinition>(
+    pushVisynView<Plugin extends VisynViewPluginType>(
     /**
      * Unique ID of the visyn view.
      */
@@ -16,20 +16,11 @@ export declare class PluginRegistry implements IRegistry {
     /**
      * Loader function for the module.
      */
-    loader: () => Promise<Plugin>, 
+    loader: () => Promise<(...args: any[]) => Plugin['definition']>, 
     /**
      * View description of the visyn view plugin.
      */
-    desc: IBaseVisynViewPluginDesc & {
-        /**
-         * View type of the registered view.
-         * This property could be inferred by the `viewType` in the actual factory, BUT then we would have to load
-         * the plugin to know this, and the desc is known without loading the plugin. Therefore, it is more efficient
-         * to define it twice.
-         * See `IBaseVisynViewPluginDesc#visynViewType` for details.
-         */
-        visynViewType: Plugin['viewType'];
-    }): void;
+    desc: Plugin['partialDesc']): void;
     private knownPlugins;
     register(plugin: string, generator?: (registry: IRegistry) => void): void;
     /**
@@ -44,7 +35,7 @@ export declare class PluginRegistry implements IRegistry {
      * @param id
      * @returns {IPluginDesc}
      */
-    getPlugin(type: 'visynView', id: string): IVisynViewPluginDesc;
+    getPlugin(type: 'visynView', id: string): VisynViewPluginDesc;
     getPlugin(type: string, id: string): IPluginDesc;
     loadPlugin(desc: IPluginDesc[]): Promise<IPlugin[]>;
     /**

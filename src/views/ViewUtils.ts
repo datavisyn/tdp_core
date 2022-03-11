@@ -16,7 +16,7 @@ import type {
   IGroupData,
 } from '../base/interfaces';
 import type { IObjectRef, ProvenanceGraph } from '../provenance';
-import type { IVisynViewPluginDesc } from './visyn/interfaces';
+import type { VisynViewPluginDesc } from './visyn/interfaces';
 import { IDType, IDTypeManager } from '../idtype';
 import { PluginRegistry } from '../app/PluginRegistry';
 import { UserSession } from '../app/UserSession';
@@ -40,7 +40,7 @@ export class ViewUtils {
 
   public static readonly VIEW_EVENT_UPDATE_SHARED = 'updateShared';
 
-  static toViewPluginDesc<ReturnType extends IViewPluginDesc | IVisynViewPluginDesc = IViewPluginDesc>(p: IPluginDesc): ReturnType {
+  static toViewPluginDesc<ReturnType extends IViewPluginDesc | VisynViewPluginDesc = IViewPluginDesc>(p: IPluginDesc): ReturnType {
     const r: any = p;
     r.selection = r.selection || 'none';
     r.group = { name: 'Other', order: 99, ...r.group };
@@ -183,10 +183,10 @@ export class ViewUtils {
     });
   }
 
-  static findVisynViews(idType?: IDType): Promise<IVisynViewPluginDesc[]> {
+  static findVisynViews(idType?: IDType): Promise<VisynViewPluginDesc[]> {
     return ViewUtils.findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_VISYN_VIEW), true).then((r) => {
       return r
-        .map((v) => ViewUtils.toViewPluginDesc<IVisynViewPluginDesc>(v))
+        .map((v) => ViewUtils.toViewPluginDesc<VisynViewPluginDesc>(v))
         .map((v) => {
           const access = ViewUtils.canAccess(v);
           const hasAccessHint = !access && Boolean(v.securityNotAllowedText);

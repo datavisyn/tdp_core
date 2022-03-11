@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { uniqueId } from 'lodash';
-import { VisSidebar, Vis, VisColumn, EColumnTypes, IVisConfig } from '../../../vis';
-import { IVisynViewPluginDesc, IVisynViewProps, IVisynViewPluginDefinition } from '../interfaces';
+import { VisSidebar, Vis, VisColumn, EColumnTypes } from '../../../vis';
+import { DemoVisynViewPluginType } from './interfaces';
 
 function fetchData(numberOfPoints: number): VisColumn[] {
   const dataGetter = async () => {
@@ -67,15 +67,7 @@ function fetchData(numberOfPoints: number): VisColumn[] {
   ];
 }
 
-type VisynDemoViewParameters = {
-  columns: VisColumn[] | null;
-  config: IVisConfig | null;
-  dataLength: number;
-};
-
-type VisynDemoViewProps = IVisynViewProps<IVisynViewPluginDesc, VisynDemoViewParameters>;
-
-export function VisynDemoView({ desc, parameters, onParametersChanged }: VisynDemoViewProps) {
+export function VisynDemoView({ desc, parameters, onParametersChanged }: DemoVisynViewPluginType['props']) {
   React.useEffect(() => {
     onParametersChanged((p) => ({
       ...p,
@@ -91,7 +83,7 @@ export function VisynDemoView({ desc, parameters, onParametersChanged }: VisynDe
   );
 }
 
-export function VisynDemoViewSidebar({ parameters, onParametersChanged }: VisynDemoViewProps) {
+export function VisynDemoViewSidebar({ parameters, onParametersChanged }: DemoVisynViewPluginType['props']) {
   return parameters.columns ? (
     <VisSidebar
       style={{
@@ -110,7 +102,7 @@ export function VisynDemoViewSidebar({ parameters, onParametersChanged }: VisynD
   ) : null;
 }
 
-export function VisynDemoViewHeader({ parameters, selection, onParametersChanged }: VisynDemoViewProps) {
+export function VisynDemoViewHeader({ parameters, selection, onParametersChanged }: DemoVisynViewPluginType['props']) {
   const id = React.useMemo(() => uniqueId('VisynDemoViewHeader'), []);
   React.useEffect(() => {
     onParametersChanged((p) => ({
@@ -145,11 +137,12 @@ export function VisynDemoViewHeader({ parameters, selection, onParametersChanged
   );
 }
 
-export function createVisynDemoView(): IVisynViewPluginDefinition {
+export function createVisynDemoView(): DemoVisynViewPluginType['definition'] {
   return {
     viewType: 'simple',
     defaultParameters: {
       columns: null,
+      config: null,
       dataLength: 100,
     },
     view: VisynDemoView,

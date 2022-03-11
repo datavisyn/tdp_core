@@ -4,6 +4,7 @@ export function createLazyVisynDemoView() {
         viewType: 'simple',
         defaultParameters: {
             columns: null,
+            config: null,
             dataLength: 100,
         },
         view: React.lazy(() => import('./VisynDemoView').then((m) => ({ default: m.VisynDemoView }))),

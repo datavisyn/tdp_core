@@ -47,7 +47,7 @@ export class PluginRegistry {
      * View description of the visyn view plugin.
      */
     desc) {
-        return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, {
+        return this.push(EXTENSION_POINT_VISYN_VIEW, id, (...args) => loader().then((callable) => callable(...args)), {
             ...desc,
             // Override the load to return the plugin directly instead of the factory function
             factory: null,
