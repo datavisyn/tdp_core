@@ -230,18 +230,22 @@ export default function (registry) {
         implicit: true,
     });
     /*
-    registry.pushVisynView<DemoVisynViewPluginType>('LazyVisynDemoView', () => import('./views/visyn/demo/index').then((m) => m.createLazyVisynDemoView), {
-      visynViewType: 'simple',
-      selection: 'any',
-      idtype: '.*',
-      name: 'Vis Demo (Lazy)',
-      description: 'Demo view showcasing Vis with randomly generated data',
-      includeInDashboardView: true,
-      group: {
-        name: 'Demo',
-        order: 99,
+    registry.pushVisynView<DemoVisynViewPluginType>(
+      'LazyVisynDemoView',
+      () => import('./views/visyn/demo/LazyVisynDemoView').then((m) => m.createLazyVisynDemoView),
+      {
+        visynViewType: 'simple',
+        selection: 'any',
+        idtype: '.*',
+        name: 'Vis Demo (Lazy)',
+        description: 'Demo view showcasing Vis with randomly generated data',
+        includeInDashboardView: true,
+        group: {
+          name: 'Demo',
+          order: 99,
+        },
       },
-    });
+    );
   
     registry.pushVisynView<DemoVisynViewPluginType>('VisynDemoView', () => import('./views/visyn/demo/VisynDemoView').then((m) => m.createVisynDemoView), {
       visynViewType: 'simple',

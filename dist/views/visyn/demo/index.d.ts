@@ -1,3 +1,2 @@
-import { DemoVisynViewPluginType } from './interfaces';
-export declare function createLazyVisynDemoView(): DemoVisynViewPluginType['definition'];
+export * from './interfaces';
 //# sourceMappingURL=index.d.ts.map
