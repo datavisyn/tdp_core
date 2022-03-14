@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
 import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { ESupportedPlotlyVis, IVisConfig, ENumericalColorScaleType, VisColumn, ICommonVisSideBarProps } from './interfaces';
+import { ESupportedPlotlyVis, IVisConfig, ENumericalColorScaleType, VisColumn, ICommonVisSideBarProps, EScatterSelectSettings } from './interfaces';
 import { isViolin, violinMergeDefaultConfig } from './violin/utils';
 import { isStrip, stripMergeDefaultConfig } from './strip/utils';
 import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
@@ -33,7 +33,7 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
       color: null,
       numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
       shape: null,
-      isRectBrush: true,
+      dragMode: EScatterSelectSettings.RECTANGLE,
       alphaSliderVal: 1,
     },
   );

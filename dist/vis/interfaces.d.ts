@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter Plot",
@@ -127,5 +128,12 @@ export declare type ColumnInfo = {
 export declare type Scales = {
     color: any;
 };
+/**
+ * Common props for all vis sidebars.
+ */
+export interface ICommonVisSideBarProps {
+    style?: React.CSSProperties | undefined;
+    className?: string | undefined;
+}
 export {};
 //# sourceMappingURL=interfaces.d.ts.map
