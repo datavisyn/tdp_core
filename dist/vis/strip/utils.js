@@ -55,6 +55,7 @@ export async function createStripTraces(columns, config, selected, scales) {
                     })
                         .filter((v) => v.selected)
                         .map((v) => v.index),
+                    // @ts-ignore
                     selected: {
                         marker: {
                             color: '#E29609',

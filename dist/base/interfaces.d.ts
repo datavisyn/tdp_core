@@ -1,13 +1,15 @@
+import * as React from 'react';
 import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
-import { AppHeader } from '../components';
 import { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
-import { IDType } from '../idtype';
-import { ProvenanceGraph, IObjectRef } from '../provenance';
-import { RangeLike, Range } from '../range';
+import { IDType } from '../idtype/IDType';
 import { IUser } from '../security';
-import { IPluginDesc, IPlugin } from './plugin';
+import type { IPlugin, IPluginDesc } from './plugin';
 import { IEventHandler } from './event';
+import { ProvenanceGraph } from '../provenance/ProvenanceGraph';
+import { IObjectRef } from '../provenance/ObjectNode';
+import { AppHeader } from '../components/header';
+import { Range, RangeLike } from '../range';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * used internally to match selections to column
@@ -16,7 +18,7 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
     selectedId: number;
     /**
      * used internally to match selections to multiple columns
-     * @default: undefined
+     * @default undefined
      */
     selectedSubtype?: string;
     /**
@@ -46,6 +48,12 @@ export declare enum EViewMode {
     FOCUS = 0,
     CONTEXT = 1,
     HIDDEN = 2
+}
+export interface IViewWrapperDump {
+    hash: string;
+    plugin: string;
+    dumpReference: number;
+    parameters: object;
 }
 /**
  * a score item
@@ -307,7 +315,17 @@ export interface IView extends IEventHandler {
 export interface IViewClass {
     new (context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
-export interface IViewPluginDesc extends IPluginDesc {
+export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
+    load(): Promise<IViewPlugin>;
+}
+export interface IVisynViewPluginDesc<Param extends Record<string, any> = Record<string, any>> extends IBaseViewPluginDesc, IPluginDesc {
+    load(): Promise<IVisynViewPlugin>;
+    /**
+     * Default parameters used for `parameters` of the actual `IVisynViewProps`.
+     */
+    defaultParameters?: Param;
+}
+export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 'id' | 'load'>> {
     /**
      * how many selection this view can handle and requires
      */
@@ -316,7 +334,6 @@ export interface IViewPluginDesc extends IPluginDesc {
      * idType regex that is required by this view
      */
     idtype?: string;
-    load(): Promise<IViewPlugin>;
     /**
      * view group hint
      */
@@ -376,11 +393,21 @@ export interface IViewPlugin {
      */
     factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
-export interface IViewWrapperDump {
-    hash: string;
-    plugin: string;
-    dumpReference: number;
-    parameters: object;
+export interface IVisynViewProps<Desc extends IVisynViewPluginDesc = IVisynViewPluginDesc, Param extends Record<string, any> = Record<string, any>> {
+    desc: Desc;
+    selection: string[];
+    parameters: Param;
+    onSelectionChanged: (selection: string[]) => void;
+    onParametersChanged: (parameters: Param) => void;
+}
+export interface IVisynViewPlugin {
+    readonly desc: IVisynViewPluginDesc;
+    factory(): IVisynViewPluginFactory;
+}
+export interface IVisynViewPluginFactory {
+    view: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
+    header?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
+    tab?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
 }
 export interface IInstantView {
     readonly node: HTMLElement;

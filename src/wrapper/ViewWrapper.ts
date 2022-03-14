@@ -16,7 +16,7 @@ import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
-import { EventHandler, IEvent, IEventListener, ResolveNow } from '../base';
+import { EventHandler, IEvent, IEventListener, ResolveNow, IBaseViewPluginDesc } from '../base';
 import { NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph } from '../provenance';
 import { Range } from '../range';
 import { I18nextManager } from '../i18n';
@@ -442,7 +442,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
     }
   }
 
-  static guessIDType(v: IViewPluginDesc): IDType | null {
-    return v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype);
+  static guessIDType(v: IBaseViewPluginDesc): IDType | null {
+    return v.idtype ? (v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype)) : null;
   }
 }

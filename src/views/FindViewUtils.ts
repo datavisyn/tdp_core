@@ -4,17 +4,25 @@ import {
   EXTENSION_POINT_TDP_INSTANT_VIEW,
   EXTENSION_POINT_TDP_VIEW,
   EXTENSION_POINT_TDP_VIEW_GROUPS,
+  EXTENSION_POINT_VISYN_VIEW,
 } from '../base/extensions';
 import { IGroupData, IInstanceViewExtensionDesc, IViewGroupExtensionDesc, IViewPluginDesc } from '../base/interfaces';
 import { IDType, IDTypeManager } from '../idtype';
 import { Range } from '../range';
 import { PluginRegistry, UserSession } from '../app';
-import { IPluginDesc } from '../base';
+import { IPluginDesc, IVisynViewPluginDesc } from '../base';
 
-export interface IDiscoveredView {
+interface IBaseDiscoveryView {
   enabled: boolean;
-  v: IViewPluginDesc;
   disabledReason?: 'selection' | 'security' | 'invalid';
+}
+
+export interface IDiscoveredView extends IBaseDiscoveryView {
+  v: IViewPluginDesc;
+}
+
+export interface IDiscoveredVisynView extends IBaseDiscoveryView {
+  v: IVisynViewPluginDesc;
 }
 
 export interface IGroupedViews<T extends { v: IViewPluginDesc }> extends IGroupData {
@@ -56,6 +64,23 @@ export class FindViewUtils {
     return FindViewUtils.findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
       return r
         .map(ViewUtils.toViewPluginDesc)
+        .map((v) => {
+          const access = FindViewUtils.canAccess(v);
+          const hasAccessHint = !access && Boolean(v.securityNotAllowedText);
+          return {
+            enabled: access,
+            v,
+            disabledReason: !access ? (hasAccessHint ? <const>'security' : <const>'invalid') : undefined,
+          };
+        })
+        .filter((v) => v.disabledReason !== 'invalid');
+    });
+  }
+
+  static findVisynViews(idType?: IDType): Promise<IDiscoveredVisynView[]> {
+    return FindViewUtils.findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_VISYN_VIEW), true).then((r) => {
+      return r
+        .map((v) => ViewUtils.toViewPluginDesc<IVisynViewPluginDesc>(v))
         .map((v) => {
           const access = FindViewUtils.canAccess(v);
           const hasAccessHint = !access && Boolean(v.securityNotAllowedText);

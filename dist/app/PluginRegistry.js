@@ -1,5 +1,6 @@
 import { UniqueIdManager } from './UniqueIdManager';
 import { BaseUtils } from '../base/BaseUtils';
+import { EXTENSION_POINT_VISYN_VIEW } from '../base/extensions';
 export class PluginRegistry {
     constructor() {
         this.registry = [];
@@ -21,6 +22,9 @@ export class PluginRegistry {
             },
         }, typeof descOrLoader === 'function' ? desc : descOrLoader);
         PluginRegistry.getInstance().registry.push(p);
+    }
+    pushVisynView(id, loader, desc) {
+        return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, desc);
     }
     register(plugin, generator) {
         if (typeof generator !== 'function') {
@@ -95,7 +99,7 @@ export class PluginRegistry {
                 }
             }
             else {
-                console.error(`neighter a default export nor the 'create' method exists in the module:`, instance);
+                console.error(`neither a default export nor the 'create' method exists in the module:`, instance);
             }
         }
         if (f.startsWith('new ')) {

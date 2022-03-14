@@ -1,6 +1,6 @@
 /// <reference types="react" />
-import { IVisConfig, VisColumn } from './interfaces';
-export interface VisSidebarProps {
+import { IVisConfig, VisColumn, ICommonVisSideBarProps } from './interfaces';
+export declare type VisSidebarProps = {
     /**
      * Required data columns which are displayed.
      */
@@ -11,7 +11,6 @@ export interface VisSidebarProps {
     filterCallback?: (s: string) => void;
     externalConfig?: IVisConfig;
     setExternalConfig?: (c: IVisConfig) => void;
-    width?: string;
-}
-export declare function VisSidebar({ columns, filterCallback, externalConfig, setExternalConfig, width }: VisSidebarProps): JSX.Element;
+} & ICommonVisSideBarProps;
+export declare function VisSidebar({ columns, filterCallback, externalConfig, setExternalConfig, className, style }: VisSidebarProps): JSX.Element;
 //# sourceMappingURL=VisSidebar.d.ts.map

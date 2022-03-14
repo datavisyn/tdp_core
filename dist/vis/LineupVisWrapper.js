@@ -8,7 +8,7 @@ export class LineupVisWrapper {
         this.props = props;
         this.getSelectedList = () => {
             const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection());
-            return selectedRows.map((r) => r._id.toString());
+            return selectedRows.map((r) => r.id.toString());
         };
         this.filterCallback = (s) => {
             const selectedIds = this.props.provider.getSelection();
@@ -36,7 +36,7 @@ export class LineupVisWrapper {
             };
             const mapData = (innerData, column) => {
                 // TODO: This should be _visyn_id?
-                return innerData.map((d) => ({ id: d.v._id, val: column.getRaw(d) }));
+                return innerData.map((d) => ({ id: d.v.id, val: column.getRaw(d) }));
             };
             const getColumnValue = async (column) => {
                 if (column.isLoaded()) {

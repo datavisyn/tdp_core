@@ -27,14 +27,14 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function ScatterVisSidebar({ config, optionsConfig, extensions, columns, filterCallback = () => null, setConfig, width = '20rem', }) {
+export function ScatterVisSidebar({ config, optionsConfig, extensions, columns, filterCallback = () => null, setConfig, className = '', style: { width = '20em', ...style } = {}, }) {
     const mergedOptionsConfig = useMemo(() => {
         return merge({}, defaultConfig, optionsConfig);
     }, [optionsConfig]);
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
-    return (React.createElement("div", { className: "container pb-3 pt-2", style: { width } },
+    return (React.createElement("div", { className: `container pb-3 pt-2 ${className}`, style: { width, ...style } },
         React.createElement(WarningMessage, null),
         React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
         React.createElement("hr", null),
