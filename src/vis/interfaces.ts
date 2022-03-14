@@ -155,3 +155,11 @@ export type ColumnInfo = {
 export type Scales = {
   color: any;
 };
+
+/**
+ * Common props for all vis sidebars.
+ */
+export interface ICommonVisSideBarProps {
+  style?: React.CSSProperties | undefined;
+  className?: string | undefined;
+}
