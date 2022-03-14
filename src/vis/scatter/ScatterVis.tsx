@@ -12,7 +12,26 @@ import { ScatterVisSidebar } from './ScatterVisSidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
 
-interface ScatterVisProps {
+const defaultExtensions = {
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
+};
+
+export function ScatterVis({
+  config,
+  optionsConfig,
+  extensions,
+  columns,
+  shapes = ['circle', 'square', 'triangle-up', 'star'],
+  filterCallback = () => null,
+  selectionCallback = () => null,
+  selected = {},
+  setConfig,
+  hideSidebar = false,
+  scales,
+}: {
   config: IScatterConfig;
   optionsConfig?: {
     color?: {
@@ -37,48 +56,12 @@ interface ScatterVisProps {
   shapes?: string[];
   columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
-  selectionCallback?: (s: string[]) => void;
-  selected?: string[];
+  selectionCallback?: (ids: string[]) => void;
+  selected?: { [key: number]: boolean };
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   hideSidebar?: boolean;
-}
-
-const defaultConfig = {
-  color: {
-    enable: true,
-    customComponent: null,
-  },
-  shape: {
-    enable: true,
-    customComponent: null,
-  },
-  filter: {
-    enable: true,
-    customComponent: null,
-  },
-};
-
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
-export function ScatterVis({
-  config,
-  optionsConfig,
-  extensions,
-  columns,
-  shapes = ['circle', 'square', 'triangle-up', 'star'],
-  filterCallback = () => null,
-  selectionCallback = () => null,
-  selected = [],
-  setConfig,
-  hideSidebar = false,
-  scales,
-}: ScatterVisProps) {
+}) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
 
   useEffect(() => {

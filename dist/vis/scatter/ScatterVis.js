@@ -10,27 +10,13 @@ import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
-const defaultConfig = {
-    color: {
-        enable: true,
-        customComponent: null,
-    },
-    shape: {
-        enable: true,
-        customComponent: null,
-    },
-    filter: {
-        enable: true,
-        customComponent: null,
-    },
-};
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
     postSidebar: null,
 };
-export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = [], setConfig, hideSidebar = false, scales, }) {
+export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, hideSidebar = false, scales, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
     useEffect(() => {
         if (hideSidebar) {

@@ -35,8 +35,7 @@ export class LineupVisWrapper {
                 };
             };
             const mapData = (innerData, column) => {
-                // TODO: This should be _visyn_id?
-                return innerData.map((d) => ({ id: d.v._id, val: column.getRaw(d) }));
+                return innerData.map((d) => ({ id: d.v.id, val: column.getRaw(d) }));
             };
             const getColumnValue = async (column) => {
                 if (column.isLoaded()) {
@@ -72,7 +71,7 @@ export class LineupVisWrapper {
             ReactDOM.render(React.createElement(Vis, {
                 columns: cols,
                 selected: selectedList,
-                selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
+                selectionCallback: (ids) => this.props.selectionCallback(ids),
                 filterCallback: (s) => this.filterCallback(s),
             }), this.node);
         };

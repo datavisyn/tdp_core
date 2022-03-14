@@ -1,6 +1,8 @@
-import { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
+import type { IPluginDesc, IRegistry, IPlugin } from '../base/plugin';
+import type { IBaseViewPluginDesc, IVisynViewPluginDesc } from '../base/interfaces';
 import { UniqueIdManager } from './UniqueIdManager';
 import { BaseUtils } from '../base/BaseUtils';
+import { EXTENSION_POINT_VISYN_VIEW } from '../base/extensions';
 
 export class PluginRegistry implements IRegistry {
   private registry: IPluginDesc[] = [];
@@ -25,6 +27,10 @@ export class PluginRegistry implements IRegistry {
     );
 
     PluginRegistry.getInstance().registry.push(p);
+  }
+
+  public pushVisynView(id: string, loader: () => Promise<any>, desc: IBaseViewPluginDesc) {
+    return this.push(EXTENSION_POINT_VISYN_VIEW, id, loader, desc);
   }
 
   private knownPlugins = new Set<string>();
@@ -107,7 +113,7 @@ export class PluginRegistry implements IRegistry {
           f = 'default';
         }
       } else {
-        console.error(`neighter a default export nor the 'create' method exists in the module:`, instance);
+        console.error(`neither a default export nor the 'create' method exists in the module:`, instance);
       }
     }
     if (f.startsWith('new ')) {
