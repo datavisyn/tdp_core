@@ -68,7 +68,7 @@
    * Colors dark theme
    */
   &.navbar-dark {
-    border-bottom: 1px solid tint-color(map-get($theme-colors, "dark"), 10%);
+    border-bottom-color: tint-color(map-get($theme-colors, "dark"), 10%);
 
     .navbar-brand {
       color: $white;
