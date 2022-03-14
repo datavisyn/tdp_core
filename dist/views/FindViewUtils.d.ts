@@ -1,10 +1,16 @@
 import { IGroupData, IInstanceViewExtensionDesc, IViewPluginDesc } from '../base/interfaces';
 import { IDType } from '../idtype';
 import { Range } from '../range';
-export interface IDiscoveredView {
+import { IVisynViewPluginDesc } from '../base';
+interface IBaseDiscoveryView {
     enabled: boolean;
-    v: IViewPluginDesc;
     disabledReason?: 'selection' | 'security' | 'invalid';
+}
+export interface IDiscoveredView extends IBaseDiscoveryView {
+    v: IViewPluginDesc;
+}
+export interface IDiscoveredVisynView extends IBaseDiscoveryView {
+    v: IVisynViewPluginDesc;
 }
 export interface IGroupedViews<T extends {
     v: IViewPluginDesc;
@@ -20,6 +26,7 @@ export declare class FindViewUtils {
      */
     static findViews(idType: IDType, selection: Range): Promise<IDiscoveredView[]>;
     static findAllViews(idType?: IDType): Promise<IDiscoveredView[]>;
+    static findVisynViews(idType?: IDType): Promise<IDiscoveredVisynView[]>;
     private static findViewBase;
     static canAccess(p: any): any;
     static findInstantViews(idType: IDType): Promise<IInstanceViewExtensionDesc[]>;
@@ -34,4 +41,5 @@ export declare class FindViewUtils {
         v: IViewPluginDesc;
     }>(views: T[]): IGroupedViews<T>[];
 }
+export {};
 //# sourceMappingURL=FindViewUtils.d.ts.map

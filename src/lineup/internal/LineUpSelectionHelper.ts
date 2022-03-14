@@ -2,7 +2,6 @@ import { LocalDataProvider } from 'lineupjs';
 import { difference } from 'lodash';
 import { EventHandler, ISelection } from '../../base';
 import { IRow } from '../../base/rest';
-import { LineupUtils } from '../utils';
 import { IDType } from '../../idtype';
 import { Range } from '../../range';
 
@@ -19,6 +18,8 @@ export class LineUpSelectionHelper extends EventHandler {
 
   private uid2index = new Map<number, number>();
 
+  private id2index = new Map<string, number>();
+
   constructor(private readonly provider: LocalDataProvider, private readonly idType: () => IDType) {
     super();
     this.addEventListener();
@@ -26,9 +27,11 @@ export class LineUpSelectionHelper extends EventHandler {
 
   private buildCache() {
     this.uid2index.clear();
+    this.id2index.clear();
     // create lookup cache
     this._rows.forEach((row, i) => {
       this.uid2index.set(row._id, i);
+      this.id2index.set(String(row.id), i);
     });
     // fill up id cache for faster mapping
     const idType = this.idType();
@@ -129,7 +132,7 @@ export class LineUpSelectionHelper extends EventHandler {
     this.addEventListener();
   }
 
-  setGeneralVisSelection(sel: ISelection) {
+  setGeneralVisSelection(sel: { idtype: IDType; ids: string[] }) {
     if (!this.provider) {
       return;
     }
@@ -137,8 +140,9 @@ export class LineUpSelectionHelper extends EventHandler {
     const old = this.provider.getSelection().sort((a, b) => a - b);
 
     const indices: number[] = [];
-    sel.range.dim(0).forEach((uid) => {
-      const index = this.uid2index.get(uid);
+
+    sel.ids.forEach((id) => {
+      const index = this.id2index.get(String(id));
       if (typeof index === 'number') {
         indices.push(index);
       }

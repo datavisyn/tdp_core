@@ -1,4 +1,4 @@
-import { IPluginDesc } from '../base';
+import { IPluginDesc, IVisynViewPluginDesc } from '../base';
 import { IViewPluginDesc, IViewContext, ISelection } from '../base/interfaces';
 import { IObjectRef, ProvenanceGraph } from '../provenance';
 export declare class ViewUtils {
@@ -11,7 +11,7 @@ export declare class ViewUtils {
     static readonly VIEW_EVENT_UPDATE_ENTRY_POINT = "update_entry_point";
     static readonly VIEW_EVENT_LOADING_FINISHED = "loadingFinished";
     static readonly VIEW_EVENT_UPDATE_SHARED = "updateShared";
-    static toViewPluginDesc(p: IPluginDesc): IViewPluginDesc;
+    static toViewPluginDesc<ReturnType extends IViewPluginDesc | IVisynViewPluginDesc = IViewPluginDesc>(p: IPluginDesc): ReturnType;
     static matchLength(s: any, length: number): boolean;
     /**
      * whether the view should be used as small multiple in case of multiple selections
