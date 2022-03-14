@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 /// <reference types="jest" />
 import { EStringGroupCriteriaType } from 'lineupjs';
 import { LineUpFilterUtils } from '../../../../src/lineup/internal/lineUpFilter';

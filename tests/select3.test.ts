@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 /// <reference types="jest" />
 import { Select3Utils } from '../src/form/elements/Select3';
 

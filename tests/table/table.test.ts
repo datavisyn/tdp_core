@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 import { ITable, Table } from '../../src/table';
 import { IDTypeManager } from '../../src/idtype';
 

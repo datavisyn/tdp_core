@@ -1,3 +1,7 @@
+/**
+ * @jest-environment jsdom
+ */
+
 /// <reference types="jest" />
 import { Stratification } from '../src/stratification';
 
