@@ -1,14 +1,14 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { useMemo, useEffect } from 'react';
-import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, } from './interfaces';
+import { ESupportedPlotlyVis, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
-import { isDensity } from './density/utils';
+import { densityMergeDefaultConfig, isDensity } from './density/utils';
 import { DensityVis } from './density/DensityVis';
 export function Vis({ columns, selected = [], colors = [
     getCssValue('visyn-c1'),
@@ -24,13 +24,12 @@ export function Vis({ columns, selected = [], colors = [
 ], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null, hideSidebar = false, }) {
     const [visConfig, setVisConfig] = React.useState(externalConfig || columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1
         ? {
-            type: ESupportedPlotlyVis.SCATTER,
+            type: ESupportedPlotlyVis.DENSITY,
             numColumnsSelected: [],
             color: null,
-            numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
-            shape: null,
-            dragMode: EScatterSelectSettings.RECTANGLE,
-            alphaSliderVal: 0.5,
+            isOpacityScale: true,
+            isSizeScale: false,
+            hexRadius: 16,
         }
         : {
             type: ESupportedPlotlyVis.BAR,
@@ -57,6 +56,9 @@ export function Vis({ columns, selected = [], colors = [
         }
         if (isBar(visConfig)) {
             setVisConfig(barMergeDefaultConfig(columns, visConfig));
+        }
+        if (isDensity(visConfig)) {
+            setVisConfig(densityMergeDefaultConfig(columns, visConfig));
         }
         // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps

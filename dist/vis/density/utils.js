@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { ESupportedPlotlyVis, } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, } from '../interfaces';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 export function isDensity(s) {
     return s.type === ESupportedPlotlyVis.DENSITY;
@@ -8,18 +8,33 @@ const defaultConfig = {
     type: ESupportedPlotlyVis.DENSITY,
     numColumnsSelected: [],
     color: null,
+    isOpacityScale: true,
+    isSizeScale: false,
+    hexRadius: 16,
 };
 export function densityMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);
+    const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
+    if (merged.numColumnsSelected.length === 0 && numCols.length > 1) {
+        merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
+        merged.numColumnsSelected.push(numCols[numCols.length - 2].info);
+    }
+    else if (merged.numColumnsSelected.length === 1 && numCols.length > 1) {
+        if (numCols[numCols.length - 1].info.id !== merged.numColumnsSelected[0].id) {
+            merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
+        }
+        else {
+            merged.numColumnsSelected.push(numCols[numCols.length - 2].info);
+        }
+    }
     return merged;
 }
-export async function getHexData(columns, config) {
-    const numCols = config.numColumnsSelected
+export async function getHexData(columns, numColumnsSelected, colorColumn) {
+    const numCols = numColumnsSelected
         .filter((col) => columns.find((c) => c.info.id === col.id))
         .map((c) => columns.find((col) => col.info.id === c.id));
-    console.log(numCols);
     const numColVals = await resolveColumnValues(numCols);
-    const colorColVals = await resolveSingleColumn(config.color ? columns.find((col) => col.info.id === config.color.id) : null);
+    const colorColVals = await resolveSingleColumn(colorColumn ? columns.find((col) => col.info.id === colorColumn.id) : null);
     return { numColVals, colorColVals };
 }
 export function cutHex(path, radius, start, sixths) {

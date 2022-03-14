@@ -5,6 +5,7 @@ import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { NumericalColumnSelect } from '../sidebar';
 import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
+import { HexSizeSlider } from '../sidebar/HexSizeSlider';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -22,6 +23,7 @@ export function DensityVisSidebar({ config, extensions, columns, setConfig, widt
         React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),
         React.createElement(CategoricalColumnSingleSelect, { callback: (color) => setConfig({ ...config, color }), columns: columns, currentSelected: config.color }),
         React.createElement("hr", null),
+        React.createElement(HexSizeSlider, { currentValue: config.hexRadius, callback: (hexRadius) => setConfig({ ...config, hexRadius }) }),
         mergedExtensions.preSidebar,
         mergedExtensions.postSidebar));
 }

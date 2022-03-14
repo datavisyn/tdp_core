@@ -95,6 +95,9 @@ export interface IDensityConfig {
   type: ESupportedPlotlyVis.DENSITY;
   numColumnsSelected: ColumnInfo[];
   color: ColumnInfo | null;
+  hexRadius: number;
+  isOpacityScale: boolean;
+  isSizeScale: boolean;
 }
 
 export interface IBarConfig {

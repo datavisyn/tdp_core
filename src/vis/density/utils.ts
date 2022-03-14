@@ -21,16 +21,32 @@ const defaultConfig: IDensityConfig = {
   type: ESupportedPlotlyVis.DENSITY,
   numColumnsSelected: [],
   color: null,
+  isOpacityScale: true,
+  isSizeScale: false,
+  hexRadius: 16,
 };
 
 export function densityMergeDefaultConfig(columns: VisColumn[], config: IDensityConfig): IVisConfig {
   const merged = merge({}, defaultConfig, config);
+  const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
+
+  if (merged.numColumnsSelected.length === 0 && numCols.length > 1) {
+    merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
+    merged.numColumnsSelected.push(numCols[numCols.length - 2].info);
+  } else if (merged.numColumnsSelected.length === 1 && numCols.length > 1) {
+    if (numCols[numCols.length - 1].info.id !== merged.numColumnsSelected[0].id) {
+      merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
+    } else {
+      merged.numColumnsSelected.push(numCols[numCols.length - 2].info);
+    }
+  }
   return merged;
 }
 
 export async function getHexData(
   columns: VisColumn[],
-  config: IDensityConfig,
+  numColumnsSelected: ColumnInfo[],
+  colorColumn: ColumnInfo | null,
 ): Promise<{
   numColVals: {
     resolvedValues: (VisNumericalValue | VisCategoricalValue)[];
@@ -43,14 +59,13 @@ export async function getHexData(
     info: ColumnInfo;
   };
 }> {
-  const numCols: VisNumericalColumn[] = config.numColumnsSelected
+  const numCols: VisNumericalColumn[] = numColumnsSelected
     .filter((col) => columns.find((c) => c.info.id === col.id))
     .map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
 
-  console.log(numCols);
-
   const numColVals = await resolveColumnValues(numCols);
-  const colorColVals = await resolveSingleColumn(config.color ? columns.find((col) => col.info.id === config.color.id) : null);
+
+  const colorColVals = await resolveSingleColumn(colorColumn ? columns.find((col) => col.info.id === colorColumn.id) : null);
 
   return { numColVals, colorColVals };
 }

@@ -6,6 +6,7 @@ import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { AllColumnSelect, CategoricalColumnSelect, NumericalColumnSelect } from '../sidebar';
 import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
+import { HexSizeSlider } from '../sidebar/HexSizeSlider';
 
 interface DensityVisSidebarProps {
   config: IDensityConfig;
@@ -44,6 +45,8 @@ export function DensityVisSidebar({ config, extensions, columns, setConfig, widt
       />
       <CategoricalColumnSingleSelect callback={(color: ColumnInfo) => setConfig({ ...config, color })} columns={columns} currentSelected={config.color} />
       <hr />
+      <HexSizeSlider currentValue={config.hexRadius} callback={(hexRadius: number) => setConfig({ ...config, hexRadius })} />
+
       {mergedExtensions.preSidebar}
       {mergedExtensions.postSidebar}
     </div>
