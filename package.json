@@ -83,9 +83,12 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
     "@popperjs/core": "^2.9.3",
+    "@types/d3-hexbin": "^0.2.3",
     "bootstrap": "~5.1.0",
     "crypto-js": "^4.0.0",
     "d3": "~3.5.17",
+    "d3-hexbin": "^0.2.2",
+    "d3v7": "npm:d3@7.3.0",
     "i18next": "^19.8.4",
     "jquery": "~3.5.1",
     "lineupjs": "next",
@@ -110,6 +113,7 @@
   },
   "devDependencies": {
     "@types/d3": "~3.5.36",
+    "@types/d3v7": "npm:@types/d3@7.1.0",
     "@types/jquery": "~3.5.5",
     "@types/select2": "4.0.44",
     "@types/jest": "~26.0.20",

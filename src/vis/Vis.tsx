@@ -20,6 +20,8 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
+import { isDensity } from './density/utils';
+import { DensityVis } from './density/DensityVis';
 
 export function Vis({
   columns,
@@ -155,6 +157,10 @@ export function Vis({
           scales={scales}
           hideSidebar={hideSidebar}
         />
+      ) : null}
+
+      {isDensity(visConfig) ? (
+        <DensityVis config={visConfig} setConfig={setVisConfig} selected={selectedMap} columns={columns} hideSidebar={hideSidebar} />
       ) : null}
 
       {isViolin(visConfig) ? (

@@ -8,6 +8,8 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
+import { isDensity } from './density/utils';
+import { DensityVis } from './density/DensityVis';
 export function Vis({ columns, selected = [], colors = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
@@ -83,6 +85,7 @@ export function Vis({ columns, selected = [], colors = [
                     enable: true,
                 },
             }, shapes: shapes, setConfig: setVisConfig, filterCallback: filterCallback, selectionCallback: selectionCallback, selected: selectedMap, columns: columns, scales: scales, hideSidebar: hideSidebar })) : null,
+        isDensity(visConfig) ? (React.createElement(DensityVis, { config: visConfig, setConfig: setVisConfig, selected: selectedMap, columns: columns, hideSidebar: hideSidebar })) : null,
         isViolin(visConfig) ? (React.createElement(ViolinVis, { config: visConfig, optionsConfig: {
                 overlay: {
                     enable: true,
