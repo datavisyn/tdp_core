@@ -60,6 +60,12 @@ class NamespaceLoginManager(security.SecurityManager):
 
   def init_app(self, app):
     self._manager.init_app(app)
+    # next, init every store if any requires that
+    for store in self._user_stores:
+      # first check if the actual "init_app" method is implemented and then call it
+      init_store_app = getattr(store, "init_app", None)
+      if callable(init_store_app):
+        init_store_app(app)
 
   def add_login_routes(self, app):
     from phovea_server import ns

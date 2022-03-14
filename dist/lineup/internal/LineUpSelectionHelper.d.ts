@@ -14,6 +14,7 @@ export declare class LineUpSelectionHelper extends EventHandler {
      */
     private readonly orderedSelectedIndices;
     private uid2index;
+    private id2index;
     constructor(provider: LocalDataProvider, idType: () => IDType);
     private buildCache;
     private addEventListener;
@@ -26,6 +27,9 @@ export declare class LineUpSelectionHelper extends EventHandler {
      */
     rowIdsAsSet(indices: number[]): Range;
     setItemSelection(sel: ISelection): void;
-    setGeneralVisSelection(sel: ISelection): void;
+    setGeneralVisSelection(sel: {
+        idtype: IDType;
+        ids: string[];
+    }): void;
 }
 //# sourceMappingURL=LineUpSelectionHelper.d.ts.map

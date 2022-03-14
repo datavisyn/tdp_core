@@ -1,13 +1,26 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, IStripConfig, IVisConfig, VisColumn } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, IStripConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 
-interface StripVisSidebarProps {
+const defaultExtensions = {
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
+};
+export function StripVisSidebar({
+  config,
+  extensions,
+  columns,
+  setConfig,
+  className = '',
+  style: { width = '20em', ...style } = {},
+}: {
   config: IStripConfig;
   extensions?: {
     prePlot?: React.ReactNode;
@@ -17,22 +30,13 @@ interface StripVisSidebarProps {
   };
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
-  width?: string;
-}
-
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-export function StripVisSidebar({ config, extensions, columns, setConfig, width = '20rem' }: StripVisSidebarProps) {
+} & ICommonVisSideBarProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
   return (
-    <div className="container pb-3 pt-2" style={{ width }}>
+    <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
       <WarningMessage />
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />
