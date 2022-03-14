@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { IBarConfig, IVisConfig, VisColumn } from '../interfaces';
-interface BarVisSidebarProps {
+import { IBarConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
+export declare function BarVisSidebar({ config, optionsConfig, extensions, columns, setConfig, className, style: { width, ...style }, }: {
     config: IBarConfig;
     optionsConfig?: {
         group?: {
@@ -32,8 +32,5 @@ interface BarVisSidebarProps {
     };
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
-    width?: string;
-}
-export declare function BarVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width }: BarVisSidebarProps): JSX.Element;
-export {};
+} & ICommonVisSideBarProps): JSX.Element;
 //# sourceMappingURL=BarVisSidebar.d.ts.map

@@ -14,13 +14,16 @@ export class LineUpSelectionHelper extends EventHandler {
          */
         this.orderedSelectedIndices = [];
         this.uid2index = new Map();
+        this.id2index = new Map();
         this.addEventListener();
     }
     buildCache() {
         this.uid2index.clear();
+        this.id2index.clear();
         // create lookup cache
         this._rows.forEach((row, i) => {
             this.uid2index.set(row._id, i);
+            this.id2index.set(String(row.id), i);
         });
         // fill up id cache for faster mapping
         const idType = this.idType();
@@ -109,8 +112,8 @@ export class LineUpSelectionHelper extends EventHandler {
         }
         const old = this.provider.getSelection().sort((a, b) => a - b);
         const indices = [];
-        sel.range.dim(0).forEach((uid) => {
-            const index = this.uid2index.get(uid);
+        sel.ids.forEach((id) => {
+            const index = this.id2index.get(String(id));
             if (typeof index === 'number') {
                 indices.push(index);
             }
