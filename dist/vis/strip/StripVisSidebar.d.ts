@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { IStripConfig, IVisConfig, VisColumn } from '../interfaces';
-interface StripVisSidebarProps {
+import { IStripConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
+export declare function StripVisSidebar({ config, extensions, columns, setConfig, className, style: { width, ...style }, }: {
     config: IStripConfig;
     extensions?: {
         prePlot?: React.ReactNode;
@@ -10,8 +10,5 @@ interface StripVisSidebarProps {
     };
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
-    width?: string;
-}
-export declare function StripVisSidebar({ config, extensions, columns, setConfig, width }: StripVisSidebarProps): JSX.Element;
-export {};
+} & ICommonVisSideBarProps): JSX.Element;
 //# sourceMappingURL=StripVisSidebar.d.ts.map
