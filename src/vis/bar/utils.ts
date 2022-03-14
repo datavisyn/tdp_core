@@ -210,7 +210,7 @@ async function setPlotsBasic(
     (curr) => (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === curr).length,
   );
   const countTotal = sum(count);
-  const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
+  const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))];
   plots.push({
     data: {
       x: vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
