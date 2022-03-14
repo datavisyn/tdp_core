@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { IPCPConfig, IVisConfig, VisColumn } from '../interfaces';
-interface PCPVisSidebarProps {
+import { IPCPConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
+export declare function PCPVisSidebar({ config, extensions, columns, setConfig, className, style: { width, ...style }, }: {
     config: IPCPConfig;
     extensions?: {
         prePlot?: React.ReactNode;
@@ -10,8 +10,5 @@ interface PCPVisSidebarProps {
     };
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
-    width?: string;
-}
-export declare function PCPVisSidebar({ config, extensions, columns, setConfig, width }: PCPVisSidebarProps): JSX.Element;
-export {};
+} & ICommonVisSideBarProps): JSX.Element;
 //# sourceMappingURL=PCPVisSidebar.d.ts.map

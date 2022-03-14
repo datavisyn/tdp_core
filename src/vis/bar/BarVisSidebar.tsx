@@ -1,7 +1,17 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { ColumnInfo, EBarDirection, EBarDisplayType, EBarGroupingType, ESupportedPlotlyVis, IBarConfig, IVisConfig, VisColumn } from '../interfaces';
+import {
+  ColumnInfo,
+  EBarDirection,
+  EBarDisplayType,
+  EBarGroupingType,
+  ESupportedPlotlyVis,
+  IBarConfig,
+  IVisConfig,
+  VisColumn,
+  ICommonVisSideBarProps,
+} from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { GroupSelect } from '../sidebar/GroupSelect';
@@ -10,41 +20,6 @@ import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
 import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
 import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
 import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
-
-interface BarVisSidebarProps {
-  config: IBarConfig;
-  optionsConfig?: {
-    group?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    multiples?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    direction?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    groupingType?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    display?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-  };
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  columns: VisColumn[];
-  setConfig: (config: IVisConfig) => void;
-  width?: string;
-}
 
 const defaultConfig = {
   group: {
@@ -76,7 +51,47 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function BarVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width = '20rem' }: BarVisSidebarProps) {
+export function BarVisSidebar({
+  config,
+  optionsConfig,
+  extensions,
+  columns,
+  setConfig,
+  className = '',
+  style: { width = '20em', ...style } = {},
+}: {
+  config: IBarConfig;
+  optionsConfig?: {
+    group?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+    multiples?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+    direction?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+    groupingType?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+    display?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+  };
+  extensions?: {
+    prePlot?: React.ReactNode;
+    postPlot?: React.ReactNode;
+    preSidebar?: React.ReactNode;
+    postSidebar?: React.ReactNode;
+  };
+  columns: VisColumn[];
+  setConfig: (config: IVisConfig) => void;
+} & ICommonVisSideBarProps) {
   const mergedOptionsConfig = useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
   }, [optionsConfig]);
@@ -86,7 +101,7 @@ export function BarVisSidebar({ config, optionsConfig, extensions, columns, setC
   }, [extensions]);
 
   return (
-    <div className="container pb-3 pt-2" style={{ width }}>
+    <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
       <WarningMessage />
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />
