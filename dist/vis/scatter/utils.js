@@ -41,6 +41,7 @@ export function moveSelectedToFront(col, selectedMap) {
     return sortedCol;
 }
 export async function createScatterTraces(columns, selected, config, scales, shapes) {
+    var _a;
     let plotCounter = 1;
     const emptyVal = {
         plots: [],
@@ -65,7 +66,6 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     validCols.forEach((c) => {
         c.resolvedValues = moveSelectedToFront(c.resolvedValues, selectedMap);
     });
-    console.log(validCols);
     const shapeScale = config.shape
         ? d3.scale
             .ordinal()
@@ -91,6 +91,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     if (validCols.length === 1) {
         return emptyVal;
     }
+    console.log(selectedMap, (_a = validCols[0]) === null || _a === void 0 ? void 0 : _a.resolvedValues);
     // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
     if (validCols.length === 2) {
         plots.push({

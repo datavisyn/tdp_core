@@ -12,7 +12,6 @@ import {
   IScatterConfig,
   ENumericalColorScaleType,
   VisCategoricalValue,
-  VisCategoricalColumn,
   VisNumericalValue,
 } from '../interfaces';
 import { getCol } from '../sidebar';
@@ -104,8 +103,6 @@ export async function createScatterTraces(
     c.resolvedValues = moveSelectedToFront(c.resolvedValues, selectedMap);
   });
 
-  console.log(validCols);
-
   const shapeScale = config.shape
     ? d3.scale
         .ordinal<string>()
@@ -138,6 +135,8 @@ export async function createScatterTraces(
   if (validCols.length === 1) {
     return emptyVal;
   }
+
+  console.log(selectedMap, validCols[0]?.resolvedValues)
 
   // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
   if (validCols.length === 2) {

@@ -27,7 +27,7 @@ export function ScatterVis({
   shapes = ['circle', 'square', 'triangle-up', 'star'],
   filterCallback = () => null,
   selectionCallback = () => null,
-  selected = {},
+  selected = [],
   setConfig,
   hideSidebar = false,
   scales,
@@ -57,7 +57,7 @@ export function ScatterVis({
   columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
   selectionCallback?: (ids: string[]) => void;
-  selected?: { [key: number]: boolean };
+  selected?: string[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   hideSidebar?: boolean;
