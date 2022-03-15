@@ -3,6 +3,8 @@ import { GraphBase, IGraphFactory } from './GraphBase';
 import { GraphEdge, GraphNode, IGraph, IGraphDataDescription } from './graph';
 
 export class LocalStorageGraph extends GraphBase implements IGraph {
+  private storage: Storage;
+
   private updateHandler = (event: IEvent) => {
     const s = event.target;
     if (s instanceof GraphNode) {
@@ -13,8 +15,9 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
     }
   };
 
-  constructor(desc: IGraphDataDescription, nodes: GraphNode[] = [], edges: GraphEdge[] = [], private storage: Storage = sessionStorage) {
+  constructor(desc: IGraphDataDescription, nodes: GraphNode[] = [], edges: GraphEdge[] = [], storage: Storage = sessionStorage) {
     super(desc, nodes, edges);
+    this.storage = storage;
 
     const { uid } = this;
     if (nodes.length > 0 || edges.length > 0) {

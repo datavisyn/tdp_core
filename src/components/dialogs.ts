@@ -180,7 +180,7 @@ export class Dialog {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_UI_FormDialog extends Dialog {
-  constructor(title: string, primaryBtnText = 'OK', private readonly formId = `form${BaseUtils.randomId(5)}`, additionalCSSClasses = '') {
+  constructor(title: string, primaryBtnText = 'OK', formId = `form${BaseUtils.randomId(5)}`, additionalCSSClasses = '') {
     super(title, primaryBtnText, additionalCSSClasses);
 
     this.body.innerHTML = `<form id="${formId}"></form>`;

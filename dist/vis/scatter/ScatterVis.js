@@ -2,7 +2,7 @@ import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
-import { InvalidCols } from '../InvalidCols';
+import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
