@@ -7,6 +7,8 @@ import { WarningMessage } from '../sidebar/WarningMessage';
 import { AllColumnSelect, CategoricalColumnSelect, NumericalColumnSelect } from '../sidebar';
 import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
 import { HexSizeSlider } from '../sidebar/HexSizeSlider';
+import { HexSizeSwitch } from '../sidebar/HexSizeScaleSwitch';
+import { HexOpacitySwitch } from '../sidebar/HexOpacityScaleSwitch';
 
 interface DensityVisSidebarProps {
   config: IDensityConfig;
@@ -46,7 +48,8 @@ export function DensityVisSidebar({ config, extensions, columns, setConfig, widt
       <CategoricalColumnSingleSelect callback={(color: ColumnInfo) => setConfig({ ...config, color })} columns={columns} currentSelected={config.color} />
       <hr />
       <HexSizeSlider currentValue={config.hexRadius} callback={(hexRadius: number) => setConfig({ ...config, hexRadius })} />
-
+      <HexSizeSwitch currentValue={config.isSizeScale} callback={(isSizeScale: boolean) => setConfig({ ...config, isSizeScale })} />
+      <HexOpacitySwitch currentValue={config.isOpacityScale} callback={(isOpacityScale: boolean) => setConfig({ ...config, isOpacityScale })} />
       {mergedExtensions.preSidebar}
       {mergedExtensions.postSidebar}
     </div>

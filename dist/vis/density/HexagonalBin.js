@@ -151,7 +151,7 @@ export function HexagonalBin({ config, columns }) {
                 return Object.keys(catMap)
                     .sort()
                     .map((key) => {
-                    const currPath = cutHex(d3Hexbin.hexagon(config.isSizeScale ? radiusScale(singleHex.length) : null), config.hexRadius, counter, Math.ceil(catMap[key] / hexDivisor));
+                    const currPath = cutHex(d3Hexbin.hexagon(config.isSizeScale ? radiusScale(singleHex.length) : null), config.isSizeScale ? radiusScale(singleHex.length) : config.hexRadius, counter, Math.ceil(catMap[key] / hexDivisor));
                     counter += Math.ceil(catMap[key] / hexDivisor);
                     return (React.createElement("path", { key: `${singleHex.x}, ${singleHex.y}, ${key}`, d: currPath, style: {
                             fill: `${colorScale ? colorScale(key) : '#69b3a2'}`,

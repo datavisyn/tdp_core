@@ -221,7 +221,7 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
               .map((key) => {
                 const currPath = cutHex(
                   d3Hexbin.hexagon(config.isSizeScale ? radiusScale(singleHex.length) : null),
-                  config.hexRadius,
+                  config.isSizeScale ? radiusScale(singleHex.length) : config.hexRadius,
                   counter,
                   Math.ceil(catMap[key] / hexDivisor),
                 );
