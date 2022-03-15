@@ -37,15 +37,6 @@ export interface ISearchProvider<Result extends IResult = IResult> {
      * @returns {Promise<<Result>[]>} a list of valid results
      */
     validate(query: string[]): Promise<Result[]>;
-    /**
-     * returns the html to be used for showing this result
-     * @param {Result} item
-     * @param {HTMLElement} node
-     * @param {string} mode the kind of formatting that should be done for a result in the dropdown or for an selected item
-     * @param {string} currentSearchQuery optional the current search query as a regular expression in which the first group is the matched subset
-     * @returns {string} the formatted html text
-     */
-    format?(item: Result, node: HTMLElement, mode: 'result' | 'selection', currentSearchQuery?: RegExp): string;
     produces?(idType: IDType): boolean;
     /**
      * returns result's format for react-select
