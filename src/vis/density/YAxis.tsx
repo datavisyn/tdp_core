@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 // code taken from https://wattenberger.com/blog/react-and-d3
 export function YAxis({ domain = [0, 100], range = [10, 290], horizontalPosition = 0 }) {
   const ticks = useMemo(() => {
-    const yScale = d3.scaleLinear().domain(domain.reverse()).range(range).nice();
+    const yScale = d3.scaleLinear().domain(domain.reverse()).range(range);
     return yScale.ticks().map((value) => ({
       value,
       yOffset: yScale(value),

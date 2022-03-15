@@ -1,9 +1,11 @@
 import * as hex from 'd3-hexbin';
 import * as d3 from 'd3v7';
+import { uniqueId } from 'lodash';
 import * as React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAsync } from '../../hooks/useAsync';
 import { VisColumn, IDensityConfig } from '../interfaces';
+import { PieChart } from './PieChart';
 import { cutHex, getHexData } from './utils';
 import { XAxis } from './XAxis';
 import { YAxis } from './YAxis';
@@ -54,10 +56,17 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
   const ref = useRef(null);
   const [height, setHeight] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
+  const [xZoomedScaleDomain, setXZoomedScaleDomain] = useState(null);
+  const [yZoomedScaleDomain, setYZoomedScaleDomain] = useState(null);
+  const [xZoomTransform, setXZoomTransform] = useState(0);
+  const [yZoomTransform, setYZoomTransform] = useState(0);
+  const [zoomScale, setZoomScale] = useState(1);
 
   const [filteredCategories, setFilteredCategories] = useState<string[]>([]);
 
   const { value: allColumns, status: colsStatus, error: colsError } = useAsync(getHexData, [columns, config.numColumnsSelected, config.color]);
+
+  const id = React.useMemo(() => uniqueId('HexPlot'), []);
 
   const currentColorColumn = useMemo(() => {
     if (colsStatus === 'success' && config.color && allColumns.colorColVals) {
@@ -198,52 +207,94 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
     return d3.scaleOrdinal<string, string>(d3.schemeCategory10).domain(Array.from(new Set<string>(colorOptions)));
   }, [colsStatus, currentColorColumn?.allValues]);
 
+  useEffect(() => {
+    if (!xScale || !yScale) {
+      return;
+    }
+
+    const zoom = d3.zoom().on('zoom', (event) => {
+      const { transform } = event;
+
+      setZoomScale(transform.k);
+      setXZoomTransform(transform.x);
+      setYZoomTransform(transform.y);
+
+      const newX = transform.rescaleX(xScale);
+      const newY = transform.rescaleY(yScale);
+
+      setXZoomedScaleDomain(newX.domain());
+      setYZoomedScaleDomain(newY.domain());
+    });
+
+    d3.select(`#${id}`).call(d3.zoom().on('zoom', null));
+    d3.select(`#${id}`).call(zoom);
+  }, [id, xScale, yScale, zoomScale, xZoomTransform, yZoomTransform]);
+
   return (
     <div ref={ref} className="mw-100">
-      <svg style={{ width: width + margin.left + margin.right, height: height + margin.top + margin.bottom }}>
-        <clipPath id="clip">
-          <rect transform={`translate(${margin.left}px, ${margin.top}px)`} width={width} height={height} />
-        </clipPath>
-        <g clipPath="url(#clip)" style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }}>
-          {hexes.map((singleHex) => {
-            const catMap = {};
+      <svg id={id} style={{ width: width + margin.left + margin.right, height: height + margin.top + margin.bottom }}>
+        <defs>
+          <clipPath id="clip">
+            <rect
+              style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }}
+              x={xZoomedScaleDomain ? -xZoomedScaleDomain[0] : 0}
+              y={yZoomedScaleDomain ? -yZoomedScaleDomain[0] : 0}
+              width={width}
+              height={height}
+            />
+          </clipPath>
+        </defs>
+        <g clipPath="url(#clip)" style={{ transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` }}>
+          <g style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }}>
+            {hexes.map((singleHex) => {
+              const catMap = {};
 
-            singleHex.forEach((point: [number, number, string]) => {
-              catMap[point[2]] = catMap[point[2]] ? catMap[point[2]] + 1 : 1;
-            });
-
-            const hexDivisor = singleHex.length / 6;
-
-            let counter = 0;
-
-            return Object.keys(catMap)
-              .sort()
-              .map((key) => {
-                const currPath = cutHex(
-                  d3Hexbin.hexagon(config.isSizeScale ? radiusScale(singleHex.length) : null),
-                  config.isSizeScale ? radiusScale(singleHex.length) : config.hexRadius,
-                  counter,
-                  Math.ceil(catMap[key] / hexDivisor),
-                );
-                counter += Math.ceil(catMap[key] / hexDivisor);
-                return (
-                  <path
-                    key={`${singleHex.x}, ${singleHex.y}, ${key}`}
-                    d={currPath}
-                    style={{
-                      fill: `${colorScale ? colorScale(key) : '#69b3a2'}`,
-                      transform: `translate(${singleHex.x}px, ${singleHex.y}px)`,
-                      stroke: 'black',
-                      strokeWidth: '0.2',
-                      fillOpacity: config.isOpacityScale ? opacityScale(singleHex.length) : '1',
-                    }}
-                  />
-                );
+              singleHex.forEach((point: [number, number, string]) => {
+                catMap[point[2]] = catMap[point[2]] ? catMap[point[2]] + 1 : 1;
               });
-          })}
+
+              const hexDivisor = singleHex.length / 6;
+
+              let counter = 0;
+
+              return Object.keys(catMap)
+                .sort()
+                .map((key) => {
+                  const currPath = cutHex(
+                    d3Hexbin.hexagon(config.isSizeScale ? radiusScale(singleHex.length) : null),
+                    config.isSizeScale ? radiusScale(singleHex.length) : config.hexRadius,
+                    counter,
+                    Math.ceil(catMap[key] / hexDivisor),
+                  );
+                  counter += Math.ceil(catMap[key] / hexDivisor);
+                  return (
+                    <>
+                      <path
+                        key={`${singleHex.x}, ${singleHex.y}, ${key}`}
+                        d={currPath}
+                        style={{
+                          // fill: `${colorScale ? colorScale(key) : '#69b3a2'}`,
+                          transform: `translate(${singleHex.x}px, ${singleHex.y}px)`,
+                          stroke: 'white',
+                          strokeWidth: '0.2',
+                          fillOpacity: config.isOpacityScale ? opacityScale(singleHex.length) : '1',
+                        }}
+                      />
+                      <PieChart
+                        data={Object.values(catMap)}
+                        dataCategories={Object.keys(catMap)}
+                        radius={config.isSizeScale ? radiusScale(singleHex.length) / 2 : config.hexRadius / 2}
+                        transform={`translate(${singleHex.x}px, ${singleHex.y}px)`}
+                        colorScale={colorScale}
+                      />
+                    </>
+                  );
+                });
+            })}
+          </g>
         </g>
-        <XAxis vertPosition={height + margin.top} domain={xScale?.domain()} range={[margin.left, width + margin.left]} />
-        <YAxis horizontalPosition={margin.left} domain={yScale?.domain()} range={[margin.top, height + margin.top]} />
+        <XAxis vertPosition={height + margin.top} domain={xZoomedScaleDomain || xScale?.domain()} range={[margin.left, width + margin.left]} />
+        <YAxis horizontalPosition={margin.left} domain={yZoomedScaleDomain || yScale?.domain()} range={[margin.top, height + margin.top]} />
       </svg>
       <div className="position-absolute" style={{ left: margin.left + width, top: margin.top }}>
         <Legend

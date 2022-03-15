@@ -1,4 +1,5 @@
-import d3 from 'd3';
+import * as d3 from 'd3v7';
+import * as React from 'react';
 import { merge } from 'lodash';
 import {
   EColumnTypes,

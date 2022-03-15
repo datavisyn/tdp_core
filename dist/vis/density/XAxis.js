@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 // code taken from https://wattenberger.com/blog/react-and-d3
 export function XAxis({ domain = [0, 100], range = [10, 290], vertPosition = 0 }) {
     const ticks = useMemo(() => {
-        const xScale = d3.scaleLinear().domain(domain).range(range).nice();
+        const xScale = d3.scaleLinear().domain(domain).range(range);
         return xScale.ticks().map((value) => ({
             value,
             xOffset: xScale(value),
