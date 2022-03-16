@@ -104,6 +104,7 @@ export abstract class ARankingView extends AView {
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
     subType: { key: '', value: '' },
+    clueifyRanking: true,
     enableOverviewMode: true,
     enableZoom: true,
     enableVisPanel: true,
@@ -673,8 +674,10 @@ export abstract class ARankingView extends AView {
       .then(() => {
         this.builtLineUp(this.provider);
 
-        // record after the initial one
-        LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+        if (this.options.clueifyRanking) {
+          // record after the initial one
+          LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+        }
         this.setBusy(false);
         this.update();
       })
