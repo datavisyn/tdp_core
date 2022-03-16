@@ -9,12 +9,13 @@ export function YAxis({ domain = [0, 100], range = [10, 290], horizontalPosition
             value,
             yOffset: yScale(value),
         }));
-    }, [domain.join('-'), range.join('-')]);
+    }, [domain, range]);
     return (React.createElement(React.Fragment, null,
         React.createElement("path", { transform: `translate(${horizontalPosition}, 0)`, d: ['M', 0, range[0], 'V', range[1]].join(' '), fill: "none", stroke: "currentColor" }),
         ticks.map(({ value, yOffset }) => (React.createElement("g", { key: value, transform: `translate(${horizontalPosition}, ${yOffset})` },
             React.createElement("line", { x2: "-6", stroke: "currentColor" }),
             React.createElement("text", { key: value, style: {
+                    dominantBaseline: 'middle',
                     fontSize: '10px',
                     textAnchor: 'end',
                     transform: 'translateX(-8px)',

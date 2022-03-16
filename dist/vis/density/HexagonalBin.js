@@ -4,8 +4,8 @@ import { uniqueId } from 'lodash';
 import * as React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAsync } from '../../hooks/useAsync';
-import { PieChart } from './PieChart';
-import { cutHex, getHexData } from './utils';
+import { SingleHex } from './SingleHex';
+import { getHexData } from './utils';
 import { XAxis } from './XAxis';
 import { YAxis } from './YAxis';
 const margin = {
@@ -21,7 +21,7 @@ function Legend({ categories, filteredCategories, colorScale, onClick, }) {
             React.createElement("div", { className: "ms-1" }, c)));
     })));
 }
-export function HexagonalBin({ config, columns }) {
+export function HexagonalBin({ config, columns, selectionCallback = () => null, selected = {} }) {
     const ref = useRef(null);
     const [height, setHeight] = useState(0);
     const [width, setWidth] = useState(0);
@@ -33,6 +33,7 @@ export function HexagonalBin({ config, columns }) {
     const [filteredCategories, setFilteredCategories] = useState([]);
     const { value: allColumns, status: colsStatus, error: colsError } = useAsync(getHexData, [columns, config.numColumnsSelected, config.color]);
     const id = React.useMemo(() => uniqueId('HexPlot'), []);
+    // getting current categorical column values, original and filtered
     const currentColorColumn = useMemo(() => {
         if (colsStatus === 'success' && config.color && allColumns.colorColVals) {
             return {
@@ -42,6 +43,7 @@ export function HexagonalBin({ config, columns }) {
         }
         return null;
     }, [allColumns === null || allColumns === void 0 ? void 0 : allColumns.colorColVals, config.color, colsStatus, filteredCategories]);
+    // getting currentX data values, both original and filtered.
     const currentX = useMemo(() => {
         if (colsStatus === 'success' && allColumns) {
             if (config.color && allColumns.colorColVals) {
@@ -59,6 +61,7 @@ export function HexagonalBin({ config, columns }) {
         }
         return null;
     }, [allColumns, config.color, colsStatus, filteredCategories]);
+    // getting currentY data values, both original and filtered.
     const currentY = useMemo(() => {
         if (colsStatus === 'success' && allColumns) {
             if (config.color && allColumns.colorColVals) {
@@ -76,6 +79,7 @@ export function HexagonalBin({ config, columns }) {
         }
         return null;
     }, [allColumns, colsStatus, config.color, filteredCategories]);
+    // resize observer for setting size of the svg and updating on size change
     useEffect(() => {
         const ro = new ResizeObserver((entries) => {
             setHeight(entries[0].contentRect.height - margin.top - margin.bottom);
@@ -85,6 +89,7 @@ export function HexagonalBin({ config, columns }) {
             ro.observe(ref.current);
         }
     }, []);
+    // create x scale
     const xScale = useMemo(() => {
         if (currentX === null || currentX === void 0 ? void 0 : currentX.allValues) {
             const min = d3.min(currentX.allValues.map((c) => c.val));
@@ -93,6 +98,7 @@ export function HexagonalBin({ config, columns }) {
         }
         return null;
     }, [currentX === null || currentX === void 0 ? void 0 : currentX.allValues, width]);
+    // create y scale
     const yScale = useMemo(() => {
         if (currentY === null || currentY === void 0 ? void 0 : currentY.allValues) {
             const min = d3.min(currentY.allValues.map((c) => c.val));
@@ -101,24 +107,32 @@ export function HexagonalBin({ config, columns }) {
         }
         return null;
     }, [currentY === null || currentY === void 0 ? void 0 : currentY.allValues, height]);
-    const d3Hexbin = hex
-        .hexbin()
-        .radius(config.hexRadius)
-        .extent([
-        [0, 0],
-        [width, height],
-    ]);
-    const inputForHexbin = [];
-    if (currentX) {
-        currentX.filteredValues.forEach((c, i) => {
-            inputForHexbin.push([
-                xScale(c.val),
-                yScale(currentY.filteredValues[i].val),
-                currentColorColumn ? currentColorColumn.filteredValues[i].val : '',
-            ]);
-        });
-    }
-    const hexes = d3Hexbin(inputForHexbin);
+    // creating d3 hexbin object to do hex math for me
+    const d3Hexbin = useMemo(() => {
+        return hex
+            .hexbin()
+            .radius(config.hexRadius)
+            .extent([
+            [0, 0],
+            [width, height],
+        ]);
+    }, [config.hexRadius, height, width]);
+    // generating the actual hexes
+    const hexes = useMemo(() => {
+        const inputForHexbin = [];
+        if (currentX && currentY) {
+            currentX.filteredValues.forEach((c, i) => {
+                inputForHexbin.push([
+                    xScale(c.val),
+                    yScale(currentY.filteredValues[i].val),
+                    currentColorColumn ? currentColorColumn.filteredValues[i].val : '',
+                    c.id,
+                ]);
+            });
+        }
+        return d3Hexbin(inputForHexbin);
+    }, [currentColorColumn, currentX, d3Hexbin, xScale, yScale, currentY]);
+    // simple radius scale for the hexes
     const radiusScale = useMemo(() => {
         if (colsStatus === 'success') {
             const min = d3.min(hexes.map((h) => h.length));
@@ -130,14 +144,16 @@ export function HexagonalBin({ config, columns }) {
         }
         return null;
     }, [colsStatus, hexes, config.hexRadius]);
+    // simple opacity scale for the hexes
     const opacityScale = useMemo(() => {
         if (colsStatus === 'success') {
             const min = d3.min(hexes.map((h) => h.length));
             const max = d3.max(hexes.map((h) => h.length));
-            return d3.scaleLinear().domain([min, max]).range([0.3, 1]);
+            return d3.scaleLinear().domain([min, max]).range([0.1, 1]);
         }
         return null;
     }, [colsStatus, hexes]);
+    // Create a default color scale
     const colorScale = useMemo(() => {
         if (colsStatus !== 'success' || !(currentColorColumn === null || currentColorColumn === void 0 ? void 0 : currentColorColumn.allValues)) {
             return null;
@@ -145,6 +161,13 @@ export function HexagonalBin({ config, columns }) {
         const colorOptions = currentColorColumn.allValues.map((val) => val.val);
         return d3.scaleOrdinal(d3.schemeCategory10).domain(Array.from(new Set(colorOptions)));
     }, [colsStatus, currentColorColumn === null || currentColorColumn === void 0 ? void 0 : currentColorColumn.allValues]);
+    // memoize the actual hexes since they do not need to change on zoom/drag
+    const hexObjects = React.useMemo(() => {
+        return (React.createElement(React.Fragment, null, hexes.map((singleHex) => {
+            return (React.createElement(SingleHex, { key: `${singleHex.x}, ${singleHex.y}`, selected: selected, hexbinOption: config.hexbinOptions, hexData: singleHex, d3Hexbin: d3Hexbin, isSizeScale: config.isSizeScale, radiusScale: radiusScale, isOpacityScale: config.isOpacityScale, opacityScale: opacityScale, hexRadius: config.hexRadius, colorScale: colorScale }));
+        })));
+    }, [colorScale, config.hexRadius, config.isOpacityScale, config.isSizeScale, d3Hexbin, hexes, opacityScale, radiusScale, selected, config.hexbinOptions]);
+    // apply zoom/panning
     useEffect(() => {
         if (!xScale || !yScale) {
             return;
@@ -159,38 +182,37 @@ export function HexagonalBin({ config, columns }) {
             setXZoomedScaleDomain(newX.domain());
             setYZoomedScaleDomain(newY.domain());
         });
-        d3.select(`#${id}`).call(d3.zoom().on('zoom', null));
-        d3.select(`#${id}`).call(zoom);
-    }, [id, xScale, yScale, zoomScale, xZoomTransform, yZoomTransform]);
+    }, [id, xScale, yScale, zoomScale, xZoomTransform, yZoomTransform, height, width]);
+    // apply brushing
+    useEffect(() => {
+        const brush = d3.brush().extent([
+            [margin.left, margin.top],
+            [margin.left + width, margin.top + height],
+        ]);
+        d3.select(`#${id}brush`).call(brush.on('end', function (event) {
+            if (!event.sourceEvent)
+                return;
+            if (!event.selection) {
+                selectionCallback([]);
+            }
+            const selectedHexes = hexes.filter((currHex) => currHex.x >= event.selection[0][0] - margin.left &&
+                currHex.x <= event.selection[1][0] - margin.left &&
+                currHex.y >= event.selection[0][1] - margin.top &&
+                currHex.y <= event.selection[1][1] - margin.top);
+            const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
+            selectionCallback(allSelectedPoints);
+            console.log(event, this);
+            d3.select(this).call(brush.move, null);
+        }));
+    }, [width, height, id, hexes, selectionCallback]);
     return (React.createElement("div", { ref: ref, className: "mw-100" },
         React.createElement("svg", { id: id, style: { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom } },
             React.createElement("defs", null,
                 React.createElement("clipPath", { id: "clip" },
-                    React.createElement("rect", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` }, x: xZoomedScaleDomain ? -xZoomedScaleDomain[0] : 0, y: yZoomedScaleDomain ? -yZoomedScaleDomain[0] : 0, width: width, height: height }))),
-            React.createElement("g", { clipPath: "url(#clip)", style: { transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` } },
-                React.createElement("g", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` } }, hexes.map((singleHex) => {
-                    const catMap = {};
-                    singleHex.forEach((point) => {
-                        catMap[point[2]] = catMap[point[2]] ? catMap[point[2]] + 1 : 1;
-                    });
-                    const hexDivisor = singleHex.length / 6;
-                    let counter = 0;
-                    return Object.keys(catMap)
-                        .sort()
-                        .map((key) => {
-                        const currPath = cutHex(d3Hexbin.hexagon(config.isSizeScale ? radiusScale(singleHex.length) : null), config.isSizeScale ? radiusScale(singleHex.length) : config.hexRadius, counter, Math.ceil(catMap[key] / hexDivisor));
-                        counter += Math.ceil(catMap[key] / hexDivisor);
-                        return (React.createElement(React.Fragment, null,
-                            React.createElement("path", { key: `${singleHex.x}, ${singleHex.y}, ${key}`, d: currPath, style: {
-                                    // fill: `${colorScale ? colorScale(key) : '#69b3a2'}`,
-                                    transform: `translate(${singleHex.x}px, ${singleHex.y}px)`,
-                                    stroke: 'white',
-                                    strokeWidth: '0.2',
-                                    fillOpacity: config.isOpacityScale ? opacityScale(singleHex.length) : '1',
-                                } }),
-                            React.createElement(PieChart, { data: Object.values(catMap), dataCategories: Object.keys(catMap), radius: config.isSizeScale ? radiusScale(singleHex.length) / 2 : config.hexRadius / 2, transform: `translate(${singleHex.x}px, ${singleHex.y}px)`, colorScale: colorScale })));
-                    });
-                }))),
+                    React.createElement("rect", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` }, width: width, height: height }))),
+            React.createElement("g", { clipPath: "url(#clip)" },
+                React.createElement("g", { id: `${id}brush`, style: { transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` } },
+                    React.createElement("g", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` } }, hexObjects))),
             React.createElement(XAxis, { vertPosition: height + margin.top, domain: xZoomedScaleDomain || (xScale === null || xScale === void 0 ? void 0 : xScale.domain()), range: [margin.left, width + margin.left] }),
             React.createElement(YAxis, { horizontalPosition: margin.left, domain: yZoomedScaleDomain || (yScale === null || yScale === void 0 ? void 0 : yScale.domain()), range: [margin.top, height + margin.top] })),
         React.createElement("div", { className: "position-absolute", style: { left: margin.left + width, top: margin.top } },

@@ -10,11 +10,12 @@ interface DensityVisProps {
     };
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
+    selectionCallback?: (ids: string[]) => void;
     selected?: {
         [key: string]: boolean;
     };
     hideSidebar?: boolean;
 }
-export declare function DensityVis({ config, extensions, columns, setConfig, selected, hideSidebar }: DensityVisProps): JSX.Element;
+export declare function DensityVis({ config, extensions, columns, setConfig, selectionCallback, selected, hideSidebar }: DensityVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=DensityVis.d.ts.map

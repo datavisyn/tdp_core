@@ -18,6 +18,13 @@ export const allVisTypes: ESupportedPlotlyVis[] = [
   ESupportedPlotlyVis.DENSITY,
 ];
 
+export enum EHexbinOptions {
+  BAR = 'Bar',
+  COLOR = 'Color',
+  PIE = 'Pie',
+  LYINGPATHS = 'Lying Paths',
+}
+
 export enum EBarDisplayType {
   ABSOLUTE = 'Absolute',
   NORMALIZED = 'Normalized',
@@ -98,6 +105,7 @@ export interface IDensityConfig {
   hexRadius: number;
   isOpacityScale: boolean;
   isSizeScale: boolean;
+  hexbinOptions: EHexbinOptions;
 }
 
 export interface IBarConfig {

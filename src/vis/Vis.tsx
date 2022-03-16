@@ -13,6 +13,7 @@ import {
   EBarDisplayType,
   EBarGroupingType,
   EScatterSelectSettings,
+  EHexbinOptions,
 } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
@@ -80,6 +81,7 @@ export function Vis({
           isOpacityScale: true,
           isSizeScale: false,
           hexRadius: 16,
+          hexbinOptions: EHexbinOptions.COLOR,
         }
       : {
           type: ESupportedPlotlyVis.BAR,
@@ -162,7 +164,14 @@ export function Vis({
       ) : null}
 
       {isDensity(visConfig) ? (
-        <DensityVis config={visConfig} setConfig={setVisConfig} selected={selectedMap} columns={columns} hideSidebar={hideSidebar} />
+        <DensityVis
+          config={visConfig}
+          selectionCallback={selectionCallback}
+          selected={selectedMap}
+          setConfig={setVisConfig}
+          columns={columns}
+          hideSidebar={hideSidebar}
+        />
       ) : null}
 
       {isViolin(visConfig) ? (

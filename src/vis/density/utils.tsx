@@ -11,6 +11,7 @@ import {
   VisCategoricalValue,
   ColumnInfo,
   VisNumericalColumn,
+  EHexbinOptions,
 } from '../interfaces';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 
@@ -25,6 +26,7 @@ const defaultConfig: IDensityConfig = {
   isOpacityScale: true,
   isSizeScale: false,
   hexRadius: 16,
+  hexbinOptions: EHexbinOptions.COLOR,
 };
 
 export function densityMergeDefaultConfig(columns: VisColumn[], config: IDensityConfig): IVisConfig {

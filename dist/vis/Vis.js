@@ -1,7 +1,7 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { useMemo, useEffect } from 'react';
-import { ESupportedPlotlyVis, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, } from './interfaces';
+import { ESupportedPlotlyVis, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EHexbinOptions, } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
@@ -30,6 +30,7 @@ export function Vis({ columns, selected = [], colors = [
             isOpacityScale: true,
             isSizeScale: false,
             hexRadius: 16,
+            hexbinOptions: EHexbinOptions.COLOR,
         }
         : {
             type: ESupportedPlotlyVis.BAR,
@@ -87,7 +88,7 @@ export function Vis({ columns, selected = [], colors = [
                     enable: true,
                 },
             }, shapes: shapes, setConfig: setVisConfig, filterCallback: filterCallback, selectionCallback: selectionCallback, selected: selectedMap, columns: columns, scales: scales, hideSidebar: hideSidebar })) : null,
-        isDensity(visConfig) ? (React.createElement(DensityVis, { config: visConfig, setConfig: setVisConfig, selected: selectedMap, columns: columns, hideSidebar: hideSidebar })) : null,
+        isDensity(visConfig) ? (React.createElement(DensityVis, { config: visConfig, selectionCallback: selectionCallback, selected: selectedMap, setConfig: setVisConfig, columns: columns, hideSidebar: hideSidebar })) : null,
         isViolin(visConfig) ? (React.createElement(ViolinVis, { config: visConfig, optionsConfig: {
                 overlay: {
                     enable: true,

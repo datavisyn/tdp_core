@@ -10,8 +10,12 @@ interface DensityVisSidebarProps {
     };
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
+    selectionCallback?: (ids: string[]) => void;
+    selected?: {
+        [key: string]: boolean;
+    };
     width?: string;
 }
-export declare function DensityVisSidebar({ config, extensions, columns, setConfig, width }: DensityVisSidebarProps): JSX.Element;
+export declare function DensityVisSidebar({ config, extensions, columns, setConfig, selectionCallback, selected, width, }: DensityVisSidebarProps): JSX.Element;
 export {};
 //# sourceMappingURL=DensityVisSidebar.d.ts.map

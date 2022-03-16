@@ -15,6 +15,13 @@ export const allVisTypes = [
     ESupportedPlotlyVis.PCP,
     ESupportedPlotlyVis.DENSITY,
 ];
+export var EHexbinOptions;
+(function (EHexbinOptions) {
+    EHexbinOptions["BAR"] = "Bar";
+    EHexbinOptions["COLOR"] = "Color";
+    EHexbinOptions["PIE"] = "Pie";
+    EHexbinOptions["LYINGPATHS"] = "Lying Paths";
+})(EHexbinOptions || (EHexbinOptions = {}));
 export var EBarDisplayType;
 (function (EBarDisplayType) {
     EBarDisplayType["ABSOLUTE"] = "Absolute";

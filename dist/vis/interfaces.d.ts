@@ -9,6 +9,12 @@ export declare enum ESupportedPlotlyVis {
     DENSITY = "Hexagonal Bin Chart"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
+export declare enum EHexbinOptions {
+    BAR = "Bar",
+    COLOR = "Color",
+    PIE = "Pie",
+    LYINGPATHS = "Lying Paths"
+}
 export declare enum EBarDisplayType {
     ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
@@ -77,6 +83,7 @@ export interface IDensityConfig {
     hexRadius: number;
     isOpacityScale: boolean;
     isSizeScale: boolean;
+    hexbinOptions: EHexbinOptions;
 }
 export interface IBarConfig {
     type: ESupportedPlotlyVis.BAR;

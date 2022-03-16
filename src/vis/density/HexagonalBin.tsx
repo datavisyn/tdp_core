@@ -1,11 +1,14 @@
+import { selection } from 'd3';
 import * as hex from 'd3-hexbin';
 import * as d3 from 'd3v7';
+import { D3BrushEvent } from 'd3v7';
 import { uniqueId } from 'lodash';
 import * as React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAsync } from '../../hooks/useAsync';
 import { VisColumn, IDensityConfig } from '../interfaces';
 import { PieChart } from './PieChart';
+import { SingleHex } from './SingleHex';
 import { cutHex, getHexData } from './utils';
 import { XAxis } from './XAxis';
 import { YAxis } from './YAxis';
@@ -13,6 +16,8 @@ import { YAxis } from './YAxis';
 interface HexagonalBinProps {
   config: IDensityConfig;
   columns: VisColumn[];
+  selectionCallback?: (ids: string[]) => void;
+  selected?: { [key: string]: boolean };
 }
 
 const margin = {
@@ -52,7 +57,7 @@ function Legend({
   );
 }
 
-export function HexagonalBin({ config, columns }: HexagonalBinProps) {
+export function HexagonalBin({ config, columns, selectionCallback = () => null, selected = {} }: HexagonalBinProps) {
   const ref = useRef(null);
   const [height, setHeight] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
@@ -68,6 +73,7 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
 
   const id = React.useMemo(() => uniqueId('HexPlot'), []);
 
+  // getting current categorical column values, original and filtered
   const currentColorColumn = useMemo(() => {
     if (colsStatus === 'success' && config.color && allColumns.colorColVals) {
       return {
@@ -79,6 +85,7 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
     return null;
   }, [allColumns?.colorColVals, config.color, colsStatus, filteredCategories]);
 
+  // getting currentX data values, both original and filtered.
   const currentX = useMemo(() => {
     if (colsStatus === 'success' && allColumns) {
       if (config.color && allColumns.colorColVals) {
@@ -98,6 +105,7 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
     return null;
   }, [allColumns, config.color, colsStatus, filteredCategories]);
 
+  // getting currentY data values, both original and filtered.
   const currentY = useMemo(() => {
     if (colsStatus === 'success' && allColumns) {
       if (config.color && allColumns.colorColVals) {
@@ -117,6 +125,7 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
     return null;
   }, [allColumns, colsStatus, config.color, filteredCategories]);
 
+  // resize observer for setting size of the svg and updating on size change
   useEffect(() => {
     const ro = new ResizeObserver((entries: ResizeObserverEntry[]) => {
       setHeight(entries[0].contentRect.height - margin.top - margin.bottom);
@@ -128,6 +137,7 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
     }
   }, []);
 
+  // create x scale
   const xScale = useMemo(() => {
     if (currentX?.allValues) {
       const min = d3.min<number>(currentX.allValues.map((c) => c.val as number));
@@ -139,6 +149,7 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
     return null;
   }, [currentX?.allValues, width]);
 
+  // create y scale
   const yScale = useMemo(() => {
     if (currentY?.allValues) {
       const min = d3.min<number>(currentY.allValues.map((c) => c.val as number));
@@ -150,28 +161,36 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
     return null;
   }, [currentY?.allValues, height]);
 
-  const d3Hexbin = hex
-    .hexbin()
-    .radius(config.hexRadius)
-    .extent([
-      [0, 0],
-      [width, height],
-    ]);
-
-  const inputForHexbin = [];
-
-  if (currentX) {
-    currentX.filteredValues.forEach((c, i) => {
-      inputForHexbin.push([
-        xScale(c.val as number),
-        yScale(currentY.filteredValues[i].val as number),
-        currentColorColumn ? currentColorColumn.filteredValues[i].val : '',
+  // creating d3 hexbin object to do hex math for me
+  const d3Hexbin = useMemo(() => {
+    return hex
+      .hexbin()
+      .radius(config.hexRadius)
+      .extent([
+        [0, 0],
+        [width, height],
       ]);
-    });
-  }
+  }, [config.hexRadius, height, width]);
 
-  const hexes = d3Hexbin(inputForHexbin);
+  // generating the actual hexes
+  const hexes = useMemo(() => {
+    const inputForHexbin = [];
 
+    if (currentX && currentY) {
+      currentX.filteredValues.forEach((c, i) => {
+        inputForHexbin.push([
+          xScale(c.val as number),
+          yScale(currentY.filteredValues[i].val as number),
+          currentColorColumn ? currentColorColumn.filteredValues[i].val : '',
+          c.id,
+        ]);
+      });
+    }
+
+    return d3Hexbin(inputForHexbin);
+  }, [currentColorColumn, currentX, d3Hexbin, xScale, yScale, currentY]);
+
+  // simple radius scale for the hexes
   const radiusScale = useMemo(() => {
     if (colsStatus === 'success') {
       const min = d3.min(hexes.map((h) => h.length));
@@ -186,17 +205,19 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
     return null;
   }, [colsStatus, hexes, config.hexRadius]);
 
+  // simple opacity scale for the hexes
   const opacityScale = useMemo(() => {
     if (colsStatus === 'success') {
       const min = d3.min(hexes.map((h) => h.length));
       const max = d3.max(hexes.map((h) => h.length));
 
-      return d3.scaleLinear().domain([min, max]).range([0.3, 1]);
+      return d3.scaleLinear().domain([min, max]).range([0.1, 1]);
     }
 
     return null;
   }, [colsStatus, hexes]);
 
+  // Create a default color scale
   const colorScale = useMemo(() => {
     if (colsStatus !== 'success' || !currentColorColumn?.allValues) {
       return null;
@@ -207,6 +228,32 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
     return d3.scaleOrdinal<string, string>(d3.schemeCategory10).domain(Array.from(new Set<string>(colorOptions)));
   }, [colsStatus, currentColorColumn?.allValues]);
 
+  // memoize the actual hexes since they do not need to change on zoom/drag
+  const hexObjects = React.useMemo(() => {
+    return (
+      <>
+        {hexes.map((singleHex) => {
+          return (
+            <SingleHex
+              key={`${singleHex.x}, ${singleHex.y}`}
+              selected={selected}
+              hexbinOption={config.hexbinOptions}
+              hexData={singleHex}
+              d3Hexbin={d3Hexbin}
+              isSizeScale={config.isSizeScale}
+              radiusScale={radiusScale}
+              isOpacityScale={config.isOpacityScale}
+              opacityScale={opacityScale}
+              hexRadius={config.hexRadius}
+              colorScale={colorScale}
+            />
+          );
+        })}
+      </>
+    );
+  }, [colorScale, config.hexRadius, config.isOpacityScale, config.isSizeScale, d3Hexbin, hexes, opacityScale, radiusScale, selected, config.hexbinOptions]);
+
+  // apply zoom/panning
   useEffect(() => {
     if (!xScale || !yScale) {
       return;
@@ -225,72 +272,50 @@ export function HexagonalBin({ config, columns }: HexagonalBinProps) {
       setXZoomedScaleDomain(newX.domain());
       setYZoomedScaleDomain(newY.domain());
     });
+  }, [id, xScale, yScale, zoomScale, xZoomTransform, yZoomTransform, height, width]);
 
-    d3.select(`#${id}`).call(d3.zoom().on('zoom', null));
-    d3.select(`#${id}`).call(zoom);
-  }, [id, xScale, yScale, zoomScale, xZoomTransform, yZoomTransform]);
+  // apply brushing
+  useEffect(() => {
+    const brush = d3.brush().extent([
+      [margin.left, margin.top],
+      [margin.left + width, margin.top + height],
+    ]);
+
+    d3.select(`#${id}brush`).call(
+      brush.on('end', function (event) {
+        if (!event.sourceEvent) return;
+        if (!event.selection) {
+          selectionCallback([]);
+        }
+        const selectedHexes = hexes.filter(
+          (currHex) =>
+            currHex.x >= event.selection[0][0] - margin.left &&
+            currHex.x <= event.selection[1][0] - margin.left &&
+            currHex.y >= event.selection[0][1] - margin.top &&
+            currHex.y <= event.selection[1][1] - margin.top,
+        );
+
+        const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
+
+        selectionCallback(allSelectedPoints);
+
+        console.log(event, this);
+        d3.select(this).call(brush.move, null);
+      }),
+    );
+  }, [width, height, id, hexes, selectionCallback]);
 
   return (
     <div ref={ref} className="mw-100">
       <svg id={id} style={{ width: width + margin.left + margin.right, height: height + margin.top + margin.bottom }}>
         <defs>
           <clipPath id="clip">
-            <rect
-              style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }}
-              x={xZoomedScaleDomain ? -xZoomedScaleDomain[0] : 0}
-              y={yZoomedScaleDomain ? -yZoomedScaleDomain[0] : 0}
-              width={width}
-              height={height}
-            />
+            <rect style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }} width={width} height={height} />
           </clipPath>
         </defs>
-        <g clipPath="url(#clip)" style={{ transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` }}>
-          <g style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }}>
-            {hexes.map((singleHex) => {
-              const catMap = {};
-
-              singleHex.forEach((point: [number, number, string]) => {
-                catMap[point[2]] = catMap[point[2]] ? catMap[point[2]] + 1 : 1;
-              });
-
-              const hexDivisor = singleHex.length / 6;
-
-              let counter = 0;
-
-              return Object.keys(catMap)
-                .sort()
-                .map((key) => {
-                  const currPath = cutHex(
-                    d3Hexbin.hexagon(config.isSizeScale ? radiusScale(singleHex.length) : null),
-                    config.isSizeScale ? radiusScale(singleHex.length) : config.hexRadius,
-                    counter,
-                    Math.ceil(catMap[key] / hexDivisor),
-                  );
-                  counter += Math.ceil(catMap[key] / hexDivisor);
-                  return (
-                    <>
-                      <path
-                        key={`${singleHex.x}, ${singleHex.y}, ${key}`}
-                        d={currPath}
-                        style={{
-                          // fill: `${colorScale ? colorScale(key) : '#69b3a2'}`,
-                          transform: `translate(${singleHex.x}px, ${singleHex.y}px)`,
-                          stroke: 'white',
-                          strokeWidth: '0.2',
-                          fillOpacity: config.isOpacityScale ? opacityScale(singleHex.length) : '1',
-                        }}
-                      />
-                      <PieChart
-                        data={Object.values(catMap)}
-                        dataCategories={Object.keys(catMap)}
-                        radius={config.isSizeScale ? radiusScale(singleHex.length) / 2 : config.hexRadius / 2}
-                        transform={`translate(${singleHex.x}px, ${singleHex.y}px)`}
-                        colorScale={colorScale}
-                      />
-                    </>
-                  );
-                });
-            })}
+        <g clipPath="url(#clip)">
+          <g id={`${id}brush`} style={{ transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` }}>
+            <g style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }}>{hexObjects}</g>
           </g>
         </g>
         <XAxis vertPosition={height + margin.top} domain={xZoomedScaleDomain || xScale?.domain()} range={[margin.left, width + margin.left]} />

@@ -10,7 +10,7 @@ export function YAxis({ domain = [0, 100], range = [10, 290], horizontalPosition
       value,
       yOffset: yScale(value),
     }));
-  }, [domain.join('-'), range.join('-')]);
+  }, [domain, range]);
   return (
     <>
       <path transform={`translate(${horizontalPosition}, 0)`} d={['M', 0, range[0], 'V', range[1]].join(' ')} fill="none" stroke="currentColor" />
@@ -20,6 +20,7 @@ export function YAxis({ domain = [0, 100], range = [10, 290], horizontalPosition
           <text
             key={value}
             style={{
+              dominantBaseline: 'middle',
               fontSize: '10px',
               textAnchor: 'end',
               transform: 'translateX(-8px)',

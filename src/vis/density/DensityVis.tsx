@@ -16,6 +16,7 @@ interface DensityVisProps {
   };
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
+  selectionCallback?: (ids: string[]) => void;
   selected?: { [key: string]: boolean };
   hideSidebar?: boolean;
 }
@@ -27,12 +28,10 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function DensityVis({ config, extensions, columns, setConfig, selected = {}, hideSidebar = false }: DensityVisProps) {
+export function DensityVis({ config, extensions, columns, setConfig, selectionCallback = () => null, selected = {}, hideSidebar = false }: DensityVisProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
-
-  //   const { value: traces, status: traceStatus, error: traceError } = useAsync(createPCPTraces, [columns, config, selected]);
 
   const id = React.useMemo(() => uniqueId('PCPVis'), []);
 
@@ -46,9 +45,13 @@ export function DensityVis({ config, extensions, columns, setConfig, selected = 
           config.numColumnsSelected.map((xCol) => {
             return config.numColumnsSelected.map((yCol) => {
               if (xCol.id !== yCol.id) {
-                console.log(xCol, yCol);
                 return (
-                  <HexagonalBin config={config} columns={[columns.find((col) => col.info.id === xCol.id), columns.find((col) => col.info.id === yCol.id)]} />
+                  <HexagonalBin
+                    selectionCallback={selectionCallback}
+                    selected={selected}
+                    config={config}
+                    columns={[columns.find((col) => col.info.id === xCol.id), columns.find((col) => col.info.id === yCol.id)]}
+                  />
                 );
               }
 
@@ -56,15 +59,8 @@ export function DensityVis({ config, extensions, columns, setConfig, selected = 
             });
           })
         ) : (
-          <HexagonalBin config={config} columns={columns} />
+          <HexagonalBin selectionCallback={selectionCallback} selected={selected} config={config} columns={columns} />
         )}
-
-        {/* {mergedExtensions.prePlot}
-        {traceStatus === 'success' && traces?.plots.length > 0 ? (
-          <div>Hello World</div>
-        ) : traceStatus !== 'pending' ? (
-          <InvalidCols message={traceError?.message || traces?.errorMessage} />
-        ) : null} */}
         {mergedExtensions.postPlot}
       </div>
       {!hideSidebar ? (

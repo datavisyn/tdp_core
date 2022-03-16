@@ -8,13 +8,14 @@ import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingl
 import { HexSizeSlider } from '../sidebar/HexSizeSlider';
 import { HexSizeSwitch } from '../sidebar/HexSizeScaleSwitch';
 import { HexOpacitySwitch } from '../sidebar/HexOpacityScaleSwitch';
+import { HexbinOptionSelect } from '../sidebar/HexbinOptionSelect';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
     postSidebar: null,
 };
-export function DensityVisSidebar({ config, extensions, columns, setConfig, width = '20rem' }) {
+export function DensityVisSidebar({ config, extensions, columns, setConfig, selectionCallback = () => null, selected = {}, width = '20rem', }) {
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
@@ -28,6 +29,7 @@ export function DensityVisSidebar({ config, extensions, columns, setConfig, widt
         React.createElement(HexSizeSlider, { currentValue: config.hexRadius, callback: (hexRadius) => setConfig({ ...config, hexRadius }) }),
         React.createElement(HexSizeSwitch, { currentValue: config.isSizeScale, callback: (isSizeScale) => setConfig({ ...config, isSizeScale }) }),
         React.createElement(HexOpacitySwitch, { currentValue: config.isOpacityScale, callback: (isOpacityScale) => setConfig({ ...config, isOpacityScale }) }),
+        React.createElement(HexbinOptionSelect, { callback: (hexbinOptions) => setConfig({ ...config, hexbinOptions }), currentSelected: config.hexbinOptions }),
         mergedExtensions.preSidebar,
         mergedExtensions.postSidebar));
 }
