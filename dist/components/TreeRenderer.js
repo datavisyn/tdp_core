@@ -6,7 +6,7 @@ export function viewPluginDescToTreeElementHelper(views, openGroups = []) {
     const normalizedGroups = openGroups.map((g) => g.toLowerCase());
     return ViewUtils.groupByCategory(views).map((g) => ({
         name: g.name,
-        items: g.views.map(({ v }) => ({
+        items: g.views.map((v) => ({
             name: v.name,
             group: v.group.name,
             id: v.id,
