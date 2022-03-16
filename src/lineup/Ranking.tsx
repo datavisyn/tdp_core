@@ -47,13 +47,20 @@ import {
   EXTENSION_POINT_TDP_SCORE_IMPL,
   PluginRegistry,
   InvalidTokenError,
-  LineupVisWrapper,
 } from '..';
 import { ILazyLoadedColumn, LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
 import { AttachemntUtils } from '../storage/internal/internal';
+
+export interface IScoreResult {
+  instance: ILazyLoadedColumn;
+  colDesc: IColumnDesc & {
+    [key: string]: any;
+  };
+  data: IScoreRow<any>[];
+}
 
 /**
  * // TODO / QUESTIONS
@@ -85,6 +92,7 @@ export interface IRankingProps {
   onItemSelect?: (current: ISelection, selection: ISelection, name: string) => void;
   onParameterChanged?: (parameter: string) => void;
   onFilterChanged?: (provider: LocalDataProvider, ranking: LineUpRanking) => void;
+  onAddScoreColumn?: (r: IScoreResult[]) => void;
 
   onUpdateEntryPoint?: (namedSet: unknown) => void;
   onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
@@ -169,10 +177,12 @@ export function Ranking({
   onItemSelect,
   onItemSelectionChanged,
   onFilterChanged,
-  onParameterChanged,
   onCustomizeRanking,
   onBuiltLineUp,
-  onStatsChanged,
+  /**
+   * Maybe refactor this when using the native lineup implementation of scores
+   */
+  onAddScoreColumn,
 }: IRankingProps) {
   const isMounted = useRef(false);
   const [busy, setBusy] = React.useState<boolean>(false);
@@ -191,7 +201,6 @@ export function Ranking({
   const taggleRef = React.useRef<EngineRenderer | TaggleRenderer>(null);
   const selectionHelperRef = React.useRef<LineUpSelectionHelper>(null);
   const panelRef = React.useRef<LineUpPanelActions>(null);
-  const generalVisRef = React.useRef<LineupVisWrapper>(null);
 
   React.useEffect(() => {
     selections.set(AView.DEFAULT_SELECTION_NAME, inputSelection);
@@ -208,7 +217,7 @@ export function Ranking({
     });
   };
 
-  const addScoreColumn = (score: IScore<any>): ILazyLoadedColumn => {
+  const addScoreColumn = (score: IScore<any>) => {
     const args =
       typeof options.additionalComputeScoreParameter === 'function' ? options.additionalComputeScoreParameter() : options.additionalComputeScoreParameter;
 
@@ -305,7 +314,6 @@ export function Ranking({
 
     const r = addColumn(colDesc, data, null);
     columnResolve(r.col);
-
     // use _score function to reload the score
     colDesc._score = () => {
       const rawOrder = providerRef.current.getRankings()[0].getOrder() as number[] | UIntTypedArray; // `getOrder()` can return an Uint8Array, Uint16Array, or Uint32Array
@@ -314,7 +322,8 @@ export function Ranking({
       const data = score.compute(ids, itemIDType, args);
       return r.reload(data);
     };
-    return r;
+
+    return { instance: r, colDesc, data };
   };
 
   const createContext = (sel: ISelection): IContext => {
@@ -416,7 +425,7 @@ export function Ranking({
       }
       selectionHelperRef.current = new LineUpSelectionHelper(providerRef.current, () => itemIDType as IDType);
 
-      panelRef.current = new LineUpPanelActions(providerRef.current, taggleRef.current.ctx, options, lineupContainer.ownerDocument);
+      panelRef.current = new LineUpPanelActions(providerRef.current, taggleRef.current.ctx, options, viewRef.current.ownerDocument);
 
       // TODO: should we hardcode the generalVis since it is a separate view
       // generalVisRef=new GeneralVisWrapper(providerRef.current, this, this.selectionHelper, this.node.ownerDocument);
@@ -436,8 +445,6 @@ export function Ranking({
         },
       );
 
-      panelRef.current.on(LineUpPanelActions.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl: IScore<any>) => {});
-
       panelRef.current.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, async (_event, scoreName: string, scoreId: string, p: any) => {
         const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
@@ -446,7 +453,14 @@ export function Ranking({
         const score: IScore<any> | IScore<any>[] = plugin.factory(params, pluginDesc);
         const scores = Array.isArray(score) ? score : [score];
         const results = await Promise.all(scores.map((s) => addScoreColumn(s)));
-        await Promise.all(results.map((r) => r.loaded));
+        const loadedResults = await Promise.all(
+          results.map(async (r) => {
+            await r.instance.loaded;
+            // data already loaded use await to get value
+            return { ...r, ...{ data: await r.data } };
+          }),
+        );
+        onAddScoreColumn?.(loadedResults);
       });
 
       panelRef.current.on(LineUpPanelActions.EVENT_ZOOM_OUT, () => {
@@ -610,28 +624,11 @@ export function Ranking({
 
   const { status } = useAsync(build, []);
 
-  /**
-   * TODO: what should the ranking do with the stats
-   * For now just let the parents know when there is a change
-   */
-  const updateLineUpStats = useMemo(
-    () => () => {
-      const selected = providerRef.current.getSelection().length;
-      const total = providerRef.current.data.length;
-      const r = providerRef.current.getRankings()[0];
-      const shown = r && r.getOrder() ? r.getOrder().length : 0;
-      onStatsChanged?.(total, shown, selected);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
-  );
-
   React.useEffect(() => {
     if (selectionHelperRef.current && !busy) {
       selectionHelperRef.current.setItemSelection(itemSelection);
-      updateLineUpStats();
     }
-  }, [busy, itemSelection, updateLineUpStats]);
+  }, [busy, itemSelection]);
 
   React.useEffect(() => {
     if (!busy) {

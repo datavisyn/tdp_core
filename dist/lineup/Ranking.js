@@ -1,7 +1,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, Ranking as LineUpRanking, } from 'lineupjs';
-import React, { useMemo, useRef } from 'react';
+import React, { useRef } from 'react';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils, AView, IDTypeManager, useSyncedRef, TDPTokenManager, ERenderAuthorizationStatus, I18nextManager, RestStorageUtils, NotificationHandler, ViewUtils, SelectionUtils, TokenManager, ErrorAlertHandler, EViewMode, useAsync, EXTENSION_POINT_TDP_SCORE_IMPL, PluginRegistry, InvalidTokenError, } from '..';
 import { LazyColumn } from './internal/column';
@@ -68,7 +68,11 @@ const defaults = {
     panelAddColumnBtnOptions: {},
     mode: null,
 };
-export function Ranking({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = false, selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onFilterChanged, onParameterChanged, onCustomizeRanking, onBuiltLineUp, onStatsChanged, }) {
+export function Ranking({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = false, selectionAdapter = null, options: opts = {}, authorization = null, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onFilterChanged, onCustomizeRanking, onBuiltLineUp, 
+/**
+ * Maybe refactor this when using the native lineup implementation of scores
+ */
+onAddScoreColumn, }) {
     const isMounted = useRef(false);
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
@@ -85,7 +89,6 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
     const taggleRef = React.useRef(null);
     const selectionHelperRef = React.useRef(null);
     const panelRef = React.useRef(null);
-    const generalVisRef = React.useRef(null);
     React.useEffect(() => {
         selections.set(AView.DEFAULT_SELECTION_NAME, inputSelection);
         const sel = (itemSelection === null || itemSelection === void 0 ? void 0 : itemSelection.ids) ? itemSelection : { idtype: null, ids: [] };
@@ -199,7 +202,7 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
             const data = score.compute(ids, itemIDType, args);
             return r.reload(data);
         };
-        return r;
+        return { instance: r, colDesc, data };
     };
     const createContext = (sel) => {
         const ranking = providerRef.current.getLastRanking();
@@ -279,7 +282,7 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
                 viewRef.current.appendChild(luBackdrop);
             }
             selectionHelperRef.current = new LineUpSelectionHelper(providerRef.current, () => itemIDType);
-            panelRef.current = new LineUpPanelActions(providerRef.current, taggleRef.current.ctx, options, lineupContainer.ownerDocument);
+            panelRef.current = new LineUpPanelActions(providerRef.current, taggleRef.current.ctx, options, viewRef.current.ownerDocument);
             // TODO: should we hardcode the generalVis since it is a separate view
             // generalVisRef=new GeneralVisWrapper(providerRef.current, this, this.selectionHelper, this.node.ownerDocument);
             // When a new column desc is added to the provider, update the panel chooser
@@ -292,7 +295,6 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
                 NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
                 onUpdateEntryPoint === null || onUpdateEntryPoint === void 0 ? void 0 : onUpdateEntryPoint(namedSet);
             });
-            panelRef.current.on(LineUpPanelActions.EVENT_ADD_SCORE_COLUMN, (_event, scoreImpl) => { });
             panelRef.current.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, async (_event, scoreName, scoreId, p) => {
                 const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
                 const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
@@ -301,7 +303,12 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
                 const score = plugin.factory(params, pluginDesc);
                 const scores = Array.isArray(score) ? score : [score];
                 const results = await Promise.all(scores.map((s) => addScoreColumn(s)));
-                await Promise.all(results.map((r) => r.loaded));
+                const loadedResults = await Promise.all(results.map(async (r) => {
+                    await r.instance.loaded;
+                    // data already loaded use await to get value
+                    return { ...r, ...{ data: await r.data } };
+                }));
+                onAddScoreColumn === null || onAddScoreColumn === void 0 ? void 0 : onAddScoreColumn(loadedResults);
             });
             panelRef.current.on(LineUpPanelActions.EVENT_ZOOM_OUT, () => {
                 taggleRef.current.zoomOut();
@@ -444,24 +451,26 @@ export function Ranking({ data = [], selection: inputSelection, itemSelection = 
     }, [options.mode, built]);
     const { status } = useAsync(build, []);
     /**
-     * TODO: what should the ranking do with the stats
+     * TODO: Remove this, it can be inferred by the data
      * For now just let the parents know when there is a change
      */
-    const updateLineUpStats = useMemo(() => () => {
-        const selected = providerRef.current.getSelection().length;
-        const total = providerRef.current.data.length;
-        const r = providerRef.current.getRankings()[0];
-        const shown = r && r.getOrder() ? r.getOrder().length : 0;
-        onStatsChanged === null || onStatsChanged === void 0 ? void 0 : onStatsChanged(total, shown, selected);
-    }, 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []);
+    // const updateLineUpStats = useMemo(
+    //   () => () => {
+    //     const selected = providerRef.current.getSelection().length;
+    //     const total = providerRef.current.data.length;
+    //     const r = providerRef.current.getRankings()[0];
+    //     const shown = r && r.getOrder() ? r.getOrder().length : 0;
+    //     onStatsChanged?.(total, shown, selected);
+    //   },
+    //   // eslint-disable-next-line react-hooks/exhaustive-deps
+    //   [],
+    // );
     React.useEffect(() => {
         if (selectionHelperRef.current && !busy) {
             selectionHelperRef.current.setItemSelection(itemSelection);
-            updateLineUpStats();
+            // updateLineUpStats();
         }
-    }, [busy, itemSelection, updateLineUpStats]);
+    }, [busy, itemSelection]);
     React.useEffect(() => {
         if (!busy) {
             const name = AView.DEFAULT_SELECTION_NAME;
