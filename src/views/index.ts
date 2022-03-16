@@ -15,3 +15,4 @@ export * from './AReactChooserView';
 export * from './ReactViewWrapper';
 export * from './TDPView';
 export * from './visyn';
+export * from './scatterplot';
