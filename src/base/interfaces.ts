@@ -17,6 +17,7 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
    * @default undefined
    */
   selectedId: string;
+  mappingEntityId?: string;
   /**
    * used internally to match selections to multiple columns
    * @default undefined

@@ -44,7 +44,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
         // get available all current subtypes from lineup
         const dynamicColumnSubtypes = usedCols.map((col) => col.desc.selectedSubtype);
         // check which parameters have been removed
-        const removedParameters = difference(dynamicColumnSubtypes, selectedSubTypes);
+        const removedParameters = difference(dynamicColumnSubtypes, selectedSubTypes.map((s) => s.columnSelection));
         context.remove([].concat(...removedParameters.map((param) => {
             return usedCols.filter((d) => d.desc.selectedSubtype === param);
         })));

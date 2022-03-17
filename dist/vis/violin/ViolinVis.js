@@ -8,12 +8,6 @@ import { beautifyLayout } from '../general/layoutUtils';
 import { createViolinTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { ViolinVisSidebar } from './ViolinVisSidebar';
-const defaultConfig = {
-    overlay: {
-        enable: true,
-        customComponent: null,
-    },
-};
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
