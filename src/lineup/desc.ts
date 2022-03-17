@@ -193,11 +193,11 @@ export class ColumnDescUtils {
     return columns.map((col) => {
       switch (col.type) {
         case 'categorical':
-          return ColumnDescUtils.categoricalCol(col.column, col.categories, { label: col.label });
+          return ColumnDescUtils.categoricalCol(col.column, col.categories, { label: niceName(col.label) });
         case 'number':
-          return ColumnDescUtils.numberCol(col.column, col.min, col.max, { label: col.label });
+          return ColumnDescUtils.numberCol(col.column, col.min, col.max, { label: niceName(col.label) });
         default:
-          return ColumnDescUtils.stringCol(col.column, { label: col.label });
+          return ColumnDescUtils.stringCol(col.column, { label: niceName(col.label) });
       }
     });
   }
