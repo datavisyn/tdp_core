@@ -9,6 +9,7 @@ import { IEventHandler } from './event';
 import { ProvenanceGraph } from '../provenance/ProvenanceGraph';
 import { IObjectRef } from '../provenance/ObjectNode';
 import { AppHeader } from '../components/header';
+import type { IServerColumn } from './rest';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**

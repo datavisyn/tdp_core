@@ -305,15 +305,14 @@ export abstract class ARankingView extends AView {
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return super.init(params, onParameterChange).then(() => {
       // inject stats
-      const base = <HTMLElement>params.querySelector('form') || params;
-      base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
-      const container = <HTMLElement>base.lastElementChild!;
-      container.appendChild(this.stats);
-
-      if (this.options.enableSidePanel === 'top') {
-        container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
-        container.insertAdjacentElement('afterbegin', this.panel.node);
-      }
+      // const base = <HTMLElement>params.querySelector('form') || params;
+      // base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
+      // const container = <HTMLElement>base.lastElementChild!;
+      // container.appendChild(this.stats);
+      // if (this.options.enableSidePanel === 'top') {
+      //   container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
+      //   container.insertAdjacentElement('afterbegin', this.panel.node);
+      // }
     });
   }
 
@@ -609,11 +608,11 @@ export abstract class ARankingView extends AView {
    * @param {string} columnId
    * @returns {Promise<boolean>}
    */
-  removeTrackedScoreColumn(columnId: string): Promise<boolean> {
-    return this.withoutTracking(() => {
-      const column = this.provider.find(columnId);
-      return column.removeMe();
-    });
+  async removeTrackedScoreColumn(columnId: string): Promise<boolean> {
+    // return this.withoutTracking(() => {
+    const column = this.provider.find(columnId);
+    return column.removeMe();
+    // });
   }
 
   /**
