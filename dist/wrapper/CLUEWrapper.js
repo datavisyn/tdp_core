@@ -10,7 +10,7 @@ import { SelectionRecorder } from '../base/Selection';
 import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
 import { VisLoader } from '../provvis/VisLoader';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
-import { ProvenanceGraphMenu } from '../menu/ProvenanceGraphMenu';
+import { ProvenanceGraphMenu } from '../provenance/ProvenanceGraphMenu';
 import { LoginMenu } from '../base/LoginMenu';
 import { ACLUEWrapper } from './ACLUEWrapper';
 import { AppHeader, AppHeaderLink } from '../components';

@@ -44,7 +44,6 @@ class DBView(object):
     self.filters = {}
     self.table = None
     self.security = None
-    self.assign_ids = False
     self.no_cache = False
 
   def needs_to_fill_up_columns(self):
@@ -191,14 +190,6 @@ class DBViewBuilder(object):
     """
     self.v.description = desc
     self.v.summary = summary or (desc if len(desc) < 20 else desc[0:20] + '...')
-    return self
-
-  def assign_ids(self):
-    """
-    defines that before results of this view are returned the unique ids should be assigned based on the contained 'id' field
-    :return: self
-    """
-    self.v.assign_ids = True
     return self
 
   def idtype(self, idtype):
@@ -488,11 +479,11 @@ def add_common_queries(queries, table, idtype, id_query, columns=None, call_func
   queries[prefix + '_items'] = DBViewBuilder('lookup').idtype(idtype).table(table).query("""
         SELECT {id}, {{column}} AS text
         FROM {table} WHERE LOWER({{column}}) LIKE :query
-        ORDER BY {{column}} ASC""".format(id=id_query, table=table)).replace('column', columns).assign_ids().call(call_function).call(limit_offset).arg('query').build()
+        ORDER BY {{column}} ASC""".format(id=id_query, table=table)).replace('column', columns).call(call_function).call(limit_offset).arg('query').build()
 
   queries[prefix + '_items_verify'] = DBViewBuilder('helper').idtype(idtype).table(table).query("""
         SELECT {id}, {name} AS text
-        FROM {table}""".format(id=id_query, table=table, name=name_column)).assign_ids().call(call_function).call(inject_where).filter(name_column, 'lower({name}) {{operator}} {{value}}'.format(name=name_column)).build()
+        FROM {table}""".format(id=id_query, table=table, name=name_column)).call(call_function).call(inject_where).filter(name_column, 'lower({name}) {{operator}} {{value}}'.format(name=name_column)).build()
 
   queries[prefix + '_unique'] = DBViewBuilder('lookup').query("""
         SELECT d as id, d as text

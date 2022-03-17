@@ -13,7 +13,6 @@ import { extent } from 'd3';
 import { IServerColumn } from '../base/rest';
 import { IAdditionalColumnDesc } from '../base/interfaces';
 import { ValueTypeUtils } from '../data';
-import { IAnyVector } from '../vector';
 
 export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'chooserGroup'> {
   /**
@@ -47,21 +46,19 @@ export interface IInitialRankingOptions {
 
 export class ColumnDescUtils {
   private static baseColumn(column: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
-    // eslint-disable-next-line prefer-object-spread
-    return Object.assign(
-      {
-        type: 'string',
-        column,
-        label: column,
-        color: '',
-        initialRanking: options.visible != null ? options.visible : true,
-        width: -1,
-        selectedId: -1,
-        selectedSubtype: undefined,
-      },
-      options,
-      options.extras || {},
-    );
+    return {
+      type: 'string',
+      // @ts-ignore
+      column,
+      label: column,
+      color: '',
+      initialRanking: options.visible != null ? options.visible : true,
+      width: -1,
+      selectedId: null,
+      selectedSubtype: undefined,
+      ...options,
+      ...(options.extras || {}),
+    };
   }
 
   static numberColFromArray(column: string, rows: any[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
@@ -144,37 +141,6 @@ export class ColumnDescUtils {
     return Object.assign(ColumnDescUtils.baseColumn(column, options), {
       type: 'boolean',
     });
-  }
-
-  static deriveCol(col: IAnyVector): IColumnDesc {
-    const r: any = {
-      column: col.desc.name,
-    };
-    const desc = <any>col.desc;
-    if (desc.color) {
-      r.color = desc.color;
-    } else if (desc.cssClass) {
-      r.cssClass = desc.cssClass;
-    }
-    const val = desc.value;
-    switch (val.type) {
-      case ValueTypeUtils.VALUE_TYPE_STRING:
-        r.type = 'string';
-        break;
-      case ValueTypeUtils.VALUE_TYPE_CATEGORICAL:
-        r.type = 'categorical';
-        r.categories = desc.categories;
-        break;
-      case ValueTypeUtils.VALUE_TYPE_REAL:
-      case ValueTypeUtils.VALUE_TYPE_INT:
-        r.type = 'number';
-        r.domain = val.range;
-        break;
-      default:
-        r.type = 'string';
-        break;
-    }
-    return r;
   }
 
   static createInitialRanking(provider: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {

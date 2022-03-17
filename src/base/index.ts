@@ -10,7 +10,6 @@ export * from './Player';
 export * from './Compression';
 export * from './annotation';
 export * from './Selection';
-export * from './Multiform';
 export * from './EmbeddedCLUE';
 export * from './ThumbnailUtils';
 export * from './WrapperUtils';

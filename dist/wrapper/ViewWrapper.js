@@ -1,21 +1,9 @@
-/** *******************************************************
- * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
- *
- * This file is property of datavisyn.
- * Code and any other files associated with this project
- * may not be copied and/or distributed without permission.
- *
- * Proprietary and confidential. No warranty.
- *
- ******************************************************** */
-import { FindViewUtils } from '../views/FindViewUtils';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
 import { EventHandler, ResolveNow } from '../base';
 import { NodeUtils, ObjectRefUtils } from '../provenance';
-import { Range } from '../range';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { Dialog } from '../components';
@@ -34,10 +22,10 @@ export class ViewWrapper extends EventHandler {
         this.preInstanceItemSelections = new Map();
         this.preInstanceParameter = new Map();
         this.inputSelections = new Map();
-        this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, range: Range.none() });
+        this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
         this.node = document.createElement('article');
         this.node.classList.add('tdp-view-wrapper');
-        this.allowed = FindViewUtils.canAccess(plugin);
+        this.allowed = ViewUtils.canAccess(plugin);
         this.node.innerHTML = `
     <header>
       <div class="parameters container-fluid ps-0 pe-0"></div>
@@ -159,7 +147,7 @@ export class ViewWrapper extends EventHandler {
                     else {
                         this.instance.setItemSelection({
                             idtype: idType,
-                            range: idType.selections(),
+                            ids: idType.selections(),
                         });
                     }
                 }
@@ -273,7 +261,8 @@ export class ViewWrapper extends EventHandler {
         return undefined;
     }
     match(selection) {
-        return ViewUtils.matchLength(this.plugin.selection, selection.range.dim(0).length);
+        var _a;
+        return ViewUtils.matchLength(this.plugin.selection, ((_a = selection.ids) === null || _a === void 0 ? void 0 : _a.length) || 0);
     }
     /**
      * @deprecated use getInputSelection instead

@@ -1,6 +1,5 @@
 import { IDType, IDTypeManager } from '../idtype';
 import { BaseUtils, EventHandler, IEvent, ResolveNow, WebpackEnv } from '../base';
-import { Range } from '../range';
 import { I18nextManager } from '../i18n';
 import { PluginRegistry } from '../app';
 import { AView } from './AView';
@@ -258,7 +257,7 @@ export class CompositeView extends EventHandler implements IView {
       this.setup.elements.forEach((d) => {
         let s = this.selection;
         if (links.length > 0 && !links.some((l) => l.fromKey === '_input' && l.toKey === d.key)) {
-          s = { idtype: this.selection.idtype, range: Range.none() };
+          s = { idtype: this.selection.idtype, ids: [] };
         }
         // Fix for nested CompositeViews:
         // Previously, nested CompositeViews were not possible, i.e. when using a CompositeView as element of a CompositeView.

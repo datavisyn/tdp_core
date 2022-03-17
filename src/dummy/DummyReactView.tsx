@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { AReactView, ISelector } from '../views/AReactView';
+import { ISelector } from '../views/AReactView';
 import { AReactChooserView } from '../views/AReactChooserView';
 
 export class DummyReactView extends AReactChooserView {

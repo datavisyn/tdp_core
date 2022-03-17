@@ -1,5 +1,5 @@
 /** *******************************************************
- * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
+ * Copyright (c) 2022 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
  * Code and any other files associated with this project
@@ -10,14 +10,13 @@
  ******************************************************** */
 
 import * as React from 'react';
-import { AReactView, IReactHandler } from './AReactView';
 import { EXTENSION_POINT_TDP_VIEW, ISelection, IView, IViewContext, IViewPlugin, IViewPluginDesc } from '../base';
 import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';
 import { PluginRegistry } from '../app';
 import { IDType, IDTypeManager } from '../idtype';
-import { Range } from '../range';
 import { LocalStorageProvenanceGraphManager, ObjectRefUtils } from '../provenance';
+import { AReactView, IReactHandler } from './AReactView';
 
 export interface ITDPViewProps {
   viewId: string;
@@ -150,16 +149,16 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
 
   private buildSelection(idtype: IDType, selection: string[]): Promise<ISelection> {
     if (!selection) {
-      return Promise.resolve({ idtype, range: Range.none() });
+      return Promise.resolve({ idtype, ids: [] });
     }
-    return idtype.map(selection).then((ids) => ({ idtype, range: Range.list(ids) }));
+    return Promise.resolve({ idtype, ids: selection });
   }
 
   private triggerSelection(selection: ISelection) {
     if (!this.props.onItemSelectionChanged) {
       return;
     }
-    selection.idtype.unmap(selection.range).then((names) => this.props.onItemSelectionChanged(names, selection.idtype.id));
+    this.props.onItemSelectionChanged(Array.from(selection.ids), selection.idtype.id);
   }
 
   private selectNative(item: string | string[], op: 'add' | 'set' | 'remove' | 'toggle' = 'set') {
