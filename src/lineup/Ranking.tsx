@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import {
@@ -19,40 +20,35 @@ import {
   Ranking as LineUpRanking,
   UIntTypedArray,
 } from 'lineupjs';
-import React, { useMemo, useRef, useState } from 'react';
-import { ISearchOption, IContext, ISelectionColumn, ColumnDescUtils, LineupUtils, IARankingViewOptions, IRankingWrapper, ISelectionAdapter } from '.';
-import {
-  BaseUtils,
-  ISelection,
-  AView,
-  IDTypeManager,
-  useSyncedRef,
-  IScoreRow,
-  TDPTokenManager,
-  ERenderAuthorizationStatus,
-  I18nextManager,
-  IDType,
-  ISecureItem,
-  RestStorageUtils,
-  NotificationHandler,
-  ViewUtils,
-  SelectionUtils,
-  TokenManager,
-  ErrorAlertHandler,
-  EViewMode,
-  useAsync,
-  IAdditionalColumnDesc,
-  IAuthorizationConfiguration,
-  IScore,
-  EXTENSION_POINT_TDP_SCORE_IMPL,
-  PluginRegistry,
-  InvalidTokenError,
-} from '..';
+import React from 'react';
 import { ILazyLoadedColumn, LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
 import { AttachemntUtils } from '../storage/internal/internal';
+import { EViewMode, IAdditionalColumnDesc, IScore, IScoreRow, ISelection } from '../base/interfaces';
+import { IContext, ISelectionColumn } from './selection/ISelectionAdapter';
+import { IRankingWrapper } from './IRankingWrapper';
+import { ISearchOption } from './panel/ISearchOption';
+import { IARankingViewOptions } from './IARankingViewOptions';
+import { ColumnDescUtils, LineupUtils } from '.';
+import { BaseUtils } from '../base/BaseUtils';
+import { IDTypeManager } from '../idtype/IDTypeManager';
+import { useSyncedRef } from '../hooks/useSyncedRef';
+import { AView } from '../views/AView';
+import { InvalidTokenError, TDPTokenManager } from '../auth/TokenManager';
+import { ERenderAuthorizationStatus } from '../auth/interfaces';
+import { I18nextManager } from '../i18n/I18nextManager';
+import { IDType } from '../idtype/IDType';
+import { RestStorageUtils } from '../storage/rest';
+import { NotificationHandler } from '../base/NotificationHandler';
+import { ISecureItem } from '../security/ISecureItem';
+import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
+import { PluginRegistry } from '../app/PluginRegistry';
+import { ViewUtils } from '../views/ViewUtils';
+import { SelectionUtils } from '../idtype/SelectionUtils';
+import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
+import { useAsync } from '../hooks/useAsync';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;
@@ -62,46 +58,25 @@ export interface IScoreResult {
   data: IScoreRow<any>[];
 }
 
-/**
- * // TODO / QUESTIONS
- * 1. Maybe separate the parameter and input selection logic to a different component that can be customized by the ranking?
- * 2. What should we do with the stats text (Showing 25 of 100 cell lines:5 selected)?
- * 3. How do we propagate the add score event to the parent in a way that i do not have to load the data twice?
- * 4. How to trigger an update when a parameter changes without passing useless parameters that are not used in the ranking?
- */
 export interface IRankingProps {
   data: any[];
-  /**
-   * Selection of the previous view
-   */
-  selection?: ISelection;
-
-  /**
-   * Own selection
-   */
   itemSelection: ISelection;
-
-  // TODO: We need to trigger an update when parameters
-  parameters: any;
   columnDesc: IAdditionalColumnDesc[];
-  selectionAdapter?: ISelectionAdapter;
   options: Partial<IRankingOptions>;
-  authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
+
+  /**
+   * Optional context
+   * Used by the selectionAdapter to add or remove a column when the input selection changes
+   */
+  onContextChanged?: (context: Omit<IContext, 'selection'>) => void;
 
   onItemSelectionChanged?: () => void;
   onItemSelect?: (current: ISelection, selection: ISelection, name: string) => void;
-  onParameterChanged?: (parameter: string) => void;
-  onFilterChanged?: (provider: LocalDataProvider, ranking: LineUpRanking) => void;
   onAddScoreColumn?: (r: IScoreResult[]) => void;
 
   onUpdateEntryPoint?: (namedSet: unknown) => void;
   onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
   onBuiltLineUp?: (provider: LocalDataProvider) => void;
-  onStatsChanged?: (total: number, shown: number, selected: number) => void;
-}
-
-export interface IRankingOptions extends IARankingViewOptions {
-  mode: EViewMode;
 }
 
 const defaults = {
@@ -164,19 +139,19 @@ const defaults = {
   mode: null,
 };
 
+export interface IRankingOptions extends IARankingViewOptions {
+  mode: EViewMode;
+}
+
 export function Ranking({
   data = [],
-  selection: inputSelection,
   itemSelection = { idtype: null, ids: [] },
   columnDesc = [],
-  parameters = false,
-  selectionAdapter = null,
   options: opts = {},
-  authorization = null,
+  onContextChanged,
   onUpdateEntryPoint,
   onItemSelect,
   onItemSelectionChanged,
-  onFilterChanged,
   onCustomizeRanking,
   onBuiltLineUp,
   /**
@@ -184,15 +159,12 @@ export function Ranking({
    */
   onAddScoreColumn,
 }: IRankingProps) {
-  const isMounted = useRef(false);
   const [busy, setBusy] = React.useState<boolean>(false);
   const [built, setBuilt] = React.useState<boolean>(false);
   const options = BaseUtils.mixin({}, defaults, opts) as Readonly<IRankingOptions>;
   const itemSelections = new Map<string, ISelection>();
-  const selections = new Map<string, ISelection>();
   const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
-  const [selection, setSelection] = React.useState(inputSelection);
-  const viewRef = React.useRef<HTMLDivElement | null>(null);
+  const lineupContainerRef = React.useRef<HTMLDivElement | null>(null);
 
   // Stores the ranking data when collapsing columns when mode changes
   const dump = React.useRef<Set<string>>(null);
@@ -203,10 +175,8 @@ export function Ranking({
   const panelRef = React.useRef<LineUpPanelActions>(null);
 
   React.useEffect(() => {
-    selections.set(AView.DEFAULT_SELECTION_NAME, inputSelection);
     const sel = itemSelection?.ids ? itemSelection : { idtype: null, ids: [] };
     itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addColumn = (colDesc: any, d: Promise<IScoreRow<any>[]>, id: string = null, position?: number) => {
@@ -249,7 +219,7 @@ export function Ranking({
             render: ({ authConfiguration, status, error, trigger }) => {
               const e = error || outsideError;
               // Select the header of the score column
-              const headerNode = viewRef.current.querySelector(`.lu-header[data-id=${col.id}]`);
+              const headerNode = lineupContainerRef.current.querySelector(`.lu-header[data-id=${col.id}]`);
               if (!col.findMyRanker() || !headerNode) {
                 // The column was removed.
                 done = true;
@@ -326,59 +296,7 @@ export function Ranking({
     return { instance: r, colDesc, data };
   };
 
-  const createContext = (sel: ISelection): IContext => {
-    const ranking = providerRef.current.getLastRanking();
-    const columns = ranking ? ranking.flatColumns : [];
-    return {
-      columns,
-      selection: sel,
-      freeColor: (id: string) => colorsRef.current.freeColumnColor(id),
-      add: (columns: ISelectionColumn[]) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
-      remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
-    };
-  };
-
   const updatePanelChooser = BaseUtils.debounce(() => panelRef.current.updateChooser(itemIDType, providerRef.current.getColumns()), 100);
-
-  const runAuthorizations = async (): Promise<void> => {
-    await TDPTokenManager.runAuthorizations(authorization, {
-      render: ({ authConfiguration, status, error, trigger }) => {
-        // Fetch or create the authorization overlay
-        let overlay = viewRef.current.querySelector<HTMLDivElement>('.tdp-authorization-overlay');
-        if (!overlay) {
-          overlay = viewRef.current.ownerDocument.createElement('div');
-          overlay.className = 'tdp-authorization-overlay';
-          // Add element at the very bottom to avoid using z-index
-          viewRef.current.appendChild(overlay);
-        }
-
-        if (status === ERenderAuthorizationStatus.SUCCESS) {
-          overlay.remove();
-        } else {
-          overlay.innerHTML = `
-                ${
-                  error
-                    ? `<div class="alert alert-info" role="alert">${I18nextManager.getInstance().i18n.t(
-                        'tdp:core.views.authorizationFailed',
-                      )} ${error.toString()}</div>`
-                    : ''
-                }
-                  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                      <p class="lead">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationRequired', { name: authConfiguration.name })}</p>
-                      <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${
-            status === 'pending'
-              ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading')
-              : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')
-          }</button>
-                  </div>`;
-
-          overlay.querySelector('button').onclick = async () => {
-            trigger();
-          };
-        }
-      },
-    });
-  };
 
   React.useEffect(() => {
     const initialized = taggleRef.current != null;
@@ -408,24 +326,23 @@ export function Ranking({
           },
         });
       }
-      const lineupContainer = viewRef.current.firstElementChild as HTMLElement;
       taggleRef.current = !options.enableOverviewMode
-        ? new EngineRenderer(providerRef.current, lineupContainer, taggleOptions)
+        ? new EngineRenderer(providerRef.current, lineupContainerRef.current, taggleOptions)
         : new TaggleRenderer(
             providerRef.current,
-            lineupContainer,
+            lineupContainerRef.current,
             Object.assign(taggleOptions, {
               violationChanged: (_: IRule, violation: string) => panelRef.current.setViolation(violation),
             }),
           );
 
-      if (viewRef.current && taggleRef.current) {
-        const luBackdrop = viewRef.current.querySelector('.lu-backdrop');
-        viewRef.current.appendChild(luBackdrop);
+      if (lineupContainerRef.current && taggleRef.current) {
+        const luBackdrop = lineupContainerRef.current.querySelector('.lu-backdrop');
+        lineupContainerRef.current.parentElement.appendChild(luBackdrop);
       }
       selectionHelperRef.current = new LineUpSelectionHelper(providerRef.current, () => itemIDType as IDType);
 
-      panelRef.current = new LineUpPanelActions(providerRef.current, taggleRef.current.ctx, options, viewRef.current.ownerDocument);
+      panelRef.current = new LineUpPanelActions(providerRef.current, taggleRef.current.ctx, options, lineupContainerRef.current.ownerDocument);
 
       // TODO: should we hardcode the generalVis since it is a separate view
       // generalVisRef=new GeneralVisWrapper(providerRef.current, this, this.selectionHelper, this.node.ownerDocument);
@@ -487,92 +404,91 @@ export function Ranking({
         }
       }
       if (options.enableSidePanel) {
-        viewRef.current.appendChild(panelRef.current.node);
+        lineupContainerRef.current.parentElement.appendChild(panelRef.current.node);
 
-        // TODO:    viewRef.current.appendChild(this.generalVis.node);
         if (options.enableSidePanel !== 'top') {
           taggleRef.current.pushUpdateAble((ctx) => panelRef.current.panel.update(ctx));
         }
       }
 
-      selectionHelperRef.current.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, selection: ISelection) => {
+      selectionHelperRef.current.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, currentSelection: ISelection) => {
         const name = AView.DEFAULT_SELECTION_NAME;
         const current = itemSelections.get(name) || { idtype: null, ids: [] };
-        if (current && ViewUtils.isSameSelection(current, selection)) {
+        if (current && ViewUtils.isSameSelection(current, currentSelection)) {
           return;
         }
         const wasEmpty = current == null || current.idtype == null || current.ids.length === 0;
-        itemSelections.set(name, selection);
+        itemSelections.set(name, currentSelection);
         // propagate
-        if (selection.idtype) {
+        if (currentSelection.idtype) {
           if (name === AView.DEFAULT_SELECTION_NAME) {
-            if (selection.ids.length === 0) {
-              selection.idtype.clear(SelectionUtils.defaultSelectionType);
+            if (currentSelection.ids.length === 0) {
+              currentSelection.idtype.clear(SelectionUtils.defaultSelectionType);
             } else {
-              selection.idtype.select(selection.ids);
+              currentSelection.idtype.select(currentSelection.ids);
             }
-          } else if (selection.ids.length === 0) {
-            selection.idtype.clear(name);
+          } else if (currentSelection.ids.length === 0) {
+            currentSelection.idtype.clear(name);
           } else {
-            selection.idtype.select(name, selection.ids);
+            currentSelection.idtype.select(name, currentSelection.ids);
           }
         }
-        const isEmpty = selection == null || selection.idtype == null || selection.ids.length === 0;
+        const isEmpty = currentSelection == null || currentSelection.idtype == null || currentSelection.ids.length === 0;
         if (!(wasEmpty && isEmpty)) {
           // the selection has changed when we really have some new values not just another empty one
           onItemSelectionChanged?.();
         }
 
-        onItemSelect?.(current, selection, name);
+        onItemSelect?.(current, currentSelection, name);
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const build = React.useMemo(
     () => async () => {
-      TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
-        // If a authorization is removed, rerun the registered authorizations
-        await runAuthorizations();
-      });
-
-      // First, run all required authorizations
-      await runAuthorizations();
-
-      // Register listener after the authorizations are run to avoid double-initializations
-      TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_STORED, async (_, id, token) => {
-        // TODO: Enabling this leads to the taggle view being loaded twice
-        // await this.initImpl();
-      });
-
       setBusy(true);
       columnDesc.forEach((c) => providerRef.current.pushDesc({ ...c } as IColumnDesc));
-      // TODO: set hint
       providerRef.current.setData(data);
       selectionHelperRef.current.rows = data;
       selectionHelperRef.current.setItemSelection(itemSelections.get(AView.DEFAULT_SELECTION_NAME));
       ColumnDescUtils.createInitialRanking(providerRef.current, {});
       const ranking = providerRef.current.getLastRanking();
+      const columns = ranking ? ranking.flatColumns : [];
+      const context = {
+        columns,
+        freeColor: (id: string) => colorsRef.current.freeColumnColor(id),
+        add: (columns: ISelectionColumn[]) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
+        remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
+      };
+      onContextChanged?.(context);
       onCustomizeRanking?.(LineupUtils.wrapRanking(providerRef.current, ranking));
 
-      return Promise.resolve()
-        .then(async () => {
-          return selectionAdapter?.selectionChanged(null, () => createContext(selection));
-        })
-        .then(() => {
-          onBuiltLineUp?.(providerRef.current);
-          setBusy(false);
-          taggleRef.current.update();
-          setBuilt(true);
-        })
-        .catch(ErrorAlertHandler.getInstance().errorAlert)
-        .catch((error) => {
-          console.error(error);
-          setBusy(false);
-        });
+      return (
+        Promise.resolve()
+          // TODO: check if this is needed
+          // .then(async () => {
+          //   return selectionAdapter?.selectionChanged(null, () => createContext(selection));
+          // })
+          .then(() => {
+            onBuiltLineUp?.(providerRef.current);
+            setBusy(false);
+            taggleRef.current.update();
+            setBuilt(true);
+          })
+          .catch(ErrorAlertHandler.getInstance().errorAlert)
+          .catch((error) => {
+            console.error(error);
+            setBusy(false);
+          })
+      );
     },
     [],
   );
 
+  /**
+   * modeChanged
+   */
   React.useEffect(() => {
     if (providerRef.current.getRankings().length <= 0 || options.mode == null || !built) {
       return;
@@ -630,53 +546,5 @@ export function Ranking({
     }
   }, [busy, itemSelection]);
 
-  React.useEffect(() => {
-    if (!busy) {
-      const name = AView.DEFAULT_SELECTION_NAME;
-      const current = selections.get(name);
-      if (current && ViewUtils.isSameSelection(current, inputSelection)) {
-        return;
-      }
-      selections.set(name, inputSelection);
-      if (name === AView.DEFAULT_SELECTION_NAME) {
-        setSelection(inputSelection);
-        if (selectionAdapter) {
-          selectionAdapter.selectionChanged(null, () => createContext(inputSelection));
-        }
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [busy, inputSelection]);
-
-  React.useEffect(() => {
-    // ignore first time parameter are passed since there is no change
-    if (!busy && parameters && isMounted.current) {
-      if (selectionAdapter) {
-        selectionAdapter.parameterChanged(null, () => createContext(inputSelection));
-      }
-    }
-    isMounted.current = true;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [busy, parameters]);
-
-  React.useEffect(() => {
-    if (providerRef.current) {
-      providerRef.current.on(`${LocalDataProvider.EVENT_ADD_RANKING}`, (ranking: LineUpRanking, index: number) => {
-        ranking.on(LineUpRanking.EVENT_FILTER_CHANGED, () => {
-          onFilterChanged?.(providerRef.current, ranking);
-        });
-      });
-    }
-    return () => {
-      if (providerRef.current) {
-        providerRef.current.on(`${LocalDataProvider.EVENT_REMOVE_RANKING}`, (ranking: LineUpRanking, index: number) => {});
-      }
-    };
-  }, [providerRef]);
-
-  return (
-    <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${busy || status !== 'success' ? 'tdp-busy' : 'not busy'}`}>
-      <div className="lineup-container" />
-    </div>
-  );
+  return <div ref={lineupContainerRef} className="lineup-container" />;
 }
