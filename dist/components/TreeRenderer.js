@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { BaseUtils } from '../base/BaseUtils';
-import { FindViewUtils } from '../views/FindViewUtils';
+import { ViewUtils } from '../views/ViewUtils';
 // convert a view plugin description (i.e. of detail views) to the form we need for the renderer
 export function viewPluginDescToTreeElementHelper(views, openGroups = []) {
     const normalizedGroups = openGroups.map((g) => g.toLowerCase());
-    return FindViewUtils.groupByCategory(views).map((g) => ({
+    return ViewUtils.groupByCategory(views).map((g) => ({
         name: g.name,
-        items: g.views.map(({ v }) => ({
+        items: g.views.map((v) => ({
             name: v.name,
             group: v.group.name,
             id: v.id,
@@ -19,7 +19,7 @@ function inputNameArrayConventionForm(name) {
 }
 function GroupHeader(props) {
     return (React.createElement("header", { className: props.defaultOpen ? '' : 'collapsed', "data-bs-toggle": "collapse", "data-bs-target": `#collapse-${props.index}-${props.randomIdSuffix}`, "data-group": props.name, "aria-expanded": "true", "aria-controls": `collapse-${props.index}` },
-        React.createElement("h6", null, props.name)));
+        React.createElement("h6", { className: "mt-1 mb-1" }, props.name)));
 }
 // TODO: implement Toolbar
 function Toolbar(props) {

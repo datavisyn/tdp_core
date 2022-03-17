@@ -78,7 +78,7 @@ export interface IPCPConfig {
     allColumnsSelected: ColumnInfo[];
 }
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
-declare type ValueGetter<T> = () => Promise<T>;
+declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**
      * Visyn id of the row.
