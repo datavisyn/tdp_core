@@ -4,8 +4,8 @@ export declare class LineUpColors {
      */
     private readonly colorMap;
     private colors;
-    getColumnColor(id: number): string;
-    freeColumnColor(id: number): void;
+    getColumnColor(id: string): string;
+    freeColumnColor(id: string): void;
     clear(): void;
 }
 //# sourceMappingURL=LineUpColors.d.ts.map

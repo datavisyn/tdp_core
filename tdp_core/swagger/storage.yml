@@ -239,7 +239,7 @@ components:
         ids:
           type: array
           items:
-            type: integer
+            type: string
         subTypeKey:
           type: string
         subTypeValue:
