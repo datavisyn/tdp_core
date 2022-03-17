@@ -178,6 +178,7 @@ export function Ranking({
   React.useEffect(() => {
     const sel = itemSelection?.ids ? itemSelection : { idtype: null, ids: [] };
     itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const addColumn = (colDesc: any, d: Promise<IScoreRow<any>[]>, id: string = null, position?: number) => {
@@ -484,6 +485,7 @@ export function Ranking({
           })
       );
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
 

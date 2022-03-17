@@ -106,6 +106,7 @@ onAddScoreColumn, }) {
     React.useEffect(() => {
         const sel = (itemSelection === null || itemSelection === void 0 ? void 0 : itemSelection.ids) ? itemSelection : { idtype: null, ids: [] };
         itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const addColumn = (colDesc, d, id = null, position) => {
         // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
@@ -371,7 +372,9 @@ onAddScoreColumn, }) {
             console.error(error);
             setBusy(false);
         }));
-    }, []);
+    }, 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []);
     /**
      * modeChanged
      */
