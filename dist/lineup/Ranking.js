@@ -33,6 +33,7 @@ const defaults = {
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
     subType: { key: '', value: '' },
+    clueifyRanking: true,
     enableOverviewMode: true,
     enableZoom: true,
     enableCustomVis: true,
