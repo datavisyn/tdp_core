@@ -1,4 +1,3 @@
-import { FindViewUtils } from '../views/FindViewUtils';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
@@ -26,7 +25,7 @@ export class ViewWrapper extends EventHandler {
         this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
         this.node = document.createElement('article');
         this.node.classList.add('tdp-view-wrapper');
-        this.allowed = FindViewUtils.canAccess(plugin);
+        this.allowed = ViewUtils.canAccess(plugin);
         this.node.innerHTML = `
     <header>
       <div class="parameters container-fluid ps-0 pe-0"></div>
@@ -262,7 +261,8 @@ export class ViewWrapper extends EventHandler {
         return undefined;
     }
     match(selection) {
-        return ViewUtils.matchLength(this.plugin.selection, selection.ids.length);
+        var _a;
+        return ViewUtils.matchLength(this.plugin.selection, ((_a = selection.ids) === null || _a === void 0 ? void 0 : _a.length) || 0);
     }
     /**
      * @deprecated use getInputSelection instead
@@ -334,7 +334,7 @@ export class ViewWrapper extends EventHandler {
         }
     }
     static guessIDType(v) {
-        return v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype);
+        return v.idtype ? (v.idtype.includes('*') ? null : IDTypeManager.getInstance().resolveIdType(v.idtype)) : null;
     }
 }
 ViewWrapper.EVENT_VIEW_INITIALIZED = 'viewInitialized';

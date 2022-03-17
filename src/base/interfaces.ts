@@ -6,10 +6,10 @@ import { IDType } from '../idtype/IDType';
 import { IUser } from '../security';
 import type { IPlugin, IPluginDesc } from './plugin';
 import { IEventHandler } from './event';
-import type { IServerColumn } from './rest';
 import { ProvenanceGraph } from '../provenance/ProvenanceGraph';
 import { IObjectRef } from '../provenance/ObjectNode';
 import { AppHeader } from '../components/header';
+import type { IServerColumn } from './rest';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
@@ -257,17 +257,20 @@ export interface IViewGroupExtensionDesc extends IPluginDesc {
   groups: IGroupData[];
 }
 
+/**
+ * Selections including an idtype and the corresponding selected ids.
+ */
 export interface ISelection {
   /**
-   * TODO:
+   * ID type of the selection, i.e. `IDTypeManager.getInstance().resolveIdType('Ensembl')`.
    */
   readonly idtype: IDType;
   /**
-   * TODO:
+   * IDs of the selection matching the idtype, i.e. `['ENSG...', 'ENSG...']`.
    */
   ids: string[];
   /**
-   * other selections floating around in a multi selection environment
+   * Other selections floating around in a multi selection environment
    */
   readonly all?: Map<IDType, string[]>;
 }
@@ -371,10 +374,6 @@ export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
   load(): Promise<IViewPlugin>;
 }
 
-export interface IVisynViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
-  load(): Promise<IVisynViewPlugin>;
-}
-
 // TODO:: refactor the Omit here to Partial<Pick<.. in ts 4
 export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 'id' | 'load'>> {
   /**
@@ -385,34 +384,28 @@ export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 
    * idType regex that is required by this view
    */
   idtype?: string;
-
   /**
    * view group hint
    */
   group: { name: string; order: number };
-
   /**
    * optional preview callback function returning a url promise, the preview image should have 320x180 px
    * @returns {Promise<string>}
    */
   preview?(): Promise<string>;
-
   /**
    * optional security check to show only certain views
    */
   security?: string | ((user: IUser) => boolean);
-
   /**
    * optional authorization configuration ensuring authorization exists before loading the view.
    * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
    */
   authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
-
   /**
    * a lot of topics/tags describing this view
    */
   topics?: string[];
-
   /**
    * a link to an external help page
    */
@@ -421,12 +414,10 @@ export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 
    * as an alternative an help text shown as pop up
    */
   helpText?: string;
-
   /**
    * a tour id to start a tour
    */
   helpTourId?: string;
-
   /**
    * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
    * @default false
@@ -448,31 +439,6 @@ export interface IViewPlugin {
   factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
-export interface IVisynViewProps<Desc extends IVisynViewPlugin, Param extends Record<string, any>> {
-  desc: Desc;
-  data: Record<string, any>;
-  // TODO:: Type to IReprovisynServerColumn when we merge that into tdp_core
-  dataDesc: IServerColumn[] | any[];
-  selection: string[];
-  idFilter: string[];
-  parameters: Param;
-  onSelectionChanged: (selection: string[]) => void;
-  onIdFilterChanged: (idFilter: string[]) => void;
-  onParametersChanged: (parameters: Param) => void;
-}
-
-export interface IVisynViewPlugin {
-  readonly desc: IVisynViewPluginDesc;
-
-  factory(): IVisynViewPluginFactory;
-}
-
-export interface IVisynViewPluginFactory {
-  view: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
-  header?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
-  tab?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
-}
-
 export interface IInstantView {
   readonly node: HTMLElement;
 
@@ -483,13 +449,9 @@ export interface IInstantViewOptions {
   document: Document;
 }
 
-export interface IItemSelection extends ISelection {
-  readonly items: { id: string; text: string }[];
-}
-
 export interface IInstanceViewExtension {
   desc: IInstanceViewExtensionDesc;
-  factory(selection: IItemSelection, options: Readonly<IInstantViewOptions>): IInstantView;
+  factory(selection: ISelection, options: Readonly<IInstantViewOptions>): IInstantView;
 }
 
 export interface IInstanceViewExtensionDesc extends IPluginDesc {

@@ -11,7 +11,8 @@ import { BarVisSidebar } from './bar/BarVisSidebar';
 import { StripVisSidebar } from './strip/StripVisSidebar';
 import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
-export function VisSidebar({ columns, filterCallback = () => null, externalConfig = null, setExternalConfig = null, width = '20rem' }) {
+import { useSyncedRef } from '../hooks';
+export function VisSidebar({ columns, filterCallback = () => null, externalConfig = null, setExternalConfig = null, className, style }) {
     const [visConfig, setVisConfig] = useState(externalConfig || {
         type: ESupportedPlotlyVis.SCATTER,
         numColumnsSelected: [],
@@ -21,9 +22,11 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
         isRectBrush: true,
         alphaSliderVal: 1,
     });
+    const setExternalConfigRef = useSyncedRef(setExternalConfig);
     useEffect(() => {
-        setExternalConfig(visConfig);
-    }, [visConfig, setExternalConfig]);
+        var _a;
+        (_a = setExternalConfigRef.current) === null || _a === void 0 ? void 0 : _a.call(setExternalConfigRef, visConfig);
+    }, [visConfig, setExternalConfigRef]);
     useEffect(() => {
         if (isScatter(visConfig)) {
             setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
@@ -48,14 +51,14 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
                 color: {
                     enable: true,
                 },
-            }, setConfig: setVisConfig, filterCallback: filterCallback, columns: columns, width: width })) : null,
+            }, setConfig: setVisConfig, filterCallback: filterCallback, columns: columns, className: className, style: style })) : null,
         isViolin(visConfig) ? (React.createElement(ViolinVisSidebar, { config: visConfig, optionsConfig: {
                 overlay: {
                     enable: true,
                 },
-            }, setConfig: setVisConfig, columns: columns, width: width })) : null,
-        isStrip(visConfig) ? React.createElement(StripVisSidebar, { config: visConfig, setConfig: setVisConfig, columns: columns, width: width }) : null,
-        isPCP(visConfig) ? React.createElement(PCPVisSidebar, { config: visConfig, setConfig: setVisConfig, columns: columns, width: width }) : null,
-        isBar(visConfig) ? React.createElement(BarVisSidebar, { config: visConfig, setConfig: setVisConfig, columns: columns, width: width }) : null));
+            }, setConfig: setVisConfig, columns: columns, className: className, style: style })) : null,
+        isStrip(visConfig) ? React.createElement(StripVisSidebar, { config: visConfig, setConfig: setVisConfig, columns: columns, className: className, style: style }) : null,
+        isPCP(visConfig) ? React.createElement(PCPVisSidebar, { config: visConfig, setConfig: setVisConfig, columns: columns, className: className, style: style }) : null,
+        isBar(visConfig) ? React.createElement(BarVisSidebar, { config: visConfig, setConfig: setVisConfig, columns: columns, className: className, style: style }) : null));
 }
 //# sourceMappingURL=VisSidebar.js.map

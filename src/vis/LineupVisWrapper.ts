@@ -20,9 +20,9 @@ export class LineupVisWrapper {
       provider: LocalDataProvider;
       /**
        * Callback when the selection in a vis changed.
-       * @param visynIds Selected visyn ids.
+       * @param ids Selected ids.
        */
-      selectionCallback(visynIds: string[]): void;
+      selectionCallback(ids: string[]): void;
       doc: Document;
     },
   ) {
@@ -76,8 +76,7 @@ export class LineupVisWrapper {
     };
 
     const mapData = <T extends ValueColumn<number | string>>(innerData: IDataRow[], column: T) => {
-      // TODO: This should be _visyn_id?
-      return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: d.v.id, val: column.getRaw(d) });
+      return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: (d.v as IRow).id, val: column.getRaw(d) });
     };
 
     const getColumnValue = async <T extends ValueColumn<number | string>>(column: T) => {
@@ -118,7 +117,7 @@ export class LineupVisWrapper {
       React.createElement(Vis, {
         columns: cols,
         selected: selectedMap,
-        selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
+        selectionCallback: (ids) => this.props.selectionCallback(ids),
         filterCallback: (s: string) => this.filterCallback(s),
       }),
       this.node,

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { IViolinConfig, IVisConfig, VisColumn } from '../interfaces';
-interface ViolinVisSidebarProps {
+import { IViolinConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
+export declare function ViolinVisSidebar({ config, optionsConfig, extensions, columns, setConfig, className, style: { width, ...style }, }: {
     config: IViolinConfig;
     optionsConfig?: {
         overlay?: {
@@ -16,8 +16,5 @@ interface ViolinVisSidebarProps {
     };
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
-    width?: string;
-}
-export declare function ViolinVisSidebar({ config, optionsConfig, extensions, columns, setConfig, width }: ViolinVisSidebarProps): JSX.Element;
-export {};
+} & ICommonVisSideBarProps): JSX.Element;
 //# sourceMappingURL=ViolinVisSidebar.d.ts.map

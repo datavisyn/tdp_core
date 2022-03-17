@@ -1,5 +1,5 @@
 import { IPluginDesc, IPlugin } from './plugin';
-import { ProvenanceGraph } from '../provenance';
+import type { ProvenanceGraph } from '../provenance';
 export declare const EXTENSION_POINT_TDP_SCORE = "tdpScore";
 export declare const EXTENSION_POINT_TDP_SCORE_IMPL = "tdpScoreImpl";
 export declare const EXTENSION_POINT_TDP_SCORE_LOADER = "tdpScoreLoader";

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { BaseUtils } from '../base/BaseUtils';
-import { FindViewUtils } from '../views/FindViewUtils';
-import type { IDiscoveredView } from '../views/FindViewUtils';
+import { IBaseViewPluginDesc } from '../base/interfaces';
+import { ViewUtils } from '../views/ViewUtils';
 
 export interface ITreeGroup {
   name: string;
@@ -16,11 +16,11 @@ export interface ITreeElement {
 }
 
 // convert a view plugin description (i.e. of detail views) to the form we need for the renderer
-export function viewPluginDescToTreeElementHelper(views: IDiscoveredView[], openGroups: string[] = []): ITreeGroup[] {
+export function viewPluginDescToTreeElementHelper(views: IBaseViewPluginDesc[], openGroups: string[] = []): ITreeGroup[] {
   const normalizedGroups = openGroups.map((g) => g.toLowerCase());
-  return FindViewUtils.groupByCategory(views).map((g) => ({
+  return ViewUtils.groupByCategory(views).map((g) => ({
     name: g.name,
-    items: g.views.map(({ v }) => ({
+    items: g.views.map((v) => ({
       name: v.name,
       group: v.group.name,
       id: v.id,
@@ -50,7 +50,7 @@ function GroupHeader(props: IGroupHeaderProps) {
       aria-expanded="true"
       aria-controls={`collapse-${props.index}`}
     >
-      <h6>{props.name}</h6>
+      <h6 className="mt-1 mb-1">{props.name}</h6>
     </header>
   );
 }
