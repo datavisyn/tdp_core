@@ -384,6 +384,7 @@ export abstract class ARankingView extends AView {
         this.withoutTracking(() => {
           c.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
         }),
+
       remove: (c: Column[]) =>
         this.withoutTracking(() => {
           c.forEach((col) => col.removeMe());
