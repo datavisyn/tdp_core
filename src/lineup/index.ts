@@ -6,5 +6,9 @@ export * from './utils';
 export * from './desc';
 export * from './selection';
 export * from './ARankingView';
+// eslint-disable-next-line import/no-cycle
+export * from './RankingViewComponent';
+// eslint-disable-next-line import/no-cycle
+export * from './Ranking';
 export * from './AOverviewDetailRankingView';
 export * from './panel';
