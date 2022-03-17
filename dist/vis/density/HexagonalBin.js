@@ -182,29 +182,35 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             setXZoomedScaleDomain(newX.domain());
             setYZoomedScaleDomain(newY.domain());
         });
+        d3.select(`#${id}`).call(d3.zoom().on('zoom', null));
+        d3.select(`#${id}`).call(zoom);
     }, [id, xScale, yScale, zoomScale, xZoomTransform, yZoomTransform, height, width]);
     // apply brushing
-    useEffect(() => {
-        const brush = d3.brush().extent([
-            [margin.left, margin.top],
-            [margin.left + width, margin.top + height],
-        ]);
-        d3.select(`#${id}brush`).call(brush.on('end', function (event) {
-            if (!event.sourceEvent)
-                return;
-            if (!event.selection) {
-                selectionCallback([]);
-            }
-            const selectedHexes = hexes.filter((currHex) => currHex.x >= event.selection[0][0] - margin.left &&
-                currHex.x <= event.selection[1][0] - margin.left &&
-                currHex.y >= event.selection[0][1] - margin.top &&
-                currHex.y <= event.selection[1][1] - margin.top);
-            const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
-            selectionCallback(allSelectedPoints);
-            console.log(event, this);
-            d3.select(this).call(brush.move, null);
-        }));
-    }, [width, height, id, hexes, selectionCallback]);
+    // useEffect(() => {
+    //   const brush = d3.brush().extent([
+    //     [margin.left, margin.top],
+    //     [margin.left + width, margin.top + height],
+    //   ]);
+    //   d3.select(`#${id}brush`).call(
+    //     brush.on('end', function (event) {
+    //       if (!event.sourceEvent) return;
+    //       if (!event.selection) {
+    //         selectionCallback([]);
+    //       }
+    //       const selectedHexes = hexes.filter(
+    //         (currHex) =>
+    //           currHex.x >= event.selection[0][0] - margin.left &&
+    //           currHex.x <= event.selection[1][0] - margin.left &&
+    //           currHex.y >= event.selection[0][1] - margin.top &&
+    //           currHex.y <= event.selection[1][1] - margin.top,
+    //       );
+    //       const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
+    //       selectionCallback(allSelectedPoints);
+    //       console.log(event, this);
+    //       d3.select(this).call(brush.move, null);
+    //     }),
+    //   );
+    // }, [width, height, id, hexes, selectionCallback]);
     return (React.createElement("div", { ref: ref, className: "mw-100" },
         React.createElement("svg", { id: id, style: { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom } },
             React.createElement("defs", null,
