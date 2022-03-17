@@ -4,3 +4,4 @@ export * from './Errors';
 export * from './header';
 export * from './metaData';
 export * from './PermissionChooser';
+export * from './TreeRenderer';

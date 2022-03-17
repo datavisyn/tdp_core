@@ -1,4 +1,3 @@
-import { FindViewUtils } from '../views/FindViewUtils';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
@@ -26,7 +25,7 @@ export class ViewWrapper extends EventHandler {
         this.preInstanceItemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
         this.node = document.createElement('article');
         this.node.classList.add('tdp-view-wrapper');
-        this.allowed = FindViewUtils.canAccess(plugin);
+        this.allowed = ViewUtils.canAccess(plugin);
         this.node.innerHTML = `
     <header>
       <div class="parameters container-fluid ps-0 pe-0"></div>

@@ -10,6 +10,7 @@ export interface IRow {
   /**
    * id, e.g. ESNGxxxx
    */
+  // TODO: Maybe use _visyn_id to avoid conflicts.
   readonly id: string;
   /**
    * unique internal number id, e.g. 42
@@ -106,7 +107,7 @@ const emptyFilters: IAllFilters = {
 };
 
 export interface ILookupItem {
-  _id: never;
+  _id?: never;
   id: string;
   text: string;
 }

@@ -59,7 +59,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
         return [];
       }
       // Filter the descriptions to only leave the new columns and load them
-      const columnsToBeAdded = descs.filter((desc) => addedParameters.indexOf(`${id}_${desc.selectedSubtype}`));
+      const columnsToBeAdded = descs.filter((desc) => addedParameters.includes(`${id}_${desc.selectedSubtype}`));
       const data = this.adapter.loadData(id, columnsToBeAdded);
 
       const position = this.computePositionToInsert(context, id);

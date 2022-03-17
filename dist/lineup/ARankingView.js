@@ -71,6 +71,7 @@ export class ARankingView extends AView {
             additionalScoreParameter: null,
             additionalComputeScoreParameter: null,
             subType: { key: '', value: '' },
+            clueifyRanking: true,
             enableOverviewMode: true,
             enableZoom: true,
             enableVisPanel: true,
@@ -297,8 +298,12 @@ export class ARankingView extends AView {
             columns,
             selection: this.selection,
             freeColor: (id) => this.colors.freeColumnColor(id),
-            add: (selectionColumns) => selectionColumns.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position)),
-            remove: (removeColumns) => removeColumns.forEach((c) => c.removeMe()),
+            add: (c) => this.withoutTracking(() => {
+                c.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
+            }),
+            remove: (c) => this.withoutTracking(() => {
+                c.forEach((col) => col.removeMe());
+            }),
         };
     }
     /**
@@ -544,8 +549,10 @@ export class ARankingView extends AView {
         })
             .then(() => {
             this.builtLineUp(this.provider);
-            // record after the initial one
-            // LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+            if (this.options.clueifyRanking) {
+                // record after the initial one
+                LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+            }
             this.setBusy(false);
             this.update();
         })
