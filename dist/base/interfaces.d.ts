@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
 import { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
@@ -6,7 +5,6 @@ import { IDType } from '../idtype/IDType';
 import { IUser } from '../security';
 import type { IPlugin, IPluginDesc } from './plugin';
 import { IEventHandler } from './event';
-import type { IServerColumn } from './rest';
 import { ProvenanceGraph } from '../provenance/ProvenanceGraph';
 import { IObjectRef } from '../provenance/ObjectNode';
 import { AppHeader } from '../components/header';
@@ -227,17 +225,20 @@ export interface IGroupData {
 export interface IViewGroupExtensionDesc extends IPluginDesc {
     groups: IGroupData[];
 }
+/**
+ * Selections including an idtype and the corresponding selected ids.
+ */
 export interface ISelection {
     /**
-     * TODO:
+     * ID type of the selection, i.e. `IDTypeManager.getInstance().resolveIdType('Ensembl')`.
      */
     readonly idtype: IDType;
     /**
-     * TODO:
+     * IDs of the selection matching the idtype, i.e. `['ENSG...', 'ENSG...']`.
      */
     ids: string[];
     /**
-     * other selections floating around in a multi selection environment
+     * Other selections floating around in a multi selection environment
      */
     readonly all?: Map<IDType, string[]>;
 }
@@ -325,9 +326,6 @@ export interface IViewClass {
 export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
     load(): Promise<IViewPlugin>;
 }
-export interface IVisynViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
-    load(): Promise<IVisynViewPlugin>;
-}
 export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 'id' | 'load'>> {
     /**
      * how many selection this view can handle and requires
@@ -396,26 +394,6 @@ export interface IViewPlugin {
      */
     factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
-export interface IVisynViewProps<Desc extends IVisynViewPlugin, Param extends Record<string, any>> {
-    desc: Desc;
-    data: Record<string, any>;
-    dataDesc: IServerColumn[] | any[];
-    selection: string[];
-    idFilter: string[];
-    parameters: Param;
-    onSelectionChanged: (selection: string[]) => void;
-    onIdFilterChanged: (idFilter: string[]) => void;
-    onParametersChanged: (parameters: Param) => void;
-}
-export interface IVisynViewPlugin {
-    readonly desc: IVisynViewPluginDesc;
-    factory(): IVisynViewPluginFactory;
-}
-export interface IVisynViewPluginFactory {
-    view: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
-    header?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
-    tab?: React.LazyExoticComponent<React.ComponentType<IVisynViewProps<any, any>>> | React.ComponentType<IVisynViewProps<any, any>>;
-}
 export interface IInstantView {
     readonly node: HTMLElement;
     destroy(): void;
@@ -423,15 +401,9 @@ export interface IInstantView {
 export interface IInstantViewOptions {
     document: Document;
 }
-export interface IItemSelection extends ISelection {
-    readonly items: {
-        id: string;
-        text: string;
-    }[];
-}
 export interface IInstanceViewExtension {
     desc: IInstanceViewExtensionDesc;
-    factory(selection: IItemSelection, options: Readonly<IInstantViewOptions>): IInstantView;
+    factory(selection: ISelection, options: Readonly<IInstantViewOptions>): IInstantView;
 }
 export interface IInstanceViewExtensionDesc extends IPluginDesc {
     /**

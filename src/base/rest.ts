@@ -1,7 +1,7 @@
 import { Ajax } from './ajax';
-import { AppContext } from '../app/AppContext';
-import type { IScoreRow } from './interfaces';
-import { IDTypeLike } from '../idtype/IDType';
+import { AppContext } from '../app';
+import { IDTypeLike } from '../idtype';
+import { IScoreRow } from './interfaces';
 
 /**
  * common interface for a row as used in LineUp
@@ -10,6 +10,7 @@ export interface IRow {
   /**
    * id, e.g. ESNGxxxx
    */
+  // TODO: Maybe use _visyn_id to avoid conflicts.
   readonly id: string;
   /**
    * unique internal number id, e.g. 42
@@ -106,7 +107,7 @@ const emptyFilters: IAllFilters = {
 };
 
 export interface ILookupItem {
-  _id: never;
+  _id?: never;
   id: string;
   text: string;
 }

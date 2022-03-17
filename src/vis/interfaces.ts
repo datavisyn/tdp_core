@@ -100,7 +100,7 @@ export interface IPCPConfig {
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 
-type ValueGetter<T> = () => Promise<T>;
+type ValueGetter<T> = () => T | Promise<T>;
 
 export interface IVisCommonValue<Type extends number | string> {
   /**
@@ -155,3 +155,11 @@ export type ColumnInfo = {
 export type Scales = {
   color: any;
 };
+
+/**
+ * Common props for all vis sidebars.
+ */
+export interface ICommonVisSideBarProps {
+  style?: React.CSSProperties | undefined;
+  className?: string | undefined;
+}

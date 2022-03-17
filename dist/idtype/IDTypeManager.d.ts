@@ -45,6 +45,8 @@ export declare class IDTypeManager {
      * @returns {Promise<IDType[]>}
      */
     getCanBeMappedTo(idType: IDType): Promise<IDType[]>;
+    mapOneNameToFirstName(idType: IDType, name: string, toIDtype: IDTypeLike): Promise<string>;
+    mapOneNameToName(idType: IDType, name: string, toIDtype: IDTypeLike): Promise<string[]>;
     mapNameToFirstName(idType: IDType, names: string[], toIDtype: IDTypeLike): Promise<string[]>;
     mapNameToName(idType: IDType, names: string[], toIDtype: IDTypeLike): Promise<string[][]>;
     findMappablePlugins(target: IDType, all: IPluginDesc[]): any[] | Promise<IPluginDesc[]>;

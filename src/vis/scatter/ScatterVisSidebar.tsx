@@ -1,41 +1,22 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { ColumnInfo, EFilterOptions, ENumericalColorScaleType, ESupportedPlotlyVis, IScatterConfig, IVisConfig, VisColumn } from '../interfaces';
+import {
+  ColumnInfo,
+  EFilterOptions,
+  ENumericalColorScaleType,
+  ESupportedPlotlyVis,
+  IScatterConfig,
+  IVisConfig,
+  VisColumn,
+  ICommonVisSideBarProps,
+} from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { ColorSelect } from '../sidebar/ColorSelect';
 import { ShapeSelect } from '../sidebar/ShapeSelect';
 import { FilterButtons } from '../sidebar/FilterButtons';
 import { WarningMessage } from '../sidebar/WarningMessage';
-
-interface ScatterVisSidebarProps {
-  config: IScatterConfig;
-  optionsConfig?: {
-    color?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    shape?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    filter?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-  };
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  columns: VisColumn[];
-  filterCallback?: (s: EFilterOptions) => void;
-  setConfig: (config: IVisConfig) => void;
-  width?: string;
-}
 
 const defaultConfig = {
   color: {
@@ -66,8 +47,34 @@ export function ScatterVisSidebar({
   columns,
   filterCallback = () => null,
   setConfig,
-  width = '20rem',
-}: ScatterVisSidebarProps) {
+  className = '',
+  style: { width = '20em', ...style } = {},
+}: {
+  config: IScatterConfig;
+  optionsConfig?: {
+    color?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+    shape?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+    filter?: {
+      enable?: boolean;
+      customComponent?: React.ReactNode;
+    };
+  };
+  extensions?: {
+    prePlot?: React.ReactNode;
+    postPlot?: React.ReactNode;
+    preSidebar?: React.ReactNode;
+    postSidebar?: React.ReactNode;
+  };
+  columns: VisColumn[];
+  filterCallback?: (s: EFilterOptions) => void;
+  setConfig: (config: IVisConfig) => void;
+} & ICommonVisSideBarProps) {
   const mergedOptionsConfig = useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
   }, [optionsConfig]);
@@ -77,7 +84,7 @@ export function ScatterVisSidebar({
   }, [extensions]);
 
   return (
-    <div className="container pb-3 pt-2" style={{ width }}>
+    <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
       <WarningMessage />
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />

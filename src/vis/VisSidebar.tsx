@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { barMergeDefaultConfig, isBar } from './bar/utils';
 import { isScatter, scatterMergeDefaultConfig } from './scatter/utils';
-import { ESupportedPlotlyVis, IVisConfig, ENumericalColorScaleType, VisColumn } from './interfaces';
+import { ESupportedPlotlyVis, IVisConfig, ENumericalColorScaleType, VisColumn, ICommonVisSideBarProps } from './interfaces';
 import { isViolin, violinMergeDefaultConfig } from './violin/utils';
 import { isStrip, stripMergeDefaultConfig } from './strip/utils';
 import { isPCP, pcpMergeDefaultConfig } from './pcp/utils';
@@ -11,8 +11,9 @@ import { BarVisSidebar } from './bar/BarVisSidebar';
 import { StripVisSidebar } from './strip/StripVisSidebar';
 import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
+import { useSyncedRef } from '../hooks';
 
-export interface VisSidebarProps {
+export type VisSidebarProps = {
   /**
    * Required data columns which are displayed.
    */
@@ -23,10 +24,9 @@ export interface VisSidebarProps {
   filterCallback?: (s: string) => void;
   externalConfig?: IVisConfig;
   setExternalConfig?: (c: IVisConfig) => void;
-  width?: string;
-}
+} & ICommonVisSideBarProps;
 
-export function VisSidebar({ columns, filterCallback = () => null, externalConfig = null, setExternalConfig = null, width = '20rem' }: VisSidebarProps) {
+export function VisSidebar({ columns, filterCallback = () => null, externalConfig = null, setExternalConfig = null, className, style }: VisSidebarProps) {
   const [visConfig, setVisConfig] = useState<IVisConfig>(
     externalConfig || {
       type: ESupportedPlotlyVis.SCATTER,
@@ -38,10 +38,10 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
       alphaSliderVal: 1,
     },
   );
-
+  const setExternalConfigRef = useSyncedRef(setExternalConfig);
   useEffect(() => {
-    setExternalConfig(visConfig);
-  }, [visConfig, setExternalConfig]);
+    setExternalConfigRef.current?.(visConfig);
+  }, [visConfig, setExternalConfigRef]);
 
   useEffect(() => {
     if (isScatter(visConfig)) {
@@ -62,6 +62,7 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
     // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visConfig.type]);
+
   return (
     <>
       {isScatter(visConfig) ? (
@@ -75,7 +76,8 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
           setConfig={setVisConfig}
           filterCallback={filterCallback}
           columns={columns}
-          width={width}
+          className={className}
+          style={style}
         />
       ) : null}
 
@@ -89,15 +91,16 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
           }}
           setConfig={setVisConfig}
           columns={columns}
-          width={width}
+          className={className}
+          style={style}
         />
       ) : null}
 
-      {isStrip(visConfig) ? <StripVisSidebar config={visConfig} setConfig={setVisConfig} columns={columns} width={width} /> : null}
+      {isStrip(visConfig) ? <StripVisSidebar config={visConfig} setConfig={setVisConfig} columns={columns} className={className} style={style} /> : null}
 
-      {isPCP(visConfig) ? <PCPVisSidebar config={visConfig} setConfig={setVisConfig} columns={columns} width={width} /> : null}
+      {isPCP(visConfig) ? <PCPVisSidebar config={visConfig} setConfig={setVisConfig} columns={columns} className={className} style={style} /> : null}
 
-      {isBar(visConfig) ? <BarVisSidebar config={visConfig} setConfig={setVisConfig} columns={columns} width={width} /> : null}
+      {isBar(visConfig) ? <BarVisSidebar config={visConfig} setConfig={setVisConfig} columns={columns} className={className} style={style} /> : null}
     </>
   );
 }

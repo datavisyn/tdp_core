@@ -68,9 +68,6 @@ def phovea(registry):
    'configKey': 'tdp_core.matomo'
   })
 
-  # phovea_data_redis
-  registry.append('mapping_provider', 'phovea_data_redis', 'tdp_core.redis_mapping_table')
-
   # phovea_data_mongo
   registry.append('dataset-provider', 'dataset-graph', 'tdp_core.graph', {})
   # generator-phovea:end

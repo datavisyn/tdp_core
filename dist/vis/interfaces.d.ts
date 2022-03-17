@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter",
@@ -77,7 +78,7 @@ export interface IPCPConfig {
     allColumnsSelected: ColumnInfo[];
 }
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
-declare type ValueGetter<T> = () => Promise<T>;
+declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**
      * Visyn id of the row.
@@ -121,5 +122,12 @@ export declare type ColumnInfo = {
 export declare type Scales = {
     color: any;
 };
+/**
+ * Common props for all vis sidebars.
+ */
+export interface ICommonVisSideBarProps {
+    style?: React.CSSProperties | undefined;
+    className?: string | undefined;
+}
 export {};
 //# sourceMappingURL=interfaces.d.ts.map

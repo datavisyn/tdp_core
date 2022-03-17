@@ -112,6 +112,12 @@ export class IDTypeManager {
         }
         return idType.canBeMappedTo;
     }
+    async mapOneNameToFirstName(idType, name, toIDtype) {
+        return this.mapNameToFirstName(idType, [name], toIDtype).then((names) => names[0]);
+    }
+    async mapOneNameToName(idType, name, toIDtype) {
+        return this.mapNameToName(idType, [name], toIDtype).then((names) => names[0]);
+    }
     async mapNameToFirstName(idType, names, toIDtype) {
         const target = IDTypeManager.getInstance().resolveIdType(toIDtype);
         if (idType.id === target.id) {
