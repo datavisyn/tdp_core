@@ -1,6 +1,5 @@
 import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewContext, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
-import { FindViewUtils } from '../views/FindViewUtils';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
@@ -85,7 +84,7 @@ export class ViewWrapper extends EventHandler implements IViewProvider {
 
     this.node = document.createElement('article');
     this.node.classList.add('tdp-view-wrapper');
-    this.allowed = FindViewUtils.canAccess(plugin);
+    this.allowed = ViewUtils.canAccess(plugin);
     this.node.innerHTML = `
     <header>
       <div class="parameters container-fluid ps-0 pe-0"></div>

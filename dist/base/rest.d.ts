@@ -82,7 +82,7 @@ export interface IAllFilters {
     gte: IParams;
 }
 export interface ILookupItem {
-    _id: never;
+    _id?: never;
     id: string;
     text: string;
 }
@@ -175,7 +175,7 @@ export declare class RestBaseUtils {
      * @param filters URL filter parameters
      */
     static mergeParamAndFilters(params: IParams, filters: IParams): {
-        [x: string]: string | number | boolean | number[] | string[] | boolean[];
+        [x: string]: string | number | boolean | string[] | number[] | boolean[];
     };
     /**
      * query the TDP rest api to read data with additional given filters
