@@ -3,8 +3,8 @@
  */
 
 /// <reference types="jest" />
-import { Compression } from '../../src/base/Compression';
-import { ActionMetaData, ActionNode } from '../../src/provenance';
+import { Compression } from '../../src/clue/base/Compression';
+import { ActionMetaData, ActionNode } from '../../src/clue/provenance';
 
 describe('action compressor', () => {
   const path: ActionNode[] = [

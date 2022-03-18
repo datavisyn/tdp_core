@@ -1,5 +1,5 @@
 import { IDType, IDTypeManager } from '../idtype';
-import { BaseUtils, EventHandler, IEvent, ResolveNow, WebpackEnv } from '../base';
+import { BaseUtils, EventHandler, IEvent, WebpackEnv } from '../base';
 import { I18nextManager } from '../i18n';
 import { PluginRegistry } from '../app';
 import { AView } from './AView';
@@ -227,7 +227,7 @@ export class CompositeView extends EventHandler implements IView {
       }
     };
 
-    return ResolveNow.resolveImmediately(this.createSetup()).then((setup) => {
+    return Promise.resolve(this.createSetup()).then((setup) => {
       this.setup = setup;
 
       const helper = this.node.ownerDocument.createElement('div');

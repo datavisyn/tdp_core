@@ -1,5 +1,5 @@
+import { merge } from 'lodash';
 import { EventHandler } from './event';
-import { BaseUtils } from './BaseUtils';
 import { PluginRegistry } from '../app';
 import { I18nextManager } from '../i18n';
 import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM, ICustomizedLoginFormPluginDesc, ICustomizedLoginFormPlugin } from './extensions';
@@ -43,7 +43,7 @@ export class LoginMenu extends EventHandler {
   constructor(private readonly header: AppHeader, options: ILoginMenuOptions = {}) {
     super();
 
-    BaseUtils.mixin(this.options, { document: header.rightMenu.ownerDocument }, options);
+    merge(this.options, { document: header.rightMenu.ownerDocument }, options);
     this.customizer = PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM);
     this.node = this.init();
     if (this.options.watch) {

@@ -2,8 +2,8 @@ import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
-import { EventHandler, ResolveNow } from '../base';
-import { NodeUtils, ObjectRefUtils } from '../provenance';
+import { EventHandler } from '../base';
+import { NodeUtils, ObjectRefUtils } from '../clue/provenance';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { Dialog } from '../components';
@@ -131,7 +131,7 @@ export class ViewWrapper extends EventHandler {
             this.context = ViewUtils.createContext(this.graph, this.plugin, this.ref);
             this.instance = p.factory(this.context, selection, this.content, this.viewOptionGenerator());
             this.fire(ViewWrapper.EVENT_VIEW_CREATED, this.instance, this);
-            return (this.instancePromise = ResolveNow.resolveImmediately(this.instance.init(this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
+            return (this.instancePromise = Promise.resolve(this.instance.init(this.node.querySelector('header div.parameters'), this.onParameterChange.bind(this))).then(() => {
                 this.inputSelections.forEach((v, k) => {
                     if (k !== AView.DEFAULT_SELECTION_NAME) {
                         // already handled

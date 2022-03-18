@@ -1,5 +1,5 @@
 import { IViewProvider } from '../IViewProvider';
-import { IObjectRef, ProvenanceGraph, ActionNode } from '../../provenance';
+import { IObjectRef, ProvenanceGraph, ActionNode } from '../../clue/provenance';
 export declare class ScoreUtils {
     static readonly CMD_ADD_SCORE = "tdpAddScore";
     static readonly CMD_REMOVE_SCORE = "tdpRemoveScore";
