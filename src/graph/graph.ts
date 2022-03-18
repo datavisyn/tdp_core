@@ -1,10 +1,8 @@
-import { SelectOperation, IDTypeManager, ASelectAble } from '../idtype';
-import { ParseRangeUtils, RangeLike, Range } from '../range';
+import { IDTypeManager } from '../idtype';
 import { UniqueIdManager } from '../app/UniqueIdManager';
 import { IPersistable } from '../base/IPersistable';
 import { EventHandler } from '../base/event';
-import { IDataDescription } from '../data/DataDescription';
-import { IDataType } from '../data/datatype';
+import type { IDataType, IDataDescription } from '../data';
 
 export class AttributeContainer extends EventHandler implements IPersistable {
   private attrMap = new Map<string, any>();
@@ -197,7 +195,7 @@ export interface IGraph extends IDataType {
   removeEdge(e: GraphEdge): this | PromiseLike<this>;
 }
 
-export abstract class AGraph extends ASelectAble {
+export abstract class AGraph extends EventHandler {
   public static DIM_NODES = 0;
 
   public static IDTYPE_NODES = '_nodes';
@@ -220,40 +218,6 @@ export abstract class AGraph extends ASelectAble {
 
   get dim() {
     return [this.nodes.length, this.edges.length];
-  }
-
-  ids(range: RangeLike = Range.all()) {
-    const ids = Range.list(
-      this.nodes.map((n) => n.id),
-      this.edges.map((n) => n.id),
-    );
-    return Promise.resolve(ids.preMultiply(ParseRangeUtils.parseRangeLike(range)));
-  }
-
-  idView(idRange: RangeLike = Range.all()): Promise<IGraph> {
-    throw Error('not implemented');
-  }
-
-  selectNode(node: GraphNode, op = SelectOperation.SET) {
-    this.select(AGraph.DIM_NODES, [this.nodes.indexOf(node)], op);
-  }
-
-  async selectedNodes(): Promise<GraphNode[]> {
-    const r = await this.selections();
-    const nodes: GraphNode[] = [];
-    r.dim(AGraph.DIM_NODES).forEach((index) => nodes.push(this.nodes[index]));
-    return nodes;
-  }
-
-  selectEdge(edge: GraphEdge, op = SelectOperation.SET) {
-    this.select(AGraph.DIM_EDGES, [this.edges.indexOf(edge)], op);
-  }
-
-  async selectedEdges(): Promise<GraphEdge[]> {
-    const r = await this.selections();
-    const edges: GraphEdge[] = [];
-    r.dim(AGraph.DIM_EDGES).forEach((index) => edges.push(this.edges[index]));
-    return edges;
   }
 
   get idtypes() {

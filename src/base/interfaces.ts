@@ -1,23 +1,23 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
-import { AppHeader } from '../components';
 import { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
-import { IDType } from '../idtype';
-import { ProvenanceGraph, IObjectRef } from '../provenance';
-import { RangeLike, Range } from '../range';
+import { IDType } from '../idtype/IDType';
 import { IUser } from '../security';
-import { IPluginDesc, IPlugin } from './plugin';
+import type { IPlugin, IPluginDesc } from './plugin';
 import { IEventHandler } from './event';
+import { ProvenanceGraph } from '../provenance/ProvenanceGraph';
+import { IObjectRef } from '../provenance/ObjectNode';
+import { AppHeader } from '../components/header';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
    * used internally to match selections to column
-   * @default -1
+   * @default undefined
    */
-  selectedId: number;
+  selectedId: string;
   /**
    * used internally to match selections to multiple columns
-   * @default: undefined
+   * @default undefined
    */
   selectedSubtype?: string;
   /**
@@ -41,7 +41,7 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
 }
 
 export function isAdditionalColumnDesc(item: IAdditionalColumnDesc | IColumnDesc): item is IAdditionalColumnDesc {
-  return (item as IAdditionalColumnDesc).selectedId !== undefined;
+  return (item as IAdditionalColumnDesc).selectedId != null;
 }
 
 /**
@@ -51,6 +51,13 @@ export enum EViewMode {
   FOCUS,
   CONTEXT,
   HIDDEN,
+}
+
+export interface IViewWrapperDump {
+  hash: string;
+  plugin: string;
+  dumpReference: number;
+  parameters: object;
 }
 
 /**
@@ -81,12 +88,12 @@ export interface IScore<T> {
 
   /**
    * start the computation of the score for the given ids
-   * @param {RangeLike} ids the currently visible ids
+   * @param {string[]} ids the currently visible ids
    * @param {IDType} idtype of this idtype
    * @param {Object} extras extra arguments
    * @returns {Promise<IScoreRow<T>[]>} the scores
    */
-  compute(ids: RangeLike, idtype: IDType, extras?: object): Promise<IScoreRow<T>[]>;
+  compute(ids: string[], idtype: IDType, extras?: object): Promise<IScoreRow<T>[]>;
 
   /**
    * Hook to override returning which authorizations are required for this score.
@@ -229,14 +236,22 @@ export interface IViewGroupExtensionDesc extends IPluginDesc {
   groups: IGroupData[];
 }
 
+/**
+ * Selections including an idtype and the corresponding selected ids.
+ */
 export interface ISelection {
-  readonly idtype: IDType; // see phovea_core/src/idtype/manager#resolve
-  readonly range: Range;
-
   /**
-   * other selections floating around in a multi selection environment
+   * ID type of the selection, i.e. `IDTypeManager.getInstance().resolveIdType('Ensembl')`.
    */
-  readonly all?: Map<IDType, Range>;
+  readonly idtype: IDType;
+  /**
+   * IDs of the selection matching the idtype, i.e. `['ENSG...', 'ENSG...']`.
+   */
+  ids: string[];
+  /**
+   * Other selections floating around in a multi selection environment
+   */
+  readonly all?: Map<IDType, string[]>;
 }
 
 export interface IViewContext {
@@ -334,7 +349,12 @@ export interface IViewClass {
   new (context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
-export interface IViewPluginDesc extends IPluginDesc {
+export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
+  load(): Promise<IViewPlugin>;
+}
+
+// TODO:: refactor the Omit here to Partial<Pick<.. in ts 4
+export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 'id' | 'load'>> {
   /**
    * how many selection this view can handle and requires
    */
@@ -343,36 +363,28 @@ export interface IViewPluginDesc extends IPluginDesc {
    * idType regex that is required by this view
    */
   idtype?: string;
-
-  load(): Promise<IViewPlugin>;
-
   /**
    * view group hint
    */
   group: { name: string; order: number };
-
   /**
    * optional preview callback function returning a url promise, the preview image should have 320x180 px
    * @returns {Promise<string>}
    */
   preview?(): Promise<string>;
-
   /**
    * optional security check to show only certain views
    */
   security?: string | ((user: IUser) => boolean);
-
   /**
    * optional authorization configuration ensuring authorization exists before loading the view.
    * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
    */
   authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
-
   /**
    * a lot of topics/tags describing this view
    */
   topics?: string[];
-
   /**
    * a link to an external help page
    */
@@ -381,12 +393,10 @@ export interface IViewPluginDesc extends IPluginDesc {
    * as an alternative an help text shown as pop up
    */
   helpText?: string;
-
   /**
    * a tour id to start a tour
    */
   helpTourId?: string;
-
   /**
    * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
    * @default false
@@ -408,13 +418,6 @@ export interface IViewPlugin {
   factory(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
-export interface IViewWrapperDump {
-  hash: string;
-  plugin: string;
-  dumpReference: number;
-  parameters: object;
-}
-
 export interface IInstantView {
   readonly node: HTMLElement;
 
@@ -425,13 +428,9 @@ export interface IInstantViewOptions {
   document: Document;
 }
 
-export interface IItemSelection extends ISelection {
-  readonly items: { _id: number; id: string; text: string }[];
-}
-
 export interface IInstanceViewExtension {
   desc: IInstanceViewExtensionDesc;
-  factory(selection: IItemSelection, options: Readonly<IInstantViewOptions>): IInstantView;
+  factory(selection: ISelection, options: Readonly<IInstantViewOptions>): IInstantView;
 }
 
 export interface IInstanceViewExtensionDesc extends IPluginDesc {

@@ -2,15 +2,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CategoricalColumn, Column, IDataRow, LocalDataProvider, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
 import { Vis } from './Vis';
-import { EColumnTypes, ColumnInfo, VisColumn, EFilterOptions } from './interfaces';
-
-export interface ILineupVisWrapperProps {
-  provider: LocalDataProvider;
-  selectionCallback: (selected: number[]) => void;
-  doc: Document;
-}
-
-type SupportedTypes = string | number;
+import { EColumnTypes, ColumnInfo, VisColumn, EFilterOptions, IVisCommonValue } from './interfaces';
+import { IRow } from '../base/rest';
 
 export class LineupVisWrapper {
   /**
@@ -22,27 +15,30 @@ export class LineupVisWrapper {
 
   private viewable: boolean;
 
-  // tslint:disable-next-line:variable-name
-  constructor(protected readonly props: ILineupVisWrapperProps) {
+  constructor(
+    protected readonly props: {
+      provider: LocalDataProvider;
+      /**
+       * Callback when the selection in a vis changed.
+       * @param ids Selected ids.
+       */
+      selectionCallback(ids: string[]): void;
+      doc: Document;
+    },
+  ) {
     this.node = props.doc.createElement('div');
     this.node.id = 'customVisDiv';
     this.node.classList.add('custom-vis-panel');
     this.viewable = false;
   }
 
-  getSelectionMap = () => {
-    const sel = this.props.provider.getSelection();
-    const selectedMap: { [key: number]: boolean } = {};
+  getSelectionMap = (): { [id: string]: boolean } => {
+    const selectedMap: { [id: string]: boolean } = {};
+    const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection()) as IRow[];
 
-    const allData = this.props.provider.data;
-
-    for (const i of allData) {
-      selectedMap[i._id] = false;
-    }
-
-    for (const i of sel) {
-      selectedMap[allData[i]._id] = true;
-    }
+    selectedRows.forEach((row) => {
+      selectedMap[row.id] = true;
+    });
 
     return selectedMap;
   };
@@ -68,7 +64,7 @@ export class LineupVisWrapper {
 
     const cols: VisColumn[] = [];
 
-    const selectedMap: { [key: number]: boolean } = this.getSelectionMap();
+    const selectedMap = this.getSelectionMap();
 
     const getColumnInfo = (column: Column): ColumnInfo => {
       return {
@@ -79,17 +75,16 @@ export class LineupVisWrapper {
       };
     };
 
-    const mapData = <T extends ValueColumn<SupportedTypes>>(innerData: IDataRow[], column: T) => {
-      // TODO: Refactor to use _visyn_id instead.
-      return innerData.map((d) => ({ id: d.v._id, val: column.getRaw(d) }));
+    const mapData = <T extends ValueColumn<number | string>>(innerData: IDataRow[], column: T) => {
+      return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: (d.v as IRow).id, val: column.getRaw(d) });
     };
 
-    const getColumnValue = async <T extends ValueColumn<SupportedTypes>>(column: T) => {
+    const getColumnValue = async <T extends ValueColumn<number | string>>(column: T) => {
       if (column.isLoaded()) {
         return mapData(data, column);
       }
 
-      return new Promise<{ id: number; val: SupportedTypes }[]>((resolve, reject) => {
+      return new Promise<IVisCommonValue<any>[]>((resolve, reject) => {
         // times out if we take longer than 60 seconds to load the columns.
         const timeout = setTimeout(() => {
           reject('Timeout');
@@ -122,7 +117,7 @@ export class LineupVisWrapper {
       React.createElement(Vis, {
         columns: cols,
         selected: selectedMap,
-        selectionCallback: (s: number[]) => this.props.selectionCallback(s),
+        selectionCallback: (ids) => this.props.selectionCallback(ids),
         filterCallback: (s: string) => this.filterCallback(s),
       }),
       this.node,

@@ -1,4 +1,4 @@
-import { RemoveNodeObserver } from '../internal/RemoveNodeObserver';
+import { RemoveNodeObserver } from '../components/RemoveNodeObserver';
 import { HashProperties } from '../base/HashProperties';
 import { PropertyHandler } from '../base/PropertyHandler';
 import { BaseUtils } from '../base/BaseUtils';

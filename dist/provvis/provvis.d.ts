@@ -1,7 +1,6 @@
 import '../webpack/_bootstrap';
 import { ProvenanceGraph } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
-import { Range } from '../range';
 export declare class LayoutedProvVis extends AVisInstance implements IVisInstance {
     data: ProvenanceGraph;
     parent: Element;
@@ -22,7 +21,6 @@ export declare class LayoutedProvVis extends AVisInstance implements IVisInstanc
     get rawSize(): [number, number];
     get node(): Element;
     option(name: string, val?: any): any;
-    locateImpl(range: Range): Promise<any>;
     private build;
     private onStateClick;
     update(): void;

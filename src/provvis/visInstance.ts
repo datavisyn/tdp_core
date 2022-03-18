@@ -1,10 +1,8 @@
 import { IPersistable } from '../base/IPersistable';
 import { UniqueIdManager } from '../app/UniqueIdManager';
 import { IDataType } from '../data/datatype';
-import { Range } from '../range/Range';
 import { IEventHandler, EventHandler } from '../base/event';
 import { ITransform } from './ITransform';
-import { ILocateAble } from './ILocateAble';
 
 export interface IVisInstanceOptions {
   rotate?: number;
@@ -14,7 +12,7 @@ export interface IVisInstanceOptions {
 /**
  * basic interface of an visualization instance
  */
-export interface IVisInstance extends IPersistable, IEventHandler, ILocateAble {
+export interface IVisInstance extends IPersistable, IEventHandler {
   /**
    * the unique id of this vis instance
    */
@@ -111,26 +109,6 @@ export class AVisInstance extends EventHandler {
     if (built) {
       this.fire('ready');
     }
-  }
-
-  locate(...range: Range[]): Promise<any> {
-    if (range.length === 1) {
-      return this.locateImpl(range[0]);
-    }
-    return Promise.all(range.map(this.locateImpl, this));
-  }
-
-  async locateById(...range: Range[]) {
-    const ids: Range = await (<any>this).data.ids();
-    if (range.length === 1) {
-      return this.locateImpl(ids.indexOf(range[0]));
-    }
-    return Promise.all(range.map((r) => this.locateImpl(ids.indexOf(r))));
-  }
-
-  locateImpl(range: Range) {
-    // no resolution by default
-    return Promise.resolve(null);
   }
 
   restore(persisted: any): Promise<AVisInstance> {

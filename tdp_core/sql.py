@@ -12,13 +12,6 @@ _log = logging.getLogger(__name__)
 app = Namespace(__name__)
 
 
-def load_ids(idtype, mapping):
-  import phovea_server.plugin
-
-  manager = phovea_server.plugin.lookup('idmanager')
-  manager.load(idtype, mapping)
-
-
 def _view_no_cache(func):
   """
   wrap the function in no_cache if the view identified by view_name has the no_cache flag set
@@ -49,10 +42,6 @@ def list_view(database):
   return jsonify([v.dump(k) for k, v in config_engine[0].views.items() if v.can_access()])
 
 
-def _assign_ids(r, view):
-  return r and (request.values.get('_assignids', False) or (view.assign_ids and '_id' not in r[0]))
-
-
 def _return_query():
   # return true if the key is given and the value doesn't start with 'f' -> no value, true, True, T
   key = '_return_query'
@@ -81,8 +70,6 @@ def get_filtered_data(database, view_name):
 
   r, view = db.get_filtered_data(database, view_name, request.values)
 
-  if _assign_ids(r, view):
-    r = db.assign_ids(r, view.idtype)
   return format(r)
 
 
@@ -110,8 +97,6 @@ def get_score_data(database, view_name):
   else:
     mapped_scores = r
 
-  if _assign_ids(mapped_scores, view):
-    mapped_scores = db.assign_ids(mapped_scores, target_idtype)
   return format(mapped_scores)
 
 
@@ -161,8 +146,6 @@ def lookup(database, view_name):
 
   r_items, more, view = db.lookup(database, view_name, query, page, limit, request.values)
 
-  if _assign_ids(r_items, view):
-    r_items = db.assign_ids(r_items, view.idtype)
   return jsonify(dict(items=r_items, more=more))
 
 

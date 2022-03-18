@@ -2,7 +2,6 @@ export * from './DetailUtils';
 export * from './provvis';
 export * from './storyvis';
 export * from './VisLoader';
-export * from './ILocateAble';
 export * from './ITransform';
 export * from './IVisMetaData';
 export * from './IVisPluginDesc';

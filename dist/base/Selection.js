@@ -1,8 +1,8 @@
 import { EventHandler, GlobalEventHandler } from './event';
 import { AppContext } from '../app';
 import { IDTypeManager, SelectionUtils } from '../idtype';
-import { ActionMetaData, ObjectRefUtils } from '../provenance';
-import { ParseRangeUtils } from '../range';
+import { ObjectRefUtils } from '../provenance';
+import { ActionMetaData } from '../provenance/ActionMeta';
 import { Compression } from './Compression';
 import { ResolveNow } from './promise';
 import { BaseUtils } from './BaseUtils';
@@ -10,16 +10,19 @@ const disabler = new EventHandler();
 export class Selection {
     static select(inputs, parameter, graph, within) {
         const idtype = IDTypeManager.getInstance().resolveIdType(parameter.idtype);
-        const range = ParseRangeUtils.parseRangeLike(parameter.range);
+        const { selection } = parameter;
         const { type } = parameter;
-        const bak = parameter.old ? ParseRangeUtils.parseRangeLike(parameter.old) : idtype.selections(type);
+        const bak = parameter.old || idtype.selections(type);
         if (AppContext.getInstance().hash.has('debug')) {
-            console.log('select', range.toString());
+            console.log('select', selection);
         }
         disabler.fire(`disable-${idtype.id}`);
-        idtype.select(type, range);
+        idtype.select(type, selection);
         disabler.fire(`enable-${idtype.id}`);
-        return Selection.createSelection(idtype, type, bak, range, parameter.animated).then((cmd) => ({ inverse: cmd, consumed: parameter.animated ? within : 0 }));
+        return Selection.createSelection(idtype, type, bak, selection, parameter.animated).then((cmd) => ({
+            inverse: cmd,
+            consumed: parameter.animated ? within : 0,
+        }));
     }
     static capitalize(s) {
         return s
@@ -27,8 +30,8 @@ export class Selection {
             .map((d) => d[0].toUpperCase() + d.slice(1))
             .join(' ');
     }
-    static meta(idtype, type, range) {
-        const l = range.dim(0).length;
+    static meta(idtype, type, selection) {
+        const l = selection.length;
         let title = type === SelectionUtils.defaultSelectionType ? '' : `${Selection.capitalize(type)} `;
         let p;
         if (l === 0) {
@@ -36,21 +39,15 @@ export class Selection {
             p = ResolveNow.resolveImmediately(title);
         }
         else if (l === 1) {
-            title += `${idtype.name} `;
-            p = idtype.unmap(range).then((r) => {
-                title += r[0];
-                return title;
-            });
+            title += `${idtype.name} ${selection[0]}`;
+            p = ResolveNow.resolveImmediately(title);
         }
         else if (l < 3) {
-            title += `${idtype.names} (`;
-            p = idtype.unmap(range).then((r) => {
-                title += `${r.join(', ')})`;
-                return title;
-            });
+            title += `${idtype.names} (${selection.join(', ')})`;
+            p = ResolveNow.resolveImmediately(title);
         }
         else {
-            title += `${range.dim(0).length} ${idtype.names}`;
+            title += `${l} ${idtype.names}`;
             p = ResolveNow.resolveImmediately(title);
         }
         return p.then((t) => ActionMetaData.actionMeta(t, ObjectRefUtils.category.selection));
@@ -59,21 +56,21 @@ export class Selection {
      * create a selection command
      * @param idtype
      * @param type
-     * @param range
+     * @param selection
      * @param old optional the old selection for inversion
      * @returns {Cmd}
      */
-    static createSelection(idtype, type, range, old = null, animated = false) {
-        return Selection.meta(idtype, type, range).then((meta) => {
+    static createSelection(idtype, type, selection, old = null, animated = false) {
+        return Selection.meta(idtype, type, selection).then((meta) => {
             return {
                 meta,
                 id: 'select',
                 f: Selection.select,
                 parameter: {
                     idtype: idtype.id,
-                    range: range.toString(),
+                    selection,
                     type,
-                    old: old.toString(),
+                    old,
                     animated,
                 },
             };

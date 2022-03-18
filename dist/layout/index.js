@@ -5,5 +5,4 @@ export * from './interfaces';
 export * from './builder';
 export * from './constants';
 export * from './layout';
-export * from './layout_view';
 //# sourceMappingURL=index.js.map
