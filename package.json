@@ -38,7 +38,7 @@
   "scripts": {
     "clean": "rimraf build dist lib",
     "delete-dependencies": "rimraf node_modules",
-    "check": "flake8 --exclude=.git,venv,deploy,docs,__pycache__,node_modules",
+    "check": "black --line-length 160 --check tdp_core",
     "compile": "tsc",
     "compile:watch": "tsc -w",
     "postcompile": "npm run copy",
@@ -76,7 +76,7 @@
     "dist:web": "mkdir lib && cd dist && tar cvzf ../lib/tdp_core.tar.gz *",
     "predocker": "npm run build",
     "docker": "docker build -t tdp_core -f deploy/Dockerfile .",
-    "db-migration:base": "docker-compose run api python phovea_server/__main__.py --env dev db-migration",
+    "db-migration:base": "TODO docker-compose run api python phovea_server/__main__.py --env dev db-migration",
     "db-migration": "npm run db-migration:base exec --",
     "db-migration:list": "npm run db-migration:base list --"
   },

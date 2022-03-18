@@ -4,7 +4,7 @@ executors:
   python-executor:
     working_directory: ~/phovea-python
     docker:
-      - image: circleci/python:3.7-buster-node-browsers # for node version see Dockerfile on https://hub.docker.com/r/circleci/python
+      - image: circleci/python:3.10-buster-node-browsers # for node version see Dockerfile on https://hub.docker.com/r/circleci/python
   node-executor:
     working_directory: ~/phovea-web
     docker:

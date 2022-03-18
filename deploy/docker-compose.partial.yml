@@ -5,6 +5,26 @@ services:
     - db_mongo
     links:
     - db_mongo:mongo
+  api:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile_dev
+      args:
+        - http_proxy
+        - HTTP_PROXY
+        - https_proxy
+        - HTTPS_PROXY
+        - no_proxy
+        - NO_PROXY
+    ports:
+      - '9000:80'
+      # Required port for the python debugger
+      - '5678:5678'
+    volumes:
+    - .:/phovea
+    environment:
+      - ENV=development
+      - PYTHONUNBUFFERED=1
   db_mongo:
     image: mongo:3.2
     volumes:

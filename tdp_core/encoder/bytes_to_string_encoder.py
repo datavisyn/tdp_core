@@ -5,19 +5,19 @@ This encoder is required to handle this change for the update to Python 3.7 by d
 
 
 class BytesToStringEncoder(object):
-  def __contains__(self, obj):
-    if isinstance(obj, bytes):
-      return True
-    return False
+    def __contains__(self, obj):
+        if isinstance(obj, bytes):
+            return True
+        return False
 
-  def __call__(self, obj, base_encoder):
-    if isinstance(obj, bytes):
-      return obj.decode('utf-8')
-    return None
+    def __call__(self, obj, base_encoder):
+        if isinstance(obj, bytes):
+            return obj.decode("utf-8")
+        return None
 
 
 encoder = BytesToStringEncoder()
 
 
 def create():
-  return encoder
+    return encoder
