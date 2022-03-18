@@ -130,6 +130,11 @@ export abstract class ARankingView extends AView {
       maxGroupColumns: Infinity,
       filterGlobally: true,
       propagateAggregationState: false,
+      /**
+       * Specify the task executor to use `direct` = no delay, `scheduled` = run when idle
+       * `scheduled` also improve scalability and performance by using web workers
+       */
+      taskExecutor: 'scheduled',
     },
     formatSearchBoxItem: (item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement): string | void => {
       // TypeScript type guard function

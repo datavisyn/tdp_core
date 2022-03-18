@@ -96,6 +96,11 @@ export class ARankingView extends AView {
                 maxGroupColumns: Infinity,
                 filterGlobally: true,
                 propagateAggregationState: false,
+                /**
+                 * Specify the task executor to use `direct` = no delay, `scheduled` = run when idle
+                 * `scheduled` also improve scalability and performance by using web workers
+                 */
+                taskExecutor: 'scheduled',
             },
             formatSearchBoxItem: (item, node) => {
                 // TypeScript type guard function
