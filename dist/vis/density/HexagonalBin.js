@@ -22,6 +22,7 @@ function Legend({ categories, filteredCategories, colorScale, onClick, }) {
     })));
 }
 export function HexagonalBin({ config, columns, selectionCallback = () => null, selected = {} }) {
+    var _a, _b;
     const ref = useRef(null);
     const [height, setHeight] = useState(0);
     const [width, setWidth] = useState(0);
@@ -219,8 +220,18 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             React.createElement("g", { clipPath: "url(#clip)" },
                 React.createElement("g", { id: `${id}brush`, style: { transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` } },
                     React.createElement("g", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` } }, hexObjects))),
-            React.createElement(XAxis, { vertPosition: height + margin.top, domain: xZoomedScaleDomain || (xScale === null || xScale === void 0 ? void 0 : xScale.domain()), range: [margin.left, width + margin.left] }),
-            React.createElement(YAxis, { horizontalPosition: margin.left, domain: yZoomedScaleDomain || (yScale === null || yScale === void 0 ? void 0 : yScale.domain()), range: [margin.top, height + margin.top] })),
+            React.createElement(XAxis, { vertPosition: height + margin.top, yRange: [margin.top, height + margin.top], domain: xZoomedScaleDomain || (xScale === null || xScale === void 0 ? void 0 : xScale.domain()), range: [margin.left, width + margin.left] }),
+            React.createElement(YAxis, { horizontalPosition: margin.left, xRange: [margin.left, width + margin.left], domain: yZoomedScaleDomain || (yScale === null || yScale === void 0 ? void 0 : yScale.domain()), range: [margin.top, height + margin.top] }),
+            React.createElement("text", { style: {
+                    dominantBaseline: 'middle',
+                    textAnchor: 'middle',
+                    transform: `translate(${margin.left + width / 2}px, ${margin.top + height + 30}px)`,
+                } }, (_a = config.numColumnsSelected[0]) === null || _a === void 0 ? void 0 : _a.name),
+            React.createElement("text", { style: {
+                    dominantBaseline: 'middle',
+                    textAnchor: 'middle',
+                    transform: `translate(10px, ${margin.top + height / 2}px) rotate(-90deg)`,
+                } }, (_b = config.numColumnsSelected[1]) === null || _b === void 0 ? void 0 : _b.name)),
         React.createElement("div", { className: "position-absolute", style: { left: margin.left + width, top: margin.top } },
             React.createElement(Legend, { categories: colorScale ? colorScale.domain() : [], filteredCategories: colorScale ? filteredCategories : [], colorScale: colorScale || null, onClick: (s) => filteredCategories.includes(s)
                     ? setFilteredCategories(filteredCategories.filter((f) => f !== s))

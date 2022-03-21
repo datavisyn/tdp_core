@@ -321,8 +321,36 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             <g style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }}>{hexObjects}</g>
           </g>
         </g>
-        <XAxis vertPosition={height + margin.top} domain={xZoomedScaleDomain || xScale?.domain()} range={[margin.left, width + margin.left]} />
-        <YAxis horizontalPosition={margin.left} domain={yZoomedScaleDomain || yScale?.domain()} range={[margin.top, height + margin.top]} />
+        <XAxis
+          vertPosition={height + margin.top}
+          yRange={[margin.top, height + margin.top]}
+          domain={xZoomedScaleDomain || xScale?.domain()}
+          range={[margin.left, width + margin.left]}
+        />
+        <YAxis
+          horizontalPosition={margin.left}
+          xRange={[margin.left, width + margin.left]}
+          domain={yZoomedScaleDomain || yScale?.domain()}
+          range={[margin.top, height + margin.top]}
+        />
+        <text
+          style={{
+            dominantBaseline: 'middle',
+            textAnchor: 'middle',
+            transform: `translate(${margin.left + width / 2}px, ${margin.top + height + 30}px)`,
+          }}
+        >
+         {config.numColumnsSelected[0]?.name}
+        </text>
+        <text
+          style={{
+            dominantBaseline: 'middle',
+            textAnchor: 'middle',
+            transform: `translate(10px, ${margin.top + height / 2}px) rotate(-90deg)`,
+          }}
+        >
+         {config.numColumnsSelected[1]?.name}
+        </text>
       </svg>
       <div className="position-absolute" style={{ left: margin.left + width, top: margin.top }}>
         <Legend

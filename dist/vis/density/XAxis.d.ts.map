@@ -1,1 +1,1 @@
-{"version":3,"file":"XAxis.d.ts","sourceRoot":"","sources":["../../../src/vis/density/XAxis.tsx"],"names":[],"mappings":";AAKA,wBAAgB,KAAK,CAAC,EAAE,MAAiB,EAAE,KAAiB,EAAE,YAAgB,EAAE;;;;CAAA,eA4B/E"}
+{"version":3,"file":"XAxis.d.ts","sourceRoot":"","sources":["../../../src/vis/density/XAxis.tsx"],"names":[],"mappings":";AAKA,wBAAgB,KAAK,CAAC,EAAE,MAAiB,EAAE,KAAiB,EAAE,MAAM,EAAE,YAAgB,EAAE;;;;;CAAA,eA6BvF"}

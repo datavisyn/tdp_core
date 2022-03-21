@@ -3,10 +3,10 @@ import * as React from 'react';
 import { useMemo } from 'react';
 
 // code taken from https://wattenberger.com/blog/react-and-d3
-export function YAxis({ domain = [0, 100], range = [10, 290], horizontalPosition = 0 }) {
+export function YAxis({ domain = [0, 100], range = [10, 290], xRange, horizontalPosition = 0 }) {
   const ticks = useMemo(() => {
     const yScale = d3.scaleLinear().domain(domain.reverse()).range(range);
-    return yScale.ticks().map((value) => ({
+    return yScale.ticks(5).map((value) => ({
       value,
       yOffset: yScale(value),
     }));
@@ -17,6 +17,7 @@ export function YAxis({ domain = [0, 100], range = [10, 290], horizontalPosition
       {ticks.map(({ value, yOffset }) => (
         <g key={value} transform={`translate(${horizontalPosition}, ${yOffset})`}>
           <line x2="-6" stroke="currentColor" />
+          <line x2={`${xRange[1] - xRange[0]}`} stroke={`${value === 0 ? 'black' : 'lightgray'}`} />
           <text
             key={value}
             style={{
