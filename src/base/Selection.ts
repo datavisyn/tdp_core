@@ -1,11 +1,10 @@
+import { merge } from 'lodash';
 import { EventHandler, GlobalEventHandler } from './event';
 import { AppContext } from '../app';
 import { IDTypeManager, IDType, SelectionUtils } from '../idtype';
-import { IObjectRef, ICmdResult, ActionNode, ProvenanceGraph, ObjectRefUtils } from '../provenance';
-import { ActionMetaData } from '../provenance/ActionMeta';
-import { Compression } from './Compression';
-import { ResolveNow } from './promise';
-import { BaseUtils } from './BaseUtils';
+import { IObjectRef, ICmdResult, ActionNode, ProvenanceGraph, ObjectRefUtils } from '../clue/provenance';
+import { ActionMetaData } from '../clue/provenance/ActionMeta';
+import { Compression } from '../clue/base/Compression';
 
 const disabler = new EventHandler();
 
@@ -42,16 +41,16 @@ export class Selection {
     let p;
     if (l === 0) {
       title += `no ${idtype.names}`;
-      p = ResolveNow.resolveImmediately(title);
+      p = Promise.resolve(title);
     } else if (l === 1) {
       title += `${idtype.name} ${selection[0]}`;
-      p = ResolveNow.resolveImmediately(title);
+      p = Promise.resolve(title);
     } else if (l < 3) {
       title += `${idtype.names} (${selection.join(', ')})`;
-      p = ResolveNow.resolveImmediately(title);
+      p = Promise.resolve(title);
     } else {
       title += `${l} ${idtype.names}`;
-      p = ResolveNow.resolveImmediately(title);
+      p = Promise.resolve(title);
     }
     return p.then((t) => ActionMetaData.actionMeta(t, ObjectRefUtils.category.selection));
   }
@@ -154,9 +153,9 @@ export class SelectionRecorder {
   };
 
   constructor(private graph: ProvenanceGraph, private type?: string, private options: any = {}) {
-    this.options = BaseUtils.mixin(
+    this.options = merge(
       {
-        filter: BaseUtils.constantTrue,
+        filter: true,
         animated: false,
       },
       this.options,

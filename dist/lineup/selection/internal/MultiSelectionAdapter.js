@@ -1,6 +1,5 @@
 import { difference } from 'lodash';
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
-import { ResolveNow } from '../../../base';
 export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     constructor(adapter) {
         super();
@@ -13,7 +12,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     }
     createColumnsFor(context, id) {
         const selectedSubTypes = this.adapter.getSelectedSubTypes();
-        return ResolveNow.resolveImmediately(this.adapter.createDescs(id, selectedSubTypes)).then((descs) => {
+        return Promise.resolve(this.adapter.createDescs(id, selectedSubTypes)).then((descs) => {
             if (descs.length <= 0) {
                 return [];
             }

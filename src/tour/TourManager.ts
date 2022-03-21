@@ -303,7 +303,19 @@ export class TourManager {
     return {
       clientWidth: right - left,
       clientHeight: bottom - top,
-      getBoundingClientRect: () => ({ left, right, top, bottom, width: right - left, height: bottom - top }),
+      getBoundingClientRect: () => ({
+        x: left,
+        y: top,
+        left,
+        right,
+        top,
+        bottom,
+        width: right - left,
+        height: bottom - top,
+        toJSON: () => {
+          throw new Error('TS4 migration required this in the type');
+        },
+      }),
     };
   }
 
