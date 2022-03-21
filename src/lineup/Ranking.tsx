@@ -21,6 +21,7 @@ import {
   UIntTypedArray,
 } from 'lineupjs';
 import React from 'react';
+import { merge } from 'lodash';
 import { ILazyLoadedColumn, LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
@@ -162,7 +163,7 @@ export function Ranking({
 }: IRankingProps) {
   const [busy, setBusy] = React.useState<boolean>(false);
   const [built, setBuilt] = React.useState<boolean>(false);
-  const options = BaseUtils.mixin({}, defaults, opts) as Readonly<IRankingOptions>;
+  const options = merge({}, defaults, opts) as Readonly<IRankingOptions>;
   const itemSelections = new Map<string, ISelection>();
   const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
   const lineupContainerRef = React.useRef<HTMLDivElement | null>(null);
@@ -306,7 +307,7 @@ export function Ranking({
       providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
       providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
 
-      const taggleOptions: ITaggleOptions = BaseUtils.mixin(
+      const taggleOptions: ITaggleOptions = merge(
         defaultOptions(),
         options.customOptions,
         {

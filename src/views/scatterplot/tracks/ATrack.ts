@@ -9,7 +9,7 @@
  *
  ******************************************************** */
 
-import { BaseUtils } from '../../../base/BaseUtils';
+import { merge } from 'lodash';
 import { IWindow } from '../base/AScatterplot';
 
 export interface ITrackOptions {
@@ -57,7 +57,7 @@ export abstract class ATrack<T> {
   private window: IWindow;
 
   constructor(protected data: T[], options: Partial<ITrackOptions> = {}) {
-    BaseUtils.mixin(this.options, options);
+    merge(this.options, options);
 
     this.node = document.createElement('div');
     this.node.classList.add('track');

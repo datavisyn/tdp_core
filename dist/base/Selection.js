@@ -1,11 +1,10 @@
+import { merge } from 'lodash';
 import { EventHandler, GlobalEventHandler } from './event';
 import { AppContext } from '../app';
 import { IDTypeManager, SelectionUtils } from '../idtype';
-import { ObjectRefUtils } from '../provenance';
-import { ActionMetaData } from '../provenance/ActionMeta';
-import { Compression } from './Compression';
-import { ResolveNow } from './promise';
-import { BaseUtils } from './BaseUtils';
+import { ObjectRefUtils } from '../clue/provenance';
+import { ActionMetaData } from '../clue/provenance/ActionMeta';
+import { Compression } from '../clue/base/Compression';
 const disabler = new EventHandler();
 export class Selection {
     static select(inputs, parameter, graph, within) {
@@ -36,19 +35,19 @@ export class Selection {
         let p;
         if (l === 0) {
             title += `no ${idtype.names}`;
-            p = ResolveNow.resolveImmediately(title);
+            p = Promise.resolve(title);
         }
         else if (l === 1) {
             title += `${idtype.name} ${selection[0]}`;
-            p = ResolveNow.resolveImmediately(title);
+            p = Promise.resolve(title);
         }
         else if (l < 3) {
             title += `${idtype.names} (${selection.join(', ')})`;
-            p = ResolveNow.resolveImmediately(title);
+            p = Promise.resolve(title);
         }
         else {
             title += `${l} ${idtype.names}`;
-            p = ResolveNow.resolveImmediately(title);
+            p = Promise.resolve(title);
         }
         return p.then((t) => ActionMetaData.actionMeta(t, ObjectRefUtils.category.selection));
     }
@@ -147,8 +146,8 @@ export class SelectionRecorder {
                 this.handler.push(new SelectionTypeRecorder(idtype, this.graph, this.type, this.options));
             }
         };
-        this.options = BaseUtils.mixin({
-            filter: BaseUtils.constantTrue,
+        this.options = merge({
+            filter: true,
             animated: false,
         }, this.options);
         GlobalEventHandler.getInstance().on('register.idtype', this.adder);

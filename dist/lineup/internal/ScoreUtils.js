@@ -2,7 +2,7 @@ import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
 import { AttachemntUtils } from '../../storage/internal/attachment';
 import { PluginRegistry } from '../../app';
 import { I18nextManager } from '../../i18n';
-import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../provenance';
+import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../clue/provenance';
 export class ScoreUtils {
     static async addScoreLogic(waitForScore, inputs, parameter) {
         const scoreId = parameter.id;

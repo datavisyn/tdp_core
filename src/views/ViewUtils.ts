@@ -15,7 +15,7 @@ import type {
   IBaseViewPluginDesc,
   IGroupData,
 } from '../base/interfaces';
-import type { IObjectRef, ProvenanceGraph } from '../provenance';
+import type { IObjectRef, ProvenanceGraph } from '../clue/provenance';
 import type { VisynViewPluginDesc } from './visyn/interfaces';
 import { IDType, IDTypeManager } from '../idtype';
 import { PluginRegistry } from '../app/PluginRegistry';

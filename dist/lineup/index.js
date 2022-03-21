@@ -10,6 +10,5 @@ export * from './ARankingView';
 export * from './RankingViewComponent';
 // eslint-disable-next-line import/no-cycle
 export * from './Ranking';
-export * from './AOverviewDetailRankingView';
 export * from './panel';
 //# sourceMappingURL=index.js.map

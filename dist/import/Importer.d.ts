@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 29.09.2016.
- */
 import * as d3 from 'd3';
 import { EventHandler } from '../base';
 import { IDataDescription } from '../data';

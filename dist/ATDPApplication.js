@@ -1,18 +1,19 @@
-import { AppHeaderLink, AppHeader } from './components';
 // TODO: Do we need a relative import?
 import './webpack/_bootstrap';
-import { EditProvenanceGraphMenu } from './utils/EditProvenanceGraphMenu';
-import { DialogUtils } from './base/dialogs';
+import { merge } from 'lodash';
+import { AppHeaderLink, AppHeader } from './components';
+import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
+import { DialogUtils } from './clue/base/dialogs';
 import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { TourManager } from './tour/TourManager';
-import { TemporarySessionList } from './utils/SessionList';
+import { TemporarySessionList, ButtonModeSelector, CLUEGraphManager } from './clue';
 import { TDPTokenManager } from './auth';
-import { ACLUEWrapper } from './wrapper/ACLUEWrapper';
-import { LoginMenu, Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager } from './base';
+import { ACLUEWrapper } from './clue/wrapper';
+import { LoginMenu, Ajax } from './base';
 import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';
-import { MixedStorageProvenanceGraphManager } from './provenance';
-import { VisLoader } from './provvis';
+import { MixedStorageProvenanceGraphManager } from './clue/provenance';
+import { VisLoader } from './clue/provvis';
 /**
  * base class for TDP based applications
  */
@@ -36,7 +37,7 @@ export class ATDPApplication extends ACLUEWrapper {
             clientConfig: null,
         };
         this.app = null;
-        BaseUtils.mixin(this.options, options);
+        merge(this.options, options);
         this.initialize();
     }
     /**
@@ -88,7 +89,7 @@ export class ATDPApplication extends ACLUEWrapper {
         }
         // Otherwise, load and merge the configuration into the existing one.
         const parsedConfig = await ATDPApplication.loadClientConfig();
-        options.clientConfig = BaseUtils.mixin((options === null || options === void 0 ? void 0 : options.clientConfig) || {}, parsedConfig || {});
+        options.clientConfig = merge((options === null || options === void 0 ? void 0 : options.clientConfig) || {}, parsedConfig || {});
         return options;
     }
     createHeader(parent) {
