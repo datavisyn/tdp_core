@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 /// <reference types="jest" />
 import { Compression } from '../../src/clue/base/Compression';
 import { ActionMetaData, ActionNode } from '../../src/clue/provenance';

@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 /// <reference types="jest" />
 import { Ajax } from '../src/base/ajax';
 import { AppContext } from '../src/app/AppContext';
