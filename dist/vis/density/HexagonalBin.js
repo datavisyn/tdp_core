@@ -4,6 +4,7 @@ import { uniqueId } from 'lodash';
 import * as React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAsync } from '../../hooks/useAsync';
+import { EScatterSelectSettings } from '../interfaces';
 import { SingleHex } from './SingleHex';
 import { getHexData } from './utils';
 import { XAxis } from './XAxis';
@@ -26,8 +27,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     const ref = useRef(null);
     const [height, setHeight] = useState(0);
     const [width, setWidth] = useState(0);
-    const [xZoomedScaleDomain, setXZoomedScaleDomain] = useState(null);
-    const [yZoomedScaleDomain, setYZoomedScaleDomain] = useState(null);
+    const xZoomedScale = useRef(null);
+    const yZoomedScale = useRef(null);
     const [xZoomTransform, setXZoomTransform] = useState(0);
     const [yZoomTransform, setYZoomTransform] = useState(0);
     const [zoomScale, setZoomScale] = useState(1);
@@ -95,7 +96,10 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         if (currentX === null || currentX === void 0 ? void 0 : currentX.allValues) {
             const min = d3.min(currentX.allValues.map((c) => c.val));
             const max = d3.max(currentX.allValues.map((c) => c.val));
-            return d3.scaleLinear().domain([min, max]).range([0, width]);
+            return d3
+                .scaleLinear()
+                .domain([min, max])
+                .range([margin.left, margin.left + width]);
         }
         return null;
     }, [currentX === null || currentX === void 0 ? void 0 : currentX.allValues, width]);
@@ -104,7 +108,10 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         if (currentY === null || currentY === void 0 ? void 0 : currentY.allValues) {
             const min = d3.min(currentY.allValues.map((c) => c.val));
             const max = d3.max(currentY.allValues.map((c) => c.val));
-            return d3.scaleLinear().domain([min, max]).range([height, 0]);
+            return d3
+                .scaleLinear()
+                .domain([min, max])
+                .range([margin.top + height, margin.top]);
         }
         return null;
     }, [currentY === null || currentY === void 0 ? void 0 : currentY.allValues, height]);
@@ -168,60 +175,61 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             return (React.createElement(SingleHex, { key: `${singleHex.x}, ${singleHex.y}`, selected: selected, hexbinOption: config.hexbinOptions, hexData: singleHex, d3Hexbin: d3Hexbin, isSizeScale: config.isSizeScale, radiusScale: radiusScale, isOpacityScale: config.isOpacityScale, opacityScale: opacityScale, hexRadius: config.hexRadius, colorScale: colorScale }));
         })));
     }, [colorScale, config.hexRadius, config.isOpacityScale, config.isSizeScale, d3Hexbin, hexes, opacityScale, radiusScale, selected, config.hexbinOptions]);
-    // apply zoom/panning
+    // // apply zoom/panning
     useEffect(() => {
-        if (!xScale || !yScale) {
+        const zoom = d3.zoom();
+        if (!xScale || !yScale || config.dragMode === EScatterSelectSettings.RECTANGLE) {
+            d3.select(`#${id}`).call(zoom).on('zoom', null);
             return;
         }
-        const zoom = d3.zoom().on('zoom', (event) => {
+        zoom.on('zoom', (event) => {
             const { transform } = event;
             setZoomScale(transform.k);
             setXZoomTransform(transform.x);
             setYZoomTransform(transform.y);
             const newX = transform.rescaleX(xScale);
             const newY = transform.rescaleY(yScale);
-            setXZoomedScaleDomain(newX.domain());
-            setYZoomedScaleDomain(newY.domain());
+            xZoomedScale.current = newX;
+            yZoomedScale.current = newY;
         });
-        d3.select(`#${id}`).call(d3.zoom().on('zoom', null));
         d3.select(`#${id}`).call(zoom);
-    }, [id, xScale, yScale, zoomScale, xZoomTransform, yZoomTransform, height, width]);
-    // apply brushing
-    // useEffect(() => {
-    //   const brush = d3.brush().extent([
-    //     [margin.left, margin.top],
-    //     [margin.left + width, margin.top + height],
-    //   ]);
-    //   d3.select(`#${id}brush`).call(
-    //     brush.on('end', function (event) {
-    //       if (!event.sourceEvent) return;
-    //       if (!event.selection) {
-    //         selectionCallback([]);
-    //       }
-    //       const selectedHexes = hexes.filter(
-    //         (currHex) =>
-    //           currHex.x >= event.selection[0][0] - margin.left &&
-    //           currHex.x <= event.selection[1][0] - margin.left &&
-    //           currHex.y >= event.selection[0][1] - margin.top &&
-    //           currHex.y <= event.selection[1][1] - margin.top,
-    //       );
-    //       const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
-    //       selectionCallback(allSelectedPoints);
-    //       console.log(event, this);
-    //       d3.select(this).call(brush.move, null);
-    //     }),
-    //   );
-    // }, [width, height, id, hexes, selectionCallback]);
+    }, [id, xScale, yScale, height, width, config.dragMode]);
+    // // apply brushing
+    useEffect(() => {
+        if (config.dragMode !== EScatterSelectSettings.RECTANGLE) {
+            d3.select(`#${id}brush`).selectAll('rect').remove();
+            return;
+        }
+        const brush = d3.brush().extent([
+            [margin.left, margin.top],
+            [margin.left + width, margin.top + height],
+        ]);
+        d3.select(`#${id}brush`).call(brush.on('end', function (event) {
+            if (!event.sourceEvent)
+                return;
+            if (!event.selection) {
+                selectionCallback([]);
+            }
+            const selectedHexes = hexes.filter((currHex) => currHex.x >= event.selection[0][0] - margin.left &&
+                currHex.x <= event.selection[1][0] - margin.left &&
+                currHex.y >= event.selection[0][1] - margin.top &&
+                currHex.y <= event.selection[1][1] - margin.top);
+            const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
+            selectionCallback(allSelectedPoints);
+            d3.select(this).call(brush.move, null);
+        }));
+    }, [width, height, id, hexes, selectionCallback, config.dragMode]);
     return (React.createElement("div", { ref: ref, className: "mw-100" },
         React.createElement("svg", { id: id, style: { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom } },
             React.createElement("defs", null,
                 React.createElement("clipPath", { id: "clip" },
                     React.createElement("rect", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` }, width: width, height: height }))),
             React.createElement("g", { clipPath: "url(#clip)" },
-                React.createElement("g", { id: `${id}brush`, style: { transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` } },
-                    React.createElement("g", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` } }, hexObjects))),
-            React.createElement(XAxis, { vertPosition: height + margin.top, yRange: [margin.top, height + margin.top], domain: xZoomedScaleDomain || (xScale === null || xScale === void 0 ? void 0 : xScale.domain()), range: [margin.left, width + margin.left] }),
-            React.createElement(YAxis, { horizontalPosition: margin.left, xRange: [margin.left, width + margin.left], domain: yZoomedScaleDomain || (yScale === null || yScale === void 0 ? void 0 : yScale.domain()), range: [margin.top, height + margin.top] }),
+                React.createElement("g", { id: `${id}brush` },
+                    React.createElement("g", { style: { transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` } },
+                        React.createElement("g", null, hexObjects)))),
+            xScale ? (React.createElement(XAxis, { vertPosition: height + margin.top, horizontalPosition: margin.left, yRange: [margin.top, height + margin.top], xScale: xZoomedScale.current || xScale })) : null,
+            yScale ? (React.createElement(YAxis, { vertPosition: margin.top, horizontalPosition: margin.left, xRange: [margin.left, width + margin.left], yScale: yZoomedScale.current || yScale })) : null,
             React.createElement("text", { style: {
                     dominantBaseline: 'middle',
                     textAnchor: 'middle',

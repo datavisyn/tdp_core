@@ -1,8 +1,8 @@
 /// <reference types="react" />
-export declare function XAxis({ domain, range, yRange, vertPosition }: {
-    domain?: number[];
-    range?: number[];
+export declare function XAxis({ xScale, yRange, vertPosition, horizontalPosition }: {
+    xScale: any;
     yRange: any;
-    vertPosition?: number;
+    vertPosition: any;
+    horizontalPosition: any;
 }): JSX.Element;
 //# sourceMappingURL=XAxis.d.ts.map

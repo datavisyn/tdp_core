@@ -24,7 +24,7 @@ export function SingleHex({ hexbinOption, hexData, d3Hexbin, isSizeScale, radius
             }
         }
         return highestCategory;
-    }, []);
+    }, [catMap]);
     const hexDivisor = hexData.length / 6;
     let counter = 0;
     return (React.createElement(React.Fragment, null,

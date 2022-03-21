@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { DensityVisSidebar } from './DensityVisSidebar';
 // eslint-disable-next-line import/no-cycle
 import { HexagonalBin } from './HexagonalBin';
+import { HexBrushOptions } from '../sidebar/HexBrushOptions';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -24,7 +25,10 @@ export function DensityVis({ config, extensions, columns, setConfig, selectionCa
                     }
                     return React.createElement("div", null, "hello world");
                 });
-            })) : (React.createElement(HexagonalBin, { selectionCallback: selectionCallback, selected: selected, config: config, columns: columns })),
+            })) : (React.createElement(React.Fragment, null,
+                React.createElement("div", { className: "position-absolute" },
+                    React.createElement(HexBrushOptions, { callback: (dragMode) => setConfig({ ...config, dragMode }), dragMode: config.dragMode })),
+                React.createElement(HexagonalBin, { selectionCallback: selectionCallback, selected: selected, config: config, columns: columns }))),
             mergedExtensions.postPlot),
         !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${id}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },

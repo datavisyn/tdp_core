@@ -1,17 +1,15 @@
-import * as d3 from 'd3v7';
 import * as React from 'react';
 import { useMemo } from 'react';
 // code taken from https://wattenberger.com/blog/react-and-d3
-export function XAxis({ domain = [0, 100], range = [10, 290], yRange, vertPosition = 0 }) {
+export function XAxis({ xScale, yRange, vertPosition, horizontalPosition }) {
     const ticks = useMemo(() => {
-        const xScale = d3.scaleLinear().domain(domain).range(range);
         return xScale.ticks(5).map((value) => ({
             value,
             xOffset: xScale(value),
         }));
-    }, [domain, range]);
+    }, [xScale]);
     return (React.createElement(React.Fragment, null,
-        React.createElement("path", { transform: `translate(0, ${vertPosition})`, d: ['M', range[0], 0, 'H', range[1]].join(' '), fill: "none", stroke: "currentColor" }),
+        React.createElement("path", { transform: `translate(0, ${vertPosition})`, d: ['M', xScale.range()[0], 0, 'H', xScale.range()[1]].join(' '), fill: "none", stroke: "currentColor" }),
         ticks.map(({ value, xOffset }) => (React.createElement("g", { key: value, transform: `translate(${xOffset}, ${vertPosition})` },
             React.createElement("line", { y2: "6", stroke: "currentColor" }),
             React.createElement("line", { y2: `${-(yRange[1] - yRange[0])}`, stroke: `${value === 0 ? 'black' : 'lightgray'}` }),

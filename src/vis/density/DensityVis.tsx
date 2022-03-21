@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
 import { useMemo } from 'react';
-import { VisColumn, IVisConfig, IDensityConfig } from '../interfaces';
+import { VisColumn, IVisConfig, IDensityConfig, EScatterSelectSettings } from '../interfaces';
 import { DensityVisSidebar } from './DensityVisSidebar';
 // eslint-disable-next-line import/no-cycle
 import { HexagonalBin } from './HexagonalBin';
+import { BrushOptionButtons } from '../sidebar';
+import { HexBrushOptions } from '../sidebar/HexBrushOptions';
 
 interface DensityVisProps {
   config: IDensityConfig;
@@ -59,7 +61,12 @@ export function DensityVis({ config, extensions, columns, setConfig, selectionCa
             });
           })
         ) : (
-          <HexagonalBin selectionCallback={selectionCallback} selected={selected} config={config} columns={columns} />
+          <>
+            <div className="position-absolute">
+              <HexBrushOptions callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
+            </div>
+            <HexagonalBin selectionCallback={selectionCallback} selected={selected} config={config} columns={columns} />
+          </>
         )}
         {mergedExtensions.postPlot}
       </div>

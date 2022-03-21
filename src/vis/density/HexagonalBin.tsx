@@ -1,15 +1,13 @@
-import { selection } from 'd3';
 import * as hex from 'd3-hexbin';
 import * as d3 from 'd3v7';
-import { D3BrushEvent } from 'd3v7';
+import { D3ZoomEvent } from 'd3v7';
 import { uniqueId } from 'lodash';
 import * as React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAsync } from '../../hooks/useAsync';
-import { VisColumn, IDensityConfig } from '../interfaces';
-import { PieChart } from './PieChart';
+import { VisColumn, IDensityConfig, EScatterSelectSettings } from '../interfaces';
 import { SingleHex } from './SingleHex';
-import { cutHex, getHexData } from './utils';
+import { getHexData } from './utils';
 import { XAxis } from './XAxis';
 import { YAxis } from './YAxis';
 
@@ -61,8 +59,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
   const ref = useRef(null);
   const [height, setHeight] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
-  const [xZoomedScaleDomain, setXZoomedScaleDomain] = useState(null);
-  const [yZoomedScaleDomain, setYZoomedScaleDomain] = useState(null);
+  const xZoomedScale = useRef<d3.ScaleLinear<number, number, never>>(null);
+  const yZoomedScale = useRef<d3.ScaleLinear<number, number, never>>(null);
   const [xZoomTransform, setXZoomTransform] = useState(0);
   const [yZoomTransform, setYZoomTransform] = useState(0);
   const [zoomScale, setZoomScale] = useState(1);
@@ -143,7 +141,10 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
       const min = d3.min<number>(currentX.allValues.map((c) => c.val as number));
       const max = d3.max<number>(currentX.allValues.map((c) => c.val as number));
 
-      return d3.scaleLinear().domain([min, max]).range([0, width]);
+      return d3
+        .scaleLinear()
+        .domain([min, max])
+        .range([margin.left, margin.left + width]);
     }
 
     return null;
@@ -155,7 +156,10 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
       const min = d3.min<number>(currentY.allValues.map((c) => c.val as number));
       const max = d3.max<number>(currentY.allValues.map((c) => c.val as number));
 
-      return d3.scaleLinear().domain([min, max]).range([height, 0]);
+      return d3
+        .scaleLinear()
+        .domain([min, max])
+        .range([margin.top + height, margin.top]);
     }
 
     return null;
@@ -253,13 +257,16 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     );
   }, [colorScale, config.hexRadius, config.isOpacityScale, config.isSizeScale, d3Hexbin, hexes, opacityScale, radiusScale, selected, config.hexbinOptions]);
 
-  // apply zoom/panning
+  // // apply zoom/panning
   useEffect(() => {
-    if (!xScale || !yScale) {
+    const zoom = d3.zoom();
+
+    if (!xScale || !yScale || config.dragMode === EScatterSelectSettings.RECTANGLE) {
+      d3.select(`#${id}`).call(zoom).on('zoom', null);
       return;
     }
 
-    const zoom = d3.zoom().on('zoom', (event) => {
+    zoom.on('zoom', (event: D3ZoomEvent<any, any>) => {
       const { transform } = event;
 
       setZoomScale(transform.k);
@@ -269,44 +276,48 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
       const newX = transform.rescaleX(xScale);
       const newY = transform.rescaleY(yScale);
 
-      setXZoomedScaleDomain(newX.domain());
-      setYZoomedScaleDomain(newY.domain());
+      xZoomedScale.current = newX;
+      yZoomedScale.current = newY;
     });
 
-    d3.select(`#${id}`).call(d3.zoom().on('zoom', null));
     d3.select(`#${id}`).call(zoom);
-  }, [id, xScale, yScale, zoomScale, xZoomTransform, yZoomTransform, height, width]);
+  }, [id, xScale, yScale, height, width, config.dragMode]);
 
-  // apply brushing
-  // useEffect(() => {
-  //   const brush = d3.brush().extent([
-  //     [margin.left, margin.top],
-  //     [margin.left + width, margin.top + height],
-  //   ]);
+  // // apply brushing
+  useEffect(() => {
+    if (config.dragMode !== EScatterSelectSettings.RECTANGLE) {
+      d3.select(`#${id}brush`).selectAll('rect').remove();
+      return;
+    }
 
-  //   d3.select(`#${id}brush`).call(
-  //     brush.on('end', function (event) {
-  //       if (!event.sourceEvent) return;
-  //       if (!event.selection) {
-  //         selectionCallback([]);
-  //       }
-  //       const selectedHexes = hexes.filter(
-  //         (currHex) =>
-  //           currHex.x >= event.selection[0][0] - margin.left &&
-  //           currHex.x <= event.selection[1][0] - margin.left &&
-  //           currHex.y >= event.selection[0][1] - margin.top &&
-  //           currHex.y <= event.selection[1][1] - margin.top,
-  //       );
+    const brush = d3.brush().extent([
+      [margin.left, margin.top],
+      [margin.left + width, margin.top + height],
+    ]);
 
-  //       const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
+    d3.select(`#${id}brush`).call(
+      brush.on('end', function (event) {
+        if (!event.sourceEvent) return;
+        if (!event.selection) {
+          selectionCallback([]);
+        }
 
-  //       selectionCallback(allSelectedPoints);
+        const selectedHexes = hexes.filter(
+          (currHex) =>
+            currHex.x >= event.selection[0][0] - margin.left &&
+            currHex.x <= event.selection[1][0] - margin.left &&
+            currHex.y >= event.selection[0][1] - margin.top &&
+            currHex.y <= event.selection[1][1] - margin.top,
+        );
 
-  //       console.log(event, this);
-  //       d3.select(this).call(brush.move, null);
-  //     }),
-  //   );
-  // }, [width, height, id, hexes, selectionCallback]);
+        const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
+
+        selectionCallback(allSelectedPoints);
+
+        d3.select(this).call(brush.move, null);
+      }),
+    );
+  }, [width, height, id, hexes, selectionCallback, config.dragMode]);
 
   return (
     <div ref={ref} className="mw-100">
@@ -317,22 +328,29 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
           </clipPath>
         </defs>
         <g clipPath="url(#clip)">
-          <g id={`${id}brush`} style={{ transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` }}>
-            <g style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }}>{hexObjects}</g>
+          <g id={`${id}brush`}>
+            <g style={{ transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` }}>
+              <g>{hexObjects}</g>
+            </g>
           </g>
         </g>
-        <XAxis
-          vertPosition={height + margin.top}
-          yRange={[margin.top, height + margin.top]}
-          domain={xZoomedScaleDomain || xScale?.domain()}
-          range={[margin.left, width + margin.left]}
-        />
-        <YAxis
-          horizontalPosition={margin.left}
-          xRange={[margin.left, width + margin.left]}
-          domain={yZoomedScaleDomain || yScale?.domain()}
-          range={[margin.top, height + margin.top]}
-        />
+        {xScale ? (
+          <XAxis
+            vertPosition={height + margin.top}
+            horizontalPosition={margin.left}
+            yRange={[margin.top, height + margin.top]}
+            xScale={xZoomedScale.current || xScale}
+          />
+        ) : null}
+        {yScale ? (
+          <YAxis
+            vertPosition={margin.top}
+            horizontalPosition={margin.left}
+            xRange={[margin.left, width + margin.left]}
+            yScale={yZoomedScale.current || yScale}
+          />
+        ) : null}
+
         <text
           style={{
             dominantBaseline: 'middle',
@@ -340,7 +358,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             transform: `translate(${margin.left + width / 2}px, ${margin.top + height + 30}px)`,
           }}
         >
-         {config.numColumnsSelected[0]?.name}
+          {config.numColumnsSelected[0]?.name}
         </text>
         <text
           style={{
@@ -349,7 +367,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             transform: `translate(10px, ${margin.top + height / 2}px) rotate(-90deg)`,
           }}
         >
-         {config.numColumnsSelected[1]?.name}
+          {config.numColumnsSelected[1]?.name}
         </text>
       </svg>
       <div className="position-absolute" style={{ left: margin.left + width, top: margin.top }}>

@@ -57,7 +57,7 @@ export function SingleHex({
     }
 
     return highestCategory;
-  }, []);
+  }, [catMap]);
 
   const hexDivisor = hexData.length / 6;
 

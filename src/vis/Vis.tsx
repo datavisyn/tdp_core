@@ -82,6 +82,7 @@ export function Vis({
           isSizeScale: false,
           hexRadius: 16,
           hexbinOptions: EHexbinOptions.COLOR,
+          dragMode: EScatterSelectSettings.PAN,
         }
       : {
           type: ESupportedPlotlyVis.BAR,

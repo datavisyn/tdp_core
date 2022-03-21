@@ -105,6 +105,7 @@ export interface IDensityConfig {
   hexRadius: number;
   isOpacityScale: boolean;
   isSizeScale: boolean;
+  dragMode: EScatterSelectSettings;
   hexbinOptions: EHexbinOptions;
 }
 

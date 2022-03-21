@@ -1,8 +1,8 @@
 /// <reference types="react" />
-export declare function YAxis({ domain, range, xRange, horizontalPosition }: {
-    domain?: number[];
-    range?: number[];
+export declare function YAxis({ yScale, xRange, vertPosition, horizontalPosition }: {
+    yScale: any;
     xRange: any;
-    horizontalPosition?: number;
+    vertPosition: any;
+    horizontalPosition: any;
 }): JSX.Element;
 //# sourceMappingURL=YAxis.d.ts.map
