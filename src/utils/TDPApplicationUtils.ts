@@ -1,7 +1,7 @@
-import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../provenance';
+import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../clue/provenance';
 import { BaseUtils } from '../base';
 import { I18nextManager } from '../i18n';
-import { Compression } from '../base/Compression';
+import { Compression } from '../clue/base/Compression';
 import { EPermission, ISecureItem, Permission, UserUtils } from '../security';
 import { UserSession } from '../app';
 

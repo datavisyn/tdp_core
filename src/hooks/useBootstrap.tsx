@@ -103,7 +103,6 @@ function BSClass<
   return function InnerBSClass({
     children,
     instanceRef,
-    // @ts-ignore Typescript does not allow spreading of generic parameters yet: https://github.com/microsoft/TypeScript/issues/10727
     ...options
   }: {
     /**
@@ -126,7 +125,9 @@ function BSClass<
     }, [instance]);
 
     // Call the optional additional hook with all options
-    additionalHook?.(instance, options);
+    // Introduced in TS4
+    // https://stackoverflow.com/questions/56675333/extending-a-union-type-exactly
+    additionalHook?.(instance, options as AdditionalHookOptions);
 
     const callbackRef = React.useCallback(
       (wrapperRef) => {

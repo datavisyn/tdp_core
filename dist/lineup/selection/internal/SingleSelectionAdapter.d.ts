@@ -19,7 +19,7 @@ export declare class SingleSelectionAdapter extends ABaseSelectionAdapter {
     private readonly adapter;
     constructor(adapter: ISingleSelectionAdapter);
     protected parameterChangedImpl(context: IContext): Promise<void>;
-    protected createColumnsFor(context: IContext, id: string): PromiseLike<{
+    protected createColumnsFor(context: IContext, id: string): Promise<{
         desc: IAdditionalColumnDesc;
         data: Promise<IScoreRow<any>[]>;
         id: string;

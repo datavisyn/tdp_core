@@ -2,7 +2,6 @@ import { difference } from 'lodash';
 import { IContext } from '../ISelectionAdapter';
 import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
-import { ResolveNow } from '../../../base';
 
 export interface IMultiSelectionAdapter {
   /**
@@ -41,7 +40,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
 
   protected createColumnsFor(context: IContext, id: string) {
     const selectedSubTypes = this.adapter.getSelectedSubTypes();
-    return ResolveNow.resolveImmediately(this.adapter.createDescs(id, selectedSubTypes)).then((descs) => {
+    return Promise.resolve(this.adapter.createDescs(id, selectedSubTypes)).then((descs) => {
       if (descs.length <= 0) {
         return [];
       }

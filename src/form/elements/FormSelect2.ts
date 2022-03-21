@@ -1,10 +1,11 @@
+import { merge } from 'lodash';
 import 'select2';
 import * as d3 from 'd3';
 import $ from 'jquery';
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
 import { AppContext } from '../../app';
-import { IPluginDesc, BaseUtils } from '../../base';
+import { IPluginDesc } from '../../base';
 
 declare type IFormSelect2Options = Select2Options & {
   return?: 'text' | 'id';
@@ -161,7 +162,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
       select2Options.multiple = true;
       select2Options.allowClear = true;
     }
-    BaseUtils.mixin(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, { data });
+    merge(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, { data });
 
     this.$jqSelect = (<any>$($select.node())).select2(select2Options).val(initialValue).trigger('change');
     // force the old value from initial

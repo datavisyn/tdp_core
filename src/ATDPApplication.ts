@@ -1,19 +1,20 @@
-import { AppHeaderLink, AppHeader } from './components';
 // TODO: Do we need a relative import?
 import './webpack/_bootstrap';
-import { EditProvenanceGraphMenu } from './utils/EditProvenanceGraphMenu';
-import { DialogUtils } from './base/dialogs';
+import { merge } from 'lodash';
+import { AppHeaderLink, AppHeader } from './components';
+import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
+import { DialogUtils } from './clue/base/dialogs';
 import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
 import { IAppExtensionExtension } from './base/interfaces';
 import { TourManager } from './tour/TourManager';
-import { TemporarySessionList } from './utils/SessionList';
+import { TemporarySessionList, ButtonModeSelector, CLUEGraphManager } from './clue';
 import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
-import { ACLUEWrapper } from './wrapper/ACLUEWrapper';
-import { LoginMenu, Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager } from './base';
+import { ACLUEWrapper } from './clue/wrapper';
+import { LoginMenu, Ajax } from './base';
 import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';
-import { IMixedStorageProvenanceGraphManagerOptions, MixedStorageProvenanceGraphManager, ProvenanceGraph } from './provenance';
-import { VisLoader } from './provvis';
+import { IMixedStorageProvenanceGraphManagerOptions, MixedStorageProvenanceGraphManager, ProvenanceGraph } from './clue/provenance';
+import { VisLoader } from './clue/provvis';
 
 export interface ITDPOptions {
   /**
@@ -140,7 +141,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
 
-    BaseUtils.mixin(this.options, options);
+    merge(this.options, options);
 
     this.initialize();
   }
@@ -207,7 +208,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     }
     // Otherwise, load and merge the configuration into the existing one.
     const parsedConfig = await ATDPApplication.loadClientConfig();
-    options.clientConfig = BaseUtils.mixin(options?.clientConfig || {}, parsedConfig || {});
+    options.clientConfig = merge(options?.clientConfig || {}, parsedConfig || {});
     return options;
   }
 

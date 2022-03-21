@@ -1,5 +1,5 @@
 import { IDTypeManager } from '../idtype';
-import { BaseUtils, EventHandler, ResolveNow, WebpackEnv } from '../base';
+import { BaseUtils, EventHandler, WebpackEnv } from '../base';
 import { I18nextManager } from '../i18n';
 import { PluginRegistry } from '../app';
 import { AView } from './AView';
@@ -134,7 +134,7 @@ export class CompositeView extends EventHandler {
                 parent.active = layout;
             }
         };
-        return ResolveNow.resolveImmediately(this.createSetup()).then((setup) => {
+        return Promise.resolve(this.createSetup()).then((setup) => {
             this.setup = setup;
             const helper = this.node.ownerDocument.createElement('div');
             const links = setup.linkedSelections;

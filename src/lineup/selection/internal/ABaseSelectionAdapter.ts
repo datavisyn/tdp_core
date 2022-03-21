@@ -1,5 +1,4 @@
 import { difference } from 'lodash';
-import { ResolveNow } from '../../../base';
 import { IAdditionalColumnDesc } from '../../../base/interfaces';
 import { ISelectionColumn, IContext, ISelectionAdapter } from '../ISelectionAdapter';
 
@@ -39,7 +38,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     if (this.waitingForSelection) {
       return this.waitingForSelection;
     }
-    return (this.waitingForSelection = ResolveNow.resolveImmediately(waitForIt)
+    return (this.waitingForSelection = Promise.resolve(waitForIt)
       .then(() => this.selectionChangedImpl(context()))
       .then(() => {
         this.waitingForSelection = null;
@@ -53,7 +52,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     if (this.waitingForParameter) {
       return this.waitingForParameter;
     }
-    return (this.waitingForParameter = ResolveNow.resolveImmediately(waitForIt)
+    return (this.waitingForParameter = Promise.resolve(waitForIt)
       .then(() => {
         if (this.waitingForSelection) {
           return undefined; // abort selection more important
