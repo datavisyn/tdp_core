@@ -3,18 +3,18 @@
  */
 /// <amd-dependency path='font-awesome' />
 /// <amd-dependency path='bootstrap' />
+import { merge } from 'lodash';
 import { select } from 'd3';
 import * as d3 from 'd3';
 import { MixedStorageProvenanceGraphManager, ProvenanceGraph } from '../provenance';
-import { SelectionRecorder } from '../base/Selection';
+import { SelectionRecorder } from '../../base/Selection';
 import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
+import { VisLoader } from '../provvis/VisLoader';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { ProvenanceGraphMenu } from '../provenance/ProvenanceGraphMenu';
-import { LoginMenu } from '../base/LoginMenu';
+import { LoginMenu } from '../../base/LoginMenu';
 import { ACLUEWrapper } from './ACLUEWrapper';
-import { AppHeader, AppHeaderLink } from '../components';
-import { BaseUtils, ResolveNow } from '../base';
-import { VisLoader } from '../provvis/VisLoader';
+import { AppHeader, AppHeaderLink } from '../../components';
 export class CLUEWrapper extends ACLUEWrapper {
     constructor(body, options = {}) {
         super();
@@ -29,13 +29,13 @@ export class CLUEWrapper extends ACLUEWrapper {
             provVisCollapsed: false,
             headerOptions: {},
         };
-        BaseUtils.mixin(this.options, options);
+        merge(this.options, options);
         this.build(body, options);
         this.on('jumped_to,loaded_graph', () => this.header.ready());
     }
     buildImpl(body) {
         // create the common header
-        const headerOptions = BaseUtils.mixin(this.options.headerOptions, {
+        const headerOptions = merge(this.options.headerOptions, {
             showOptionsLink: true,
             appLink: this.options.appLink,
         });
@@ -125,7 +125,7 @@ export class CLUEWrapper extends ACLUEWrapper {
         return {
             on: (...args) => 0,
             $main,
-            graph: ResolveNow.resolveImmediately(graph),
+            graph: Promise.resolve(graph),
             jumpToStored: () => 0,
         };
     }
