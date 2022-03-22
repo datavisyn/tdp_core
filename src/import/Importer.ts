@@ -1,12 +1,9 @@
-/**
- * Created by Samuel Gratzl on 29.09.2016.
- */
-
 import * as d3 from 'd3';
+import { merge } from 'lodash';
 import { ParserUtils } from './parser';
-import { ValueTypeEditor } from '../valuetype/valuetypes';
+import { ValueTypeEditor } from './valuetype/valuetypes';
 import { ImportUtils } from './ImportUtils';
-import { EventHandler, BaseUtils } from '../base';
+import { EventHandler } from '../base';
 import { IDataDescription } from '../data';
 
 export interface IImporterOptions {
@@ -27,7 +24,7 @@ export class Importer extends EventHandler {
 
   constructor(parent: Element, options: IImporterOptions = {}) {
     super();
-    BaseUtils.mixin(this.options, options);
+    merge(this.options, options);
     this.$parent = d3.select(parent).append('div').classed('caleydo-importer', true);
 
     this.build(this.$parent);

@@ -1,5 +1,5 @@
 import type { IViewContext, ISelection, IViewPluginDesc, IInstanceViewExtensionDesc, IBaseViewPluginDesc, IGroupData } from '../base/interfaces';
-import type { IObjectRef, ProvenanceGraph } from '../provenance';
+import type { IObjectRef, ProvenanceGraph } from '../clue/provenance';
 import type { VisynViewPluginDesc } from './visyn/interfaces';
 import { IDType } from '../idtype';
 import { IPluginDesc } from '../base/plugin';

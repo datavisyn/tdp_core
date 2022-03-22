@@ -8,7 +8,7 @@
  * Proprietary and confidential. No warranty.
  *
  ******************************************************** */
-import { BaseUtils } from '../../../base/BaseUtils';
+import { merge } from 'lodash';
 export class ATrack {
     constructor(data, options = {}) {
         this.data = data;
@@ -24,7 +24,7 @@ export class ATrack {
             backgroundColor: '',
             title: '',
         };
-        BaseUtils.mixin(this.options, options);
+        merge(this.options, options);
         this.node = document.createElement('div');
         this.node.classList.add('track');
         this.node.style.marginLeft = `${this.options.margin.left}px`;

@@ -1,7 +1,6 @@
 import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { UserSession } from '../../app';
-import { ResolveNow } from '../../base';
 /**
  * Select form element instance
  * Propagates the changes from the DOM select element using the internal `change` event
@@ -161,10 +160,10 @@ export class FormSelect extends AFormElement {
     }
     static resolveData(data) {
         if (data === undefined) {
-            return () => ResolveNow.resolveImmediately([]);
+            return () => Promise.resolve([]);
         }
         if (Array.isArray(data)) {
-            return () => ResolveNow.resolveImmediately(data.map(this.toOption));
+            return () => Promise.resolve(data.map(this.toOption));
         }
         if (data instanceof Promise) {
             return () => data.then((r) => r.map(this.toOption));
@@ -176,9 +175,9 @@ export class FormSelect extends AFormElement {
                 return r.then((a) => a.map(this.toOption));
             }
             if (Array.isArray(r)) {
-                return ResolveNow.resolveImmediately(r.map(this.toOption));
+                return Promise.resolve(r.map(this.toOption));
             }
-            return ResolveNow.resolveImmediately(r);
+            return Promise.resolve(r);
         };
     }
 }

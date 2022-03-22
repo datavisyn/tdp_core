@@ -15,4 +15,5 @@ export declare class I18nextManager {
     private static instance;
     static getInstance(): I18nextManager;
 }
+export declare const i18n: I18nextManager;
 //# sourceMappingURL=I18nextManager.d.ts.map

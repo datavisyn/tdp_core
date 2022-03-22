@@ -1,4 +1,5 @@
 import { EngineRenderer, defaultOptions, isGroup, LocalDataProvider, deriveColors, TaggleRenderer, spaceFillingRule, updateLodRules, } from 'lineupjs';
+import { merge } from 'lodash';
 import { AView } from '../views/AView';
 import { EViewMode } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -14,7 +15,7 @@ import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
-import { BaseUtils, debounceAsync } from '../base';
+import { debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { LineupVisWrapper } from '../vis';
@@ -136,7 +137,7 @@ export class ARankingView extends AView {
         const names = options.itemName
             ? { itemNamePlural: typeof options.itemName === 'function' ? () => `${options.itemName()}s` : `${options.itemName}s` }
             : {};
-        BaseUtils.mixin(this.options, idTypeNames, names, options);
+        merge(this.options, idTypeNames, names, options);
         this.node.classList.add('lineup', 'lu-taggle', 'lu');
         this.node.insertAdjacentHTML('beforeend', `<div></div>`);
         this.stats = this.node.ownerDocument.createElement('div');
@@ -147,7 +148,7 @@ export class ARankingView extends AView {
         // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
         this.context.ref.value.data = this.provider;
         this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
-        const taggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, {
+        const taggleOptions = merge(defaultOptions(), this.options.customOptions, {
             summaryHeader: this.options.enableHeaderSummary,
             labelRotation: this.options.enableHeaderRotation ? 45 : 0,
         }, options.customOptions);

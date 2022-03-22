@@ -155,26 +155,11 @@ export default function (registry) {
     /* phovea_core */
     /// #if include('datatype', 'graph')
     registry.push('datatype', 'graph', function () {
-        return import('./graph/GraphProxy').then((m) => m.GraphProxy);
+        return import('./clue/graph/GraphProxy').then((m) => m.GraphProxy);
     }, {
         factory: 'create',
     });
     /// #endif
-    /// #if include('tabSyncer', 'selection')
-    registry.push('tabSyncer', 'selection', function () {
-        return import('./sync/SelectionSyncer').then((m) => m.SelectionSyncerOptionUtils);
-    }, {
-        factory: 'create',
-    });
-    /* tdp_react */
-    registry.push('tdpView', 'dummy_react', function () {
-        return import('./dummy/DummyReactView');
-    }, {
-        name: 'Dummy React View',
-        factory: 'new DummyReactView',
-        idtype: 'IDTypeA',
-        selection: 'some',
-    });
     /* tdp_matomo */
     registry.push(EP_PHOVEA_CORE_LOGIN, 'matomoLogin', () => import('./app/Matomo').then((m) => m.Matomo), {
         factory: 'trackLogin',
@@ -187,42 +172,42 @@ export default function (registry) {
     });
     /* phovea_importer */
     registry.push('importer_value_type', 'boolean', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
         factory: 'boolean',
         name: 'Boolean',
-        priority: 30,
+        priority: 30, // test first for boolean then for categorical
     });
     registry.push('importer_value_type', 'categorical', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
         factory: 'categorical',
         name: 'Categorical',
-        priority: 40,
+        priority: 40, // test first for boolean then for categorical
     });
     registry.push('importer_value_type', 'real', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
         factory: 'numerical',
         name: 'Float',
         priority: 10,
     });
     registry.push('importer_value_type', 'int', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
         factory: 'numerical',
         name: 'Integer',
         priority: 20,
     });
     registry.push('importer_value_type', 'string', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
         factory: 'string_',
         name: 'String',
         priority: 100,
     });
     registry.push('importer_value_type', 'idType', function () {
-        return import('./valuetype/idtypes').then((v) => v.IDTypeUtils);
+        return import('./import/valuetype/idtypes').then((v) => v.IDTypeUtils);
     }, {
         factory: 'idType',
         name: 'IDType',
@@ -260,6 +245,5 @@ export default function (registry) {
       },
     });
     */
-    /// #endif
 }
 //# sourceMappingURL=phovea.js.map
