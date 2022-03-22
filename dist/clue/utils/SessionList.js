@@ -1,13 +1,13 @@
 import { select, event } from 'd3';
 import $ from 'jquery';
-import { PHOVEA_UI_FormDialog } from '../components';
-import { I18nextManager } from '../i18n';
-import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
-import { TDPApplicationUtils } from './TDPApplicationUtils';
-import { NotificationHandler } from '../base/NotificationHandler';
+import { PHOVEA_UI_FormDialog } from '../../components';
+import { I18nextManager } from '../../i18n';
+import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
+import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
+import { NotificationHandler } from '../../base/NotificationHandler';
 import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
-import { GlobalEventHandler } from '../base';
-import { UniqueIdManager, UserSession } from '../app';
+import { GlobalEventHandler } from '../../base';
+import { UniqueIdManager, UserSession } from '../../app';
 class ASessionList {
     constructor(parent, graphManager, mode = 'table') {
         this.parent = parent;

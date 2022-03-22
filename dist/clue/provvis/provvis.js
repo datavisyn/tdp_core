@@ -1,16 +1,14 @@
-// TODO: Why?
-import '../webpack/_bootstrap';
 import * as d3 from 'd3';
-import { ModeWrapper } from '../base/mode';
-import { Dialog } from '../components';
+import { merge } from 'lodash';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { ActionMetaData, SlideNode } from '../provenance';
 import { AVisInstance } from './visInstance';
-import { SelectionUtils, SelectOperation } from '../idtype';
-import { BaseUtils } from '../base';
-import { AppContext, DnDUtils } from '../app';
-import { I18nextManager } from '../i18n';
+import { SelectionUtils, SelectOperation } from '../../idtype';
+import { AppContext, DnDUtils } from '../../app';
+import { I18nextManager } from '../../i18n';
+import { Dialog } from '../../components/dialogs';
+import { ModeWrapper } from '../base/mode';
 const DOI_LARGE = 0.9;
 const DOI_MEDIUM = 0.7;
 const DOI_SMALL = 0.4;
@@ -297,8 +295,8 @@ export class LayoutedProvVis extends AVisInstance {
         this.data = data;
         this.parent = parent;
         this.options = options;
-        this.trigger = BaseUtils.bind(this.update, this);
-        this.triggerStoryHighlight = BaseUtils.bind(this.updateStoryHighlight, this);
+        this.trigger = this.update.bind(this);
+        this.triggerStoryHighlight = this.updateStoryHighlight.bind(this);
         this.onStateAdded = (event, state) => {
             state.on('setAttr', this.trigger);
         };
@@ -335,7 +333,7 @@ export class LayoutedProvVis extends AVisInstance {
             },
             tags: [],
         };
-        this.options = BaseUtils.mixin({
+        this.options = merge({
             thumbnails: true,
             provVisCollapsed: false,
             hideCLUEButtonsOnCollapse: false,
@@ -395,9 +393,6 @@ export class LayoutedProvVis extends AVisInstance {
         this.fire(`option.${name}`, val, this.options[name]);
         this.options[name] = val;
         return undefined;
-    }
-    locateImpl(range) {
-        return Promise.resolve(null);
     }
     build($parent) {
         //  scale = this.options.scale;

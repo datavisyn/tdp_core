@@ -1,8 +1,8 @@
+import { merge } from 'lodash';
 import 'select2';
 import $ from 'jquery';
 import { AFormElement } from './AFormElement';
 import { AppContext } from '../../app';
-import { BaseUtils } from '../../base';
 /**
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event
@@ -86,7 +86,7 @@ export class FormSelect2 extends AFormElement {
             select2Options.multiple = true;
             select2Options.allowClear = true;
         }
-        BaseUtils.mixin(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, { data });
+        merge(select2Options, options.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, options, { data });
         this.$jqSelect = $($select.node()).select2(select2Options).val(initialValue).trigger('change');
         // force the old value from initial
         this.previousValue = this.resolveValue(this.$jqSelect.select2('data'));

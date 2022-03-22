@@ -1,10 +1,10 @@
-import { NotificationHandler } from '../base/NotificationHandler';
-import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
+import { NotificationHandler } from '../../base/NotificationHandler';
+import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
 import { TemporarySessionList, PersistentSessionList } from './SessionList';
 import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
-import { GlobalEventHandler, PropertyHandler } from '../base';
-import { I18nextManager } from '../i18n';
-import { Dialog, PHOVEA_UI_FormDialog } from '../components';
+import { GlobalEventHandler, PropertyHandler } from '../../base';
+import { I18nextManager } from '../../i18n';
+import { Dialog, PHOVEA_UI_FormDialog } from '../../components';
 export class EditProvenanceGraphMenu {
     constructor(manager, parent) {
         this.manager = manager;

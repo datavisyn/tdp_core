@@ -1,9 +1,9 @@
-import { UserSession } from '../app';
-import { BaseUtils } from '../base';
-import { PHOVEA_UI_FormDialog } from '../components';
-import { I18nextManager } from '../i18n';
-import { EEntity } from '../security';
-import { TDPApplicationUtils } from './TDPApplicationUtils';
+import { merge, uniqueId } from 'lodash';
+import { UserSession } from '../../app';
+import { PHOVEA_UI_FormDialog } from '../../components';
+import { I18nextManager } from '../../i18n';
+import { EEntity } from '../../security';
+import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
 export class ProvenanceGraphMenuUtils {
     static isPersistent(d) {
         return d.local === false || d.local === undefined;
@@ -20,14 +20,14 @@ export class ProvenanceGraphMenuUtils {
         return UserSession.getInstance().hasPermission(d, EEntity.OTHERS);
     }
     static editProvenanceGraphMetaData(d, args = {}) {
-        args = BaseUtils.mixin({
+        args = merge({
             button: I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.save'),
             title: `<i class="fas fa-edit" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.editSessionDetails')}`,
             permission: true,
             name: d.name,
         }, args);
         const dialog = new PHOVEA_UI_FormDialog(args.title, args.button, undefined, 'modal-lg');
-        const prefix = `d${BaseUtils.randomId()}`;
+        const prefix = `d${uniqueId()}`;
         const permissions = TDPApplicationUtils.permissionForm(d, {
             extra: `<div class="form-text">
           ${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.isPublicMessage')}
