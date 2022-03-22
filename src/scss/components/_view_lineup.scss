@@ -148,6 +148,12 @@ $lu_assets: "~lineupjs/src/assets";
     }
   }
 
+  .custom-vis-panel {
+    display: none;
+    width: 70%;
+    flex-direction: column;
+  }
+
   .lu-side-panel-wrapper {
     display: flex;
     flex-direction: column;
@@ -470,6 +476,7 @@ $lu_assets: "~lineupjs/src/assets";
 
       &.once .lu-search {
         left: -1.2em;
+        top: 2em;
       }
 
       &.once::before {

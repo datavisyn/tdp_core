@@ -1,5 +1,5 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
-import { ProvenanceGraph } from '../provenance';
+import { ProvenanceGraph } from '../clue/provenance';
 import { ARankingView } from '../lineup/ARankingView';
 import { IARankingViewOptions } from '../lineup/IARankingViewOptions';
 import { IViewProviderLocal } from '../lineup/internal/cmds';

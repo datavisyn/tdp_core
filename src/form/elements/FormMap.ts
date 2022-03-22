@@ -1,3 +1,4 @@
+import { merge } from 'lodash';
 import 'select2';
 import { event as d3event } from 'd3';
 import $ from 'jquery';
@@ -9,7 +10,7 @@ import { FormSelect2 } from './FormSelect2';
 import type { IFormElement } from '..';
 import { ISelect3Options, Select3, IdTextPair } from './Select3';
 import { UserSession } from '../../app';
-import { IPluginDesc, ResolveNow, BaseUtils } from '../../base';
+import { IPluginDesc } from '../../base';
 import { I18nextManager } from '../../i18n';
 
 export interface ISubDesc {
@@ -97,7 +98,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 
   private updateBadge() {
     const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
-    ResolveNow.resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
+    Promise.resolve(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
       this.$inputNode
         .select('span.badge')
         .html(text)
@@ -296,7 +297,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           const s = parent.firstElementChild;
           const $s = <any>$(s);
           // merge only the default options if we have no local data
-          $s.select2(BaseUtils.mixin({}, desc.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, desc));
+          $s.select2(merge({}, desc.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, desc));
           const $searchContainer = $('.select2.select2-container', parent);
           const $search = $searchContainer.find('input');
           $search.attr('data-testid', 'select2-search-field');

@@ -64,21 +64,6 @@ def resolve_view(database, view_name, check_default_security=False):
   return connector, engine, view
 
 
-def assign_ids(rows, idtype):
-  """
-  assigns unique ids (stored in '_id') based on the 'id' column and given idtype
-  :param rows: the rows having an 'id' column each
-  :param idtype: the idtype to resolve the id
-  :return: the extended rows
-  """
-  import phovea_server.plugin
-
-  manager = phovea_server.plugin.lookup('idmanager')
-  for _id, row in zip(manager((r['id'] for r in rows), idtype), rows):
-    row['_id'] = _id
-  return rows
-
-
 def to_query(q, supports_array_parameter, parameters):
   """
   converts to the native SQL query using sqlalchemy + handling of array parameters

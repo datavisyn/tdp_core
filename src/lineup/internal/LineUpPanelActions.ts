@@ -78,6 +78,8 @@ export class LineUpPanelActions extends EventHandler {
 
   static readonly EVENT_ZOOM_IN = 'zoomIn';
 
+  static readonly EVENT_OPEN_VIS = 'openVis';
+
   static readonly EVENT_TOGGLE_OVERVIEW = 'toggleOverview';
 
   static readonly EVENT_SAVE_NAMED_SET = 'saveNamedSet';
@@ -249,6 +251,15 @@ export class LineUpPanelActions extends EventHandler {
         onClick: () => this.fire(LineUpPanelActions.EVENT_ZOOM_OUT),
       });
       this.header.addButton(zoomOutButton, EPanelHeaderToolbar.CENTER);
+    }
+
+    if (this.options.enableVisPanel) {
+      const customVis = new PanelButton(buttons, {
+        title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.openVis'),
+        faIcon: 'fas fa-chart-bar',
+        onClick: () => this.fire(LineUpPanelActions.EVENT_OPEN_VIS),
+      });
+      this.header.addButton(customVis, EPanelHeaderToolbar.END);
     }
 
     if (this.options.enableOverviewMode) {

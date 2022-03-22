@@ -38,6 +38,7 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
   const [status, setStatus] = React.useState<useAsyncStatus>('idle');
   const [value, setValue] = React.useState<T | null>(null);
   const [error, setError] = React.useState<E | null>(null);
+  const latestPromiseRef = React.useRef<Promise<T> | null>();
   // The execute function wraps asyncFunction and
   // handles setting state for pending, value, and error.
   // useCallback ensures the below useEffect is not called
@@ -47,18 +48,24 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
       setStatus('pending');
       setValue(null);
       setError(null);
-      return Promise.resolve(asyncFunction(...args))
+      const currentPromise = Promise.resolve(asyncFunction(...args))
         .then((response: T) => {
-          setValue(response);
-          setStatus('success');
+          if (currentPromise === latestPromiseRef.current) {
+            setValue(response);
+            setStatus('success');
+          }
           return response;
         })
         .catch((e: E) => {
-          setError(e);
-          setStatus('error');
+          if (currentPromise === latestPromiseRef.current) {
+            setError(e);
+            setStatus('error');
+          }
           // eslint-disable-next-line @typescript-eslint/no-throw-literal
           throw e;
         });
+      latestPromiseRef.current = currentPromise;
+      return currentPromise;
     },
     [asyncFunction],
   );
@@ -67,7 +74,11 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
   // in an onClick handler.
   useDeepCompareEffect(() => {
     if (immediate) {
-      execute(...immediate);
+      try {
+        execute(...immediate);
+      } catch (e) {
+        // ignore any immediate error
+      }
     }
   }, [execute, immediate]);
 

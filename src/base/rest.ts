@@ -10,11 +10,8 @@ export interface IRow {
   /**
    * id, e.g. ESNGxxxx
    */
+  // TODO: Maybe use _visyn_id to avoid conflicts.
   readonly id: string;
-  /**
-   * unique internal number id, e.g. 42
-   */
-  readonly _id: number;
 
   [key: string]: any;
 }
@@ -100,7 +97,7 @@ const emptyFilters: IAllFilters = {
 };
 
 export interface ILookupItem {
-  _id: number;
+  _id?: never;
   id: string;
   text: string;
 }
@@ -145,17 +142,8 @@ export class RestBaseUtils {
 
   public static readonly REST_DB_NAMESPACE = `${RestBaseUtils.REST_NAMESPACE}/db`;
 
-  private static getTDPDataImpl(
-    database: string,
-    view: string,
-    method: 'none' | 'filter' | 'desc' | 'score' | 'count' | 'lookup',
-    params: IParams = {},
-    assignIds = false,
-  ) {
+  private static getTDPDataImpl(database: string, view: string, method: 'none' | 'filter' | 'desc' | 'score' | 'count' | 'lookup', params: IParams = {}) {
     const mmethod = method === 'none' ? '' : `/${method}`;
-    if (assignIds) {
-      params._assignids = true; // assign globally ids on the server side
-    }
     const url = `${RestBaseUtils.REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
     const encoded = Ajax.encodeParams(params);
     if (encoded && url.length + encoded.length > Ajax.MAX_URL_LENGTH) {
@@ -230,11 +218,10 @@ export class RestBaseUtils {
    * @param {string} database the database connector key
    * @param {string} view the view id
    * @param {IParams} params additional parameters
-   * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
    * @returns {Promise<T[]>}
    */
-  static getTDPData<T>(database: string, view: string, params: IParams = {}, assignIds = false): Promise<T[]> {
-    return RestBaseUtils.getTDPDataImpl(database, view, 'none', params, assignIds);
+  static getTDPData<T>(database: string, view: string, params: IParams = {}): Promise<T[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'none', params);
   }
 
   /**
@@ -242,11 +229,10 @@ export class RestBaseUtils {
    * @param {string} database the database connector key
    * @param {string} view the view id
    * @param {IParams} params additional parameters
-   * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
    * @returns {Promise<IRow[]>}
    */
-  static getTDPRows(database: string, view: string, params: IParams = {}, assignIds = false): Promise<IRow[]> {
-    return RestBaseUtils.getTDPDataImpl(database, view, 'none', params, assignIds);
+  static getTDPRows(database: string, view: string, params: IParams = {}): Promise<IRow[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'none', params);
   }
 
   /**
@@ -266,11 +252,10 @@ export class RestBaseUtils {
    * @param {string} view the view id
    * @param {IParams} params additional parameters
    * @param {IParams} filters filters to use
-   * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
    * @returns {Promise<IRow[]>}
    */
-  static getTDPFilteredRows(database: string, view: string, params: IParams, filters: IParams, assignIds = false): Promise<IRow[]> {
-    return RestBaseUtils.getTDPDataImpl(database, view, 'filter', RestBaseUtils.mergeParamAndFilters(params, filters), assignIds);
+  static getTDPFilteredRows(database: string, view: string, params: IParams, filters: IParams): Promise<IRow[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'filter', RestBaseUtils.mergeParamAndFilters(params, filters));
   }
 
   /**
@@ -279,17 +264,10 @@ export class RestBaseUtils {
    * @param {string} view the view id
    * @param {IParams} params additional parameters
    * @param {IAllFilters} filters object that contains all filter options
-   * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
    * @returns {Promise<IRow[]>}
    */
-  static getTDPFilteredRowsWithLessGreater(
-    database: string,
-    view: string,
-    params: IParams,
-    filters: IAllFilters = emptyFilters,
-    assignIds = false,
-  ): Promise<IRow[]> {
-    return RestBaseUtils.getTDPDataImpl(database, view, 'filter', RestBaseUtils.mergeParamAndAllFilters(params, filters), assignIds);
+  static getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters: IAllFilters = emptyFilters): Promise<IRow[]> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'filter', RestBaseUtils.mergeParamAndAllFilters(params, filters));
   }
 
   /**
@@ -349,10 +327,9 @@ export class RestBaseUtils {
    * @param {string} database the database connector key
    * @param {string} view the view id
    * @param {IParams} params additional parameters
-   * @param {boolean} assignIds
    * @returns {Promise<Readonly<ILookupResult>>}
    */
-  static getTDPLookup(database: string, view: string, params: IParams = {}, assignIds = false): Promise<Readonly<ILookupResult>> {
-    return RestBaseUtils.getTDPDataImpl(database, view, 'lookup', params, assignIds);
+  static getTDPLookup(database: string, view: string, params: IParams = {}): Promise<Readonly<ILookupResult>> {
+    return RestBaseUtils.getTDPDataImpl(database, view, 'lookup', params);
   }
 }

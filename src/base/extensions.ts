@@ -1,11 +1,12 @@
 import { IPluginDesc, IPlugin } from './plugin';
-import { ProvenanceGraph } from '../provenance';
+import type { ProvenanceGraph } from '../clue/provenance';
 
 export const EXTENSION_POINT_TDP_SCORE = 'tdpScore';
 export const EXTENSION_POINT_TDP_SCORE_IMPL = 'tdpScoreImpl';
 export const EXTENSION_POINT_TDP_SCORE_LOADER = 'tdpScoreLoader';
 export const EXTENSION_POINT_TDP_RANKING_BUTTON = 'tdpRankingButton';
 export const EXTENSION_POINT_TDP_VIEW = 'tdpView';
+export const EXTENSION_POINT_VISYN_VIEW = 'visynView';
 export const EXTENSION_POINT_TDP_INSTANT_VIEW = 'tdpInstantView';
 export const EXTENSION_POINT_TDP_APP_EXTENSION = 'tdpAppExtension';
 // filter extensions

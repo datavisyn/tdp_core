@@ -1,5 +1,6 @@
 import '../webpack/_bootstrap';
 import $ from 'jquery';
+import { merge } from 'lodash';
 import { I18nextManager } from '../i18n';
 import { BaseUtils } from '../base/BaseUtils';
 
@@ -152,7 +153,7 @@ export class Dialog {
     if (typeof options === 'string') {
       options = { title: options };
     }
-    BaseUtils.mixin(o, options);
+    merge(o, options);
     return new Promise((resolve) => {
       const dialog = Dialog.generateDialog(o.title, o.primaryBtnText, o.additionalCSSClasses);
       if (o.multiline) {
@@ -221,7 +222,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
     if (typeof options === 'string') {
       options = { title: options };
     }
-    BaseUtils.mixin(o, options);
+    merge(o, options);
 
     return new Promise((resolve) => {
       const dialog = Dialog.generateDialog(o.title, o.primaryBtnText, o.additionalCSSClasses);
@@ -260,7 +261,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
     if (typeof options === 'string') {
       options = { title: options };
     }
-    BaseUtils.mixin(o, options);
+    merge(o, options);
 
     return new Promise((resolve) => {
       const dialog = Dialog.generateDialog(o.title, o.cancelButton, o.additionalCSSClasses);

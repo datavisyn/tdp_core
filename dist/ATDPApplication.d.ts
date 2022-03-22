@@ -1,10 +1,11 @@
-import { AppHeader } from './components';
 import './webpack/_bootstrap';
+import { AppHeader } from './components';
 import { TourManager } from './tour/TourManager';
+import { CLUEGraphManager } from './clue';
 import { IAuthorizationConfiguration } from './auth';
-import { ACLUEWrapper } from './wrapper';
-import { LoginMenu, CLUEGraphManager } from './base';
-import { IMixedStorageProvenanceGraphManagerOptions, ProvenanceGraph } from './provenance';
+import { ACLUEWrapper } from './clue/wrapper';
+import { LoginMenu } from './base';
+import { IMixedStorageProvenanceGraphManagerOptions, ProvenanceGraph } from './clue/provenance';
 export interface ITDPOptions {
     /**
      * alternative login formular
@@ -111,8 +112,8 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
     protected buildImpl(body: HTMLElement): {
         graph: Promise<ProvenanceGraph>;
         manager: CLUEGraphManager;
-        storyVis: () => Promise<import("./vis").VerticalStoryVis>;
-        provVis: () => Promise<import("./vis").LayoutedProvVis>;
+        storyVis: () => Promise<import("./clue").VerticalStoryVis>;
+        provVis: () => Promise<import("./clue").LayoutedProvVis>;
     };
     /**
      * customize the using extension point

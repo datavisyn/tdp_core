@@ -1,11 +1,11 @@
 import { scale } from 'd3';
-import { LineupUtils } from '../utils';
+import { difference } from 'lodash';
 
 export class LineUpColors {
   /**
    * Map that assigns each selection ID a color, which is used as color for columns
    */
-  private readonly colorMap = new Map<number, { color: string; items: number }>();
+  private readonly colorMap = new Map<string, { color: string; items: number }>();
 
   private colors: string[] = scale
     .category10()
@@ -17,15 +17,15 @@ export class LineUpColors {
         .filter((_d, i) => i % 2 === 1),
     );
 
-  getColumnColor(id: number): string {
-    if (id < 0) {
-      id = this.colorMap.size;
+  getColumnColor(id: string): string {
+    if (id == null) {
+      id = `${this.colorMap.size}`;
     }
 
     let color = '';
     if (!this.colorMap.has(id)) {
       const usedColors = Array.from(this.colorMap.values()).map((item) => item.color);
-      color = LineupUtils.array_diff(this.colors, usedColors)[0];
+      color = difference(this.colors, usedColors)[0];
       this.colorMap.set(id, { color, items: 1 });
     } else {
       const value = this.colorMap.get(id);
@@ -35,7 +35,7 @@ export class LineUpColors {
     return color;
   }
 
-  freeColumnColor(id: number): void {
+  freeColumnColor(id: string): void {
     if (this.colorMap.has(id)) {
       const value = this.colorMap.get(id);
 

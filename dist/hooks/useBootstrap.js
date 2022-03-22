@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Modal, Toast, Popover, Alert, Offcanvas, Tooltip, Tab, Collapse, Dropdown } from 'bootstrap';
+import { useSyncedRef } from './useSyncedRef';
 function useBSClass(clazz, ...options) {
     const [instance, setInstance] = React.useState(null);
     const setRef = React.useCallback((ref) => {
@@ -21,9 +22,8 @@ function useBSClass(clazz, ...options) {
             // Set instance to null if no ref is passed
             return null;
         });
-    }, 
-    // TODO: Check if this causes problems when rerendering
-    [clazz, options]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     React.useEffect(() => {
         // Whenever we are unmounting (an instance), destroy it.
         return () => instance === null || instance === void 0 ? void 0 : instance.dispose();
@@ -51,7 +51,8 @@ export const useBSDropdown = __useBSClass(Dropdown);
  */
 class ReferenceWrapper extends React.Component {
     render() {
-        return React.Children.only(this.props.children);
+        const { children } = this.props;
+        return React.Children.only(children);
     }
 }
 ReferenceWrapper.displayName = 'BSReferenceWrapper';
@@ -61,16 +62,17 @@ ReferenceWrapper.displayName = 'BSReferenceWrapper';
  * @param additionalHook An additional hook to support additional properties for each instance type, i.e. show/hide in modals.
  */
 function BSClass(hook, additionalHook) {
-    return function InnerBSClass({ children, instanceRef, 
-    // @ts-ignore Typescript does not allow spreading of generic parameters yet: https://github.com/microsoft/TypeScript/issues/10727
-    ...options }) {
+    return function InnerBSClass({ children, instanceRef, ...options }) {
         // Instantiate the hook
         const [ref, instance] = hook(options);
         // Store the ref to the onInstance callback to avoid putting it into the deps
         React.useEffect(() => {
             instanceRef === null || instanceRef === void 0 ? void 0 : instanceRef(instance);
-        }, [instanceRef, instance]);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [instance]);
         // Call the optional additional hook with all options
+        // Introduced in TS4
+        // https://stackoverflow.com/questions/56675333/extending-a-union-type-exactly
         additionalHook === null || additionalHook === void 0 ? void 0 : additionalHook(instance, options);
         const callbackRef = React.useCallback((wrapperRef) => {
             try {
@@ -131,31 +133,35 @@ function useBSShowHide(instance, show) {
     }, [show, instance]);
 }
 export const BSModal = BSClass(useBSModal, (instance, { show, setShow }) => {
+    const setShowRef = useSyncedRef(setShow);
     useBSListeners(instance, {
-        'shown.bs.modal': () => setShow === null || setShow === void 0 ? void 0 : setShow(true),
-        'hidden.bs.modal': () => setShow === null || setShow === void 0 ? void 0 : setShow(false),
+        'shown.bs.modal': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, true); },
+        'hidden.bs.modal': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, false); },
     });
     useBSShowHide(instance, show);
 });
 export const BSToast = BSClass(useBSToast, (instance, { show, setShow }) => {
+    const setShowRef = useSyncedRef(setShow);
     useBSListeners(instance, {
-        'shown.bs.toast': () => setShow === null || setShow === void 0 ? void 0 : setShow(true),
-        'hidden.bs.toast': () => setShow === null || setShow === void 0 ? void 0 : setShow(false),
+        'shown.bs.toast': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, true); },
+        'hidden.bs.toast': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, false); },
     });
     useBSShowHide(instance, show);
 });
 export const BSPopover = BSClass(useBSPopover, (instance, { show, setShow }) => {
+    const setShowRef = useSyncedRef(setShow);
     useBSListeners(instance, {
-        'shown.bs.popover': () => setShow === null || setShow === void 0 ? void 0 : setShow(true),
-        'hidden.bs.popover': () => setShow === null || setShow === void 0 ? void 0 : setShow(false),
+        'shown.bs.popover': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, true); },
+        'hidden.bs.popover': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, false); },
     });
     useBSShowHide(instance, show);
 });
 export const BSAlert = BSClass(useBSAlert);
 export const BSOffcanvas = BSClass(useBSOffcanvas, (instance, { show, relatedTarget, setShow }) => {
+    const setShowRef = useSyncedRef(setShow);
     useBSListeners(instance, {
-        'shown.bs.offcanvas': () => setShow === null || setShow === void 0 ? void 0 : setShow(true),
-        'hidden.bs.offcanvas': () => setShow === null || setShow === void 0 ? void 0 : setShow(false),
+        'shown.bs.offcanvas': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, true); },
+        'hidden.bs.offcanvas': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, false); },
     });
     React.useEffect(() => {
         if (show) {
@@ -164,27 +170,31 @@ export const BSOffcanvas = BSClass(useBSOffcanvas, (instance, { show, relatedTar
         else {
             instance === null || instance === void 0 ? void 0 : instance.hide();
         }
-    }, [show, instance, relatedTarget]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [show, instance]);
 });
 export const BSTooltip = BSClass(useBSTooltip, (instance, { show, setShow }) => {
+    const setShowRef = useSyncedRef(setShow);
     useBSListeners(instance, {
-        'shown.bs.tooltip': () => setShow === null || setShow === void 0 ? void 0 : setShow(true),
-        'hidden.bs.tooltip': () => setShow === null || setShow === void 0 ? void 0 : setShow(false),
+        'shown.bs.tooltip': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, true); },
+        'hidden.bs.tooltip': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, false); },
     });
     useBSShowHide(instance, show);
 });
 export const BSTab = BSClass(useBSTab);
 export const BSCollapse = BSClass(useBSCollapse, (instance, { show, setShow }) => {
+    const setShowRef = useSyncedRef(setShow);
     useBSListeners(instance, {
-        'shown.bs.collapse': () => setShow === null || setShow === void 0 ? void 0 : setShow(true),
-        'hidden.bs.collapse': () => setShow === null || setShow === void 0 ? void 0 : setShow(false),
+        'shown.bs.collapse': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, true); },
+        'hidden.bs.collapse': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, false); },
     });
     useBSShowHide(instance, show);
 });
 export const BSDropdown = BSClass(useBSDropdown, (instance, { show, setShow }) => {
+    const setShowRef = useSyncedRef(setShow);
     useBSListeners(instance, {
-        'shown.bs.dropdown': () => setShow === null || setShow === void 0 ? void 0 : setShow(true),
-        'hidden.bs.dropdown': () => setShow === null || setShow === void 0 ? void 0 : setShow(false),
+        'shown.bs.dropdown': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, true); },
+        'hidden.bs.dropdown': () => { var _a; return (_a = setShowRef.current) === null || _a === void 0 ? void 0 : _a.call(setShowRef, false); },
     });
     useBSShowHide(instance, show);
 });
