@@ -85,3 +85,5 @@ export class I18nextManager {
     return I18nextManager.instance;
   }
 }
+
+export const i18n = I18nextManager.getInstance();

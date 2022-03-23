@@ -6,8 +6,8 @@ import { IDType } from '../idtype/IDType';
 import { IUser } from '../security';
 import type { IPlugin, IPluginDesc } from './plugin';
 import { IEventHandler } from './event';
-import { ProvenanceGraph } from '../provenance/ProvenanceGraph';
-import { IObjectRef } from '../provenance/ObjectNode';
+import { ProvenanceGraph } from '../clue/provenance/ProvenanceGraph';
+import { IObjectRef } from '../clue/provenance/ObjectNode';
 import { AppHeader } from '../components/header';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {

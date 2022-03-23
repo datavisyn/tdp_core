@@ -1,3 +1,4 @@
+import { merge } from 'lodash';
 import 'select2';
 import { event as d3event } from 'd3';
 import $ from 'jquery';
@@ -7,7 +8,6 @@ import { FormSelect } from './FormSelect';
 import { FormSelect2 } from './FormSelect2';
 import { Select3 } from './Select3';
 import { UserSession } from '../../app';
-import { ResolveNow, BaseUtils } from '../../base';
 import { I18nextManager } from '../../i18n';
 export class FormMap extends AFormElement {
     /**
@@ -24,7 +24,7 @@ export class FormMap extends AFormElement {
     }
     updateBadge() {
         const dependent = (this.elementDesc.dependsOn || []).map((id) => this.form.getElementById(id));
-        ResolveNow.resolveImmediately(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
+        Promise.resolve(this.elementDesc.options.badgeProvider(this.value, ...dependent)).then((text) => {
             this.$inputNode
                 .select('span.badge')
                 .html(text)
@@ -191,7 +191,7 @@ export class FormMap extends AFormElement {
                     const s = parent.firstElementChild;
                     const $s = $(s);
                     // merge only the default options if we have no local data
-                    $s.select2(BaseUtils.mixin({}, desc.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, desc));
+                    $s.select2(merge({}, desc.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, desc));
                     if (initialValue) {
                         $s.val(initially).trigger('change');
                     }
