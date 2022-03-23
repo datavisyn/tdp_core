@@ -116,8 +116,12 @@ export class GraphEdge extends AttributeContainer {
   }
 
   private init() {
-    this.source.outgoing.push(this);
-    this.target.incoming.push(this);
+    if (this.source) {
+      this.source.outgoing.push(this);
+    }
+    if (this.target) {
+      this.target.incoming.push(this);
+    }
   }
 
   takeDown() {
@@ -137,8 +141,8 @@ export class GraphEdge extends AttributeContainer {
     const r = super.persist();
     r.type = this.type;
     r.id = this.id;
-    r.source = this.source.id;
-    r.target = this.target.id;
+    r.source = this.source?.id;
+    r.target = this.target?.id;
     return r;
   }
 
