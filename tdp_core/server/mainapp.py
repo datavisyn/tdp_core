@@ -81,15 +81,7 @@ def _generate_index():
     for app in apps:
         text.append("<li>")
         text.append(
-            '<a class="appinfo" href="/'
-            + app.id
-            + '/"><span class="title">'
-            + app.title
-            + '</span><span class="name">'
-            + app.name
-            + '</span><span class="description">'
-            + app.description
-            + "</span></a>"
+            '<a class="appinfo" href="/' + app.id + '/"><span class="title">' + app.title + '</span><span class="name">' + app.name + '</span><span class="description">' + app.description + "</span></a>"
         )
         text.append('<div class="links">')
         if app.homepage and app.homepage != "":
@@ -123,7 +115,7 @@ def build_info():
     requirements = "requirements.txt"
     if os.path.exists(requirements):
         with open(requirements, "r", encoding="utf-8") as f:
-            dependencies.extend([l.strip() for l in f.readlines()])
+            dependencies.extend([line.strip() for line in f.readlines()])
 
     for p in get_registry().plugins:
         if p.id == "tdp_core":
@@ -139,7 +131,7 @@ def build_info():
 
 # health check for docker-compose, kubernetes
 def health():
-    return "ok", 200
+    return "ok"
 
 
 def create():

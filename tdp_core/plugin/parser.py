@@ -1,6 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from functools import lru_cache
-from typing import Dict, List, Tuple, Type, Union
+from typing import Dict, List, Tuple, Type
 from pkg_resources import iter_entry_points
 import importlib
 from pydantic import BaseSettings

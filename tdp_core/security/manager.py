@@ -4,7 +4,7 @@ from fastapi import FastAPI, Request
 from .store.base_store import BaseStore
 from ..server.request_context import get_request
 from ..plugin import registry
-from .model import ANONYMOUS_USER, LogoutReturnValue, User
+from .model import ANONYMOUS_USER, LogoutReturnValue, Token, User
 from ..settings import get_global_settings
 import logging
 import jwt
@@ -13,7 +13,6 @@ from fastapi import APIRouter
 from datetime import timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from .model import Token, User
 from .constants import ACCESS_TOKEN_EXPIRE_MINUTES
 from fastapi.responses import HTMLResponse, JSONResponse
 from functools import wraps
@@ -60,7 +59,7 @@ class SecurityManager:
     @property
     def is_logged_in(self) -> bool:
         try:
-            return self.current_user != None
+            return self.current_user is not None
         except Exception:
             return False
 
@@ -79,7 +78,7 @@ class SecurityManager:
             if callable(load_from_req):
                 try:
                     user = load_from_req(request)
-                except:
+                except Exception:
                     _log.exception(f"Error loading from request in {store}")
                 else:
                     if user:
@@ -195,7 +194,7 @@ def security_manager():
 
 
 def is_logged_in():
-    return security_manager().current_user != None
+    return security_manager().current_user is not None
 
 
 def login_required(func):

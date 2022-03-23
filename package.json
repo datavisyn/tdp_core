@@ -38,7 +38,7 @@
   "scripts": {
     "clean": "rimraf build dist lib",
     "delete-dependencies": "rimraf node_modules",
-    "check": "black --line-length 160 --check tdp_core",
+    "check": "flake8 --exclude=.git,venv,deploy,docs,__pycache__,node_modules",
     "compile": "tsc",
     "compile:watch": "tsc -w",
     "postcompile": "npm run copy",
@@ -49,7 +49,7 @@
     "posttest:web": "npm run lint",
     "pretest": "echo hybrid",
     "test:web": "test ! $(find tests -name \"*.ts\") || jest -w=1",
-    "test:python": "test ! $(find tests -name \"*.py\") || python setup.py test",
+    "test:python": "pytest tdp_core",
     "test": "npm run test:web && npm run test:python",
     "lint": "eslint --cache src/**/*.ts{,x} tests/**/*.ts{,x}",
     "lint:fix": "eslint --fix --cache src/**/*.ts{,x} tests/**/*.ts{,x}",

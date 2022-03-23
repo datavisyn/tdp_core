@@ -10,9 +10,7 @@ PERMISSION_EXECUTE = 1
 
 def to_number(p_set):
     return (
-        (PERMISSION_READ if PERMISSION_READ in p_set else 0)
-        + (PERMISSION_WRITE if PERMISSION_WRITE in p_set else 0)
-        + (PERMISSION_EXECUTE if PERMISSION_EXECUTE in p_set else 0)
+        (PERMISSION_READ if PERMISSION_READ in p_set else 0) + (PERMISSION_WRITE if PERMISSION_WRITE in p_set else 0) + (PERMISSION_EXECUTE if PERMISSION_EXECUTE in p_set else 0)
     )
 
 

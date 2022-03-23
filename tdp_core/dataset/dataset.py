@@ -1,6 +1,5 @@
 from builtins import str
-from ..plugin.registry import list_plugins, lookup_singleton
-from .dataset_def import to_idtype_description
+from ..plugin.registry import list_plugins
 import itertools
 
 _providers_r = None

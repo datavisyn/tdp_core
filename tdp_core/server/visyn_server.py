@@ -2,17 +2,16 @@ import threading
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 import logging
+import logging.config
 from pydantic import create_model
 from pydantic.utils import deep_update
 from .request_context import RequestContextMiddleware
-import time
 import sys
 
 
 def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
     from ..settings import model as settings_model, get_global_settings
     from ..settings.utils import load_workspace_config
-
 
     # Load the workspace config.json and initialize the global settings
     workspace_config = load_workspace_config()
@@ -85,17 +84,16 @@ def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
         logging.info(f"Registering router: {p.id}")
         app.include_router(p.load().factory())
 
+    # Initialize the login routes
+    from ..security.manager import security_manager
+    security_manager().init_app(app)
+
     # load `after_server_started` extension points which are run immediately after server started,
     # so all plugins should have been loaded at this point of time
     # the hooks are run in a separate (single) thread to not block the main execution of the server
     # TODO: Use FastAPI mechanism for that
     t = threading.Thread(target=load_after_server_started_hooks)
-    t.setDaemon(True)
+    t.daemon = True
     t.start()
-
-    # Initialize the login routes
-    from ..security.manager import security_manager
-
-    security_manager().init_app(app)
 
     return app

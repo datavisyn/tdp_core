@@ -1,6 +1,6 @@
+from ..dataset.dataset_def import to_idtype_description
 from ..utils import etag
 import logging
-from . import list_idtypes
 from .manager import get_mappingmanager
 from flask import Flask, request, abort, jsonify
 
@@ -13,7 +13,17 @@ _log = logging.getLogger(__name__)
 @app_idtype.route("/")
 @etag
 def _list_idtypes():
-    return jsonify(list_idtypes())
+    tmp = dict()
+    # TODO: We probably don't want to have these idtypes as "all" idtypes
+    # for d in list_datasets():
+    #     for idtype in d.to_idtype_descriptions():
+    #         tmp[idtype["id"]] = idtype
+
+    # also include the known elements from the mapping graph
+    mapping = get_mappingmanager()
+    for idtype_id in mapping.known_idtypes():
+        tmp[idtype_id] = to_idtype_description(idtype_id)
+    return jsonify(list(tmp.values()))
 
 
 @app_idtype.route("/<idtype>/")

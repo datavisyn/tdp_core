@@ -7,13 +7,13 @@ _log = logging.getLogger(__name__)
 
 
 class DBMigrationSettings(BaseModel):
-    autoUpgrade: bool = True
+    autoUpgrade: bool = True  # NOQA
 
 
 class MatomoSettings(BaseModel):
     url: str = ""
     site: str = "1"
-    encryptUserName: bool = False
+    encryptUserName: bool = False  # NOQA
 
 
 class MongoSettings(BaseModel):
@@ -74,7 +74,7 @@ class VisynServerSettings(BaseModel):
             },
         ]
     )
-    alwaysAppendDummyStore: bool = Field(False)
+    alwaysAppendDummyStore: bool = Field(False)  # NOQA
     security: Dict[str, Any] = Field(
         {
             "store": {
@@ -95,8 +95,8 @@ class VisynServerSettings(BaseModel):
 
 
 class GlobalSettings(BaseSettings):
-    env: Literal['development', 'production']
-    secret_key: str = Field("VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w")
+    env: Literal['development', 'production'] = 'development'
+    secret_key: str = "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w"
     tdp_core: VisynServerSettings = VisynServerSettings()
     start_cmd: Optional[str] = Field(
         None,
@@ -131,27 +131,3 @@ def get_global_settings() -> GlobalSettings:
     if __global_settings is None:
         raise Exception("Global setting is not yet initialized!")
     return __global_settings
-
-
-
-# def get_settings() -> Marketplace360Settings:
-    # return get_global_settings().marketplace360
-
-
-# # This happens in marketplace360/settings.py
-
-# class Marketplace360Settings(GlobalSettings):
-#     # Config.json equivalent
-#     very_import_setting: str = 'important'
-
-
-# marketplace360_settings: Marketplace360Settings = Marketplace360Settings()
-
-
-# # namespace /api/marketplace360
-
-
-# # marketplace360/api/project_api.py
-
-# # from ..settings import marketplace360_settings
-# # marketplace360_settings.very_important_setting

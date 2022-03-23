@@ -1,8 +1,7 @@
 from tdp_core.utils import to_json
 
 
-class TestCustomEncoders:
-  def test_nan_values(self):
+def test_nan_values(app):
     # single variable
     test_var = float('nan')
     # simple list

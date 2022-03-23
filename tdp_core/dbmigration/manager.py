@@ -279,7 +279,6 @@ def create_migration_command(parser):
                 _log.info("Currently, only single migrations are supported. Please execute the command for each migration individually as we are working on a fix.")
                 return
 
-
             # Using REMAINDER as nargs causes the argument to be be optional, but '+' does not work because it also parses additional --attr with the parser which should actually be ignored.
             # Therefore, args.command might be empty and we simply pass None to trigger the error message
             db_migration_manager[args.id].execute(args.command if len(args.command) > 0 else None)

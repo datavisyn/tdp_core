@@ -1,4 +1,3 @@
-from urllib.request import Request
 from fastapi import Request
 from .model import User
 

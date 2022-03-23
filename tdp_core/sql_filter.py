@@ -88,7 +88,7 @@ def filter_logic(view, args):
             del where_clause[k]  # delete value
             id_type_and_key = k[7:]
             id_type = id_type_and_key[: id_type_and_key.index("4")]
-            real_key = id_type_and_key[id_type_and_key.index("4") + 1 :]  # remove the range4 part
+            real_key = id_type_and_key[id_type_and_key.index("4") + 1:]  # remove the range4 part
             ids = _replace_range_in_ids(v, id_type, view.idtype)
             if real_key not in where_clause:
                 where_clause[real_key] = ids
