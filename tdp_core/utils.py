@@ -3,7 +3,7 @@ import json
 from builtins import range
 from flask import abort, make_response, request, Response
 import logging
-
+from .plugin.registry import list_plugins
 
 _log = logging.getLogger(__name__)
 
@@ -143,8 +143,6 @@ class JSONExtensibleEncoder(json.JSONEncoder):
     """
     json encoder with extension point extensions
     """
-
-    from .plugin.registry import list_plugins
 
     def __init__(self, *args, **kwargs):
         super(JSONExtensibleEncoder, self).__init__(*args, **kwargs)

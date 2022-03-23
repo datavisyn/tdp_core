@@ -1,12 +1,5 @@
 from builtins import object
 import abc
-import sys
-import importlib
-import tdp_core
-
-importlib.reload(tdp_core)
-print(sys.path)
-print("TEST!23")
 from ..utils import fix_id
 from ..security import can_read, can_write
 

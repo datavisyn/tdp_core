@@ -1,25 +1,28 @@
-alembic==1.7.6
-fastapi==0.73.0
-flask-smorest==0.30.0
+alembic==1.7.7
+fastapi==0.75.0
+flask-smorest==0.37.0
 flask-swagger-ui==3.36.0
-Flask==1.1.4
+Flask==2.0.3
 json-cfg==0.4.2
-marshmallow-sqlalchemy==0.26.1
-marshmallow==3.14.1
+marshmallow-sqlalchemy==0.28.0
+marshmallow==3.15.0
 numpy==1.22.3
-openpyxl==3.0.5
+openpyxl==3.0.9
 pandas==1.4.1
-Pillow==8.3.2
+Pillow==9.0.1
 pydantic==1.9.0
-pyjwt==2.1.0
-pymongo==4.0.2
+pyjwt==2.3.0
+pymongo~=3.11.1
 python-memcached==1.59
 python-multipart==0.0.5
 requests==2.27.1
 SQLAlchemy==1.4.32
-urllib3==1.26.8
+urllib3==1.26.9
+uvicorn==0.17.6
 yamlreader==3.0.4
 # Pin docutils to avoid AttributeError: 'Values' object has no attribute 'section_self_link'
-docutils==0.17.1
+# docutils==0.17.1
+docutils==0.18.1
 # Pin markupsafe to avoid ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/usr/local/lib/python3.7/site-packages/markupsafe/__init__.py) 
-markupsafe==2.0.1
+# markupsafe==2.0.1
+markupsafe==2.1.1

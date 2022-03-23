@@ -284,14 +284,14 @@ def get_config_from_plugins(plugins: List[APlugin]) -> Tuple[List[Dict[str, Dict
     models: Dict[str, Type[BaseSettings]] = {}
     for plugin in plugins:
         plugin_module = plugin.get_module()
-        if hasattr(plugin_module, 'config_model'):
-            plugin_config_model = plugin_module.config_model()
-            if plugin_config_model:
+        if hasattr(plugin_module, 'visyn_settings_model'):
+            plugin_settings_model = plugin_module.visyn_settings_model()
+            if plugin_settings_model:
                 logging.info(f'Plugin {plugin.id} has a settings model')
                 # Load the class of the config and wrap it in a tuple like (<clazz>, ...),
                 # such that pydantic can use it as type-hint in the create_model class.
                 # Otherwise, it would except <clazz> to be the default value...
-                models[plugin.id] = (plugin_config_model, ...)
+                models[plugin.id] = (plugin_settings_model, ...)
         else:
             # Load actual config.json
             f = plugin.config_file()
