@@ -95,7 +95,7 @@ TreeRenderer.defaultProps = {
     readOnly: false,
     selection: {
         isSelectable: false,
-        inputNameAttribute: 'treeItem[]', // usually an array of items
+        inputNameAttribute: 'treeItem[]',
     },
     securityNotAllowedText: `Not allowed`,
     /**
