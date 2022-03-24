@@ -141,6 +141,15 @@ export declare type VisynDataViewPluginType<Param extends Record<string, unknown
      * TODO:: Type to IReprovisynServerColumn when we merge that into tdp_core
      */
     dataDesc: IServerColumn[] | any[];
+    /**
+     * List of items which are filtered out of the view. Ids match the idtype from 'desc.idtype'
+     */
+    idFilter: string[];
+    /**
+     * Callback when the Filter changed.
+     * @param selection New Filter.
+     */
+    onIdFilterChanged(idFilter: React.SetStateAction<string[]>): void;
 }, Desc>;
 export {};
 //# sourceMappingURL=interfaces.d.ts.map
