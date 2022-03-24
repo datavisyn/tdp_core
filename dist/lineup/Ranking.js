@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
 import React from 'react';
+import { merge } from 'lodash';
 import { LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
@@ -92,7 +93,7 @@ export function Ranking({ data = [], itemSelection = { idtype: null, ids: [] }, 
 onAddScoreColumn, }) {
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
-    const options = BaseUtils.mixin({}, defaults, opts);
+    const options = merge({}, defaults, opts);
     const itemSelections = new Map();
     const itemIDType = options.itemIDType ? IDTypeManager.getInstance().resolveIdType(options.itemIDType) : null;
     const lineupContainerRef = React.useRef(null);
@@ -223,7 +224,7 @@ onAddScoreColumn, }) {
         if (!initialized) {
             providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
             providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
-            const taggleOptions = BaseUtils.mixin(defaultOptions(), options.customOptions, {
+            const taggleOptions = merge(defaultOptions(), options.customOptions, {
                 summaryHeader: options.enableHeaderSummary,
                 labelRotation: options.enableHeaderRotation ? 45 : 0,
             }, options.customOptions);

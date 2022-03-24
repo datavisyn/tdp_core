@@ -18,9 +18,8 @@ import {
 } from 'lineupjs';
 import { isEqual } from 'lodash';
 import { LineUpFilterUtils } from './lineUpFilter';
-import { ResolveNow } from '../../base';
 import { I18nextManager } from '../../i18n';
-import { IObjectRef, ICmdResult, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode, IAction } from '../../provenance';
+import { IObjectRef, ICmdResult, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode, IAction } from '../../clue/provenance';
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 enum LineUpTrackAndUntrackActions {
@@ -152,7 +151,7 @@ export class LineupTrackingManager {
   }
 
   static async addRankingImpl(inputs: IObjectRef<any>[], parameter: any) {
-    const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+    const p: LocalDataProvider = await Promise.resolve((await inputs[0].v).data);
     const { index } = parameter;
 
     if (!parameter.dump) {
@@ -216,7 +215,7 @@ export class LineupTrackingManager {
   }
 
   static async setRankingSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-    const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+    const p: LocalDataProvider = await Promise.resolve((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
     const bak = LineupTrackingManager.getInstance().toSortObject(ranking.getSortCriteria());
     LineupTrackingManager.getInstance().ignoreNext = Ranking.EVENT_SORT_CRITERIA_CHANGED;
@@ -247,7 +246,7 @@ export class LineupTrackingManager {
   }
 
   static async setSortCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-    const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+    const p: LocalDataProvider = await Promise.resolve((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
 
     const waitForSorted = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
@@ -292,7 +291,7 @@ export class LineupTrackingManager {
   }
 
   static async setGroupCriteriaImpl(inputs: IObjectRef<any>[], parameter: any) {
-    const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+    const p: LocalDataProvider = await Promise.resolve((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
     const current = ranking.getGroupCriteria().map((d) => d.fqpath);
     const columns = parameter.columns.map((a) => ranking.findByPath(a));
@@ -341,7 +340,7 @@ export class LineupTrackingManager {
   }
 
   static async setAggregationImpl(inputs: IObjectRef<any>[], parameter: IAggregationParameter) {
-    const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+    const p: LocalDataProvider = await Promise.resolve((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
 
     LineupTrackingManager.getInstance().ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
@@ -375,7 +374,7 @@ export class LineupTrackingManager {
   }
 
   static async setColumnImpl(inputs: IObjectRef<any>[], parameter: any) {
-    const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+    const p: LocalDataProvider = await Promise.resolve((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
     const prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
 
@@ -463,7 +462,7 @@ export class LineupTrackingManager {
   }
 
   static async addColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any) {
-    const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+    const p: LocalDataProvider = await Promise.resolve((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
     let parent: Ranking | CompositeColumn = ranking;
 
@@ -497,7 +496,7 @@ export class LineupTrackingManager {
   }
 
   static async moveColumnImpl(inputs: IObjectRef<IViewProviderLocal>[], parameter: any) {
-    const p: LocalDataProvider = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+    const p: LocalDataProvider = await Promise.resolve((await inputs[0].v).data);
     const ranking = p.getRankings()[parameter.rid];
     let parent: Ranking | CompositeColumn = ranking;
     const waitForSorted = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
@@ -1082,7 +1081,7 @@ export class LineupTrackingManager {
    * @returns Returns a promise that is waiting for the object reference (LineUp instance)
    */
   public async clueify(lineup: EngineRenderer | TaggleRenderer, objectRef: IObjectRef<IViewProviderLocal>, graph: ProvenanceGraph): Promise<void> {
-    const p = await ResolveNow.resolveImmediately((await objectRef.v).data);
+    const p = await Promise.resolve((await objectRef.v).data);
     p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking: Ranking, index: number) => {
       if (LineupTrackingManager.getInstance().ignore(LocalDataProvider.EVENT_ADD_RANKING, objectRef)) {
         return;
@@ -1115,7 +1114,7 @@ export class LineupTrackingManager {
    * @returns Returns a promise that is waiting for the object reference (LineUp instance)
    */
   public async untrack(objectRef: IObjectRef<IViewProviderLocal>): Promise<void> {
-    const p = await ResolveNow.resolveImmediately((await objectRef.v).data);
+    const p = await Promise.resolve((await objectRef.v).data);
     p.on([`${LocalDataProvider.EVENT_ADD_RANKING}.track`, `${LocalDataProvider.EVENT_REMOVE_RANKING}.track`], null);
     p.getRankings().forEach(LineupTrackingManager.getInstance().untrackRanking);
   }
@@ -1128,7 +1127,7 @@ export class LineupTrackingManager {
    */
   public withoutTracking<T>(objectRef: IObjectRef<IViewProviderLocal>, func: () => T): PromiseLike<T> {
     return objectRef.v
-      .then((d) => ResolveNow.resolveImmediately(d.data))
+      .then((d) => Promise.resolve(d.data))
       .then((p) => {
         LineupTrackingManager.getInstance().temporaryUntracked.add(objectRef.hash);
         const r = func();

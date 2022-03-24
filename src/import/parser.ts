@@ -1,9 +1,5 @@
-/**
- * Created by Samuel Gratzl on 29.09.2016.
- */
-
+import { merge } from 'lodash';
 import * as papaparse from 'papaparse';
-import { BaseUtils } from '../base';
 
 export interface IParseResult {
   data: any;
@@ -31,7 +27,7 @@ export class ParserUtils {
     return new Promise((resolve, reject) => {
       papaparse.parse(
         data,
-        BaseUtils.mixin(
+        merge(
           {
             complete: (result) => resolve({ data: result.data, meta: result.meta }),
             error: (error) => reject(error),
@@ -47,7 +43,7 @@ export class ParserUtils {
     return new Promise((resolve, reject) => {
       papaparse.parse(
         data,
-        BaseUtils.mixin(
+        merge(
           {
             complete: (result) => resolve(null),
             chunk: (result) => chunk({ data: result.data, meta: result.meta }),

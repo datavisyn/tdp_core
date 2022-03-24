@@ -1,5 +1,5 @@
 import { LocalDataProvider } from 'lineupjs';
-import { ObjectRefUtils } from '../provenance';
+import { ObjectRefUtils } from '../clue/provenance';
 import { ARankingView } from '../lineup/ARankingView';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
 import { PluginRegistry } from '../app';

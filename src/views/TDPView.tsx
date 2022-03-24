@@ -15,7 +15,7 @@ import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';
 import { PluginRegistry } from '../app';
 import { IDType, IDTypeManager } from '../idtype';
-import { LocalStorageProvenanceGraphManager, ObjectRefUtils } from '../provenance';
+import { LocalStorageProvenanceGraphManager, ObjectRefUtils } from '../clue/provenance';
 import { AReactView, IReactHandler } from './AReactView';
 
 export interface ITDPViewProps {

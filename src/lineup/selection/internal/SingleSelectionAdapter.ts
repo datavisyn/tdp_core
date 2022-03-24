@@ -1,7 +1,6 @@
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
 import { IContext } from '../ISelectionAdapter';
 import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
-import { ResolveNow } from '../../../base';
 
 export interface ISingleSelectionAdapter {
   /**
@@ -42,7 +41,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
   }
 
   protected createColumnsFor(context: IContext, id: string) {
-    return ResolveNow.resolveImmediately(this.adapter.createDesc(id)).then((desc) => [
+    return Promise.resolve(this.adapter.createDesc(id)).then((desc) => [
       {
         desc: ABaseSelectionAdapter.patchDesc(desc, id),
         data: this.adapter.loadData(id),

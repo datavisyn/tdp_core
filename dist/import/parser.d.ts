@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 29.09.2016.
- */
 export interface IParseResult {
     data: any;
     meta: any;

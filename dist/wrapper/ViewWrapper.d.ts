@@ -2,7 +2,7 @@ import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
 import { AView } from '../views/AView';
 import { EventHandler, IEvent, IBaseViewPluginDesc } from '../base';
-import { ObjectNode, ProvenanceGraph } from '../provenance';
+import { ObjectNode, ProvenanceGraph } from '../clue/provenance';
 import { IDType } from '../idtype';
 export declare class ViewWrapper extends EventHandler implements IViewProvider {
     readonly plugin: IViewPluginDesc;

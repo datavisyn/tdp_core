@@ -70,9 +70,7 @@ ReferenceWrapper.displayName = 'BSReferenceWrapper';
  * @param additionalHook An additional hook to support additional properties for each instance type, i.e. show/hide in modals.
  */
 function BSClass(hook, additionalHook) {
-    return function InnerBSClass({ children, instanceRef, 
-    // @ts-ignore Typescript does not allow spreading of generic parameters yet: https://github.com/microsoft/TypeScript/issues/10727
-    ...options }) {
+    return function InnerBSClass({ children, instanceRef, ...options }) {
         // Instantiate the hook
         const [ref, instance] = hook(options);
         // Store the ref to the onInstance callback to avoid putting it into the deps
@@ -81,6 +79,8 @@ function BSClass(hook, additionalHook) {
             // eslint-disable-next-line react-hooks/exhaustive-deps
         }, [instance]);
         // Call the optional additional hook with all options
+        // Introduced in TS4
+        // https://stackoverflow.com/questions/56675333/extending-a-union-type-exactly
         additionalHook === null || additionalHook === void 0 ? void 0 : additionalHook(instance, options);
         const callbackRef = React.useCallback((wrapperRef) => {
             try {

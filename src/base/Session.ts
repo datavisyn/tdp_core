@@ -3,7 +3,7 @@ export class Session {
    * Use the browser's sessionStorage
    * @type {Storage}
    */
-  private context: Storage = sessionStorage;
+  private context: Storage = window.sessionStorage;
 
   /**
    * Store any value for a given key and returns the previous stored value.

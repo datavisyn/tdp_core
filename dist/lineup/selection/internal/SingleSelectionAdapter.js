@@ -1,5 +1,4 @@
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
-import { ResolveNow } from '../../../base';
 export class SingleSelectionAdapter extends ABaseSelectionAdapter {
     constructor(adapter) {
         super();
@@ -21,7 +20,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
         return this.addDynamicColumns(context, selectedIds);
     }
     createColumnsFor(context, id) {
-        return ResolveNow.resolveImmediately(this.adapter.createDesc(id)).then((desc) => [
+        return Promise.resolve(this.adapter.createDesc(id)).then((desc) => [
             {
                 desc: ABaseSelectionAdapter.patchDesc(desc, id),
                 data: this.adapter.loadData(id),

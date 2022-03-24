@@ -14,7 +14,7 @@ import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';
 import { PluginRegistry } from '../app';
 import { IDTypeManager } from '../idtype';
-import { LocalStorageProvenanceGraphManager, ObjectRefUtils } from '../provenance';
+import { LocalStorageProvenanceGraphManager, ObjectRefUtils } from '../clue/provenance';
 import { AReactView } from './AReactView';
 export class TDPView extends React.Component {
     constructor(props, context) {

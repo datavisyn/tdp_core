@@ -1,7 +1,7 @@
+import { merge } from 'lodash';
 import { RemoveNodeObserver } from '../components/RemoveNodeObserver';
 import { HashProperties } from '../base/HashProperties';
 import { PropertyHandler } from '../base/PropertyHandler';
-import { BaseUtils } from '../base/BaseUtils';
 import { Ajax } from '../base/ajax';
 import { WebpackEnv } from '../base/WebpackEnv';
 
@@ -40,7 +40,7 @@ export class AppContext {
    * @param config
    */
   public init(config: { offline?: boolean; server_url?: string; server_json_suffix?: string } = {}) {
-    config = BaseUtils.mixin(
+    config = merge(
       {
         offline: this.offline,
         server_url: this.server_url,
