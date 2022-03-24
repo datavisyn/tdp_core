@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { FormatOptionLabelMeta } from 'react-select';
 import { IPluginDesc } from '../../base';
 import { IDType } from '../../idtype';

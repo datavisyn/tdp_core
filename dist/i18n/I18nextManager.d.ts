@@ -6,12 +6,12 @@ export declare class I18nextManager {
      * Thus allowing the existence of multiple i18next instances with different configurations
      * without one overwriting the other
      */
-    i18n: import("i18next").i18n;
+    i18n: any;
     /**
      *  Awaits the translation files registered at the EP_PHOVEA_CORE_LOCALE extension point
      *  Initialize I18next with the translation files
      */
-    initI18n(): Promise<void>;
+    initI18n(): Promise<any>;
     private static instance;
     static getInstance(): I18nextManager;
 }

@@ -75,7 +75,7 @@ export declare class CLUEWrapper extends ACLUEWrapper {
      */
     static createWrapperFactory(body: HTMLElement, options?: any): {
         on: (...args: any[]) => number;
-        $main: d3.Selection<any>;
+        $main: any;
         graph: Promise<ProvenanceGraph>;
         jumpToStored: () => number;
     };

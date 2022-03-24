@@ -9,7 +9,7 @@ declare abstract class ASessionList {
     destroy(): void;
     protected static createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit'): string;
     protected registerActionListener(manager: CLUEGraphManager, $enter: Selection<IProvenanceGraphDataDescription>): void;
-    protected createLoader(): Selection<any>;
+    protected createLoader(): any;
     protected abstract build(manager: CLUEGraphManager): Promise<() => any>;
 }
 /**
