@@ -168,6 +168,10 @@ export type VisynDataViewPluginType<
      * TODO:: Type to IReprovisynServerColumn when we merge that into tdp_core
      */
     dataDesc: IServerColumn[] | any[];
+
+    idFilter: string[];
+
+    onIdFilterChanged(idFilter: React.SetStateAction<string[]>): void;
   },
   Desc
 >;

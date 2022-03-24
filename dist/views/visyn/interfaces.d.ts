@@ -141,6 +141,8 @@ export declare type VisynDataViewPluginType<Param extends Record<string, unknown
      * TODO:: Type to IReprovisynServerColumn when we merge that into tdp_core
      */
     dataDesc: IServerColumn[] | any[];
+    idFilter: string[];
+    onIdFilterChanged(idFilter: React.SetStateAction<string[]>): void;
 }, Desc>;
 export {};
 //# sourceMappingURL=interfaces.d.ts.map
