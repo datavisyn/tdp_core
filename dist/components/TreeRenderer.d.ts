@@ -58,7 +58,7 @@ export declare class TreeRenderer extends React.Component<Partial<ITreeRendererP
         selectionChanged: (items: ITreeElement[]) => any;
     };
     constructor(props: any);
-    handleItemClick: (e: any, item: ITreeElement) => void;
+    handleItemClick: (e: React.MouseEvent, item: ITreeElement) => void;
     handleSelectionChanged: (item: any, group: any, selected: any) => void;
     setSelectedIds: (itemIds?: string[]) => void;
     render(): JSX.Element;

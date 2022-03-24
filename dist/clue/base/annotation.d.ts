@@ -52,7 +52,7 @@ export declare class Renderer {
     renderAnnotations(state: SlideNode): Promise<unknown>;
     hideOld(): Promise<void>;
     renderSubtitle(overlay: SlideNode): Promise<unknown>;
-    renderText(overlay: SlideNode): Promise<any>;
+    renderText(overlay: SlideNode): Promise<Node>;
     static createAnnotation(main: HTMLElement, graph: ProvenanceGraph): {
         render: any;
     };

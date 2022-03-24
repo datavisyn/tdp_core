@@ -73,7 +73,7 @@ export declare class ViewWrapper extends EventHandler implements IViewProvider {
     update(): void;
     dumpReference(): number;
     dump(): IViewWrapperDump;
-    selectionText(selection: any, idType: string): any;
+    selectionText(selection: any, idType: string): string;
     static guessIDType(v: IBaseViewPluginDesc): IDType | null;
 }
 //# sourceMappingURL=ViewWrapper.d.ts.map

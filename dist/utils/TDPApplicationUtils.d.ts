@@ -23,7 +23,7 @@ export declare class TDPApplicationUtils {
      * @param {Date} date
      */
     static fromNow(date: Date | number): string;
-    static notAllowedText(notAllowed: boolean | string): any;
+    static notAllowedText(notAllowed: boolean | string): string;
     /**
      * utilitly for adding a permission form as used in TDP by default
      * @param item

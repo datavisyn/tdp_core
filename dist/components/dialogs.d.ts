@@ -1,6 +1,6 @@
 /// <reference types="jquery" />
-/// <reference types="jquery.scrollto" />
 /// <reference types="select2" />
+/// <reference types="jquery.scrollto" />
 /// <reference types="bootstrap" />
 import '../webpack/_bootstrap';
 export interface IDialogOptions {

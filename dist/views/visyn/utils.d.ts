@@ -6,7 +6,7 @@ import { VisynViewPluginDesc, VisynSimpleViewPluginType, VisynDataViewPluginType
  * @param valueOrFunction Value or function to the value.
  * @param currentValue Current value passed to the function to receive the new value.
  */
-export declare function setStateActionCaller<T>(valueOrFunction: React.SetStateAction<T>, currentValue: T): any;
+export declare function setStateActionCaller<T>(valueOrFunction: React.SetStateAction<T>, currentValue: T): T;
 export declare function isVisynViewPluginDesc(desc: unknown): desc is VisynViewPluginDesc;
 export declare function isVisynSimpleViewDesc(desc: unknown): desc is VisynSimpleViewPluginType['desc'];
 export declare function isVisynSimpleView(plugin: unknown): plugin is VisynSimpleViewPluginType['plugin'];

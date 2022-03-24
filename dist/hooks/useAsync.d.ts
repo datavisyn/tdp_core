@@ -28,10 +28,10 @@ export declare type useAsyncStatus = 'idle' | 'pending' | 'success' | 'error';
  * @param immediate Null if function should not be triggered immediately, or the initial parameter array if immediate.
  */
 export declare const useAsync: <F extends (...args: any[]) => any, E = Error, T = Awaited<ReturnType<F>>>(asyncFunction: F, immediate?: Parameters<F>) => {
-    execute: any;
-    status: any;
-    value: any;
-    error: any;
+    execute: (...args: Parameters<F>) => Promise<T>;
+    status: useAsyncStatus;
+    value: T;
+    error: E;
 };
 export {};
 //# sourceMappingURL=useAsync.d.ts.map
