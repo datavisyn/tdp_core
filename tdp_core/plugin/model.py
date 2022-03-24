@@ -1,5 +1,6 @@
-
-from typing import Any, Dict
+from typing import Any, Dict, Type
+from abc import ABC, abstractmethod
+from pydantic import BaseSettings
 
 
 class RegHelper(object):
@@ -21,3 +22,14 @@ class RegHelper(object):
     def append_router(self, id_: str, module_: Any, desc: Dict[str, Any]):
         # TODO: Validate desc
         return self.append("fastapi_router", id_, module_, desc)
+
+
+class AVisynPlugin(ABC):
+
+    @abstractmethod
+    def register(self, registry: RegHelper):
+        pass
+
+    @property
+    def setting_class(self) -> Type[BaseSettings]:
+        return None

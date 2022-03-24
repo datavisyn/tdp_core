@@ -31,7 +31,7 @@ def packaged(*files):
 
 
 def requirements(file):
-  return [r.strip() for r in read_it(file).strip().split('\n') if not r.startswith('-e git+https://')]
+  return [r.strip() for r in read_it(file).strip().split('\n')]
 
 
 def to_version(v):
@@ -54,8 +54,7 @@ setup(
   zip_safe=False,
 
   entry_points={
-    'phovea.registry': ['{0} = {0}:phovea'.format(pkg['name'])],
-    'phovea.config': ['{0} = {0}:phovea_config'.format(pkg['name'])]
+    'visyn.plugin': ['{0} = {0}:VisynPlugin'.format(pkg['name'])],
   },
 
   # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
@@ -65,7 +64,7 @@ setup(
     # Pick your license as you wish (should match "license" above)
     'License :: OSI Approved :: ' + ('BSD License' if pkg['license'] == 'BSD-3-Clause' else pkg['license']),
     'Programming Language :: Python',
-    'Programming Language :: Python :: 3.7'
+    'Programming Language :: Python :: 3.10'
   ],
 
   # You can just specify the packages manually here if your project is
@@ -77,12 +76,14 @@ setup(
   # requirements files see:
   # https://packaging.python.org/en/latest/requirements.html
   install_requires=requirements('requirements.txt'),
-  tests_require=requirements('requirements_dev.txt'),
+  extras_require={
+    'develop': requirements('requirements_dev.txt'),
+  },
 
   # If there are data files included in your packages that need to be
   # installed, specify them here.  If using Python 2.6 or less, then these
   # have to be included in MANIFEST.in as well.
-  package_data=packaged('config.json', 'buildInfo.json'),
+  package_data=packaged(),
 
   # Although 'package_data' is the preferred approach, in some case you may
   # need to place data files outside of your packages. See:

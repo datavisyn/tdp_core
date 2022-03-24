@@ -20,9 +20,3 @@ SQLAlchemy==1.4.32
 urllib3==1.26.9
 uvicorn==0.17.6
 yamlreader==3.0.4
-# Pin docutils to avoid AttributeError: 'Values' object has no attribute 'section_self_link'
-# docutils==0.17.1
-docutils==0.18.1
-# Pin markupsafe to avoid ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/usr/local/lib/python3.7/site-packages/markupsafe/__init__.py) 
-# markupsafe==2.0.1
-markupsafe==2.1.1

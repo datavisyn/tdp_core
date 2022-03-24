@@ -97,12 +97,12 @@ class VisynServerSettings(BaseModel):
 class GlobalSettings(BaseSettings):
     env: Literal['development', 'production'] = 'development'
     secret_key: str = "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w"
-    tdp_core: VisynServerSettings = VisynServerSettings()
     start_cmd: Optional[str] = Field(
         None,
         title='Start command',
         description='Optional start command for the server, i.e. db-migration exposes commands like `db-migration exec <..> upgrade head`.'
     )
+    tdp_core: VisynServerSettings = VisynServerSettings()
 
     @property
     def is_development_mode(self) -> bool:

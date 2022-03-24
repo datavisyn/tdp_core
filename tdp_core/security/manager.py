@@ -178,19 +178,27 @@ class SecurityManager:
         app.include_router(jwt_router)
 
 
-_manager: SecurityManager = None
+__security_manager: SecurityManager = None
 
 
 def security_manager():
     """
     :return: the security manager
     """
-    global _manager
-    if _manager is None:
-        _manager = registry.lookup_singleton("security_manager")
-        if _manager is None:
-            raise Exception("No security_manager found")
-    return _manager
+    global __security_manager
+    if __security_manager is None:
+        _log.info("Creating security_manager")
+
+        user_stores = list(filter(None, [p.load().factory() for p in registry.list_plugins("user_stores")]))
+        if len(user_stores) == 0 or get_global_settings().tdp_core.alwaysAppendDummyStore:
+            from .store import dummy_store
+            user_stores.append(dummy_store.create())
+
+        from .store import jwt_store
+        user_stores.append(jwt_store.create())
+
+        __security_manager = SecurityManager(user_stores=user_stores)
+    return __security_manager
 
 
 def is_logged_in():
@@ -211,18 +219,3 @@ def current_user():
     if not user:
         return ANONYMOUS_USER
     return user
-
-
-def create():
-    _log.info("Creating security_manager")
-
-    user_stores = list(filter(None, [p.load().factory() for p in registry.list_plugins("user_stores")]))
-    if len(user_stores) == 0 or get_global_settings().tdp_core.alwaysAppendDummyStore:
-        from .store import dummy_store
-
-        user_stores.append(dummy_store.create())
-    from .store import jwt_store
-
-    user_stores.append(jwt_store.create())
-
-    return SecurityManager(user_stores=user_stores)

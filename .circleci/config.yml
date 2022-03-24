@@ -1,6 +1,10 @@
 version: 2.1
 
 executors:
+  python-test-executor:
+    working_directory: ~/phovea-python
+    docker:
+      - image: circleci/python:3.10-buster
   python-executor:
     working_directory: ~/phovea-python
     docker:
@@ -11,6 +15,58 @@ executors:
       - image: circleci/node:14.17-buster
 
 jobs:
+  python-test-build:
+    executor: python-test-executor
+    steps:
+      - checkout
+      - restore_cache:
+          key: deps-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
+      - run:
+          name: Install dependencies
+          command: |
+            virtualenv ~/venv
+            . ~/venv/bin/activate
+            pip install -e .[develop]
+      # - save_cache:
+      #     key: deps-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
+      #     paths:
+      #     - ~/venv
+      # - run:
+      #     name: Force an update of pip dependencies from git repositories # not sure if this is working ?
+      #     command: |
+      #       . ~/venv/bin/activate
+      #       pip install --upgrade --upgrade-strategy=only-if-needed .[develop]
+      - run:
+          name: Show installed pip packages
+          command: |
+            . ~/venv/bin/activate
+            pip list || true
+      - run:
+          name: Linting
+          command: |
+            . ~/venv/bin/activate
+            flake8 --exclude=.git,venv,deploy,docs,__pycache__,node_modules
+      - run:
+          name: Run tests
+          command: |
+            . ~/venv/bin/activate
+            python setup.py egg_info && pytest tdp_core
+      - run:
+          name: API Doc generation
+          command: |
+            . ~/venv/bin/activate
+            sphinx-apidoc -o docs -f ./tdp_core && sphinx-build ./docs build/docs
+      - run:
+          name: Build wheel
+          command: |
+            . ~/venv/bin/activate
+            python setup.py sdist bdist_wheel
+      - store_artifacts:
+          path: dist
+          destination: dist-python
+      - persist_to_workspace:
+          root: ~/.
+          paths: phovea-python
   python-build:
     executor: python-executor
     steps:
@@ -153,6 +209,10 @@ workflows:
 #      - web-build
   build-branches-only:
     jobs:
+      - python-test-build:
+          filters:
+            tags:
+              ignore: /.*/
       - python-build:
           filters:
             tags:

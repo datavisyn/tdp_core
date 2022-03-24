@@ -2,7 +2,7 @@ from builtins import object
 import logging
 from functools import cmp_to_key
 from typing import List
-from .parser import APlugin, get_extensions_from_plugins
+from .parser import EntryPointPlugin, get_extensions_from_plugins
 
 __registry = None
 
@@ -95,7 +95,7 @@ class PreLoadedExtension(object):
 
 
 class Registry(object):
-    def __init__(self, plugins: List[APlugin]):
+    def __init__(self, plugins: List[EntryPointPlugin]):
         self.plugins = plugins
         self._extensions = [ExtensionDesc(p) for p in get_extensions_from_plugins(plugins)]
         self._extensions.append(PreLoadedExtensionDesc(dict(type="manager", id="registry"), self))
