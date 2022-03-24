@@ -1,4 +1,4 @@
-import { VisynSimpleViewPluginType } from 'tdp_core';
+import { VisynSimpleViewPluginType } from '../interfaces';
 export declare type ProxyViewPluginType = VisynSimpleViewPluginType<{
     currentId: string;
 }, {

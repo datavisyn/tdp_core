@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 import Select from 'react-select';
-import { VisynSimpleViewPluginType } from 'tdp_core';
+import { VisynSimpleViewPluginType } from '../interfaces';
 
 export type ProxyViewPluginType = VisynSimpleViewPluginType<
   { currentId: string },
