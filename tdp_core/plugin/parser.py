@@ -86,9 +86,9 @@ def load_all_plugins() -> List[EntryPointPlugin]:
     # The solution now is to *not* install the plugins, but to add them to the path instead. One remaining problem is that entry_points are not found
     # when a plugin is not installed, because it looks for the <plugin>/*.egg-info/entry_points.txt file which does not exist (yet).
     # Therefore, we need to call the python setup.py egg-info command to generate this information for us.
-    if get_global_settings().is_development_mode:
+    if get_global_settings().is_development_mode and False:
         # Add all workspace paths
-        workspace_setup_pys = glob.glob("/phovea*/*/setup.py")
+        workspace_setup_pys = glob.glob("/phovea/*/setup.py")
         _log.info(f"Discovered {len(workspace_setup_pys)} folders with a setup.py")
         for setup_py, folder in zip(workspace_setup_pys, [path.abspath(path.dirname(s)) for s in workspace_setup_pys]):
             # Add the folder to the sys.path

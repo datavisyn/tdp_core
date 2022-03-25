@@ -3,16 +3,16 @@ FROM python:3.10-buster
 LABEL maintainer="contact@caleydo.org"
 WORKDIR /phovea
 
-
 # install dependencies last step such that everything before can be cached
+# COPY docker_packages.txt docker_script*.sh _docker_data* ./
 COPY . .
 RUN (!(test -s docker_packages.txt) || (apt-get update && \
-    (cat docker_packages.txt | xargs apt-get install -y)))
+    (cat docker_packages.txt | xargs apt-get install -y))) && \
+    (pip install --no-cache-dir -r requirements.txt) && \
+    (pip install --no-cache-dir -r requirements_dev.txt) && \
+    (pip install --no-cache-dir --no-deps -r requirements_workspace.txt)
 RUN (!(test -s docker_script.sh) || (bash ./docker_script.sh))
 
-ENV VISYN_WORKSPACE_REPOS="./tdp_publicdb ./tdp_uploaded_data ./tdp_bi_bioinfodb ./tdp_core"
-
-RUN pip install -v -e ${VISYN_WORKSPACE_REPOS} --install-option="--workspace_repos=${VISYN_WORKSPACE_REPOS}"
 
 CMD [ "sh", "-c", "python -m debugpy --listen 0.0.0.0:5678 -m uvicorn tdp_core.server.main:app --app-dir /phovea/tdp_core --reload --host 0.0.0.0 --port 80"]
 
