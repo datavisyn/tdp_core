@@ -26,9 +26,9 @@ def map_scores(scores, from_idtype, to_idtype):
     """
     if len(scores) == 0:
         return []
-    from .id_mapping.manager import get_mappingmanager
+    from .id_mapping.manager import mapping_manager
 
-    manager = get_mappingmanager()
+    manager = mapping_manager()
     if not manager.can_map(from_idtype, to_idtype):
         abort(400, "score cannot be mapped to target")
     mapped_ids = manager(from_idtype, to_idtype, [r["id"] for r in scores])

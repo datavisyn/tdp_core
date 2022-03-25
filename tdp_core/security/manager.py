@@ -15,7 +15,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from .constants import ACCESS_TOKEN_EXPIRE_MINUTES
 from fastapi.responses import HTMLResponse, JSONResponse
-from functools import wraps
+from functools import lru_cache, wraps
 
 _log = logging.getLogger(__name__)
 
@@ -178,27 +178,22 @@ class SecurityManager:
         app.include_router(jwt_router)
 
 
-__security_manager: SecurityManager = None
-
-
+@lru_cache(maxsize=1)
 def security_manager():
     """
     :return: the security manager
     """
-    global __security_manager
-    if __security_manager is None:
-        _log.info("Creating security_manager")
+    _log.info("Creating security_manager")
 
-        user_stores = list(filter(None, [p.load().factory() for p in registry.list_plugins("user_stores")]))
-        if len(user_stores) == 0 or get_global_settings().tdp_core.alwaysAppendDummyStore:
-            from .store import dummy_store
-            user_stores.append(dummy_store.create())
+    user_stores = list(filter(None, [p.load().factory() for p in registry.list_plugins("user_stores")]))
+    if len(user_stores) == 0 or get_global_settings().tdp_core.alwaysAppendDummyStore:
+        from .store import dummy_store
+        user_stores.append(dummy_store.create())
 
-        from .store import jwt_store
-        user_stores.append(jwt_store.create())
+    from .store import jwt_store
+    user_stores.append(jwt_store.create())
 
-        __security_manager = SecurityManager(user_stores=user_stores)
-    return __security_manager
+    return SecurityManager(user_stores=user_stores)
 
 
 def is_logged_in():
