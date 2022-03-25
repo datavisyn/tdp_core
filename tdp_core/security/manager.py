@@ -61,6 +61,7 @@ class SecurityManager:
         try:
             return self.current_user is not None
         except Exception:
+            _log.exception('Error loading current user')
             return False
 
     @property

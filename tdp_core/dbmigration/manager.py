@@ -3,7 +3,7 @@ import logging
 import re
 from ..plugin.registry import list_plugins, AExtensionDesc
 from ..settings import get_global_settings
-from ..db import configs as engines
+from ..db import db_manager
 from typing import List, Dict, Optional
 import alembic.command
 import alembic.config
@@ -193,13 +193,13 @@ class DBMigrationManager(object):
                 _log.info(f"Both dbKey and dbUrl defined for DBMigration {id} - falling back to dbUrl")
             elif db_key:
                 # Check if engine exists
-                if db_key not in engines:
+                if db_key not in db_manager():
                     _log.error(f"No engine called {db_key} found for DBMigration {id} - is your configuration up to date?")
                     continue
 
                 # Retrieve engine and store string as db url
                 try:
-                    db_url = str(engines.engine(db_key).url)
+                    db_url = str(db_manager().engine(db_key).url)
                 except Exception:
                     _log.exception(f"Error retrieving URL from engine {db_key}")
                     continue

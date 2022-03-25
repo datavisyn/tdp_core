@@ -1,3 +1,4 @@
+from functools import lru_cache
 import logging
 
 from .plugin.registry import list_plugins
@@ -117,3 +118,8 @@ class DBManager(object):
         if item not in self:
             return default
         return self[item]
+
+
+@lru_cache(maxsize=1)
+def db_manager() -> DBManager:
+    return DBManager()

@@ -39,7 +39,7 @@ def _gen():
             return "number"
 
     # integrate all views using the template
-    for database, connector in db.configs.connectors.items():
+    for database, connector in db.db_manager().connectors.items():
 
         db.resolve(database)  # trigger filling up columns
 

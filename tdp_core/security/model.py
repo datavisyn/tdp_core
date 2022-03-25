@@ -23,14 +23,6 @@ class User(BaseModel):
         return str(self.id)
 
     @property
-    def is_authenticated(self):
-        return False
-
-    @property
-    def is_active(self):
-        return False
-
-    @property
     def is_anonymous(self):
         return self.name == ANONYMOUS
 
