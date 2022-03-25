@@ -8,6 +8,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 import json
+from setuptools.command.develop import develop
 
 here = path.abspath(path.dirname(__file__))
 
@@ -19,6 +20,25 @@ def read_it(name):
 
 def requirements(file):
     return [r.strip() for r in read_it(file).strip().split('\n')]
+
+
+class DevelopCommand(develop):
+    user_options = develop.user_options + [
+        ('workspace-repos=', None, 'Space separated list of directories in the workspace. Will be stripped from the loaded requirements. Example: "./tdp_core ./another_repo"'),
+    ]
+
+    def initialize_options(self):
+        develop.initialize_options(self)
+        self.workspace_repos = ''
+
+    def run(self):
+        # Extract the workspace repos by converting "./tdp_core ./another_repo" to ("tdp_core@", "another_repo@")
+        workspace_repos = tuple(filter(None, (path.basename(s) + "@" for s in self.workspace_repos.split(' '))))
+        if workspace_repos:
+            # If any dependency starts with these workspace dependency names, do not install them.
+            self.distribution.install_requires = [s for s in self.distribution.install_requires if not s.startswith(workspace_repos)]
+            self.distribution.install_requires.extend(self.distribution.extras_require['develop'])
+        develop.run(self)
 
 
 pkg = json.loads(read_it('package.json'))
@@ -39,6 +59,10 @@ setup(
 
   entry_points={
     'visyn.plugin': ['{0} = {0}:VisynPlugin'.format(pkg['name'])],
+  },
+
+  cmdclass={
+      'develop': DevelopCommand,
   },
 
   # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
