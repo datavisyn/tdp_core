@@ -120,7 +120,7 @@ jobs:
           command: npm list --depth=1 || true
       - run:
           name: Build
-          command: npm run dist:web
+          command: npm run dist
       - store_artifacts:
           path: dist
           destination: dist-web
