@@ -1,7 +1,7 @@
+from functools import lru_cache
 import logging
 import re
-
-from ..plugin.registry import list_plugins, lookup_singleton, AExtensionDesc
+from ..plugin.registry import list_plugins, AExtensionDesc
 from ..settings import get_global_settings
 from ..db import configs as engines
 from typing import List, Dict, Optional
@@ -236,13 +236,9 @@ class DBMigrationManager(object):
         return list(self._migrations.values())
 
 
-def get_db_migration_manager() -> DBMigrationManager:
-    return lookup_singleton("db-migration-manager")
-
-
-def create_migration_manager():
-    _log.info("Creating db-migration-manager")
-
+@lru_cache(maxsize=1)
+def db_migration_manager() -> DBMigrationManager:
+    _log.info("Creating db_migration_manager")
     return DBMigrationManager(list_plugins("tdp-sql-database-migration"))
 
 
@@ -250,7 +246,7 @@ def create_migration_command(parser):
     """
     Creates a migration command used by the 'command' extension point.
     """
-    db_migration_manager = get_db_migration_manager()
+    manager = db_migration_manager()
 
     subparsers = parser.add_subparsers(dest="action", required=True)
 
@@ -261,7 +257,7 @@ def create_migration_command(parser):
     # Either require individual ids or all flag
     command_parser.add_argument(
         "id",
-        choices=db_migration_manager.ids + ["all"],
+        choices=manager.ids + ["all"],
         help="ID of the migration, or all of them",
     )
 
@@ -269,10 +265,10 @@ def create_migration_command(parser):
 
     def execute(args):
         if args.action == "list":
-            if len(db_migration_manager) == 0:
+            if len(manager) == 0:
                 _log.info("No migrations found")
             else:
-                _log.info("Available migrations: {}".format(", ".join(str(migration) for migration in db_migration_manager.migrations)))
+                _log.info("Available migrations: {}".format(", ".join(str(migration) for migration in manager.migrations)))
         elif args.action == "exec":
             if args.id == "all":
                 # TODO
@@ -281,6 +277,6 @@ def create_migration_command(parser):
 
             # Using REMAINDER as nargs causes the argument to be be optional, but '+' does not work because it also parses additional --attr with the parser which should actually be ignored.
             # Therefore, args.command might be empty and we simply pass None to trigger the error message
-            db_migration_manager[args.id].execute(args.command if len(args.command) > 0 else None)
+            manager[args.id].execute(args.command if len(args.command) > 0 else None)
 
     return lambda args: lambda: execute(args)

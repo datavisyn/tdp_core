@@ -1,7 +1,7 @@
 from ..dataset.dataset_def import to_idtype_description
 from ..utils import etag
 import logging
-from .manager import get_mappingmanager
+from .manager import mapping_manager
 from flask import Flask, request, abort, jsonify
 
 
@@ -20,7 +20,7 @@ def _list_idtypes():
     #         tmp[idtype["id"]] = idtype
 
     # also include the known elements from the mapping graph
-    mapping = get_mappingmanager()
+    mapping = mapping_manager()
     for idtype_id in mapping.known_idtypes():
         tmp[idtype_id] = to_idtype_description(idtype_id)
     return jsonify(list(tmp.values()))
@@ -29,7 +29,7 @@ def _list_idtypes():
 @app_idtype.route("/<idtype>/")
 @etag
 def _maps_to(idtype):
-    mapper = get_mappingmanager()
+    mapper = mapping_manager()
     target_id_types = mapper.maps_to(idtype)
     return jsonify(target_id_types)
 
@@ -43,14 +43,14 @@ def _mapping_to(idtype, to_idtype):
 def _mapping_to_search(idtype, to_idtype):
     query = request.args.get("q", None)
     max_results = int(request.args.get("limit", 10))
-    mapper = get_mappingmanager()
+    mapper = mapping_manager()
     if hasattr(mapper, "search"):
         return jsonify(mapper.search(idtype, to_idtype, query, max_results))
     return jsonify([])
 
 
 def _do_mapping(idtype, to_idtype):
-    mapper = get_mappingmanager()
+    mapper = mapping_manager()
     args = request.values
     first_only = args.get("mode", "all") == "first"
 

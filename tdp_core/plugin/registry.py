@@ -1,10 +1,7 @@
 from builtins import object
 import logging
-from functools import cmp_to_key
 from typing import List
 from .parser import EntryPointPlugin, get_extensions_from_plugins
-
-__registry = None
 
 _log = logging.getLogger(__name__)
 
@@ -74,65 +71,10 @@ class ExtensionDesc(AExtensionDesc):
         return self._impl
 
 
-class PreLoadedExtensionDesc(AExtensionDesc):
-    def __init__(self, desc, impl):
-        super(PreLoadedExtensionDesc, self).__init__(desc)
-        self._wrapper = PreLoadedExtension(impl)
-
-    def load(self):
-        return self._wrapper
-
-
-class PreLoadedExtension(object):
-    def __init__(self, impl):
-        self._impl = impl
-
-    def __call__(self, *args, **kwargs):
-        return self._impl
-
-    def factory(self, *args, **kwargs):
-        return self._impl
-
-
 class Registry(object):
     def __init__(self, plugins: List[EntryPointPlugin]):
         self.plugins = plugins
         self._extensions = [ExtensionDesc(p) for p in get_extensions_from_plugins(plugins)]
-        self._extensions.append(PreLoadedExtensionDesc(dict(type="manager", id="registry"), self))
-
-        self._singletons = None
-
-    @property
-    def singletons(self):
-        import collections
-
-        # check initialization
-        _log = logging.getLogger(__name__)
-        if self._singletons is not None:
-            return self._singletons
-
-        def loader(e):
-            return lambda: e.load().factory()
-
-        # select singleton impl with lowest priority default 100
-        mm = collections.defaultdict(lambda: [])
-        for e in self._extensions:
-            if e.type == "manager":
-                mm[e.id].append(e)
-
-        def compare(a, b):
-            a_prio = getattr(a, "priority", 100)
-            b_prio = getattr(b, "priority", 100)
-            return a_prio - b_prio
-
-        def select(v):
-            v = sorted(v, key=cmp_to_key(compare))
-            _log.info("creating singleton %s %s", v[0].id, getattr(v[0], "module", "server"))
-            return loader(v[0])
-
-        self._singletons = {k: select(v) for k, v in mm.items()}
-
-        return self._singletons
 
     def __len__(self):
         return len(self._extensions)
@@ -150,18 +92,12 @@ class Registry(object):
             return [x for x in self if x.type == plugin_type]
         return [x for x in self if plugin_type(x)]
 
-    def lookup(self, singleton_id):
-        if singleton_id in self.singletons:
-            return self.singletons[singleton_id]()
-        return None
-
 
 def list_plugins(plugin_type=None):
     return get_registry().list(plugin_type)
 
 
-def lookup_singleton(singleton_id):
-    return get_registry().lookup(singleton_id)
+__registry: Registry = None
 
 
 def get_registry() -> Registry:

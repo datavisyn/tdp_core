@@ -45,8 +45,8 @@ def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
         sys.exit(0)
 
     # Initialize global managers. TODO: Should we do that by loading all singletons in the registry?
-    from ..dbmigration.manager import get_db_migration_manager
-    get_db_migration_manager()
+    from ..dbmigration.manager import db_migration_manager
+    db_migration_manager()
 
     app = FastAPI(
         # TODO: Remove debug
@@ -61,11 +61,6 @@ def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
     )
     # Add middleware to access Request "outside"
     app.add_middleware(RequestContextMiddleware)
-
-    # TODO: Check mainapp.py what it does and transfer them here. Currently, we cannot mount a flask app at root, such that the flask app is now mounted at /app/
-    from .mainapp import build_info, health
-    app.add_api_route('/health', health)
-    app.add_api_route('/buildInfo.json', build_info)
 
     # Load all namespace plugins as WSGIMiddleware plugins
     from ..plugin.registry import list_plugins
@@ -95,5 +90,10 @@ def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
     t = threading.Thread(target=load_after_server_started_hooks)
     t.daemon = True
     t.start()
+
+    # TODO: Check mainapp.py what it does and transfer them here. Currently, we cannot mount a flask app at root, such that the flask app is now mounted at /app/
+    from .mainapp import build_info, health
+    app.add_api_route('/health', health)
+    app.add_api_route('/buildInfo.json', build_info)
 
     return app

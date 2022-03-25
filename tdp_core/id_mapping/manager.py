@@ -1,5 +1,6 @@
 from builtins import object, set
-from ..plugin.registry import list_plugins as list_plugin, lookup_singleton
+from functools import lru_cache
+from ..plugin.registry import list_plugins
 from itertools import chain
 from typing import List
 import logging
@@ -196,13 +197,11 @@ class MappingManager(object):
         return list(rset)
 
 
-def create():
+@lru_cache(maxsize=1)
+def mapping_manager() -> MappingManager:
+    _log.info("Creating mapping_manager")
     # Load mapping providers
     providers = []
-    for plugin in list_plugin("mapping_provider"):
+    for plugin in list_plugins("mapping_provider"):
         providers = providers + list(plugin.load().factory())
     return MappingManager(providers)
-
-
-def get_mappingmanager():
-    return lookup_singleton("mappingmanager")

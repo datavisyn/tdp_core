@@ -19,8 +19,6 @@ class VisynPlugin(AVisynPlugin):
         registry.append("json-encoder", "numpy", "tdp_core.encoder.json_encoder")
         registry.append("json-encoder", "set-encoder", "tdp_core.encoder.set_encoder", {})
 
-        registry.append("manager", "mappingmanager", "tdp_core.id_mapping.manager", dict(singleton=True))
-
         registry.append(
             "dataset-specific-handler",
             "handler-graph",
@@ -59,15 +57,9 @@ class VisynPlugin(AVisynPlugin):
         registry.append("namespace", "tdp_xlsx2json", "tdp_core.xlsx", {"namespace": "/api/tdp/xlsx"})
         registry.append("mapping_provider", "tdp_core", "tdp_core.mapping_table")
         # TODO: Check if this is still required?
-        # registry.append("greenifier", "psycopg2", "tdp_core.sql_use_gevent", {})
+        registry.append("greenifier", "psycopg2", "tdp_core.sql_use_gevent", {})
 
         # DB migration plugins
-        registry.append(
-            "manager",
-            "db-migration-manager",
-            "tdp_core.dbmigration.manager",
-            {"singleton": True, "factory": "create_migration_manager"},
-        )
         registry.append(
             "command",
             "db-migration",

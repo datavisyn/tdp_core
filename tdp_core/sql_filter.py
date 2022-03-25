@@ -1,6 +1,6 @@
 import logging
 from werkzeug.datastructures import MultiDict
-from .id_mapping.manager import get_mappingmanager
+from .id_mapping.manager import mapping_manager
 
 _log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def _replace_named_sets_in_ids(v):
 
 
 def _replace_range_in_ids(v, id_type, target_id_type):
-    mappingmanager = get_mappingmanager()
+    mappingmanager = mapping_manager()
 
     union = set()
 
