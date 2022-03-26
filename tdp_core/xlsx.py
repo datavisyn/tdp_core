@@ -1,12 +1,12 @@
-from flask import Flask, request, abort, Response, jsonify
+import logging
+from datetime import datetime
+from tempfile import NamedTemporaryFile
+
+import dateutil.parser
+from flask import Flask, Response, abort, jsonify, request
 from openpyxl import Workbook, load_workbook
 from openpyxl.cell import WriteOnlyCell
 from openpyxl.styles import Font
-from tempfile import NamedTemporaryFile
-from datetime import datetime
-import dateutil.parser
-import logging
-
 
 _log = logging.getLogger(__name__)
 app = Flask(__name__)

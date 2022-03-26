@@ -1,1 +1,1 @@
-from .model import get_global_settings, GlobalSettings  # NOQA
+from .model import GlobalSettings, get_global_settings  # NOQA

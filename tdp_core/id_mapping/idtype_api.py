@@ -1,9 +1,10 @@
+import logging
+
+from flask import Flask, abort, jsonify, request
+
 from ..dataset.dataset_def import to_idtype_description
 from ..utils import etag
-import logging
 from .manager import mapping_manager
-from flask import Flask, request, abort, jsonify
-
 
 app_idtype = Flask(__name__)
 

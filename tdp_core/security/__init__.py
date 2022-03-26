@@ -1,9 +1,10 @@
 # TODO: This file was previously in the tdp_core/security.py file, causing a name conflict with this package.
-from .manager import login_required, current_username, current_user, is_logged_in  # NOQA
-from .permissions import can_execute, can_read, can_write, can, _includes, DEFAULT_PERMISSION  # NOQA
-from ..formatter import formatter
-from .model import User  # NOQA
 from functools import wraps
+
+from ..formatter import formatter
+from .manager import current_user, current_username, is_logged_in, login_required  # NOQA
+from .model import User  # NOQA
+from .permissions import DEFAULT_PERMISSION, _includes, can, can_execute, can_read, can_write  # NOQA
 
 
 # custom login_required decorator to be able to disable the login for DBViews, i.e. to make them public
@@ -15,7 +16,9 @@ def login_required_for_dbviews(func):
         if kwargs.get("view_name", None) is not None and kwargs.get("database", None) is not None:
             view_name, _ = formatter(kwargs["view_name"])
             config, _, view = resolve_view(kwargs["database"], view_name)
-            if isinstance(view.security, bool) and view.security is False:  # if security is disabled for the view just call it without checking the login
+            if (
+                isinstance(view.security, bool) and view.security is False
+            ):  # if security is disabled for the view just call it without checking the login
                 return func(*args, **kwargs)
             return login_required(func)(*args, **kwargs)  # call the function returned by the decorator
         return login_required(func)(*args, **kwargs)

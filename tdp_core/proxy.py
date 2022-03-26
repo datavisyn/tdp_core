@@ -1,6 +1,8 @@
-from flask import Flask, Response, request, abort
-import requests
 import logging
+
+import requests
+from flask import Flask, Response, abort, request
+
 from .plugin.registry import list_plugins
 
 _log = logging.getLogger(__name__)

@@ -1,1 +1,1 @@
-from .manager import DBMigrationManager, DBMigration, db_migration_manager  # NOQA
+from .manager import DBMigration, DBMigrationManager, db_migration_manager  # NOQA

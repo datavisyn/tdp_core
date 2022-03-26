@@ -1,10 +1,11 @@
-from flask import Flask, abort, request, Response, make_response
-from ..utils import etag, jsonify, to_json
-from builtins import str
-from ..plugin.registry import list_plugins
 import logging
-from .dataset import iter, get, list_datasets, add, remove
+from builtins import str
 
+from flask import Flask, Response, abort, make_response, request
+
+from ..plugin.registry import list_plugins
+from ..utils import etag, jsonify, to_json
+from .dataset import add, get, iter, list_datasets, remove
 
 app = Flask(__name__)
 

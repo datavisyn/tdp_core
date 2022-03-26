@@ -1,6 +1,7 @@
-from flask import jsonify, request, abort
-from ...utils import etag
+from flask import abort, jsonify, request
+
 from ...plugin.registry import list_plugins
+from ...utils import etag
 
 
 def _to_desc():

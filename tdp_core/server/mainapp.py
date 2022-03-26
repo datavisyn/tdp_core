@@ -1,11 +1,11 @@
-from flask import send_from_directory, safe_join, Flask
-from builtins import next
+import logging
 import os
 import re
+from builtins import next
+
+from flask import Flask, safe_join, send_from_directory
+
 from ..settings import get_global_settings
-
-
-import logging
 
 _log = logging.getLogger(__name__)
 
@@ -81,7 +81,15 @@ def _generate_index():
     for app in apps:
         text.append("<li>")
         text.append(
-            '<a class="appinfo" href="/' + app.id + '/"><span class="title">' + app.title + '</span><span class="name">' + app.name + '</span><span class="description">' + app.description + "</span></a>"
+            '<a class="appinfo" href="/'
+            + app.id
+            + '/"><span class="title">'
+            + app.title
+            + '</span><span class="name">'
+            + app.name
+            + '</span><span class="description">'
+            + app.description
+            + "</span></a>"
         )
         text.append('<div class="links">')
         if app.homepage and app.homepage != "":
@@ -106,6 +114,7 @@ def _generate_index():
 
 def build_info():
     from codecs import open
+
     from ..plugin.registry import get_registry
 
     dependencies = []

@@ -1,8 +1,8 @@
-from . import get_global_settings
-from ..plugin.registry import list_plugins
-from ..security.dependencies import get_current_user
 from fastapi import APIRouter, Depends, HTTPException
 
+from ..plugin.registry import list_plugins
+from ..security.dependencies import get_current_user
+from . import get_global_settings
 
 router = APIRouter(tags=["Configuration"], prefix="/api/tdp/config", dependencies=[Depends(get_current_user)])
 

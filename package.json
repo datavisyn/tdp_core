@@ -56,7 +56,8 @@
     "release:minor": "npm version minor && npm publish && git push --follow-tags",
     "release:patch": "npm version patch && npm publish && git push --follow-tags",
     "test:watch": "jest --watch",
-    "test": "test ! $(find tests -name \"*.ts\") || jest -w=1"
+    "test": "test ! $(find tests -name \"*.ts\") || jest -w=1",
+    "docker-exec": "docker-compose run -w /phovea/tdp_core api make --"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",

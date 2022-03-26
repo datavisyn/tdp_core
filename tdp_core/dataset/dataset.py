@@ -1,6 +1,7 @@
-from builtins import str
-from ..plugin.registry import list_plugins
 import itertools
+from builtins import str
+
+from ..plugin.registry import list_plugins
 
 _providers_r = None
 

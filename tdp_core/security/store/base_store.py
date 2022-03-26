@@ -1,5 +1,7 @@
 from typing import Union
+
 from fastapi import Request
+
 from ..model import LogoutReturnValue, User
 
 

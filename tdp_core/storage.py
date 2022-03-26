@@ -1,10 +1,13 @@
+import logging
+
+from flask import Flask, abort, jsonify, request
 from pymongo import MongoClient
 from pymongo.collection import ReturnDocument
-from .utils import etag, fix_id, random_id
-from flask import Flask, request, abort, jsonify
+
 import tdp_core.security as security
-import logging
+
 from .settings import get_global_settings
+from .utils import etag, fix_id, random_id
 
 c = get_global_settings().tdp_core.mongo
 _log = logging.getLogger(__name__)

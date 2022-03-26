@@ -1,5 +1,7 @@
 import logging
+
 from werkzeug.datastructures import MultiDict
+
 from .id_mapping.manager import mapping_manager
 
 _log = logging.getLogger(__name__)
@@ -88,7 +90,7 @@ def filter_logic(view, args):
             del where_clause[k]  # delete value
             id_type_and_key = k[7:]
             id_type = id_type_and_key[: id_type_and_key.index("4")]
-            real_key = id_type_and_key[id_type_and_key.index("4") + 1:]  # remove the range4 part
+            real_key = id_type_and_key[id_type_and_key.index("4") + 1 :]  # remove the range4 part
             ids = _replace_range_in_ids(v, id_type, view.idtype)
             if real_key not in where_clause:
                 where_clause[real_key] = ids
@@ -134,7 +136,9 @@ def filter_logic(view, args):
         check_complement_filter = False
 
         if key.startswith("lt_") or key.startswith("gt_"):
-            key = key[3:]  # remove the leading identifiers ('lt_' = less than, 'gt_' = greater than) for filter parameter check in `view.is_valid_filter(key):`
+            key = key[
+                3:
+            ]  # remove the leading identifiers ('lt_' = less than, 'gt_' = greater than) for filter parameter check in `view.is_valid_filter(key):`
             is_greater_less_filter = True
 
         if key.startswith("lte_") or key.startswith("gte_"):
@@ -157,12 +161,20 @@ def filter_logic(view, args):
         # check if column type is number for one of the greater ('gt' and 'gte') or less ('lt' and 'lte') filters
         column_type = view.columns.get(key, {}).get("type")
         if is_greater_less_filter and column_type != "number":
-            raise RuntimeError('Filters "lt","lte","gt", and "gte" are only applicable to columns of type "number", "' + key + '" is not of type "number".')
+            raise RuntimeError(
+                'Filters "lt","lte","gt", and "gte" are only applicable to columns of type "number", "' + key + '" is not of type "number".'
+            )
 
         # check if a greater ('gt' or 'gte') or less ('lt' or 'lte') filter was used on the same column more than once
         if is_greater_less_filter and (len(where_clause[original_key]) > 1):
             separator = '", "'
-            raise RuntimeError('Filter "' + original_key + '" has too many values ("' + separator.join(where_clause[original_key]) + '"), only one is allowed.')
+            raise RuntimeError(
+                'Filter "'
+                + original_key
+                + '" has too many values ("'
+                + separator.join(where_clause[original_key])
+                + '"), only one is allowed.'
+            )
 
         # check complement filter for gte or lte ('gt' or 'lt' respectively)
         if check_complement_filter:
@@ -170,7 +182,13 @@ def filter_logic(view, args):
             complement_filter_exist = complement_filter in where_clause  # look if complement filter exist in the where clause
             # check if complement filter exists
             if complement_filter_exist:
-                raise RuntimeError('Filter "' + original_key + '" has a complement filter "' + complement_filter + '", only one of these filters is allowed.')
+                raise RuntimeError(
+                    'Filter "'
+                    + original_key
+                    + '" has a complement filter "'
+                    + complement_filter
+                    + '", only one of these filters is allowed.'
+                )
 
     where_default_clause = []
     where_group_clauses = {group: [] for group in view.filter_groups()}

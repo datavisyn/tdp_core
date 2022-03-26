@@ -1,9 +1,10 @@
+import logging
 from builtins import object, set
 from functools import lru_cache
-from ..plugin.registry import list_plugins
 from itertools import chain
 from typing import List
-import logging
+
+from ..plugin.registry import list_plugins
 
 _log = logging.getLogger(__name__)
 

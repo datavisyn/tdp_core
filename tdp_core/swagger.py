@@ -1,23 +1,24 @@
 import json
 import logging
-
 from collections import OrderedDict
-from flask import render_template
+
+from flask import Flask, Response, render_template
 from jinja2 import Template
-from flask import Flask, Response
+
 from . import db
-from .utils import secure_replacements
 from .plugin.registry import list_plugins
+from .utils import secure_replacements
 
 _log = logging.getLogger(__name__)
 app = Flask("flask_swagger_ui", static_folder="dist", template_folder="templates")
 
 
 def _gen():
-    from yamlreader import yaml_load, data_merge
-    from yaml import safe_load
-    from os import path
     import io
+    from os import path
+
+    from yaml import safe_load
+    from yamlreader import data_merge, yaml_load
 
     here = path.abspath(path.dirname(__file__))
 

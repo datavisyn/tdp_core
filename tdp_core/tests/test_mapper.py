@@ -1,25 +1,24 @@
 import pytest
+
 from tdp_core.id_mapping.manager import MappingManager
 
 
 @pytest.fixture(scope="module")
 def mapper():
-    mapper = MappingManager([
-      ('ID1', 'ID2', OneToTwoMappingTable('ID1', 'ID2')),
-      ('ID2', 'ID1', TwoToOneMappingTable('ID1', 'ID2')),
-
-      ('ID2', 'ID3', TwoToOneMappingTable('ID2', 'ID3')),
-      ('ID3', 'ID2', OneToTwoMappingTable('ID3', 'ID2')),
-
-      ('ID1', 'ID4', OneToTwoMappingTable('ID1', 'ID4')),
-      ('ID4', 'ID1', TwoToOneMappingTable('ID4', 'ID1')),
-
-      ('ID3', 'ID4', OneToTwoMappingTable('ID3', 'ID4')),
-      ('ID4', 'ID3', TwoToOneMappingTable('ID4', 'ID3')),
-
-      ('ID5', 'ID6', OneToMoreMappingTable('ID5', 'ID6')),
-      ('ID6', 'ID7', OneToMoreMappingTable('ID6', 'ID7'))
-    ])
+    mapper = MappingManager(
+        [
+            ("ID1", "ID2", OneToTwoMappingTable("ID1", "ID2")),
+            ("ID2", "ID1", TwoToOneMappingTable("ID1", "ID2")),
+            ("ID2", "ID3", TwoToOneMappingTable("ID2", "ID3")),
+            ("ID3", "ID2", OneToTwoMappingTable("ID3", "ID2")),
+            ("ID1", "ID4", OneToTwoMappingTable("ID1", "ID4")),
+            ("ID4", "ID1", TwoToOneMappingTable("ID4", "ID1")),
+            ("ID3", "ID4", OneToTwoMappingTable("ID3", "ID4")),
+            ("ID4", "ID3", TwoToOneMappingTable("ID4", "ID3")),
+            ("ID5", "ID6", OneToMoreMappingTable("ID5", "ID6")),
+            ("ID6", "ID7", OneToMoreMappingTable("ID6", "ID7")),
+        ]
+    )
     yield mapper
 
 
@@ -66,41 +65,41 @@ def test_merge_2d_arrays_invalid_length(mapper):
 
 
 def test_known_idtypes(mapper):
-    assert mapper.known_idtypes() == set(['ID1', 'ID2', 'ID3', 'ID4', 'ID5', 'ID6', 'ID7'])
+    assert mapper.known_idtypes() == set(["ID1", "ID2", "ID3", "ID4", "ID5", "ID6", "ID7"])
 
 
 def test_maps_to(mapper):
-    assert set(mapper.maps_to('ID1')) == set(['ID2', 'ID3', 'ID4'])
-    assert set(mapper.maps_to('ID2')) == set(['ID1', 'ID3', 'ID4'])
-    assert set(mapper.maps_to('ID3')) == set(['ID1', 'ID2', 'ID4'])
-    assert set(mapper.maps_to('ID4')) == set(['ID1', 'ID2', 'ID3'])
-    assert set(mapper.maps_to('ID5')) == set(['ID6', 'ID7'])
-    assert set(mapper.maps_to('ID6')) == set(['ID7'])
+    assert set(mapper.maps_to("ID1")) == set(["ID2", "ID3", "ID4"])
+    assert set(mapper.maps_to("ID2")) == set(["ID1", "ID3", "ID4"])
+    assert set(mapper.maps_to("ID3")) == set(["ID1", "ID2", "ID4"])
+    assert set(mapper.maps_to("ID4")) == set(["ID1", "ID2", "ID3"])
+    assert set(mapper.maps_to("ID5")) == set(["ID6", "ID7"])
+    assert set(mapper.maps_to("ID6")) == set(["ID7"])
 
 
 def test_single_mapping(mapper):
-    assert mapper('ID1', 'ID2', [2]) == [[4]]
-    assert mapper('ID1', 'ID4', [2]) == [[4]]
-    assert mapper('ID2', 'ID1', [4]) == [[2]]
-    assert mapper('ID4', 'ID1', [4]) == [[2]]
+    assert mapper("ID1", "ID2", [2]) == [[4]]
+    assert mapper("ID1", "ID4", [2]) == [[4]]
+    assert mapper("ID2", "ID1", [4]) == [[2]]
+    assert mapper("ID4", "ID1", [4]) == [[2]]
 
-    assert mapper('ID1', 'ID2', [2, 4]) == [[4], [8]]
-    assert mapper('ID1', 'ID4', [2, 4]) == [[4], [8]]
-    assert mapper('ID2', 'ID1', [2, 4]) == [[1], [2]]
-    assert mapper('ID4', 'ID1', [2, 4]) == [[1], [2]]
+    assert mapper("ID1", "ID2", [2, 4]) == [[4], [8]]
+    assert mapper("ID1", "ID4", [2, 4]) == [[4], [8]]
+    assert mapper("ID2", "ID1", [2, 4]) == [[1], [2]]
+    assert mapper("ID4", "ID1", [2, 4]) == [[1], [2]]
 
-    assert mapper('ID5', 'ID6', [2, 4]) == [[2, 4, 6], [4, 8, 12]]
-    assert mapper('ID6', 'ID7', [2, 4, 6]) == [[2, 4, 6], [4, 8, 12], [6, 12, 18]]
-    assert mapper('ID6', 'ID7', [4, 8, 12]) == [[4, 8, 12], [8, 16, 24], [12, 24, 36]]
+    assert mapper("ID5", "ID6", [2, 4]) == [[2, 4, 6], [4, 8, 12]]
+    assert mapper("ID6", "ID7", [2, 4, 6]) == [[2, 4, 6], [4, 8, 12], [6, 12, 18]]
+    assert mapper("ID6", "ID7", [4, 8, 12]) == [[4, 8, 12], [8, 16, 24], [12, 24, 36]]
 
 
 def test_transitive_mapping(mapper):
-    assert mapper('ID1', 'ID3', [2]) == [[2]]
-    assert mapper('ID3', 'ID1', [2]) == [[2]]
+    assert mapper("ID1", "ID3", [2]) == [[2]]
+    assert mapper("ID3", "ID1", [2]) == [[2]]
 
 
 def test_transitive_merge_mapping(mapper):
-    assert mapper('ID5', 'ID7', [2, 4]) == [[2, 4, 6, 4, 8, 12, 6, 12, 18], [4, 8, 12, 8, 16, 24, 12, 24, 36]]
+    assert mapper("ID5", "ID7", [2, 4]) == [[2, 4, 6, 4, 8, 12, 6, 12, 18], [4, 8, 12, 8, 16, 24, 12, 24, 36]]
 
 
 class OneToOneMappingTable(object):
@@ -118,7 +117,7 @@ class OneToTwoMappingTable(object):
         self.to_idtype = to_idtype
 
     def __call__(self, ids):
-        return [[id*2] for id in ids]
+        return [[id * 2] for id in ids]
 
 
 class TwoToOneMappingTable(object):
@@ -127,7 +126,7 @@ class TwoToOneMappingTable(object):
         self.to_idtype = to_idtype
 
     def __call__(self, ids):
-        return [[id/2] for id in ids]
+        return [[id / 2] for id in ids]
 
 
 class OneToMoreMappingTable(object):
@@ -136,4 +135,4 @@ class OneToMoreMappingTable(object):
         self.to_idtype = to_idtype
 
     def __call__(self, ids):
-        return [[id, id*2, id*3] for id in ids]
+        return [[id, id * 2, id * 3] for id in ids]

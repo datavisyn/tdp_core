@@ -1,10 +1,10 @@
+import logging
 from typing import Optional
 
-from ...settings import get_global_settings
-import logging
 import jwt
-from ..model import User
 
+from ...settings import get_global_settings
+from ..model import User
 
 _log = logging.getLogger(__name__)
 _conf = get_global_settings().get_nested("tdp_core.security.store.alb_security_store")

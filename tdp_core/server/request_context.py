@@ -1,7 +1,7 @@
 from contextvars import ContextVar
+
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
-
 
 REQUEST_CTX_KEY = "request"
 

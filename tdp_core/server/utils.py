@@ -1,7 +1,8 @@
 import json
 import logging
-from ..settings import get_global_settings
 import time
+
+from ..settings import get_global_settings
 
 _log = logging.getLogger(__name__)
 
@@ -17,11 +18,11 @@ def init_legacy_app(app):
         _log.warn("already inited: " + str(app))
         return
 
-    if hasattr(app, 'debug'):
+    if hasattr(app, "debug"):
         app.debug = get_global_settings().is_development_mode
 
     if get_global_settings().tdp_core:
-        app.config['SECRET_KEY'] = get_global_settings().secret_key
+        app.config["SECRET_KEY"] = get_global_settings().secret_key
 
     @app.errorhandler(500)
     def handle_exception(e):
@@ -29,11 +30,13 @@ def init_legacy_app(app):
         # start with the correct headers and status code from the error
         response = e.get_response()
         # replace the body with JSON
-        response.data = json.dumps({
-            "status_code": e.code,
-            "name": e.name,
-            "detail": e.description,
-        })
+        response.data = json.dumps(
+            {
+                "status_code": e.code,
+                "name": e.name,
+                "detail": e.description,
+            }
+        )
         response.content_type = "application/json"
         return response
 
@@ -46,6 +49,7 @@ def load_after_server_started_hooks():
     The factory method of an extension implementing this extension point should return a function which is then executed here
     """
     from ..plugin.registry import list_plugins
+
     _log = logging.getLogger(__name__)
 
     start = time.time()

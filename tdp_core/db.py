@@ -1,9 +1,11 @@
 import logging
-from .sql_filter import filter_logic
+
 from flask import abort
-from .dbmanager import db_manager
-from .utils import clean_query, secure_replacements
 from werkzeug.datastructures import MultiDict
+
+from .dbmanager import db_manager
+from .sql_filter import filter_logic
+from .utils import clean_query, secure_replacements
 
 _log = logging.getLogger(__name__)
 
@@ -477,7 +479,9 @@ def derive_columns(table_name, engine, columns=None):
 
     # derive the missing domains and categories
     number_columns = [k for k, col in columns.items() if col["type"] == "number" and ("min" not in col or "max" not in col)]
-    categorical_columns = [k for k, col in columns.items() if (col["type"] == "categorical" or col["type"] == "set") and "categories" not in col]
+    categorical_columns = [
+        k for k, col in columns.items() if (col["type"] == "categorical" or col["type"] == "set") and "categories" not in col
+    ]
     if number_columns or categorical_columns:
         with session(engine) as s:
             if number_columns:

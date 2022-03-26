@@ -1,7 +1,8 @@
-from builtins import object
-from ..dataset_def import ADataSetEntry
-from ...plugin.registry import list_plugins
 import abc
+from builtins import object
+
+from ...plugin.registry import list_plugins
+from ..dataset_def import ADataSetEntry
 
 
 class GraphNode(object):

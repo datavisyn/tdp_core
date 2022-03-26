@@ -1,7 +1,9 @@
 import logging
 import re
 from collections import OrderedDict
+
 from tdp_core.security import current_user, is_logged_in
+
 from .utils import clean_query
 
 _log = logging.getLogger(__name__)
@@ -149,7 +151,9 @@ class DBView(object):
             return current_user().has_role(role)
         if callable(self.security):
             return self.security(current_user())
-        if isinstance(self.security, bool) and self.security is False:  # check if security is a boolean and if it's disabled, i.e. it's value is False
+        if (
+            isinstance(self.security, bool) and self.security is False
+        ):  # check if security is a boolean and if it's disabled, i.e. it's value is False
             return True  # return that we're allowed to access the view, because its security is disabled
         return is_logged_in()  # because security is not disabled check if the user is at least logged in
 

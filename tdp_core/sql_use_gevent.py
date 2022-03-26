@@ -31,9 +31,8 @@ def gevent_wait_callback(conn, timeout=None):
 
 try:
     import psycopg2
-    from psycopg2 import extensions
-
     from gevent.socket import wait_read, wait_write
+    from psycopg2 import extensions
 
     _log.info("patching psycopg2 to be green")
     make_psycopg_green()

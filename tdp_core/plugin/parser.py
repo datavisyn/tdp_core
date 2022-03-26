@@ -1,15 +1,17 @@
-from functools import cached_property, lru_cache
-from typing import Dict, List, Tuple, Type
-from importlib.metadata import EntryPoint, entry_points
-import importlib
-from pydantic import BaseSettings
-from .model import AVisynPlugin, RegHelper
-from ..settings import get_global_settings
-import logging
-from os import path
 import glob
-import sys
+import importlib
+import logging
 import subprocess
+import sys
+from functools import cached_property, lru_cache
+from importlib.metadata import EntryPoint, entry_points
+from os import path
+from typing import Dict, List, Tuple, Type
+
+from pydantic import BaseSettings
+
+from ..settings import get_global_settings
+from .model import AVisynPlugin, RegHelper
 
 _log = logging.getLogger(__name__)
 
@@ -47,7 +49,7 @@ class EntryPointPlugin(object):
         self.id = entry_point.name
         self.name = self.id
         self.title = self.name
-        self.description = ''
+        self.description = ""
         self.version = entry_point.dist.version
         self.extensions = []
 
@@ -60,7 +62,7 @@ class EntryPointPlugin(object):
         visyn_plugin_clazz: Type[AVisynPlugin] = self.entry_point.load()
 
         if not issubclass(visyn_plugin_clazz, AVisynPlugin):
-            raise Exception('Entrypoint plugin {self.id} does not load a proper class extending AVisynPlugin')
+            raise Exception("Entrypoint plugin {self.id} does not load a proper class extending AVisynPlugin")
 
         return visyn_plugin_clazz()
 
@@ -74,7 +76,7 @@ class EntryPointPlugin(object):
 
 
 def _find_entry_point_plugins():
-    return [EntryPointPlugin(entry_point) for entry_point in entry_points(group='visyn.plugin')]
+    return [EntryPointPlugin(entry_point) for entry_point in entry_points(group="visyn.plugin")]
 
 
 def load_all_plugins() -> List[EntryPointPlugin]:
@@ -86,7 +88,7 @@ def load_all_plugins() -> List[EntryPointPlugin]:
     # The solution now is to *not* install the plugins, but to add them to the path instead. One remaining problem is that entry_points are not found
     # when a plugin is not installed, because it looks for the <plugin>/*.egg-info/entry_points.txt file which does not exist (yet).
     # Therefore, we need to call the python setup.py egg-info command to generate this information for us.
-    if get_global_settings().is_development_mode and False:
+    if False and get_global_settings().is_development_mode:
         # Add all workspace paths
         workspace_setup_pys = glob.glob("/phovea/*/setup.py")
         _log.info(f"Discovered {len(workspace_setup_pys)} folders with a setup.py")
@@ -97,10 +99,10 @@ def load_all_plugins() -> List[EntryPointPlugin]:
                 sys.path.append(folder)
 
             # Call the setup.py to generate the egg-info folder
-            entry_points_glob = folder + '/*.egg-info/entry_points.txt'
+            entry_points_glob = folder + "/*.egg-info/entry_points.txt"
             if not glob.glob(entry_points_glob):
                 _log.info(f"No '{entry_points_glob}' exists, creating one using setup.py")
-                subprocess.call(['python', setup_py, 'egg_info', '--egg-base', folder])
+                subprocess.call(["python", setup_py, "egg_info", "--egg-base", folder])
 
     # Load all plugins found via entry points
     plugins: List[EntryPointPlugin] = [p for p in _find_entry_point_plugins() if not is_disabled_plugin(p)]
@@ -117,7 +119,7 @@ def get_extensions_from_plugins(plugins: List[EntryPointPlugin]) -> List:
         reg = RegHelper(plugin)
         plugin.plugin.register(reg)
         ext = [r for r in reg if not is_disabled_extension(r, "python", plugin)]
-        logging.info(f'plugin {plugin.id} registered {len(ext)} extension(s)')
+        logging.info(f"plugin {plugin.id} registered {len(ext)} extension(s)")
         plugin.extensions = ext
         server_extensions.extend(ext)
 
@@ -133,7 +135,7 @@ def get_config_from_plugins(plugins: List[EntryPointPlugin]) -> Tuple[List[Dict[
     for plugin in plugins:
         plugin_settings_model = plugin.plugin.setting_class
         if plugin_settings_model:
-            logging.info(f'Plugin {plugin.id} has a settings model')
+            logging.info(f"Plugin {plugin.id} has a settings model")
             # Load the class of the config and wrap it in a tuple like (<clazz>, ...),
             # such that pydantic can use it as type-hint in the create_model class.
             # Otherwise, it would except <clazz> to be the default value...

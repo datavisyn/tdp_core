@@ -1,7 +1,8 @@
-from typing import Callable, Union
-from ..plugin.registry import list_plugins
 import logging
 import shlex
+from typing import Callable, Union
+
+from ..plugin.registry import list_plugins
 
 _log = logging.getLogger(__name__)
 
@@ -26,12 +27,12 @@ def parse_command_string(cmd: Union[str, None]) -> Union[Callable, None]:
 
     import argparse
 
-    parser = argparse.ArgumentParser(description='Visyn Server')
+    parser = argparse.ArgumentParser(description="Visyn Server")
 
     # create a subparser, with the first argument being the command id
-    subparsers = parser.add_subparsers(dest='cmd')
+    subparsers = parser.add_subparsers(dest="cmd")
 
-    for command in list_plugins('command'):
+    for command in list_plugins("command"):
         _log.info(f"Received an alternative starting command: {command.id}")
 
         # create a argument parser for this specific command

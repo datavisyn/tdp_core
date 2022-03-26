@@ -1,12 +1,13 @@
-from builtins import object
 import abc
-from ..utils import fix_id
+from builtins import object
+
 from ..security import can_read, can_write
+from ..utils import fix_id
 
 
 def to_plural(s):
     if s[len(s) - 1] == "y":
-        return s[0:len(s) - 1] + "ies"
+        return s[0 : len(s) - 1] + "ies"
     return s + "s"
 
 

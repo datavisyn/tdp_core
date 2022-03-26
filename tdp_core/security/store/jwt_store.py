@@ -1,12 +1,14 @@
-from fastapi import Request
-from fastapi.security.utils import get_authorization_scheme_param
 import logging
 
-from tdp_core.security.model import LogoutReturnValue
-from .base_store import BaseStore
-from ..model import User
-from ..constants import SECRET_KEY, ALGORITHM
 import jwt
+from fastapi import Request
+from fastapi.security.utils import get_authorization_scheme_param
+
+from tdp_core.security.model import LogoutReturnValue
+
+from ..constants import ALGORITHM, SECRET_KEY
+from ..model import User
+from .base_store import BaseStore
 
 _log = logging.getLogger(__name__)
 

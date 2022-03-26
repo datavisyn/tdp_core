@@ -1,7 +1,8 @@
-import logging
-from .dbview import DBMapping
-from . import db
 import itertools
+import logging
+
+from . import db
+from .dbview import DBMapping
 
 _log = logging.getLogger(__name__)
 

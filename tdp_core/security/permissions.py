@@ -1,7 +1,6 @@
-from .manager import current_user
 from .constants import ANONYMOUS
+from .manager import current_user
 from .model import User
-
 
 PERMISSION_READ = 4
 PERMISSION_WRITE = 2
@@ -10,12 +9,18 @@ PERMISSION_EXECUTE = 1
 
 def to_number(p_set):
     return (
-        (PERMISSION_READ if PERMISSION_READ in p_set else 0) + (PERMISSION_WRITE if PERMISSION_WRITE in p_set else 0) + (PERMISSION_EXECUTE if PERMISSION_EXECUTE in p_set else 0)
+        (PERMISSION_READ if PERMISSION_READ in p_set else 0)
+        + (PERMISSION_WRITE if PERMISSION_WRITE in p_set else 0)
+        + (PERMISSION_EXECUTE if PERMISSION_EXECUTE in p_set else 0)
     )
 
 
 def to_string(p_set):
-    return ("r" if PERMISSION_READ in p_set else "-") + ("w" if PERMISSION_WRITE in p_set else "-") + ("x" if PERMISSION_EXECUTE in p_set else "-")
+    return (
+        ("r" if PERMISSION_READ in p_set else "-")
+        + ("w" if PERMISSION_WRITE in p_set else "-")
+        + ("x" if PERMISSION_EXECUTE in p_set else "-")
+    )
 
 
 def _from_number(p):

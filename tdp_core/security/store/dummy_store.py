@@ -1,8 +1,10 @@
-from fastapi import Request
-from ..model import User
 import hashlib
 import logging
+
+from fastapi import Request
+
 from ...settings import get_global_settings
+from ..model import User
 from .base_store import BaseStore
 
 _log = logging.getLogger(__name__)

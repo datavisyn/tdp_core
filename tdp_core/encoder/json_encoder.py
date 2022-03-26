@@ -1,9 +1,9 @@
-from builtins import range
-from builtins import object
-import numpy as np
-import numpy.ma as ma
 import datetime as dt
 import decimal
+from builtins import object, range
+
+import numpy as np
+import numpy.ma as ma
 
 
 class NumpyTablesEncoder(object):

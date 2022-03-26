@@ -1,21 +1,19 @@
-from datetime import datetime
-from typing import List, Union
-from fastapi import FastAPI, Request
-from .store.base_store import BaseStore
-from ..server.request_context import get_request
-from ..plugin import registry
-from .model import ANONYMOUS_USER, LogoutReturnValue, Token, User
-from ..settings import get_global_settings
 import logging
-import jwt
-from .constants import ANONYMOUS, SECRET_KEY, ALGORITHM
-from fastapi import APIRouter
-from datetime import timedelta
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
-from .constants import ACCESS_TOKEN_EXPIRE_MINUTES
-from fastapi.responses import HTMLResponse, JSONResponse
+from datetime import datetime, timedelta
 from functools import lru_cache, wraps
+from typing import List, Union
+
+import jwt
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, status
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.security import OAuth2PasswordRequestForm
+
+from ..plugin import registry
+from ..server.request_context import get_request
+from ..settings import get_global_settings
+from .constants import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, ANONYMOUS, SECRET_KEY
+from .model import ANONYMOUS_USER, LogoutReturnValue, Token, User
+from .store.base_store import BaseStore
 
 _log = logging.getLogger(__name__)
 
@@ -61,7 +59,7 @@ class SecurityManager:
         try:
             return self.current_user is not None
         except Exception:
-            _log.exception('Error loading current user')
+            _log.exception("Error loading current user")
             return False
 
     @property
@@ -189,9 +187,11 @@ def security_manager():
     user_stores = list(filter(None, [p.load().factory() for p in registry.list_plugins("user_stores")]))
     if len(user_stores) == 0 or get_global_settings().tdp_core.alwaysAppendDummyStore:
         from .store import dummy_store
+
         user_stores.append(dummy_store.create())
 
     from .store import jwt_store
+
     user_stores.append(jwt_store.create())
 
     return SecurityManager(user_stores=user_stores)

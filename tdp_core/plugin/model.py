@@ -1,5 +1,6 @@
-from typing import Any, Dict, Type
 from abc import ABC, abstractmethod
+from typing import Any, Dict, Type
+
 from pydantic import BaseSettings
 
 
@@ -25,7 +26,6 @@ class RegHelper(object):
 
 
 class AVisynPlugin(ABC):
-
     @abstractmethod
     def register(self, registry: RegHelper):
         pass

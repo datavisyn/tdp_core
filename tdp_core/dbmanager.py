@@ -1,5 +1,5 @@
-from functools import lru_cache
 import logging
+from functools import lru_cache
 
 from .plugin.registry import list_plugins
 from .settings import get_global_settings

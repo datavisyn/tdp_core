@@ -1,11 +1,12 @@
-from .utils import no_cache
-from . import db
-from .utils import map_scores
-from flask import jsonify, Flask, request, abort
-from .security import login_required_for_dbviews
-from .formatter import formatter
 import logging
 from functools import wraps
+
+from flask import Flask, abort, jsonify, request
+
+from . import db
+from .formatter import formatter
+from .security import login_required_for_dbviews
+from .utils import map_scores, no_cache
 
 _log = logging.getLogger(__name__)
 app = Flask(__name__)

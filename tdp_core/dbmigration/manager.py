@@ -1,15 +1,16 @@
-from functools import lru_cache
 import logging
 import re
-from ..plugin.registry import list_plugins, AExtensionDesc
-from ..settings import get_global_settings
-from ..db import db_manager
-from typing import List, Dict, Optional
+from argparse import REMAINDER
+from functools import lru_cache
+from os import path
+from typing import Dict, List, Optional
+
 import alembic.command
 import alembic.config
-from os import path
-from argparse import REMAINDER
 
+from ..db import db_manager
+from ..plugin.registry import AExtensionDesc, list_plugins
+from ..settings import get_global_settings
 
 __author__ = "Datavisyn"
 _log = logging.getLogger(__name__)
@@ -186,7 +187,11 @@ class DBMigrationManager(object):
                 missing_fields.append("dbUrl or dbKey")
 
             if len(missing_fields) > 0:
-                _log.error("No {} defined for DBMigration {} - is your configuration up to date?".format(", ".join(missing_fields), id or "<UNKNOWN>"))
+                _log.error(
+                    "No {} defined for DBMigration {} - is your configuration up to date?".format(
+                        ", ".join(missing_fields), id or "<UNKNOWN>"
+                    )
+                )
                 continue
 
             if db_key and db_url:
@@ -272,7 +277,9 @@ def create_migration_command(parser):
         elif args.action == "exec":
             if args.id == "all":
                 # TODO
-                _log.info("Currently, only single migrations are supported. Please execute the command for each migration individually as we are working on a fix.")
+                _log.info(
+                    "Currently, only single migrations are supported. Please execute the command for each migration individually as we are working on a fix."
+                )
                 return
 
             # Using REMAINDER as nargs causes the argument to be be optional, but '+' does not work because it also parses additional --attr with the parser which should actually be ignored.

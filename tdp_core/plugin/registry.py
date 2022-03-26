@@ -1,6 +1,7 @@
-from builtins import object
 import logging
+from builtins import object
 from typing import List
+
 from .parser import EntryPointPlugin, get_extensions_from_plugins
 
 _log = logging.getLogger(__name__)

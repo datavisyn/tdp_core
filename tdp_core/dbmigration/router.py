@@ -1,9 +1,9 @@
 import logging
 
 from flask import Flask, abort, jsonify
-from ..security import login_required
-from .manager import db_migration_manager, DBMigration
 
+from ..security import login_required
+from .manager import DBMigration, db_migration_manager
 
 __author__ = "Datavisyn"
 _log = logging.getLogger(__name__)
