@@ -192,7 +192,6 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     useEffect(() => {
         const zoom = d3.zoom();
         if (!xScale || !yScale || config.dragMode === EScatterSelectSettings.RECTANGLE) {
-            d3.select(`#${id}`).call(zoom).on('zoom', null);
             return;
         }
         zoom.on('zoom', (event) => {
@@ -203,14 +202,13 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             // But when I made it a useState object it didnt work with the object.
             xZoomedScale.current = newX;
             yZoomedScale.current = newY;
-            console.log('setting zoom transforms');
             setXRescaleFunc(() => (x) => transform.rescaleX(x));
             setYRescaleFunc(() => (y) => transform.rescaleY(y));
             setZoomScale(transform.k);
             setXZoomTransform(transform.x);
             setYZoomTransform(transform.y);
         });
-        d3.select(`#${id}`).call(zoom);
+        d3.select(`#${id}zoom`).call(zoom);
     }, [id, xScale, yScale, height, width, config.dragMode]);
     // // apply brushing
     useEffect(() => {
@@ -265,7 +263,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
                     dominantBaseline: 'middle',
                     textAnchor: 'middle',
                     transform: `translate(10px, ${margin.top + height / 2}px) rotate(-90deg)`,
-                } }, (_b = config.numColumnsSelected[1]) === null || _b === void 0 ? void 0 : _b.name)),
+                } }, (_b = config.numColumnsSelected[1]) === null || _b === void 0 ? void 0 : _b.name),
+            React.createElement("rect", { id: `${id}zoom`, style: { width, height, opacity: 0, pointerEvents: config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none' } })),
         React.createElement("div", { className: "position-absolute", style: { left: margin.left + width, top: margin.top } },
             React.createElement(Legend, { categories: colorScale ? colorScale.domain() : [], filteredCategories: colorScale ? filteredCategories : [], colorScale: colorScale || null, onClick: (s) => filteredCategories.includes(s)
                     ? setFilteredCategories(filteredCategories.filter((f) => f !== s))

@@ -279,7 +279,6 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     const zoom = d3.zoom();
 
     if (!xScale || !yScale || config.dragMode === EScatterSelectSettings.RECTANGLE) {
-      d3.select(`#${id}`).call(zoom).on('zoom', null);
       return;
     }
 
@@ -294,8 +293,6 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
       xZoomedScale.current = newX;
       yZoomedScale.current = newY;
 
-      console.log('setting zoom transforms');
-
       setXRescaleFunc(() => (x) => transform.rescaleX(x));
       setYRescaleFunc(() => (y) => transform.rescaleY(y));
 
@@ -304,7 +301,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
       setYZoomTransform(transform.y);
     });
 
-    d3.select(`#${id}`).call(zoom);
+    d3.select(`#${id}zoom`).call(zoom);
   }, [id, xScale, yScale, height, width, config.dragMode]);
 
   // // apply brushing
@@ -385,6 +382,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         >
           {config.numColumnsSelected[1]?.name}
         </text>
+        <rect id={`${id}zoom`} style={{ width, height, opacity: 0, pointerEvents: config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none' }} />
       </svg>
       <div className="position-absolute" style={{ left: margin.left + width, top: margin.top }}>
         <Legend
