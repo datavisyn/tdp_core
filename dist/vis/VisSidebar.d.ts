@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { IVisConfig, VisColumn, ICommonVisSideBarProps } from './interfaces';
 export declare type VisSidebarProps = {
     /**

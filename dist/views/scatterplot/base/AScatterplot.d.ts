@@ -1,3 +1,4 @@
+/// <reference types="cypress" />
 import { AxisScale, Axis } from 'd3-axis';
 import { ZoomScale, ZoomTransform, ZoomBehavior } from 'd3-zoom';
 import { Quadtree } from 'd3-quadtree';

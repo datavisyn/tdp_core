@@ -1,6 +1,5 @@
 import { ModeWrapper, CLUEMode } from '../base';
-import { LayoutedProvVis } from '../provvis';
-import { VerticalStoryVis } from '../provvis';
+import { LayoutedProvVis, VerticalStoryVis } from '../provvis';
 import { ProvenanceGraph, StateNode, SlideNode } from '../provenance';
 import { CLUEGraphManager, IClueState } from '../base/CLUEGraphManager';
 import { WrapperUtils } from '../base/WrapperUtils';
