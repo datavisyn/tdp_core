@@ -6,6 +6,7 @@ import threading
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
+from pydantic.utils import deep_update
 
 from .request_context import RequestContextMiddleware
 
@@ -25,10 +26,10 @@ def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
 
     plugins = load_all_plugins()
     # With all the plugins, load the corresponding configuration files and create a new model based on the global settings, with all plugin models as sub-models
-    plugin_settings_models = get_config_from_plugins(plugins)
+    [plugin_config_files, plugin_settings_models] = get_config_from_plugins(plugins)
     visyn_server_settings = create_model("VisynServerSettings", __base__=settings_model.GlobalSettings, **plugin_settings_models)
     # Patch the global settings by instantiating the new settings model with the global config, all config.json(s), and pydantic models
-    settings_model.__global_settings = visyn_server_settings(**workspace_config)
+    settings_model.__global_settings = visyn_server_settings(**deep_update(*plugin_config_files, workspace_config))
     logging.info("All settings successfully loaded")
 
     # Finally, initialize the registry as the config is now up-to-date

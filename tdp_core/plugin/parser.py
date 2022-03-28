@@ -124,4 +124,4 @@ def get_config_from_plugins(plugins: List[EntryPointPlugin]) -> Tuple[List[Dict[
         #     logging.info(f'Plugin {plugin.id} has a config.json')
         #     files.append({f"{plugin.id}": load_config_file(f)})
 
-    return models
+    return (files, models)
