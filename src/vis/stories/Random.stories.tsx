@@ -1,7 +1,16 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Vis } from './Vis';
-import { EColumnTypes, VisColumn } from './interfaces';
+import { Vis } from '../Vis';
+import {
+  EBarDirection,
+  EBarDisplayType,
+  EBarGroupingType,
+  EColumnTypes,
+  ENumericalColorScaleType,
+  ESupportedPlotlyVis,
+  EViolinOverlay,
+  VisColumn,
+} from '../interfaces';
 
 function fetchData(numberOfPoints: number): VisColumn[] {
   const dataGetter = async () => {
@@ -69,9 +78,8 @@ function fetchData(numberOfPoints: number): VisColumn[] {
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
-  title: 'Example/Vis',
+  title: 'Example/Vis/RandomData',
   component: Vis,
-  // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   argTypes: {
     pointCount: { control: 'number' },
   },
@@ -88,7 +96,108 @@ const Template: ComponentStory<typeof Vis> = (args) => {
 
   return <Vis {...args} columns={columns} />;
 };
-
-export const Default = Template.bind({}) as typeof Template;
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
-Default.args = {};
+
+export const ScatterPlot = Template.bind({}) as typeof Template;
+ScatterPlot.args = {
+  externalConfig: {
+    type: ESupportedPlotlyVis.SCATTER,
+    numColumnsSelected: [
+      {
+        description: '',
+        id: 'pca_x',
+        name: 'pca_x',
+      },
+      {
+        description: '',
+        id: 'pca_y',
+        name: 'pca_y',
+      },
+    ],
+    color: null,
+    numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+    shape: null,
+    isRectBrush: true,
+    alphaSliderVal: 1,
+  },
+};
+
+export const BarChart = Template.bind({}) as typeof Template;
+BarChart.args = {
+  externalConfig: {
+    type: ESupportedPlotlyVis.BAR,
+    multiples: null,
+    group: null,
+    direction: EBarDirection.VERTICAL,
+    display: EBarDisplayType.DEFAULT,
+    groupType: EBarGroupingType.GROUP,
+    numColumnsSelected: [],
+    catColumnsSelected: [
+      {
+        description: '',
+        id: 'category',
+        name: 'category',
+      },
+    ],
+  },
+};
+
+export const ViolinPlot = Template.bind({}) as typeof Template;
+ViolinPlot.args = {
+  externalConfig: {
+    type: ESupportedPlotlyVis.VIOLIN,
+    numColumnsSelected: [
+      {
+        description: '',
+        id: 'pca_x',
+        name: 'pca_x',
+      },
+      {
+        description: '',
+        id: 'pca_y',
+        name: 'pca_y',
+      },
+    ],
+    catColumnsSelected: [],
+    violinOverlay: EViolinOverlay.NONE,
+  },
+};
+
+export const StripPlot = Template.bind({}) as typeof Template;
+StripPlot.args = {
+  externalConfig: {
+    type: ESupportedPlotlyVis.STRIP,
+    numColumnsSelected: [
+      {
+        description: '',
+        id: 'pca_x',
+        name: 'pca_x',
+      },
+      {
+        description: '',
+        id: 'pca_y',
+        name: 'pca_y',
+      },
+    ],
+    catColumnsSelected: [],
+  },
+};
+
+export const ParallelCoordinatesPlot = Template.bind({}) as typeof Template;
+ParallelCoordinatesPlot.args = {
+  externalConfig: {
+    type: ESupportedPlotlyVis.PCP,
+    allColumnsSelected: [
+      {
+        description: '',
+        id: 'pca_x',
+        name: 'pca_x',
+      },
+      {
+        description: '',
+        id: 'pca_y',
+        name: 'pca_y',
+      },
+    ],
+  },
+};
