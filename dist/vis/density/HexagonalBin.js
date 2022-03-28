@@ -186,8 +186,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             const { transform } = event;
             const newX = transform.rescaleX(xScale);
             const newY = transform.rescaleY(yScale);
-            // Question: I dont think this should be a ref, because it doesnt actually cause a re render. Only the other setters below make it work, if i moved them above this code there would be bugs. 
-            // But when I made it a useState object it didnt work with the object. 
+            // Question: I dont think this should be a ref, because it doesnt actually cause a re render. Only the other setters below make it work, if i moved them above this code there would be bugs.
+            // But when I made it a useState object it didnt work with the object.
             xZoomedScale.current = newX;
             yZoomedScale.current = newY;
             setZoomScale(transform.k);
@@ -207,16 +207,19 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             [margin.left + width, margin.top + height],
         ]);
         d3.select(`#${id}brush`).call(brush.on('end', function (event) {
+            console.log(event);
             if (!event.sourceEvent)
                 return;
             if (!event.selection) {
                 selectionCallback([]);
+                return;
             }
-            const selectedHexes = hexes.filter((currHex) => currHex.x >= event.selection[0][0] - margin.left &&
-                currHex.x <= event.selection[1][0] - margin.left &&
-                currHex.y >= event.selection[0][1] - margin.top &&
-                currHex.y <= event.selection[1][1] - margin.top);
+            const selectedHexes = hexes.filter((currHex) => currHex.x >= event.selection[0][0] &&
+                currHex.x <= event.selection[1][0] &&
+                currHex.y >= event.selection[0][1] &&
+                currHex.y <= event.selection[1][1]);
             const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
+            console.log(allSelectedPoints, selectedHexes);
             selectionCallback(allSelectedPoints);
             d3.select(this).call(brush.move, null);
         }));
