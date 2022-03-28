@@ -206,6 +206,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             [margin.left, margin.top],
             [margin.left + width, margin.top + height],
         ]);
+        // it does look like we are creating a ton of brush events without cleaning them up right here.
+        // But d3.call will remove the previous brush event when called, so this actually works as expected.
         d3.select(`#${id}brush`).call(brush.on('end', function (event) {
             console.log(event);
             if (!event.sourceEvent)
@@ -214,16 +216,17 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
                 selectionCallback([]);
                 return;
             }
-            const selectedHexes = hexes.filter((currHex) => currHex.x >= event.selection[0][0] &&
-                currHex.x <= event.selection[1][0] &&
-                currHex.y >= event.selection[0][1] &&
-                currHex.y <= event.selection[1][1]);
+            console.log(xZoomTransform, yZoomTransform, zoomScale);
+            const selectedHexes = hexes.filter((currHex) => currHex.x >= event.selection[0][0] - xZoomTransform &&
+                currHex.x <= event.selection[1][0] - xZoomTransform &&
+                currHex.y >= event.selection[0][1] - yZoomTransform &&
+                currHex.y <= event.selection[1][1] - yZoomTransform);
             const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
-            console.log(allSelectedPoints, selectedHexes);
+            console.log(hexes, allSelectedPoints);
             selectionCallback(allSelectedPoints);
             d3.select(this).call(brush.move, null);
         }));
-    }, [width, height, id, hexes, selectionCallback, config.dragMode]);
+    }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale]);
     return (React.createElement("div", { ref: ref, className: "mw-100" },
         React.createElement("svg", { id: id, style: { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom } },
             React.createElement("defs", null,
