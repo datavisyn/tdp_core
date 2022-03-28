@@ -31,6 +31,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     const yZoomedScale = useRef(null);
     const [xZoomTransform, setXZoomTransform] = useState(0);
     const [yZoomTransform, setYZoomTransform] = useState(0);
+    const [xRescaleFunc, setXRescaleFunc] = useState(null);
+    const [yRescaleFunc, setYRescaleFunc] = useState(null);
     const [zoomScale, setZoomScale] = useState(1);
     const [filteredCategories, setFilteredCategories] = useState([]);
     const { value: allColumns, status: colsStatus, error: colsError } = useAsync(getHexData, [columns, config.numColumnsSelected, config.color]);
@@ -84,6 +86,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     // resize observer for setting size of the svg and updating on size change
     useEffect(() => {
         const ro = new ResizeObserver((entries) => {
+            console.log('setting sizes');
             setHeight(entries[0].contentRect.height - margin.top - margin.bottom);
             setWidth(entries[0].contentRect.width - margin.left - margin.right);
         });
@@ -96,24 +99,34 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         if (currentX === null || currentX === void 0 ? void 0 : currentX.allValues) {
             const min = d3.min(currentX.allValues.map((c) => c.val));
             const max = d3.max(currentX.allValues.map((c) => c.val));
-            return d3
+            const newScale = d3
                 .scaleLinear()
                 .domain([min, max])
                 .range([margin.left, margin.left + width]);
+            if (xRescaleFunc) {
+                xZoomedScale.current = xRescaleFunc(newScale);
+            }
+            return newScale;
         }
         return null;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentX === null || currentX === void 0 ? void 0 : currentX.allValues, width]);
     // create y scale
     const yScale = useMemo(() => {
         if (currentY === null || currentY === void 0 ? void 0 : currentY.allValues) {
             const min = d3.min(currentY.allValues.map((c) => c.val));
             const max = d3.max(currentY.allValues.map((c) => c.val));
-            return d3
+            const newScale = d3
                 .scaleLinear()
                 .domain([min, max])
                 .range([margin.top + height, margin.top]);
+            if (yRescaleFunc) {
+                yZoomedScale.current = yRescaleFunc(newScale);
+            }
+            return newScale;
         }
         return null;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentY === null || currentY === void 0 ? void 0 : currentY.allValues, height]);
     // creating d3 hexbin object to do hex math for me
     const d3Hexbin = useMemo(() => {
@@ -190,6 +203,9 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             // But when I made it a useState object it didnt work with the object.
             xZoomedScale.current = newX;
             yZoomedScale.current = newY;
+            console.log('setting zoom transforms');
+            setXRescaleFunc(() => (x) => transform.rescaleX(x));
+            setYRescaleFunc(() => (y) => transform.rescaleY(y));
             setZoomScale(transform.k);
             setXZoomTransform(transform.x);
             setYZoomTransform(transform.y);
@@ -209,24 +225,26 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         // it does look like we are creating a ton of brush events without cleaning them up right here.
         // But d3.call will remove the previous brush event when called, so this actually works as expected.
         d3.select(`#${id}brush`).call(brush.on('end', function (event) {
-            console.log(event);
             if (!event.sourceEvent)
                 return;
             if (!event.selection) {
                 selectionCallback([]);
                 return;
             }
-            console.log(xZoomTransform, yZoomTransform, zoomScale);
-            const selectedHexes = hexes.filter((currHex) => currHex.x >= event.selection[0][0] - xZoomTransform &&
-                currHex.x <= event.selection[1][0] - xZoomTransform &&
-                currHex.y >= event.selection[0][1] - yZoomTransform &&
-                currHex.y <= event.selection[1][1] - yZoomTransform);
+            const selectedHexes = hexes.filter((currHex) => xZoomedScale.current
+                ? currHex.x >= xScale(xZoomedScale.current.invert(event.selection[0][0])) &&
+                    currHex.x <= xScale(xZoomedScale.current.invert(event.selection[1][0])) &&
+                    currHex.y >= yScale(yZoomedScale.current.invert(event.selection[0][1])) &&
+                    currHex.y <= yScale(yZoomedScale.current.invert(event.selection[1][1]))
+                : currHex.x >= event.selection[0][0] &&
+                    currHex.x <= event.selection[1][0] &&
+                    currHex.y >= event.selection[0][1] &&
+                    currHex.y <= event.selection[1][1]);
             const allSelectedPoints = selectedHexes.map((currHex) => currHex.map((points) => points[3])).flat();
-            console.log(hexes, allSelectedPoints);
             selectionCallback(allSelectedPoints);
             d3.select(this).call(brush.move, null);
         }));
-    }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale]);
+    }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale, xScale, yScale]);
     return (React.createElement("div", { ref: ref, className: "mw-100" },
         React.createElement("svg", { id: id, style: { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom } },
             React.createElement("defs", null,
