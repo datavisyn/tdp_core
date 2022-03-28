@@ -127,7 +127,7 @@ export interface IPCPConfig {
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig | IDensityConfig;
 
-type ValueGetter<T> = () => Promise<T>;
+type ValueGetter<T> = () => T | Promise<T>;
 
 export interface IVisCommonValue<Type extends number | string> {
   /**

@@ -2,6 +2,7 @@ import { FormElementType } from './form/interfaces';
 import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH, EP_TDP_CORE_FORM_ELEMENT } from './base/extensions';
 import { EP_PHOVEA_CORE_LOCALE, PluginRegistry, ILocaleEPDesc, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT } from './app';
 import { IRegistry } from './base';
+import { DemoVisynViewPluginType } from './views/visyn/demo/interfaces';
 
 export default function (registry: IRegistry) {
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -183,39 +184,6 @@ export default function (registry: IRegistry) {
   );
   /// #endif
 
-  /// #if include('clue', 'multiform')
-  registry.push(
-    'actionFunction',
-    'transform',
-    function () {
-      return import('./base/Multiform').then((m) => m.Multiform);
-    },
-    {
-      factory: 'transform',
-    },
-  );
-  registry.push(
-    'actionFunction',
-    'changeVis',
-    function () {
-      return import('./base/Multiform').then((m) => m.Multiform);
-    },
-    {
-      factory: 'changeVis',
-    },
-  );
-  registry.push(
-    'actionFunction',
-    'select',
-    function () {
-      return import('./base/Multiform').then((m) => m.Multiform);
-    },
-    {
-      factory: 'select',
-    },
-  );
-  /// #endif
-
   registry.push(
     EP_PHOVEA_CORE_LOCALE,
     'phoveaClueLocaleEN',
@@ -228,108 +196,18 @@ export default function (registry: IRegistry) {
   );
 
   /* phovea_core */
-  /// #if include('datatype', 'matrix')
-  registry.push(
-    'datatype',
-    'matrix',
-    function () {
-      return import('./matrix/Matrix').then((m) => m.Matrix);
-    },
-    {
-      factory: 'create',
-      static: true,
-    },
-  );
-  /// #endif
-  /// #if include('datatype', 'table')
-  registry.push(
-    'datatype',
-    'table',
-    function () {
-      return import('./table/Table').then((m) => m.Table);
-    },
-    {
-      factory: 'create',
-      static: true,
-    },
-  );
-  /// #endif
-  /// #if include('datatype', 'vector')
-  registry.push(
-    'datatype',
-    'vector',
-    function () {
-      return import('./vector/Vector').then((m) => m.Vector);
-    },
-    {
-      factory: 'create',
-      static: true,
-    },
-  );
-  /// #endif
-  /// #if include('datatype', 'stratification')
-  registry.push(
-    'datatype',
-    'stratification',
-    function () {
-      return import('./stratification/Stratification').then((m) => m.Stratification);
-    },
-    {
-      factory: 'create',
-    },
-  );
-  /// #endif
   /// #if include('datatype', 'graph')
   registry.push(
     'datatype',
     'graph',
     function () {
-      return import('./graph/GraphProxy').then((m) => m.GraphProxy);
+      return import('./clue/graph/GraphProxy').then((m) => m.GraphProxy);
     },
     {
       factory: 'create',
     },
   );
   /// #endif
-  /// #if include('datatype', 'atom')
-  registry.push(
-    'datatype',
-    'atom',
-    function () {
-      return import('./atom/Atom').then((m) => m.Atom);
-    },
-    {
-      factory: 'create',
-    },
-  );
-  /// #endif
-  /// #if include('tabSyncer', 'selection')
-  registry.push(
-    'tabSyncer',
-    'selection',
-    function () {
-      return import('./sync/SelectionSyncer').then((m) => m.SelectionSyncerOptionUtils);
-    },
-    {
-      factory: 'create',
-    },
-  );
-
-  /* tdp_react */
-  registry.push(
-    'tdpView',
-    'dummy_react',
-    function () {
-      return import('./dummy/DummyReactView');
-    },
-    {
-      name: 'Dummy React View',
-      factory: 'new DummyReactView',
-      idtype: 'IDTypeA',
-      selection: 'some',
-    },
-  );
-
   /* tdp_matomo */
   registry.push(EP_PHOVEA_CORE_LOGIN, 'matomoLogin', () => import('./app/Matomo').then((m) => m.Matomo), {
     factory: 'trackLogin',
@@ -348,7 +226,7 @@ export default function (registry: IRegistry) {
     'importer_value_type',
     'boolean',
     function () {
-      return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+      return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     },
     {
       factory: 'boolean',
@@ -361,7 +239,7 @@ export default function (registry: IRegistry) {
     'importer_value_type',
     'categorical',
     function () {
-      return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+      return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     },
     {
       factory: 'categorical',
@@ -374,7 +252,7 @@ export default function (registry: IRegistry) {
     'importer_value_type',
     'real',
     function () {
-      return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+      return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     },
     {
       factory: 'numerical',
@@ -387,7 +265,7 @@ export default function (registry: IRegistry) {
     'importer_value_type',
     'int',
     function () {
-      return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+      return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     },
     {
       factory: 'numerical',
@@ -400,7 +278,7 @@ export default function (registry: IRegistry) {
     'importer_value_type',
     'string',
     function () {
-      return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+      return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     },
     {
       factory: 'string_',
@@ -413,7 +291,7 @@ export default function (registry: IRegistry) {
     'importer_value_type',
     'idType',
     function () {
-      return import('./valuetype/idtypes').then((v) => v.IDTypeUtils);
+      return import('./import/valuetype/idtypes').then((v) => v.IDTypeUtils);
     },
     {
       factory: 'idType',
@@ -423,5 +301,35 @@ export default function (registry: IRegistry) {
     },
   );
 
-  /// #endif
+  /*
+  registry.pushVisynView<DemoVisynViewPluginType>(
+    'LazyVisynDemoView',
+    () => import('./views/visyn/demo/LazyVisynDemoView').then((m) => m.createLazyVisynDemoView),
+    {
+      visynViewType: 'simple',
+      selection: 'any',
+      idtype: '.*',
+      name: 'Vis Demo (Lazy)',
+      description: 'Demo view showcasing Vis with randomly generated data',
+      includeInDashboardView: true,
+      group: {
+        name: 'Demo',
+        order: 99,
+      },
+    },
+  );
+
+  registry.pushVisynView<DemoVisynViewPluginType>('VisynDemoView', () => import('./views/visyn/demo/VisynDemoView').then((m) => m.createVisynDemoView), {
+    visynViewType: 'simple',
+    selection: 'any',
+    idtype: '.*',
+    name: 'Vis Demo',
+    description: 'Demo view showcasing Vis with randomly generated data',
+    includeInDashboardView: true,
+    group: {
+      name: 'Demo',
+      order: 99,
+    },
+  });
+  */
 }

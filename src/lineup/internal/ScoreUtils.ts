@@ -4,7 +4,7 @@ import { AttachemntUtils } from '../../storage/internal/attachment';
 import { IViewProvider } from '../IViewProvider';
 import { PluginRegistry } from '../../app';
 import { I18nextManager } from '../../i18n';
-import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../../provenance';
+import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../../clue/provenance';
 
 export class ScoreUtils {
   public static readonly CMD_ADD_SCORE = 'tdpAddScore';

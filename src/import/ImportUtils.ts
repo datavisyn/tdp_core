@@ -1,9 +1,6 @@
-/**
- * Created by Samuel Gratzl on 29.09.2016.
- */
-
+import { merge, identity } from 'lodash';
 import * as d3 from 'd3';
-import { ITypeDefinition, ValueTypeEditor, PHOVEA_IMPORTER_ValueTypeUtils } from '../valuetype/valuetypes';
+import { ITypeDefinition, ValueTypeEditor, PHOVEA_IMPORTER_ValueTypeUtils } from './valuetype/valuetypes';
 import { I18nextManager } from '../i18n';
 import { BaseUtils } from '../base';
 import { UserSession } from '../app';
@@ -117,7 +114,7 @@ export class ImportUtils {
     const columns = config
       .filter((c) => c !== idProperty)
       .map((c) => {
-        const r: IColumnDefinition = BaseUtils.mixin(<any>{}, c);
+        const r: IColumnDefinition = merge(<any>{}, c);
         delete (<any>r).editor;
         return r;
       });
@@ -203,7 +200,7 @@ export class ImportUtils {
     $rows.select('select').on('change', PHOVEA_IMPORTER_ValueTypeUtils.updateType(editors, false));
     $rows.select('button').on('click', (d, i) => {
       if (i < 2) {
-        d.editor.guessOptions(d.value, i === 0 ? rows : cols, BaseUtils.identity);
+        d.editor.guessOptions(d.value, i === 0 ? rows : cols, identity);
       } else {
         d.editor.guessOptions(d.value, dataRange, byIndex);
       }
@@ -212,8 +209,8 @@ export class ImportUtils {
 
     // parse data
     // TODO set rows and cols
-    configs[0].editor.parse(configs[0].value, rows, BaseUtils.identity);
-    configs[1].editor.parse(configs[1].value, cols, BaseUtils.identity);
+    configs[0].editor.parse(configs[0].value, rows, identity);
+    configs[1].editor.parse(configs[1].value, cols, identity);
     configs[2].editor.parse(configs[2].value, dataRange, byIndex);
 
     const common = ImportUtils.extractCommonFields($root);
