@@ -116,7 +116,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             }}
           />
         ) : traceStatus !== 'pending' ? (
-          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
       </div>

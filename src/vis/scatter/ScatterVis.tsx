@@ -145,7 +145,7 @@ export function ScatterVis({
             }}
           />
         ) : traceStatus !== 'pending' ? (
-          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         <div className="position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x">
           <BrushOptionButtons callback={(e: boolean) => setConfig({ ...config, isRectBrush: e })} isRectBrush={config.isRectBrush} />

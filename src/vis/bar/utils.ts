@@ -243,6 +243,7 @@ export async function createBarTraces(columns: VisColumn[], config: IBarConfig, 
       rows: 0,
       cols: 0,
       errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
+      errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
   }
 
@@ -271,5 +272,6 @@ export async function createBarTraces(columns: VisColumn[], config: IBarConfig, 
     rows,
     cols,
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
   };
 }
