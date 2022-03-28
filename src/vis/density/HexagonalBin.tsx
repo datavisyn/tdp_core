@@ -269,15 +269,17 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     zoom.on('zoom', (event: D3ZoomEvent<any, any>) => {
       const { transform } = event;
 
-      setZoomScale(transform.k);
-      setXZoomTransform(transform.x);
-      setYZoomTransform(transform.y);
-
       const newX = transform.rescaleX(xScale);
       const newY = transform.rescaleY(yScale);
 
+      // Question: I dont think this should be a ref, because it doesnt actually cause a re render. Only the other setters below make it work, if i moved them above this code there would be bugs. 
+      // But when I made it a useState object it didnt work with the object. 
       xZoomedScale.current = newX;
       yZoomedScale.current = newY;
+
+      setZoomScale(transform.k);
+      setXZoomTransform(transform.x);
+      setYZoomTransform(transform.y);
     });
 
     d3.select(`#${id}`).call(zoom);
@@ -334,22 +336,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             </g>
           </g>
         </g>
-        {xScale ? (
-          <XAxis
-            vertPosition={height + margin.top}
-            horizontalPosition={margin.left}
-            yRange={[margin.top, height + margin.top]}
-            xScale={xZoomedScale.current || xScale}
-          />
-        ) : null}
-        {yScale ? (
-          <YAxis
-            vertPosition={margin.top}
-            horizontalPosition={margin.left}
-            xRange={[margin.left, width + margin.left]}
-            yScale={yZoomedScale.current || yScale}
-          />
-        ) : null}
+        {xScale ? <XAxis vertPosition={height + margin.top} yRange={[margin.top, height + margin.top]} xScale={xZoomedScale.current || xScale} /> : null}
+        {yScale ? <YAxis horizontalPosition={margin.left} xRange={[margin.left, width + margin.left]} yScale={yZoomedScale.current || yScale} /> : null}
 
         <text
           style={{

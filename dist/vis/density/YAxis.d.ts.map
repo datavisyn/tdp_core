@@ -1,1 +1,1 @@
-{"version":3,"file":"YAxis.d.ts","sourceRoot":"","sources":["../../../src/vis/density/YAxis.tsx"],"names":[],"mappings":";AAKA,wBAAgB,KAAK,CAAC,EAAE,MAAM,EAAE,MAAM,EAAE,YAAY,EAAE,kBAAkB,EAAE;;;;;CAAA,eAmCzE"}
+{"version":3,"file":"YAxis.d.ts","sourceRoot":"","sources":["../../../src/vis/density/YAxis.tsx"],"names":[],"mappings":";AAKA,wBAAgB,KAAK,CAAC,EAAE,MAAM,EAAE,MAAM,EAAE,kBAAkB,EAAE;;;;CAAA,eAmC3D"}

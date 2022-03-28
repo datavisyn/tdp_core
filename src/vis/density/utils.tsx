@@ -12,6 +12,7 @@ import {
   ColumnInfo,
   VisNumericalColumn,
   EHexbinOptions,
+  EScatterSelectSettings,
 } from '../interfaces';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 
@@ -26,6 +27,7 @@ const defaultConfig: IDensityConfig = {
   isOpacityScale: true,
   isSizeScale: false,
   hexRadius: 16,
+  dragMode: EScatterSelectSettings.RECTANGLE,
   hexbinOptions: EHexbinOptions.COLOR,
 };
 

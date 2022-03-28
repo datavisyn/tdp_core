@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { EColumnTypes, ESupportedPlotlyVis, EHexbinOptions, } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, EHexbinOptions, EScatterSelectSettings, } from '../interfaces';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 export function isDensity(s) {
     return s.type === ESupportedPlotlyVis.DENSITY;
@@ -11,6 +11,7 @@ const defaultConfig = {
     isOpacityScale: true,
     isSizeScale: false,
     hexRadius: 16,
+    dragMode: EScatterSelectSettings.RECTANGLE,
     hexbinOptions: EHexbinOptions.COLOR,
 };
 export function densityMergeDefaultConfig(columns, config) {

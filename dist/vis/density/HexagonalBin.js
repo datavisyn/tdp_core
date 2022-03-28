@@ -184,13 +184,15 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         }
         zoom.on('zoom', (event) => {
             const { transform } = event;
+            const newX = transform.rescaleX(xScale);
+            const newY = transform.rescaleY(yScale);
+            // Question: I dont think this should be a ref, because it doesnt actually cause a re render. Only the other setters below make it work, if i moved them above this code there would be bugs. 
+            // But when I made it a useState object it didnt work with the object. 
+            xZoomedScale.current = newX;
+            yZoomedScale.current = newY;
             setZoomScale(transform.k);
             setXZoomTransform(transform.x);
             setYZoomTransform(transform.y);
-            const newX = transform.rescaleX(xScale);
-            const newY = transform.rescaleY(yScale);
-            xZoomedScale.current = newX;
-            yZoomedScale.current = newY;
         });
         d3.select(`#${id}`).call(zoom);
     }, [id, xScale, yScale, height, width, config.dragMode]);
@@ -228,8 +230,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
                 React.createElement("g", { id: `${id}brush` },
                     React.createElement("g", { style: { transform: `translate(${xZoomTransform}px, ${yZoomTransform}px) scale(${zoomScale})` } },
                         React.createElement("g", null, hexObjects)))),
-            xScale ? (React.createElement(XAxis, { vertPosition: height + margin.top, horizontalPosition: margin.left, yRange: [margin.top, height + margin.top], xScale: xZoomedScale.current || xScale })) : null,
-            yScale ? (React.createElement(YAxis, { vertPosition: margin.top, horizontalPosition: margin.left, xRange: [margin.left, width + margin.left], yScale: yZoomedScale.current || yScale })) : null,
+            xScale ? React.createElement(XAxis, { vertPosition: height + margin.top, yRange: [margin.top, height + margin.top], xScale: xZoomedScale.current || xScale }) : null,
+            yScale ? React.createElement(YAxis, { horizontalPosition: margin.left, xRange: [margin.left, width + margin.left], yScale: yZoomedScale.current || yScale }) : null,
             React.createElement("text", { style: {
                     dominantBaseline: 'middle',
                     textAnchor: 'middle',

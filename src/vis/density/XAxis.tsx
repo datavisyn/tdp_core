@@ -3,7 +3,7 @@ import * as React from 'react';
 import { useMemo } from 'react';
 
 // code taken from https://wattenberger.com/blog/react-and-d3
-export function XAxis({ xScale, yRange, vertPosition, horizontalPosition }) {
+export function XAxis({ xScale, yRange, vertPosition }) {
   const ticks = useMemo(() => {
     return xScale.ticks(5).map((value) => ({
       value,
