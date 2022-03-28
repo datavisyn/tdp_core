@@ -1,11 +1,7 @@
-import glob
 import importlib
 import logging
-import subprocess
-import sys
 from functools import cached_property, lru_cache
 from importlib.metadata import EntryPoint, entry_points
-from os import path
 from typing import Dict, List, Tuple, Type
 
 from pydantic import BaseSettings
@@ -19,6 +15,7 @@ _log = logging.getLogger(__name__)
 def is_disabled_plugin(p):
     import re
 
+    # TODO: Check if case insensitive
     def check(disable):
         return isinstance(disable, str) and re.match(disable, p.id)
 
@@ -80,30 +77,6 @@ def _find_entry_point_plugins():
 
 
 def load_all_plugins() -> List[EntryPointPlugin]:
-    # This is now allowing the plugin discovery within workspaces:
-    # In a local workspace, the plugins are not installed by default, as the generator strips them from the requirements.txt.
-    # This leads to them not being discoverable via the entry_points mechanism.
-    # One possible solution would be to install the plugin via `pip install -e ./tdp_core`, but that causes problems
-    # with other repositories, as they might contain a workspace dependency like `tdp_core` but with a different version/branch, causing pip to fail.
-    # The solution now is to *not* install the plugins, but to add them to the path instead. One remaining problem is that entry_points are not found
-    # when a plugin is not installed, because it looks for the <plugin>/*.egg-info/entry_points.txt file which does not exist (yet).
-    # Therefore, we need to call the python setup.py egg-info command to generate this information for us.
-    if False and get_global_settings().is_development_mode:
-        # Add all workspace paths
-        workspace_setup_pys = glob.glob("/phovea/*/setup.py")
-        _log.info(f"Discovered {len(workspace_setup_pys)} folders with a setup.py")
-        for setup_py, folder in zip(workspace_setup_pys, [path.abspath(path.dirname(s)) for s in workspace_setup_pys]):
-            # Add the folder to the sys.path
-            if folder not in sys.path:
-                _log.info(f"No '{folder}' in sys.path, adding to allow plugin discovery")
-                sys.path.append(folder)
-
-            # Call the setup.py to generate the egg-info folder
-            entry_points_glob = folder + "/*.egg-info/entry_points.txt"
-            if not glob.glob(entry_points_glob):
-                _log.info(f"No '{entry_points_glob}' exists, creating one using setup.py")
-                subprocess.call(["python", setup_py, "egg_info", "--egg-base", folder])
-
     # Load all plugins found via entry points
     plugins: List[EntryPointPlugin] = [p for p in _find_entry_point_plugins() if not is_disabled_plugin(p)]
     plugins.sort(key=lambda p: p.id)
@@ -141,7 +114,7 @@ def get_config_from_plugins(plugins: List[EntryPointPlugin]) -> Tuple[List[Dict[
             # Otherwise, it would except <clazz> to be the default value...
             models[plugin.id] = (plugin_settings_model, ...)
 
-        # TODO: Currently we append an empty object as "default", but we should actually pass an instance of the settings omdel instead.
+        # TODO: Currently we append an empty object as "default", but we should actually pass an instance of the settings model instead.
         files.append({f"{plugin.id}": {}})
         # else:
         # _log.warn(f'No "visyn_settings_model" found for {plugin.id}. No configuration will be loaded.')
@@ -151,4 +124,4 @@ def get_config_from_plugins(plugins: List[EntryPointPlugin]) -> Tuple[List[Dict[
         #     logging.info(f'Plugin {plugin.id} has a config.json')
         #     files.append({f"{plugin.id}": load_config_file(f)})
 
-    return (files, models)
+    return models

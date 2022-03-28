@@ -6,7 +6,6 @@ import threading
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
-from pydantic.utils import deep_update
 
 from .request_context import RequestContextMiddleware
 
@@ -26,10 +25,10 @@ def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
 
     plugins = load_all_plugins()
     # With all the plugins, load the corresponding configuration files and create a new model based on the global settings, with all plugin models as sub-models
-    [plugin_config_files, plugin_settings_models] = get_config_from_plugins(plugins)
+    plugin_settings_models = get_config_from_plugins(plugins)
     visyn_server_settings = create_model("VisynServerSettings", __base__=settings_model.GlobalSettings, **plugin_settings_models)
     # Patch the global settings by instantiating the new settings model with the global config, all config.json(s), and pydantic models
-    settings_model.__global_settings = visyn_server_settings(**deep_update(*plugin_config_files, workspace_config))
+    settings_model.__global_settings = visyn_server_settings(**workspace_config)
     logging.info("All settings successfully loaded")
 
     # Finally, initialize the registry as the config is now up-to-date
@@ -38,7 +37,7 @@ def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
     registry.__registry = registry.Registry(plugins)
     logging.info("Plugin registry successfully initialized")
 
-    # Allow custom command routine (i.e. for db-migrations)
+    # TODO: Allow custom command routine (i.e. for db-migrations)
     from .cmd import parse_command_string
 
     alternative_start_command = parse_command_string(get_global_settings().start_cmd)
@@ -102,6 +101,7 @@ def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
     # TODO: Check mainapp.py what it does and transfer them here. Currently, we cannot mount a flask app at root, such that the flask app is now mounted at /app/
     from .mainapp import build_info, health
 
+    # TODO: Move up?
     app.add_api_route("/health", health)
     app.add_api_route("/buildInfo.json", build_info)
 

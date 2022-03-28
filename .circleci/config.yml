@@ -74,6 +74,12 @@ jobs:
           at: ~/.
       - run: ls -a
       - run:
+          name: Install twine
+          command: |
+            virtualenv ~/venv
+            . ~/venv/bin/activate
+            pip install twine
+      - run:
           name: Authentication
           command:  |
             echo -e "[pypi]" >> ~/.pypirc
@@ -84,7 +90,7 @@ jobs:
           name: Publish package
           command: |
             . ~/venv/bin/activate
-            make publish
+            twine upload dist/*
   web-build:
     executor: node-executor
     steps:

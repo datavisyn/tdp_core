@@ -74,7 +74,7 @@ class ExtensionDesc(AExtensionDesc):
 
 class Registry(object):
     def __init__(self, plugins: List[EntryPointPlugin]):
-        self.plugins = plugins
+        self.plugins: List[EntryPointPlugin] = plugins
         self._extensions = [ExtensionDesc(p) for p in get_extensions_from_plugins(plugins)]
 
     def __len__(self):

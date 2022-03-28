@@ -17,7 +17,7 @@ services:
         - no_proxy
         - NO_PROXY
     ports:
-      - '9000:80'
+      - '9000:9000'
       # Required port for the python debugger
       - '5678:5678'
     volumes:
