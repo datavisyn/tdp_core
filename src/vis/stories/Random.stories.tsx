@@ -13,26 +13,20 @@ import {
 } from '../interfaces';
 
 function fetchData(numberOfPoints: number): VisColumn[] {
-  const dataGetter = async () => {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1500);
-    });
-
-    return {
-      value: Array(numberOfPoints)
-        .fill(null)
-        .map(() => Math.random() * 100),
-      pca_x: Array(numberOfPoints)
-        .fill(null)
-        .map(() => Math.random() * 100),
-      pca_y: Array(numberOfPoints)
-        .fill(null)
-        .map(() => Math.random() * 100),
-      category: Array(numberOfPoints)
-        .fill(null)
-        .map(() => parseInt((Math.random() * 10).toString(), 10).toString()),
-    };
-  };
+  const dataGetter = async () => ({
+    value: Array(numberOfPoints)
+      .fill(null)
+      .map(() => Math.random() * 100),
+    pca_x: Array(numberOfPoints)
+      .fill(null)
+      .map(() => Math.random() * 100),
+    pca_y: Array(numberOfPoints)
+      .fill(null)
+      .map(() => Math.random() * 100),
+    category: Array(numberOfPoints)
+      .fill(null)
+      .map(() => parseInt((Math.random() * 10).toString(), 10).toString()),
+  });
 
   const dataPromise = dataGetter();
 

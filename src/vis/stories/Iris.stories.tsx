@@ -11,24 +11,9 @@ import {
   EViolinOverlay,
   VisColumn,
 } from '../interfaces';
-import { iris } from './irisData';
 
 function fetchIrisData(): VisColumn[] {
-  const dataGetter = async () => {
-    await new Promise((resolve) => {
-      setTimeout(resolve, 1500);
-    });
-
-    return {
-      sepalLength: iris.map((row) => row.sepalLength),
-      sepalWidth: iris.map((row) => row.sepalWidth),
-      petalLength: iris.map((row) => row.petalLength),
-      petalWidth: iris.map((row) => row.petalWidth),
-      species: iris.map((row) => row.species),
-    };
-  };
-
-  const dataPromise = dataGetter();
+  const dataPromise = import('./irisData').then((m) => m.iris);
 
   return [
     {
@@ -38,7 +23,7 @@ function fetchIrisData(): VisColumn[] {
         name: 'Sepal Length',
       },
       type: EColumnTypes.NUMERICAL,
-      values: () => dataPromise.then((data) => data.sepalLength.map((val, i) => ({ id: i.toString(), val }))),
+      values: () => dataPromise.then((data) => data.map((r) => r.sepalLength).map((val, i) => ({ id: i.toString(), val }))),
     },
     {
       info: {
@@ -47,7 +32,7 @@ function fetchIrisData(): VisColumn[] {
         name: 'Sepal Width',
       },
       type: EColumnTypes.NUMERICAL,
-      values: () => dataPromise.then((data) => data.sepalWidth.map((val, i) => ({ id: i.toString(), val }))),
+      values: () => dataPromise.then((data) => data.map((r) => r.sepalWidth).map((val, i) => ({ id: i.toString(), val }))),
     },
     {
       info: {
@@ -56,7 +41,7 @@ function fetchIrisData(): VisColumn[] {
         name: 'Petal Length',
       },
       type: EColumnTypes.NUMERICAL,
-      values: () => dataPromise.then((data) => data.petalLength.map((val, i) => ({ id: i.toString(), val }))),
+      values: () => dataPromise.then((data) => data.map((r) => r.petalLength).map((val, i) => ({ id: i.toString(), val }))),
     },
     {
       info: {
@@ -65,7 +50,7 @@ function fetchIrisData(): VisColumn[] {
         name: 'Petal Width',
       },
       type: EColumnTypes.NUMERICAL,
-      values: () => dataPromise.then((data) => data.petalWidth.map((val, i) => ({ id: i.toString(), val }))),
+      values: () => dataPromise.then((data) => data.map((r) => r.petalWidth).map((val, i) => ({ id: i.toString(), val }))),
     },
     {
       info: {
@@ -74,7 +59,7 @@ function fetchIrisData(): VisColumn[] {
         name: 'Species',
       },
       type: EColumnTypes.CATEGORICAL,
-      values: () => dataPromise.then((data) => data.species.map((val, i) => ({ id: i.toString(), val }))),
+      values: () => dataPromise.then((data) => data.map((r) => r.species).map((val, i) => ({ id: i.toString(), val }))),
     },
   ];
 }
@@ -89,9 +74,7 @@ export default {
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 // eslint-disable-next-line react/function-component-definition
 const Template: ComponentStory<typeof Vis> = (args) => {
-  // @ts-ignore TODO: The pointCount is an injected property, but we are using typeof Vis such that this prop does not exist.
   const columns = React.useMemo(() => fetchIrisData(), []);
-
   return <Vis {...args} columns={columns} />;
 };
 
@@ -113,7 +96,11 @@ ScatterPlot.args = {
         name: 'Sepal Width',
       },
     ],
-    color: null,
+    color: {
+      description: '',
+      id: 'species',
+      name: 'Species',
+    },
     numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
     shape: null,
     isRectBrush: true,
@@ -157,7 +144,13 @@ ViolinPlot.args = {
         name: 'Sepal Width',
       },
     ],
-    catColumnsSelected: [],
+    catColumnsSelected: [
+      {
+        description: '',
+        id: 'species',
+        name: 'Species',
+      },
+    ],
     violinOverlay: EViolinOverlay.NONE,
   },
 };
@@ -178,7 +171,13 @@ StripPlot.args = {
         name: 'Sepal Width',
       },
     ],
-    catColumnsSelected: [],
+    catColumnsSelected: [
+      {
+        description: '',
+        id: 'species',
+        name: 'Species',
+      },
+    ],
   },
 };
 
