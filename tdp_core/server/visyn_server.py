@@ -2,6 +2,7 @@ import logging
 import logging.config
 import sys
 import threading
+from typing import Dict
 
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
@@ -11,12 +12,12 @@ from pydantic.utils import deep_update
 from .request_context import RequestContextMiddleware
 
 
-def create_visyn_server(*, fast_api_args: dict = {}) -> FastAPI:
+def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = None) -> FastAPI:
     from ..settings import get_global_settings, model as settings_model
     from ..settings.utils import load_workspace_config
 
     # Load the workspace config.json and initialize the global settings
-    workspace_config = load_workspace_config()
+    workspace_config = workspace_config if isinstance(workspace_config, dict) else load_workspace_config()
     settings_model.__global_settings = settings_model.GlobalSettings(**workspace_config)
     logging.config.dictConfig(get_global_settings().tdp_core.logging)
     logging.info("Workspace settings successfully loaded")
