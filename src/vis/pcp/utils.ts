@@ -39,6 +39,7 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
       rows: 0,
       cols: 0,
       errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
+      errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
   }
 
@@ -51,6 +52,7 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
       rows: 0,
       cols: 0,
       errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
+      errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
   }
 
@@ -89,5 +91,6 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
     rows: 1,
     cols: 1,
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
   };
 }

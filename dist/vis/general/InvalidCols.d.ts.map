@@ -1,1 +1,1 @@
-{"version":3,"file":"InvalidCols.d.ts","sourceRoot":"","sources":["../../../src/vis/general/InvalidCols.tsx"],"names":[],"mappings":"AAEA,UAAU,gBAAgB;IACxB,OAAO,EAAE,MAAM,CAAC;CACjB;AAED,wBAAgB,WAAW,CAAC,EAAE,OAAO,EAAE,EAAE,gBAAgB,eASxD"}
+{"version":3,"file":"InvalidCols.d.ts","sourceRoot":"","sources":["../../../src/vis/general/InvalidCols.tsx"],"names":[],"mappings":";AAEA,wBAAgB,WAAW,CAAC,EAAE,aAAa,EAAE,WAAW,EAAE,EAAE;IAAE,aAAa,EAAE,MAAM,CAAC;IAAC,WAAW,EAAE,MAAM,CAAA;CAAE,eASzG"}
