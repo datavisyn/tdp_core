@@ -35,6 +35,7 @@ export async function createPCPTraces(columns, config) {
             rows: 0,
             cols: 0,
             errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
+            errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
         };
     }
     const allCols = config.allColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
@@ -45,6 +46,7 @@ export async function createPCPTraces(columns, config) {
             rows: 0,
             cols: 0,
             errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
+            errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
         };
     }
     const allColValues = await resolveColumnValues(allCols);
@@ -79,6 +81,7 @@ export async function createPCPTraces(columns, config) {
         rows: 1,
         cols: 1,
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
+        errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
 }
 //# sourceMappingURL=utils.js.map

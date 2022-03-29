@@ -138,6 +138,7 @@ export type PlotlyInfo = {
   rows: number;
   cols: number;
   errorMessage: string;
+  errorMessageHeader: string;
 };
 
 export type PlotlyData = {

@@ -103,7 +103,7 @@ export function StripVis({ config, extensions, columns, setConfig, scales, hideS
             }}
           />
         ) : traceStatus !== 'pending' ? (
-          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
       </div>
