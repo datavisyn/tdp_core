@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 /// <reference types="jest" />
 import { Session } from '../src/base/Session';
 
