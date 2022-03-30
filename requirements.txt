@@ -13,8 +13,6 @@ pyjwt==2.1.0
 python-memcached==1.59
 flask-login==0.5.0
 cachelib==0.1.1
-# Pin docutils to avoid AttributeError: 'Values' object has no attribute 'section_self_link'
 docutils==0.17.1
-# Pin markupsafe to avoid ImportError: cannot import name 'soft_unicode' from 'markupsafe' (/usr/local/lib/python3.7/site-packages/markupsafe/__init__.py) 
 markupsafe==2.0.1
--e git+https://github.com/phovea/phovea_server.git@develop#egg=phovea_server
+phovea_server>=8.0.0,<9.0.0
