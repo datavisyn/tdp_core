@@ -1,6 +1,9 @@
 import logging
 from builtins import object
+from functools import lru_cache
 from typing import List
+
+from fastapi import FastAPI
 
 from .parser import EntryPointPlugin, get_extensions_from_plugins
 
@@ -73,8 +76,12 @@ class ExtensionDesc(AExtensionDesc):
 
 
 class Registry(object):
-    def __init__(self, plugins: List[EntryPointPlugin]):
-        self.plugins: List[EntryPointPlugin] = plugins
+    def __init__(self):
+        self.plugins: List[EntryPointPlugin] = []
+        self._extensions: List[ExtensionDesc] = []
+
+    def init_app(self, app: FastAPI, plugins: List[EntryPointPlugin]):
+        self.plugins = plugins
         self._extensions = [ExtensionDesc(p) for p in get_extensions_from_plugins(plugins)]
 
     def __len__(self):
@@ -98,11 +105,6 @@ def list_plugins(plugin_type=None):
     return get_registry().list(plugin_type)
 
 
-__registry: Registry = None
-
-
+@lru_cache(maxsize=1)
 def get_registry() -> Registry:
-    global __registry
-    if __registry is None:
-        raise Exception("Registry is not yet initialized!")
-    return __registry
+    return Registry()

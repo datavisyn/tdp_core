@@ -2,7 +2,7 @@ import logging
 import logging.config
 import sys
 import threading
-from typing import Dict
+from typing import Dict, Union
 
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
@@ -12,7 +12,15 @@ from pydantic.utils import deep_update
 from ..middleware.request_context_middleware import RequestContextMiddleware
 
 
-def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = None) -> FastAPI:
+def create_visyn_server(*, fast_api_args: dict = {}, start_cmd: Union[str, None] = None, workspace_config: Dict = None) -> FastAPI:
+    """
+    Create a new FastAPI instance while ensuring that the configuration and plugins are loaded, extension points are registered, database migrations are executed, ...
+
+    Keyword arguments:
+    fast_api_args: Optional dictionary of arguments directly passed to the FastAPI constructor.
+    start_cmd: Optional start command for the server, i.e. db-migration exposes commands like `db-migration exec <..> upgrade head`.
+    workspace_config: Optional override for the workspace configuration. If nothing is provided `load_workspace_config()` is used instead.
+    """
     from ..settings import get_global_settings, model as settings_model
     from ..settings.utils import load_workspace_config
 
@@ -33,12 +41,6 @@ def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = No
     settings_model.__global_settings = visyn_server_settings(**deep_update(*plugin_config_files, workspace_config))
     logging.info("All settings successfully loaded")
 
-    # Finally, initialize the registry as the config is now up-to-date
-    from ..plugin import registry
-
-    registry.__registry = registry.Registry(plugins)
-    logging.info("Plugin registry successfully initialized")
-
     app = FastAPI(
         # TODO: Remove debug
         debug=get_global_settings().is_development_mode,
@@ -54,24 +56,28 @@ def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = No
     app.add_middleware(RequestContextMiddleware)
 
     # Initialize global managers. TODO: Should we do that by loading all singletons in the registry?
+    from ..plugin.registry import get_registry, list_plugins
+
+    get_registry().init_app(app, plugins)
+    logging.info("Plugin registry successfully initialized")
+
     from ..dbmanager import db_manager
+
+    db_manager().init_app(app)
     from ..dbmigration.manager import db_migration_manager
+
+    db_migration_manager().init_app(app, list_plugins("tdp-sql-database-migration"))
     from ..plugin.registry import list_plugins
     from ..security.manager import security_manager
 
-    db_manager().init_app(app)
-    logging.info("DBManager successfully initialized")
-    db_migration_manager().init_app(app, list_plugins("tdp-sql-database-migration"))
-    logging.info("DBMigrationManager successfully initialized")
     security_manager().init_app(app)
-    logging.info("SecurityManager successfully initialized")
 
     # TODO: Allow custom command routine (i.e. for db-migrations)
     from .cmd import parse_command_string
 
-    alternative_start_command = parse_command_string(get_global_settings().start_cmd)
+    alternative_start_command = parse_command_string(start_cmd)
     if alternative_start_command:
-        logging.info(f"Received start command: {get_global_settings().start_cmd}")
+        logging.info(f"Received start command: {start_cmd}")
         alternative_start_command()
         logging.info("Successfully executed command, exiting server...")
         # TODO: How to properly exit here? Should a command support the "continuation" of the server, i.e. by returning True?

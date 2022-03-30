@@ -10,16 +10,16 @@ _log = logging.getLogger(__name__)
 def parse_command_string(cmd: Union[str, None]) -> Union[Callable, None]:
     """
     Parses an application command.
-    Example using environment variables:
+    Example using cmd entrypoint:
     ```
-    START_CMD='dbmigration list' uvicorn ...
+    python -m tdp_core.cmd db-migration list
     ```
-    The last argument (e.g., `dbmigration`) is the command that must be registered as extension in the __init__.py and points to an execution file.
+    The last argument (e.g., `db-migration`) is the command that must be registered as extension in the __init__.py and points to an execution file.
     Example:
     ```py
-    registry.append('command', 'dbmigration', 'tdp_core.dbmigration.manager', {})
+    registry.append('command', 'db-migration', 'tdp_core.dbmigration.manager', {})
     ```
-    The example registers the dbmigration command that runs the `create()` factory method from the tdp_core.dbmigration.manager.py.
+    The example registers the db-migration command that runs the `create()` factory method from the tdp_core.dbmigration.manager.py.
     """
     # If we receive no command, just return None
     if not cmd:

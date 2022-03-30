@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Union
 
 from pydantic import BaseModel, BaseSettings, Extra, Field
 
@@ -98,11 +98,6 @@ class VisynServerSettings(BaseModel):
 class GlobalSettings(BaseSettings):
     env: Literal["development", "production"] = "development"
     secret_key: str = "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w"
-    start_cmd: Optional[str] = Field(
-        None,
-        title="Start command",
-        description="Optional start command for the server, i.e. db-migration exposes commands like `db-migration exec <..> upgrade head`.",
-    )
     tdp_core: VisynServerSettings = VisynServerSettings()
 
     @property
