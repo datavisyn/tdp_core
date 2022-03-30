@@ -1,9 +1,8 @@
 /// <reference types="jest" />
-import {Compression} from '../../src/base/Compression';
-import {ActionMetaData, ActionNode} from '../../src/provenance';
+import { Compression } from '../../src/clue/base/Compression';
+import { ActionMetaData, ActionNode } from '../../src/clue/provenance';
 
 describe('action compressor', () => {
-
   const path: ActionNode[] = [
     new ActionNode(new ActionMetaData('', '', 'action1'), 'selection1', () => null),
     new ActionNode(new ActionMetaData('', '', 'action2'), 'selection2', () => null),
@@ -12,7 +11,6 @@ describe('action compressor', () => {
     new ActionNode(new ActionMetaData('', '', 'action5'), 'selection3', () => null), // consecutive duplicate
     new ActionNode(new ActionMetaData('', '', 'action6'), 'selection2', () => null),
   ];
-
 
   it('ground truth', () => {
     expect(path.length).toBe(6);
@@ -32,5 +30,4 @@ describe('action compressor', () => {
     expect(newPath.length).toBe(5);
     expect(newPath.toString()).toBe('action1,action3,action4,action5,action6'); // missing action2 only
   });
-
 });

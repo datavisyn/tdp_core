@@ -1,16 +1,13 @@
-import {IPluginDesc} from '../../base';
-import {IDType} from '../../idtype';
+import { FormatOptionLabelMeta } from 'react-select';
+import { IPluginDesc } from '../../base';
+import { IDType } from '../../idtype';
 
 /**
  * a search result
  */
 export interface IResult {
   /**
-   * id of this result
-   */
-  readonly _id: number;
-  /**
-   * the name for _id
+   * id of the result
    */
   readonly id: string;
   /**
@@ -24,34 +21,31 @@ export interface IResult {
 /**
  * a search provider extension provides
  */
-export interface ISearchProvider {
+export interface ISearchProvider<Result extends IResult = IResult> {
   /**
    * performs the search
    * @param {string} query the query to search can be ''
    * @param {number} page the page starting with 0 = first page
    * @param {number} pageSize the size of a page
-   * @returns {Promise<{ more: boolean, items: IResult[] }>} list of results along with a hint whether more are available
+   * @returns {Promise<{ more: boolean, items: Result[] }>} list of results along with a hint whether more are available
    */
-  search(query: string, page: number, pageSize: number): Promise<{ more: boolean, items: IResult[] }>;
+  search(query: string, page: number, pageSize: number): Promise<{ more: boolean; items: Result[] }>;
 
   /**
    * validates the given fully queries and returns the matching result subsets
    * @param {string[]} query the list of tokens to validate
-   * @returns {Promise<IResult[]>} a list of valid results
+   * @returns {Promise<<Result>[]>} a list of valid results
    */
-  validate(query: string[]): Promise<IResult[]>;
-
-  /**
-   * returns the html to be used for showing this result
-   * @param {IResult} item
-   * @param {HTMLElement} node
-   * @param {string} mode the kind of formatting that should be done for a result in the dropdown or for an selected item
-   * @param {string} currentSearchQuery optional the current search query as a regular expression in which the first group is the matched subset
-   * @returns {string} the formatted html text
-   */
-  format?(item: IResult, node: HTMLElement, mode: 'result'|'selection', currentSearchQuery?: RegExp): string;
+  validate(query: string[]): Promise<Result[]>;
 
   produces?(idType: IDType): boolean;
+
+  /**
+   * returns result's format for react-select
+   * @param option the option to format
+   * @param labelMeta provides inputText and context from react-select component
+   */
+  formatOptionLabel?(option: Result, labelMeta: FormatOptionLabelMeta<Result, true>): React.ReactNode;
 }
 
 /**

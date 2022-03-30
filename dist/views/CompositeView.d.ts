@@ -1,7 +1,6 @@
 import { IDType } from '../idtype';
 import { EventHandler } from '../base';
-import { ISelection, IView, IViewContext, IViewPluginDesc } from '../base/interfaces';
-import { EViewMode } from '../base/interfaces';
+import { ISelection, IView, IViewContext, IViewPluginDesc, EViewMode } from '../base/interfaces';
 interface IElementDesc {
     key: string;
     loader: () => any;
@@ -52,7 +51,7 @@ export declare class CompositeView extends EventHandler implements IView {
     private readonly debounceUpdateEntryPoint;
     private itemSelection;
     constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: Partial<IACompositeViewOptions>);
-    init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): PromiseLike<Promise<any[]>>;
+    init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any[]>;
     get node(): HTMLElement;
     private setBusy;
     private build;
@@ -73,3 +72,4 @@ export declare class CompositeView extends EventHandler implements IView {
     isRegex(v: string): boolean;
 }
 export {};
+//# sourceMappingURL=CompositeView.d.ts.map

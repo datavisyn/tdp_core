@@ -6,5 +6,4 @@ export * from './utils';
 export * from './desc';
 export * from './selection';
 export * from './ARankingView';
-export * from './AOverviewDetailRankingView';
 export * from './panel';

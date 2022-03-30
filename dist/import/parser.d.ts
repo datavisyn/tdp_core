@@ -1,6 +1,3 @@
-/**
- * Created by Samuel Gratzl on 29.09.2016.
- */
 export interface IParseResult {
     data: any;
     meta: any;
@@ -20,3 +17,4 @@ export declare class ParserUtils {
     static parseCSV(data: any, options?: ICSVParsingOptions): Promise<IParseResult>;
     static streamCSV(data: any, chunk: (chunk: IParseResult) => any, options?: ICSVParsingOptions): Promise<IParseResult>;
 }
+//# sourceMappingURL=parser.d.ts.map

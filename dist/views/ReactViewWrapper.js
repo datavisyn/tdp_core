@@ -1,5 +1,5 @@
-/*********************************************************
- * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
+/** *******************************************************
+ * Copyright (c) 2022 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
  * Code and any other files associated with this project
@@ -7,7 +7,7 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
+ ******************************************************** */
 import * as React from 'react';
 import { AReactView } from './AReactView';
 /**

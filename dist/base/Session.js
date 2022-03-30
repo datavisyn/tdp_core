@@ -4,7 +4,7 @@ export class Session {
          * Use the browser's sessionStorage
          * @type {Storage}
          */
-        this.context = sessionStorage;
+        this.context = window.sessionStorage;
     }
     /**
      * Store any value for a given key and returns the previous stored value.
@@ -31,7 +31,7 @@ export class Session {
      * @returns {boolean}
      */
     has(key) {
-        return (this.context.getItem(key) !== null);
+        return this.context.getItem(key) !== null;
     }
     /**
      * Returns the value for the given key if it exists in the session.

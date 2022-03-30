@@ -8,7 +8,7 @@ executors:
   node-executor:
     working_directory: ~/phovea-web
     docker:
-      - image: circleci/node:12.13-buster-browsers
+      - image: circleci/node:14.17-buster
 
 jobs:
   python-build:
@@ -30,7 +30,7 @@ jobs:
           command: |
             (!(test -f docker_packages.txt) || (cat docker_packages.txt | xargs sudo apt-get install -y))
       - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
+          key: deps2-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
       - run:
           name: Install pip requirements
           command: |
@@ -39,7 +39,7 @@ jobs:
             pip install -r requirements_dev.txt
             pip install -r requirements.txt
       - save_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
+          key: deps2-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
           paths:
           - ~/venv
       - run:
@@ -99,7 +99,7 @@ jobs:
             node -v
             npm -v
       - restore_cache:
-          key: deps2-{{ .Branch }}-{{ checksum "package.json" }}
+          key: deps3-{{ .Branch }}-{{ checksum "package.json" }}
       - run:
           name: Install npm dependencies
           command: npm install
@@ -108,7 +108,7 @@ jobs:
           command: |
             (grep -l '._resolved.: .\(git[^:]*\|bitbucket\):' ./node_modules/*/package.json || true) | xargs -r dirname | xargs -r rm -rf
       - save_cache:
-          key: deps2-{{ .Branch }}-{{ checksum "package.json" }}
+          key: deps3-{{ .Branch }}-{{ checksum "package.json" }}
           paths: ./node_modules
       - run:
           name: Install npm dependencies from git repositories (always get latest commit)

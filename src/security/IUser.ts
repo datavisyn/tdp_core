@@ -10,5 +10,5 @@ export interface IUser {
 }
 
 export class UserUtils {
-  static ANONYMOUS_USER: IUser = {name: 'anonymous', roles: ['anonymous']};
+  static ANONYMOUS_USER: IUser = { name: 'anonymous', roles: ['anonymous'] };
 }

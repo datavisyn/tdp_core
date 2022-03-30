@@ -1,6 +1,6 @@
+import { Ranking } from 'lineupjs';
 import { RestBaseUtils } from '../base/rest';
 import { FormMap } from '../form/elements/FormMap';
-import { Ranking } from 'lineupjs';
 import { Ajax } from '../base';
 export class AScoreAccessorProxy {
     constructor(missingValue = null) {
@@ -31,7 +31,7 @@ class NumberScoreAccessorProxy extends AScoreAccessorProxy {
 class CategoricalScoreAccessorProxy extends AScoreAccessorProxy {
     access(row) {
         const v = super.access(row);
-        return String(v); //even null values;
+        return String(v); // even null values;
     }
 }
 export class LineupUtils {
@@ -47,7 +47,7 @@ export class LineupUtils {
             scoreId: score.id,
             factory(extraArgs, count) {
                 return score.load().then((p) => Promise.resolve(p.factory(score, extraArgs, count)));
-            }
+            },
         };
     }
     /**
@@ -66,7 +66,7 @@ export class LineupUtils {
      */
     static toFilter(filter) {
         if (Array.isArray(filter)) {
-            //map first
+            // map first
             return LineupUtils.toFilter(FormMap.convertRow2MultiMap(filter));
         }
         const clean = (v) => {
@@ -95,12 +95,14 @@ export class LineupUtils {
             }
             return v.toString();
         };
-        return keys.map((d) => {
+        return keys
+            .map((d) => {
             const v = filter[d];
             const label = key2name && key2name.has(d) ? key2name.get(d) : d;
-            const vn = Array.isArray(v) ? '["' + v.map(toString).join('","') + '"]' : '"' + toString(v) + '"';
+            const vn = Array.isArray(v) ? `["${v.map(toString).join('","')}"]` : `"${toString(v)}"`;
             return `${label}=${vn}`;
-        }).join(' & ');
+        })
+            .join(' & ');
     }
     /**
      * generator for a FormMap compatible badgeProvider based on the given database url
@@ -109,13 +111,15 @@ export class LineupUtils {
         let total = null;
         const cache = new Map();
         return (rows) => {
-            if (total === null) { // compute all by no setting any filter
-                total = RestBaseUtils.getTDPCount(database, view, (extraParams ? extraParams() : {}));
+            if (total === null) {
+                // compute all by no setting any filter
+                total = RestBaseUtils.getTDPCount(database, view, extraParams ? extraParams() : {});
             }
-            if (!rows) { //if no filter is set return all
+            if (!rows) {
+                // if no filter is set return all
                 return total.then((count) => `${count} / ${count}`);
             }
-            //compute filtered ones
+            // compute filtered ones
             const filter = LineupUtils.toFilter(rows);
             const param = {};
             if (extraParams) {
@@ -132,31 +136,6 @@ export class LineupUtils {
                 return `? / ?`;
             });
         };
-    }
-    /**
-     * Returns the all items that are not in the given two arrays
-     * TODO improve performance of diff algorithm
-     * @param array1
-     * @param array2
-     * @returns {any}
-     */
-    static array_diff(array1, array2) {
-        return array1.filter((elm) => array2.indexOf(elm) === -1);
-    }
-    /**
-     * Returns all elements from set1 which are not in set2
-     * @param set1
-     * @param set2
-     * @returns Set<T>
-     */
-    static set_diff(set1, set2) {
-        const diff = new Set();
-        set1.forEach((elem) => {
-            if (!set2.has(elem)) {
-                diff.add(elem);
-            }
-        });
-        return diff;
     }
     static wrapRanking(data, ranking) {
         const findColumn = (column) => ranking.find((d) => d.desc.column === column || d.desc.label === column);
@@ -183,7 +162,7 @@ export class LineupUtils {
                     });
                 }
                 return true;
-            }
+            },
         };
     }
 }

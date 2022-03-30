@@ -1,5 +1,5 @@
-/*********************************************************
- * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
+/** *******************************************************
+ * Copyright (c) 2022 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
  * Code and any other files associated with this project
@@ -7,11 +7,11 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
+ ******************************************************** */
 
 import * as React from 'react';
-import {IViewPluginDesc} from '../base';
-import {AReactView, ISelector} from './AReactView';
+import { IViewPluginDesc } from '../base';
+import { AReactView, ISelector } from './AReactView';
 
 export interface IWrappedProps {
   inputSelection: string[];
@@ -20,12 +20,12 @@ export interface IWrappedProps {
 }
 
 export interface IComponentModule {
-  default: (new (props?: IWrappedProps, context?: any) => React.Component<IWrappedProps, any>);
+  default: new (props?: IWrappedProps, context?: any) => React.Component<IWrappedProps, any>;
 }
 
 export interface IReactViewWrapperPluginDesc extends IViewPluginDesc {
   itemType?: string;
-  component: ()=>Promise<IComponentModule>;
+  component: () => Promise<IComponentModule>;
 }
 
 /**
@@ -54,6 +54,6 @@ export class ReactViewWrapper extends AReactView {
     if (!this.impl) {
       return <div>Loading...</div>;
     }
-    return React.createElement(this.impl.default, {inputSelection, itemSelection, itemSelector});
+    return React.createElement(this.impl.default, { inputSelection, itemSelection, itemSelector });
   }
 }

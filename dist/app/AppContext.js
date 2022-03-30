@@ -1,7 +1,7 @@
-import { RemoveNodeObserver } from '../internal/RemoveNodeObserver';
+import { merge } from 'lodash';
+import { RemoveNodeObserver } from '../components/RemoveNodeObserver';
 import { HashProperties } from '../base/HashProperties';
 import { PropertyHandler } from '../base/PropertyHandler';
-import { BaseUtils } from '../base/BaseUtils';
 import { Ajax } from '../base/ajax';
 import { WebpackEnv } from '../base/WebpackEnv';
 export class AppContext {
@@ -11,12 +11,12 @@ export class AppContext {
          * @type {boolean}
          */
         this.offline = false;
-        /* tslint:disable:variable-name */
+        // eslint-disable @typescript-eslint/naming-convention disable
         /**
-         * server prefix ofr api calls
+         * server prefix of api calls
          * @type {string}
          */
-        this.server_url = (WebpackEnv.__APP_CONTEXT__ || '/') + 'api';
+        this.server_url = `${WebpackEnv.__APP_CONTEXT__ || '/'}api`;
         /**
          * server suffix for api calls
          * @type {string}
@@ -32,19 +32,19 @@ export class AppContext {
          * access to get parameters
          * @type {PropertyHandler}
          */
-        this.param = new PropertyHandler(location.search);
+        this.param = new PropertyHandler(window.location.search);
         this.defaultGenerator = () => Promise.reject('offline');
     }
-    /* tslint:enable:variable-name */
+    // eslint-enable @typescript-eslint/naming-convention disable
     /**
      * initializes certain properties of the core
      * @param config
      */
     init(config = {}) {
-        config = BaseUtils.mixin({
+        config = merge({
             offline: this.offline,
             server_url: this.server_url,
-            server_json_suffix: this.server_json_suffix
+            server_json_suffix: this.server_json_suffix,
         }, config);
         this.offline = config.offline;
         this.server_url = config.server_url;
@@ -63,20 +63,22 @@ export class AppContext {
             if (!node) {
                 return undefined;
             }
-            return node.dataset['phovea' + camelCaseName];
+            return node.dataset[`phovea${camelCaseName}`];
         }
         const config = {};
-        if ('true' === find('offline')) {
+        if (find('offline') === 'true') {
             config.offline = true;
         }
         let v;
+        // eslint-disable-next-line no-cond-assign
         if ((v = find('server-url', 'ServerUrl')) !== undefined) {
             config.server_url = v;
         }
+        // eslint-disable-next-line no-cond-assign
         if ((v = find('server-json-suffix', 'ServerJsonSuffix')) !== undefined) {
             config.server_json_suffix = v;
         }
-        //init myself
+        // init myself
         this.init(config);
     }
     /**

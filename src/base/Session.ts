@@ -3,7 +3,7 @@ export class Session {
    * Use the browser's sessionStorage
    * @type {Storage}
    */
-  private context: Storage = sessionStorage;
+  private context: Storage = window.sessionStorage;
 
   /**
    * Store any value for a given key and returns the previous stored value.
@@ -32,7 +32,7 @@ export class Session {
    * @returns {boolean}
    */
   public has(key: string) {
-    return (this.context.getItem(key) !== null);
+    return this.context.getItem(key) !== null;
   }
 
   /**
@@ -45,5 +45,4 @@ export class Session {
   public retrieve<T>(key: string, defaultValue: T = null): T {
     return this.has(key) ? JSON.parse(this.context.getItem(key)) : defaultValue;
   }
-
 }

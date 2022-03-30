@@ -1,8 +1,8 @@
-import { GlobalEventHandler } from './event';
 import { merge } from 'lodash';
+import { GlobalEventHandler } from './event';
 export class AjaxError extends Error {
     constructor(response, message) {
-        super(message ? message : response.statusText);
+        super(message || response.statusText);
         this.response = response;
         // Set the prototype explicitly. needed for Typescript 2.1
         Object.setPrototypeOf(this, AjaxError.prototype);
@@ -13,9 +13,7 @@ export class Ajax {
         if (response.ok) {
             return response;
         }
-        else {
-            throw new AjaxError(response);
-        }
+        throw new AjaxError(response);
     }
     static parseType(expectedDataType, response) {
         switch (expectedDataType.trim().toLowerCase()) {
@@ -47,7 +45,7 @@ export class Ajax {
         method = method.toUpperCase();
         // need to encode the body in the url in case of GET and HEAD
         if (method === 'GET' || method === 'HEAD') {
-            data = Ajax.encodeParams(data); //encode in url
+            data = Ajax.encodeParams(data); // encode in url
             if (data) {
                 url += (/\?/.test(url) ? '&' : '?') + data;
                 data = null;
@@ -57,7 +55,7 @@ export class Ajax {
             credentials: 'same-origin',
             method,
             headers: {
-                'Accept': 'application/json'
+                Accept: 'application/json',
             },
         }, options);
         if (data) {
@@ -93,7 +91,7 @@ export class Ajax {
         }
         // there are no typings for fetch so far
         GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_PRE_SEND, url, mergedOptions);
-        const r = Ajax.checkStatus(await self.fetch(url, mergedOptions));
+        const r = Ajax.checkStatus(await window.fetch(url, mergedOptions));
         const output = Ajax.parseType(expectedDataType, r);
         GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_POST_SEND, url, mergedOptions, r, output);
         return output;
@@ -141,7 +139,7 @@ export class Ajax {
                         add(prefix, `${key}[${i}]`, v);
                     }
                     else {
-                        //primitive values uses the same key
+                        // primitive values uses the same key
                         add(prefix, `${key}[]`, v);
                     }
                 });
@@ -155,7 +153,7 @@ export class Ajax {
                 });
             }
             else {
-                s.push(encodeURIComponent(prefix + key) + '=' + encodeURIComponent(value));
+                s.push(`${encodeURIComponent(prefix + key)}=${encodeURIComponent(value)}`);
             }
         }
         keys.forEach((key) => {

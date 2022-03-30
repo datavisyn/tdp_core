@@ -1,135 +1,7 @@
-import { __extends } from 'tslib';
 export class BaseUtils {
-    /**
-     * integrate b into a and override all duplicates
-     * @param {Object} a
-     * @param {Object} bs
-     * @returns {Object} a with extended b
-     */
-    static mixin(a, b, ...bs) {
-        bs.unshift(b);
-        function extend(r, b) {
-            Object.keys(b).forEach((key) => {
-                const v = b[key];
-                if (Object.prototype.toString.call(v) === '[object Object]') {
-                    r[key] = (r[key] != null) ? extend(r[key], v) : v;
-                }
-                else {
-                    r[key] = v;
-                }
-            });
-            return r;
-        }
-        bs.forEach((b) => {
-            if (b) {
-                a = extend(a, b);
-            }
-        });
-        return a;
-    }
-    /**
-     * @deprecated use obj === undefined directly
-     * @param obj
-     * @return {boolean}
-     */
-    static isUndefined(obj) {
-        return typeof obj === 'undefined';
-    }
-    //fixes a javascript bug on using "%" with negative numbers
+    // fixes a javascript bug on using "%" with negative numbers
     static mod(n, m) {
         return ((n % m) + m) % m;
-    }
-    /**
-     * binds the given function to the given context / this arg
-     * @deprecated use Function.prototype.bind directly
-     * @param f
-     * @param thisArg
-     * @returns {function(): any}
-     */
-    static bind(f, thisArg, ...args) {
-        return f.bind(thisArg, ...args);
-    }
-    /**
-     * getter generator by name or index
-     * @deprecated too simple to write
-     */
-    static getter(...attr) {
-        if (attr.length === 1) {
-            return (obj) => obj[attr[0]];
-        }
-        return (obj) => attr.map((a) => obj[a]);
-    }
-    /**
-     * @deprecated use `typeof(f) === 'function`
-     * @param f
-     * @return {boolean}
-     */
-    static isFunction(f) {
-        return typeof (f) === 'function';
-    }
-    /**
-     * @deprecated use `(d) => d`
-     * identity function
-     */
-    static identity(d) {
-        return d;
-    }
-    /**
-     * a dummy function, which does exactly nothing, i.e. used as default
-     * @deprecated use `()=>undefined`
-     */
-    static noop() {
-        //no op
-    }
-    /**
-     * just returns the argument in any case
-     * @deprecated use `() => x`
-     * @param r - the value to return
-     * @returns {*}
-     */
-    static constant(r) {
-        if (typeof r === 'boolean' && r === true) {
-            return BaseUtils.constantTrue;
-        }
-        if (typeof r === 'boolean' && r === false) {
-            return BaseUtils.constantFalse;
-        }
-        return () => r;
-    }
-    /**
-     * special constant function which returns always true, i.e., as a default for a filter function
-     * @deprecated use ()=>true
-     * @returns {boolean}
-     */
-    static constantTrue() {
-        return true;
-    }
-    /**
-     * special constant function which returns always false, i.e., as a default for a filter function
-     * @deprecated use ()=>false
-     * @returns {boolean}
-     */
-    static constantFalse() {
-        return false;
-    }
-    /**
-     * copies a plain object into a function and call a specific method onto direct call
-     * @param obj - the
-     * @param f
-     * @deprecated
-     */
-    static callable(obj, f) {
-        //assert this.isPlainObject(obj);
-        function CallAbleFactory() {
-            let that;
-            function CallAble() {
-                that[f].apply(that, Array.from(arguments));
-            }
-            that = CallAble;
-            BaseUtils.mixin(CallAble, obj);
-            return CallAble;
-        }
-        return CallAbleFactory;
     }
     /**
      * generates a random id of the given length
@@ -141,7 +13,7 @@ export class BaseUtils {
         while (id.length < length) {
             id += Math.random().toString(36).slice(-8);
         }
-        return id.substr(0, length);
+        return id.substring(0, length);
     }
     /**
      * fixes a given name by converting it to plain camelcase
@@ -149,17 +21,10 @@ export class BaseUtils {
      * @return {string}
      */
     static fixId(name) {
+        // eslint-disable-next-line no-useless-escape
         const clean = name.replace(/[\s!#$%&'()*+,.\/:;<=>?@\[\\\]\^`{|}~_-]/g, ' ');
-        const words = clean.trim().split(/\s+/); //remove heading and trailing spaces and combine multiple one during split
+        const words = clean.trim().split(/\s+/); // remove heading and trailing spaces and combine multiple one during split
         return words.map((w, i) => (i === 0 ? w[0].toLowerCase() : w[0].toUpperCase()) + w.slice(1)).join('');
-    }
-    /**
-     * extends class copied from TypeScript compiler
-     * @param subClass
-     * @param baseClass
-     */
-    static extendClass(subClass, baseClass) {
-        __extends(subClass, baseClass);
     }
     /**
      * create a debounce call, can be called multiple times but only the last one at most delayed by timeToDelay will be executed
@@ -171,11 +36,12 @@ export class BaseUtils {
         let tm = -1;
         return function (...args) {
             if (tm >= 0) {
-                clearTimeout(tm);
+                window.clearTimeout(tm);
                 tm = -1;
             }
             args.unshift(this);
-            tm = self.setTimeout(callback.bind.apply(callback, args), timeToDelay);
+            // eslint-disable-next-line @typescript-eslint/no-implied-eval
+            tm = window.setTimeout(callback.bind.apply(callback, args), timeToDelay);
         };
     }
     /**
@@ -193,7 +59,7 @@ export class BaseUtils {
             left: obj.left + w.pageXOffset,
             top: obj.top + w.pageYOffset,
             width: obj.width,
-            height: obj.height
+            height: obj.height,
         };
     }
     /**
@@ -210,7 +76,7 @@ export class BaseUtils {
             x: obj.left,
             y: obj.top,
             w: obj.width,
-            h: obj.height
+            h: obj.height,
         };
     }
     /**
@@ -231,19 +97,42 @@ export class BaseUtils {
      * @return {[number,number]} [min, max]
      */
     static extent(arr) {
-        let min = NaN, max = NaN;
+        let min = NaN;
+        let max = NaN;
         arr.forEach((v) => {
-            if (isNaN(v)) {
+            if (Number.isNaN(v)) {
                 return;
             }
-            if (isNaN(min) || min > v) {
+            if (Number.isNaN(min) || min > v) {
                 min = v;
             }
-            if (isNaN(max) || min < v) {
+            if (Number.isNaN(max) || min < v) {
                 max = v;
             }
         });
         return [min, max];
     }
+}
+/**
+ * Debounces a function returning a promise and properly returns a promise resolving when the function is finally evaluated.
+ * See https://github.com/lodash/lodash/issues/4400 for details why lodash#debounce does not work in cases like this.
+ * @param callback Function to be debounced.
+ * @param wait Wait time in milliseconds.
+ */
+export function debounceAsync(callback, wait) {
+    let timeoutId = null;
+    return (...args) => {
+        if (timeoutId) {
+            window.clearTimeout(timeoutId);
+        }
+        return new Promise((resolve) => {
+            const timeoutPromise = new Promise((r) => {
+                timeoutId = window.setTimeout(r, wait);
+            });
+            timeoutPromise.then(async () => {
+                resolve(await callback(...args));
+            });
+        });
+    };
 }
 //# sourceMappingURL=BaseUtils.js.map

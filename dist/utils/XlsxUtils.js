@@ -1,5 +1,5 @@
 import { AppContext } from '../app';
-import { Ajax } from '../base';
+import { Ajax } from '../base/ajax';
 export class XlsxUtils {
     static xlsx2json(file) {
         const data = new FormData();

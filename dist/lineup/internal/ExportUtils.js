@@ -24,15 +24,16 @@ export class ExportUtils {
             case 'xlsx':
             case 'XLSX':
                 return ExportUtils.EXPORT_FORMAT.XLSX;
+            default:
+                return null;
         }
-        return null;
     }
     static getColumnName(column) {
-        return column.label + (column.desc.summary ? ' - ' + column.desc.summary : '') + (column.description ? '\n' + column.description : '');
+        return column.label + (column.desc.summary ? ` - ${column.desc.summary}` : '') + (column.description ? `\n${column.description}` : '');
     }
     static exportRanking(columns, rows, separator) {
-        //optionally quote not numbers
-        const escape = new RegExp(`["]`, 'g');
+        // optionally quote not numbers
+        const escape = /["]/g;
         function quote(v, c) {
             if (v == null) {
                 return '';
@@ -72,11 +73,16 @@ export class ExportUtils {
             return r;
         });
         return XlsxUtils.json2xlsx({
-            sheets: [{
+            sheets: [
+                {
                     title: 'LineUp',
-                    columns: columns.map((d) => ({ name: ExportUtils.getColumnName(d), type: (isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string') })),
-                    rows: converted
-                }]
+                    columns: columns.map((d) => ({
+                        name: ExportUtils.getColumnName(d),
+                        type: (isNumberColumn(d) ? 'float' : isDateColumn(d) ? 'date' : 'string'),
+                    })),
+                    rows: converted,
+                },
+            ],
         });
     }
     static toBlob(content, mimeType) {

@@ -1,9 +1,7 @@
-
 /**
  * Interface for the options parameter of PanelTab
  */
 export interface IPanelTabDesc {
-
   /**
    * Font Awesome icon
    * Will be used as a button icon

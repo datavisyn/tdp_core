@@ -22,3 +22,4 @@ export declare class LoginUtils {
      */
     static bindLoginForm(form: HTMLFormElement, callback: (error: any, user: IUser) => any, onSubmit?: () => void): void;
 }
+//# sourceMappingURL=LoginUtils.d.ts.map

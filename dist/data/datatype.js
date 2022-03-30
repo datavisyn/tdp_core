@@ -1,9 +1,8 @@
-import { ASelectAble } from '../idtype/ASelectAble';
-import { Range } from '../range';
+import { EventHandler } from '../base/event';
 /**
  * dummy data type just holding the description
  */
-export class ADataType extends ASelectAble {
+export class ADataType extends EventHandler {
     constructor(desc) {
         super();
         this.desc = desc;
@@ -11,10 +10,7 @@ export class ADataType extends ASelectAble {
     get dim() {
         return [];
     }
-    ids(range = Range.all()) {
-        return Promise.resolve(Range.none());
-    }
-    idView(idRange) {
+    idView(ids) {
         return Promise.resolve(this);
     }
     get idtypes() {
@@ -41,13 +37,10 @@ export class ADataType extends ASelectAble {
         if (v instanceof ADataType) {
             return true;
         }
-        //sounds good
-        return (typeof (v.idView) === 'function' && typeof (v.persist) === 'function' && typeof (v.restore) === 'function' && v instanceof ASelectAble && ('desc' in v) && ('dim' in v));
+        // sounds good
+        return typeof v.persist === 'function' && typeof v.restore === 'function' && 'desc' in v;
     }
 }
 export class DummyDataType extends ADataType {
-    constructor(desc) {
-        super(desc);
-    }
 }
 //# sourceMappingURL=datatype.js.map

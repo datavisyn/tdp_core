@@ -55,3 +55,4 @@ export declare class DnDUtils {
     private static instance;
     static getInstance(): DnDUtils;
 }
+//# sourceMappingURL=DndUtils.d.ts.map

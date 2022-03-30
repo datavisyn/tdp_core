@@ -1,5 +1,5 @@
 import { EngineRenderer, TaggleRenderer, LocalDataProvider } from 'lineupjs';
-import { IObjectRef, ICmdResult, ProvenanceGraph, IAction } from '../../provenance';
+import { IObjectRef, ICmdResult, ProvenanceGraph, IAction } from '../../clue/provenance';
 export interface IViewProviderLocal {
     data: LocalDataProvider;
     getInstance(): {
@@ -155,3 +155,4 @@ export declare class LineupTrackingManager {
     static getInstance(): LineupTrackingManager;
 }
 export {};
+//# sourceMappingURL=cmds.d.ts.map

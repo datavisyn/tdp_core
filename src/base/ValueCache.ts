@@ -1,5 +1,4 @@
 export class ValueCache {
-
   private values = new Map<string, any>();
 
   /**
@@ -39,9 +38,10 @@ export class ValueCache {
    * @param {() => T} creator the function to create in case the values not yet cached
    * @returns {() => T}
    */
-  public cachedLazy<T>(key: string, creator: () => T): (() => T)  {
+  public cachedLazy<T>(key: string, creator: () => T): () => T {
     return () => ValueCache.getInstance().cached(key, creator);
   }
+
   private static instance: ValueCache;
 
   public static getInstance(): ValueCache {

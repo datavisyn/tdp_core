@@ -1,7 +1,32 @@
 import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { UserSession } from '../../app';
-import { ResolveNow } from '../../base';
+/**
+ * ResolveNow executes the result without an intermediate tick, and because FormSelect#resolveData is sometimes used
+ * as dependency for FormMap for example, the result needs to be there immediately as otherwise the dependents
+ * receive null as value. This is some form of race-condition, as the dependents are executed before the value is resolved and set.
+ * See https://github.com/datavisyn/tdp_core/issues/675 for details.
+ */
+class ResolveNow {
+    constructor(v) {
+        this.v = v;
+    }
+    // When using Typescript v2.7+ the typing can be further specified as `then<TResult1 = T, TResult2 = never>(...`
+    then(onfulfilled, onrejected) {
+        return ResolveNow.resolveImmediately(onfulfilled(this.v));
+    }
+    /**
+     * similar to Promise.resolve but executes the result immediately without an intermediate tick
+     * @param {PromiseLike<T> | T} result
+     * @returns {PromiseLike<T>}
+     */
+    static resolveImmediately(result) {
+        if (result instanceof Promise || (result && typeof result.then === 'function')) {
+            return result;
+        }
+        return new ResolveNow(result);
+    }
+}
 /**
  * Select form element instance
  * Propagates the changes from the DOM select element using the internal `change` event
@@ -49,14 +74,14 @@ export class FormSelect extends AFormElement {
      */
     init() {
         super.init();
-        const options = this.elementDesc.options;
+        const { options } = this.elementDesc;
         // propagate change action with the data of the selected option
         this.$inputNode.on('change.propagate', () => {
             this.fire(FormSelect.EVENT_CHANGE, this.value, this.$inputNode);
         });
         const data = FormSelect.resolveData(options.optionsData);
-        const values = this.handleDependent((values) => {
-            data(values).then((items) => {
+        const values = this.handleDependent((val) => {
+            data(val).then((items) => {
                 this.updateOptionElements(items);
                 this.$inputNode.property('selectedIndex', options.selectedIndex || 0);
                 this.fire(FormSelect.EVENT_CHANGE, this.value, this.$inputNode);
@@ -80,7 +105,7 @@ export class FormSelect extends AFormElement {
     getSelectedIndex() {
         const defaultSelectedIndex = this.getStoredValue(0);
         const currentSelectedIndex = this.$inputNode.property('selectedIndex');
-        return (currentSelectedIndex === -1) ? defaultSelectedIndex : currentSelectedIndex;
+        return currentSelectedIndex === -1 ? defaultSelectedIndex : currentSelectedIndex;
     }
     /**
      * Update the options of a select form element using the given data array
@@ -102,16 +127,18 @@ export class FormSelect extends AFormElement {
         }
         const node = this.$inputNode.node();
         const $options = this.$inputNode.selectAll(() => Array.from(node.children)).data(options);
-        $options.enter()
-            .append((d) => node.ownerDocument.createElement(isGroup ? 'optgroup' : 'option'));
-        const $sub = $options.filter(isGroup)
+        $options.enter().append((d) => node.ownerDocument.createElement(isGroup ? 'optgroup' : 'option'));
+        const $sub = $options
+            .filter(isGroup)
             .attr('label', (d) => d.name)
-            .selectAll('option').data((d) => d.children);
+            .selectAll('option')
+            .data((d) => d.children);
         $sub.enter().append('option');
         $sub.attr('value', (d) => d.value).html((d) => d.name);
         $sub.exit().remove();
-        $options.filter((d) => !isGroup)
-            .attr('value', (d) => (d.value))
+        $options
+            .filter((d) => !isGroup)
+            .attr('value', (d) => d.value)
             .html((d) => d.name);
         $options.exit().remove();
     }
@@ -121,7 +148,7 @@ export class FormSelect extends AFormElement {
      */
     get value() {
         const option = d3.select(this.$inputNode.node().selectedOptions[0]);
-        return (option.size() > 0) ? option.datum() : null;
+        return option.size() > 0 ? option.datum() : null;
     }
     /**
      * Select the option by value. If no value found, then the first option is selected.
@@ -134,7 +161,10 @@ export class FormSelect extends AFormElement {
             this.previousValue = null;
             return;
         }
-        this.$inputNode.selectAll('option').data().forEach((d, i) => {
+        this.$inputNode
+            .selectAll('option')
+            .data()
+            .forEach((d, i) => {
             if ((v.value && d.value === v.value) || d.value === v || d === v) {
                 this.$inputNode.property('selectedIndex', i);
                 this.updateStoredValue();
@@ -164,11 +194,11 @@ export class FormSelect extends AFormElement {
         if (data instanceof Promise) {
             return () => data.then((r) => r.map(this.toOption));
         }
-        //assume it is a function
+        // assume it is a function
         return (dependents) => {
             const r = data(dependents);
             if (r instanceof Promise) {
-                return r.then((r) => r.map(this.toOption));
+                return r.then((a) => a.map(this.toOption));
             }
             if (Array.isArray(r)) {
                 return ResolveNow.resolveImmediately(r.map(this.toOption));

@@ -1,30 +1,30 @@
-import {ILayoutDump, ISize, PHOVEA_UI_IView, IViewLayoutContainer} from '../interfaces';
-import {ALayoutContainer, ILayoutContainerOption} from './ALayoutContainer';
-import {Dropper} from './Dropper';
-import {LayoutContainerEvents} from '../interfaces';
+import { ILayoutDump, ISize, PHOVEA_UI_IView, IViewLayoutContainer, LayoutContainerEvents } from '../interfaces';
+import { ALayoutContainer, ILayoutContainerOption } from './ALayoutContainer';
+import { Dropper } from './Dropper';
 
 export interface IViewLayoutContainerOptions extends ILayoutContainerOption {
   hideHeader: boolean;
 }
 
-
 export class HTMLView implements PHOVEA_UI_IView {
   readonly minSize: ISize = [0, 0];
-  visible: boolean = true;
+
+  visible = true;
+
   readonly node: HTMLElement;
 
   constructor(html: string, doc: Document) {
-    //HTML
+    // HTML
     this.node = doc.createElement('div');
     this.node.innerHTML = html;
   }
 
   destroy() {
-    //nothing to do
+    // nothing to do
   }
 
   resized() {
-    //nothing to do
+    // nothing to do
   }
 
   dumpReference() {
@@ -32,20 +32,19 @@ export class HTMLView implements PHOVEA_UI_IView {
   }
 }
 
-
 export class NodeView implements PHOVEA_UI_IView {
   readonly minSize: ISize = [0, 0];
-  visible: boolean = true;
 
-  constructor(public readonly node: HTMLElement) {
-  }
+  visible = true;
+
+  constructor(public readonly node: HTMLElement) {}
 
   destroy() {
-    //nothing to do
+    // nothing to do
   }
 
   resized() {
-    //nothing to do
+    // nothing to do
   }
 
   dumpReference() {
@@ -54,8 +53,8 @@ export class NodeView implements PHOVEA_UI_IView {
 }
 
 export class ViewLayoutContainer extends ALayoutContainer<IViewLayoutContainerOptions> implements IViewLayoutContainer {
-
   readonly node: HTMLElement;
+
   readonly type = 'view';
 
   constructor(public readonly view: PHOVEA_UI_IView, options: Partial<ILayoutContainerOption>) {
@@ -65,7 +64,10 @@ export class ViewLayoutContainer extends ALayoutContainer<IViewLayoutContainerOp
     this.node.appendChild(view.node);
 
     // TODO: The expand view is broken currently, therefore we hide it temporarily.
-    this.header.insertAdjacentHTML('beforeend', `<button type="button" title="Expand view" class="size-toggle invisible" aria-label="Toggle View Size"><span><i class="fas fa-expand"></i></span></button>`);
+    this.header.insertAdjacentHTML(
+      'beforeend',
+      `<button type="button" title="Expand view" class="size-toggle invisible" aria-label="Toggle View Size"><span><i class="fas fa-expand"></i></span></button>`,
+    );
 
     const min = this.minSize;
     if (min[0] > 0) {
@@ -87,7 +89,7 @@ export class ViewLayoutContainer extends ALayoutContainer<IViewLayoutContainerOp
 
   protected defaultOptions() {
     return Object.assign(super.defaultOptions(), {
-      hideHeader: false
+      hideHeader: false,
     });
   }
 
@@ -100,11 +102,11 @@ export class ViewLayoutContainer extends ALayoutContainer<IViewLayoutContainerOp
   }
 
   set visible(visible: boolean) {
-    this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_VISIBILITY_CHANGED), this.view.visible, this.view.visible = visible);
+    this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_VISIBILITY_CHANGED), this.view.visible, (this.view.visible = visible));
   }
 
   get minSize() {
-    return this.view.minSize? this.view.minSize : <[number, number]>[0, 0];
+    return this.view.minSize ? this.view.minSize : <[number, number]>[0, 0];
   }
 
   resized() {
@@ -121,10 +123,9 @@ export class ViewLayoutContainer extends ALayoutContainer<IViewLayoutContainerOp
     this.view.destroy();
   }
 
-
   persist() {
     const r: ILayoutDump = Object.assign(super.persist(), {
-      type: 'view'
+      type: 'view',
     });
     if (this.view instanceof HTMLView) {
       r.html = this.view.node.innerHTML;
@@ -133,7 +134,6 @@ export class ViewLayoutContainer extends ALayoutContainer<IViewLayoutContainerOp
     }
     return r;
   }
-
 
   static restore(dump: ILayoutDump, restoreView: (referenceId: number) => PHOVEA_UI_IView, doc: Document) {
     const view = dump.html ? new HTMLView(dump.html, doc) : restoreView(dump.view);

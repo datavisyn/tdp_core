@@ -1,5 +1,6 @@
+import { merge, isObject } from 'lodash';
 import { UniqueIdManager } from './UniqueIdManager';
-import { BaseUtils } from '../base/BaseUtils';
+import { EXTENSION_POINT_VISYN_VIEW } from '../base/extensions';
 export class PluginRegistry {
     constructor() {
         this.registry = [];
@@ -8,7 +9,7 @@ export class PluginRegistry {
     push(type, idOrLoader, descOrLoader, desc) {
         const id = typeof idOrLoader === 'string' ? idOrLoader : UniqueIdManager.getInstance().uniqueString(type);
         const loader = typeof idOrLoader === 'string' ? descOrLoader : descOrLoader;
-        const p = BaseUtils.mixin({
+        const p = merge({
             type,
             id,
             name: id,
@@ -17,14 +18,44 @@ export class PluginRegistry {
             version: '1.0.0',
             load: async () => {
                 const instance = await Promise.resolve(loader());
-                return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory) };
-            }
+                if (p.factory) {
+                    return { desc: p, factory: PluginRegistry.getInstance().getFactoryMethod(instance, p.factory) };
+                }
+                // If no factory was given, and the instance is an object, use it as factory object.
+                if (isObject(instance)) {
+                    return { ...instance, desc: p, factory: () => null };
+                }
+                // If nothing matches, return the instance by the factory function
+                return { desc: p, factory: () => instance };
+            },
         }, typeof descOrLoader === 'function' ? desc : descOrLoader);
         PluginRegistry.getInstance().registry.push(p);
     }
+    /**
+     * Push a visyn view to the registry.
+     */
+    pushVisynView(
+    /**
+     * Unique ID of the visyn view.
+     */
+    id, 
+    /**
+     * Loader function for the module.
+     */
+    loader, 
+    /**
+     * View description of the visyn view plugin.
+     */
+    desc) {
+        return this.push(EXTENSION_POINT_VISYN_VIEW, id, (...args) => loader().then((callable) => callable(...args)), {
+            ...desc,
+            // Override the load to return the plugin directly instead of the factory function
+            factory: null,
+        });
+    }
     register(plugin, generator) {
         if (typeof generator !== 'function') {
-            //wrong type - not a function, maybe a dummy inline
+            // wrong type - not a function, maybe a dummy inline
             return;
         }
         if (PluginRegistry.getInstance().knownPlugins.has(plugin)) {
@@ -45,12 +76,6 @@ export class PluginRegistry {
         }
         return PluginRegistry.getInstance().registry.filter(filter);
     }
-    /**
-     * returns an extension identified by type and id
-     * @param type
-     * @param id
-     * @returns {IPluginDesc}
-     */
     getPlugin(type, id) {
         return PluginRegistry.getInstance().registry.find((d) => d.type === type && d.id === id);
     }
@@ -65,27 +90,32 @@ export class PluginRegistry {
      */
     asResource(data) {
         return {
-            create: () => data
+            create: () => data,
         };
     }
     /**
      * determines the factory method to use in case of the 'new ' syntax wrap the class constructor using a factory method
      */
     getFactoryMethod(instance, factory) {
+        if (factory == null) {
+            return instance;
+        }
         let f = factory.trim();
         if (f === 'new') {
-            //instantiate the default class
+            // instantiate the default class
             f = 'new default';
         }
-        if (f === 'create') { //default value
+        if (f === 'create') {
+            // default value
             if (typeof instance.create === 'function') {
-                //default exists
+                // default exists
                 return instance.create;
             }
             // try another default
             if (typeof instance.default === 'function') {
-                //we have a default export
-                if (instance.default.prototype !== undefined) { // it has a prototype so guess it is a class
+                // we have a default export
+                if (instance.default.prototype !== undefined) {
+                    // it has a prototype so guess it is a class
                     f = 'new default';
                 }
                 else {
@@ -93,7 +123,7 @@ export class PluginRegistry {
                 }
             }
             else {
-                console.error(`neighter a default export nor the 'create' method exists in the module:`, instance);
+                console.error(`neither a default export nor the 'create' method exists in the module:`, instance);
             }
         }
         if (f.startsWith('new ')) {

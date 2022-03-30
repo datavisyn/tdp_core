@@ -1,8 +1,7 @@
 import { IDType } from '../idtype';
 import { EventHandler } from '../base';
 import { IFormElementDesc } from '../form/interfaces';
-import { ISelection, IView, IViewContext } from '../base/interfaces';
-import { EViewMode } from '../base/interfaces';
+import { ISelection, IView, IViewContext, EViewMode } from '../base/interfaces';
 import { IAuthorizationConfiguration } from '../auth';
 /**
  * base class for all views
@@ -101,21 +100,6 @@ export declare abstract class AView extends EventHandler implements IView {
      * @returns {Promise<string[]>}
      */
     protected resolveSelection(idType?: IDType): Promise<string[]>;
-    /**
-     * resolve the name of the current input selection
-     * @returns {Promise<string[]>}
-     */
-    protected resolveSelectionByName(idType?: IDType): Promise<string[]>;
-    /**
-     * resolve the ids of the current input selection to all 1:n related names, not just the first one like `resolveSelection` does
-     * @returns {Promise<string[]>}
-     */
-    protected resolveMultipleSelections(idType?: IDType): Promise<string[][]>;
-    /**
-     * resolve the names of the current input selection to all 1:n related names, not just the first one like `resolveSelectionByName` does
-     * @returns {Promise<string[]>}
-     */
-    protected resolveMultipleSelectionsByName(idType?: IDType): Promise<string[][]>;
     setItemSelection(selection: ISelection, name?: string): void;
     /**
      * hook when the item selection has changed
@@ -126,3 +110,4 @@ export declare abstract class AView extends EventHandler implements IView {
     destroy(): void;
     isRegex(v: string): boolean;
 }
+//# sourceMappingURL=AView.d.ts.map

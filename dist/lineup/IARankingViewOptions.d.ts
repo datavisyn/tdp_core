@@ -32,6 +32,11 @@ export interface IARankingViewOptions {
         value: string;
     };
     /**
+     * enables CLUE for the ranking, leading to tracking of all ranking relevant features like sorting, filtering, and adding columns.
+     * @default true
+     */
+    clueifyRanking: boolean;
+    /**
      * enable taggle overview mode switcher
      * @default true
      */
@@ -41,6 +46,11 @@ export interface IARankingViewOptions {
      * @default true
      */
     enableZoom: boolean;
+    /**
+     * enable custom plotly vis
+     * @default true
+     */
+    enableVisPanel: boolean;
     /**
      * enable download data button
      * @default true
@@ -140,3 +150,4 @@ export interface IARankingViewOptions {
      */
     panelAddColumnBtnOptions: IPanelAddColumnButtonOptions;
 }
+//# sourceMappingURL=IARankingViewOptions.d.ts.map

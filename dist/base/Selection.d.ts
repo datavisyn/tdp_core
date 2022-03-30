@@ -1,19 +1,18 @@
 import { IDType } from '../idtype';
-import { IObjectRef, ICmdResult, ActionNode, ProvenanceGraph } from '../provenance';
-import { Range } from '../range';
+import { IObjectRef, ICmdResult, ActionNode, ProvenanceGraph } from '../clue/provenance';
 export declare class Selection {
     static select(inputs: IObjectRef<any>[], parameter: any, graph: any, within: any): ICmdResult;
     static capitalize(s: string): string;
-    static meta(idtype: IDType, type: string, range: Range): any;
+    static meta(idtype: IDType, type: string, selection: string[]): any;
     /**
      * create a selection command
      * @param idtype
      * @param type
-     * @param range
+     * @param selection
      * @param old optional the old selection for inversion
      * @returns {Cmd}
      */
-    static createSelection(idtype: IDType, type: string, range: Range, old?: Range, animated?: boolean): any;
+    static createSelection(idtype: IDType, type: string, selection: string[], old?: string[], animated?: boolean): any;
     static compressSelection(path: ActionNode[]): ActionNode[];
 }
 /**
@@ -29,3 +28,4 @@ export declare class SelectionRecorder {
     destroy(): void;
     static createSelectionRecorder(graph: ProvenanceGraph, type?: string, options?: any): SelectionRecorder;
 }
+//# sourceMappingURL=Selection.d.ts.map

@@ -102,3 +102,4 @@ export declare class PanelTabContainer implements ITabContainer {
      */
     hideCurrentTab(): void;
 }
+//# sourceMappingURL=PanelTabContainer.d.ts.map

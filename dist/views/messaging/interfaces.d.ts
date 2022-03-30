@@ -22,3 +22,4 @@ export interface ITDPSetParameterMessage {
     };
 }
 export declare type ITDPMessage = ITDPSetInputSelectionMessage | ITDPSetItemSelectionMessage | ITDPSetParameterMessage;
+//# sourceMappingURL=interfaces.d.ts.map

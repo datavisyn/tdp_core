@@ -1,5 +1,5 @@
+import { merge } from 'lodash';
 import { IDTypeManager } from '../idtype';
-import { BaseUtils } from '../base';
 import { I18nextManager } from '../i18n';
 import { FormElementType } from '../form/interfaces';
 import { AD3View } from './AD3View';
@@ -28,10 +28,10 @@ export class ProxyView extends AD3View {
              */
             idtype: null,
             extra: {},
-            openExternally: false
+            openExternally: false,
         };
         this.naturalSize = [1280, 800];
-        BaseUtils.mixin(this.options, context.desc, options);
+        merge(this.options, context.desc, options);
         this.$node.classed('proxy_view', true);
         this.openExternally = parent.ownerDocument.createElement('p');
     }
@@ -46,13 +46,12 @@ export class ProxyView extends AD3View {
     initImpl() {
         super.initImpl();
         // update the selection first, then update the proxy view
-        return this.updateSelectedItemSelect()
-            .then(() => {
+        return this.updateSelectedItemSelect().then(() => {
             this.updateProxyView();
         });
     }
     createUrl(args) {
-        //use internal proxy
+        // use internal proxy
         if (this.options.proxy) {
             return RestBaseUtils.getProxyUrl(this.options.proxy, args);
         }
@@ -62,15 +61,17 @@ export class ProxyView extends AD3View {
         return null;
     }
     getParameterFormDescs() {
-        return super.getParameterFormDescs().concat([{
+        return super.getParameterFormDescs().concat([
+            {
                 type: FormElementType.SELECT,
                 label: 'Show',
                 id: ProxyView.FORM_ID_SELECTED_ITEM,
                 options: {
                     optionsData: [],
                 },
-                useSession: true
-            }]);
+                useSession: true,
+            },
+        ]);
     }
     parameterChanged(name) {
         super.parameterChanged(name);
@@ -122,12 +123,12 @@ export class ProxyView extends AD3View {
             this.showErrorMessage(selectedItemId);
             return;
         }
-        //remove old mapping error notice if any exists
+        // remove old mapping error notice if any exists
         this.openExternally.innerHTML = '';
         this.$node.selectAll('p').remove();
         this.$node.selectAll('iframe').remove();
         this.setBusy(true);
-        const args = BaseUtils.mixin(this.options.extra, { [this.options.argument]: selectedItemId });
+        const args = merge(this.options.extra, { [this.options.argument]: selectedItemId });
         const url = this.createUrl(args);
         if (ProxyView.isNoNSecurePage(url)) {
             this.showNoHttpsMessage(url);
@@ -140,25 +141,28 @@ export class ProxyView extends AD3View {
       </div>`;
             return;
         }
-        this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${url.startsWith('http') ? url : `${location.protocol}${url}`}</a>`;
-        //console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
-        this.$node.append('iframe')
+        this.openExternally.innerHTML = `${I18nextManager.getInstance().i18n.t('tdp:core.views.isLoaded')} <a href="${url}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i>${url.startsWith('http') ? url : `${window.location.protocol}${url}`}</a>`;
+        // console.log('start loading', this.$node.select('iframe').node().getBoundingClientRect());
+        this.$node
+            .append('iframe')
             .attr('src', url)
             .on('load', () => {
             this.setBusy(false);
-            //console.log('finished loading', this.$node.select('iframe').node().getBoundingClientRect());
+            // console.log('finished loading', this.$node.select('iframe').node().getBoundingClientRect());
             this.fire(ProxyView.EVENT_LOADING_FINISHED);
         });
     }
     showErrorMessage(selectedItemId) {
         this.setBusy(false);
-        const to = this.options.idtype ? IDTypeManager.getInstance().resolveIdType(this.options.idtype).name : I18nextManager.getInstance().i18n.t('tdp:core.views.unknown');
+        const to = this.options.idtype
+            ? IDTypeManager.getInstance().resolveIdType(this.options.idtype).name
+            : I18nextManager.getInstance().i18n.t('tdp:core.views.unknown');
         this.$node.html(`<p>${I18nextManager.getInstance().i18n.t('tdp:core.views.cannotMap', { name: this.selection.idtype.name, selectedItemId, to })}</p>`);
         this.openExternally.innerHTML = ``;
         this.fire(ProxyView.EVENT_LOADING_FINISHED);
     }
     static isNoNSecurePage(url) {
-        const self = location.protocol.toLowerCase();
+        const self = window.location.protocol.toLowerCase();
         if (!self.startsWith('https')) {
             return false; // if I'm not secure doesn't matter
         }

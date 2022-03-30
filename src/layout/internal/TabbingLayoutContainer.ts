@@ -1,11 +1,8 @@
-import {AParentLayoutContainer} from './AParentLayoutContainer';
-import {ILayoutContainer, ILayoutDump, ISize, ITabbingLayoutContainer} from '../interfaces';
-import {ALayoutContainer, ILayoutContainerOption} from './ALayoutContainer';
-import {IDropArea} from '../interfaces';
-import {LayoutContainerEvents} from '../interfaces';
-import {LAYOUT_CONTAINER_WRAPPER} from '../constants';
-import {DnDUtils} from '../../app';
-
+import { AParentLayoutContainer } from './AParentLayoutContainer';
+import { ILayoutContainer, ILayoutDump, ISize, ITabbingLayoutContainer, IDropArea, LayoutContainerEvents } from '../interfaces';
+import { ALayoutContainer, ILayoutContainerOption } from './ALayoutContainer';
+import { LAYOUT_CONTAINER_WRAPPER } from '../constants';
+import { DnDUtils } from '../../app';
 
 export interface ITabbingLayoutContainerOptions extends ILayoutContainerOption {
   readonly active: number;
@@ -13,14 +10,16 @@ export interface ITabbingLayoutContainerOptions extends ILayoutContainerOption {
 
 export class TabbingLayoutContainer extends AParentLayoutContainer<ITabbingLayoutContainerOptions> implements ITabbingLayoutContainer {
   private static readonly TAB_REORDER = `<div data-layout="tab-reorder">&nbsp;</div>`;
+
   readonly minChildCount = 0;
+
   readonly type = 'tabbing';
 
   private readonly mouseEnter = () => this.header.classList.add('show-header'); // show full header when hovering over the minimal header
+
   private readonly mouseLeave = () => this.header.classList.remove('show-header'); // hide header again
 
   private _active: ILayoutContainer | null = null;
-
 
   constructor(document: Document, options: Partial<ITabbingLayoutContainerOptions>, ...children: ILayoutContainer[]) {
     super(document, options);
@@ -32,28 +31,34 @@ export class TabbingLayoutContainer extends AParentLayoutContainer<ITabbingLayou
     }
 
     if (!this.options.fixedLayout) {
-      DnDUtils.getInstance().dropAble(this.header, [ALayoutContainer.MIME_TYPE], (result) => {
-        const id = parseInt(result.data[ALayoutContainer.MIME_TYPE], 10);
-        console.assert(id >= 0);
-        //find id and move it here
-        const root = this.rootParent;
-        const toMove = root.find(id);
-        if (toMove === null || toMove === this || toMove instanceof AParentLayoutContainer && this.parents.indexOf(toMove) >= 0) {
-          //can't move parent into me
-          return false;
-        }
-        const alreadyChild = this._children.indexOf(toMove) >= 0;
-        if (alreadyChild) {
-          this.moveChild(toMove, this.length);
-        } else {
-          //not a child already
-          this.push(toMove);
-        }
-        return true;
-      }, null, true);
+      DnDUtils.getInstance().dropAble(
+        this.header,
+        [ALayoutContainer.MIME_TYPE],
+        (result) => {
+          const id = parseInt(result.data[ALayoutContainer.MIME_TYPE], 10);
+          console.assert(id >= 0);
+          // find id and move it here
+          const root = this.rootParent;
+          const toMove = root.find(id);
+          if (toMove === null || toMove === this || (toMove instanceof AParentLayoutContainer && this.parents.indexOf(toMove) >= 0)) {
+            // can't move parent into me
+            return false;
+          }
+          const alreadyChild = this._children.indexOf(toMove) >= 0;
+          if (alreadyChild) {
+            this.moveChild(toMove, this.length);
+          } else {
+            // not a child already
+            this.push(toMove);
+          }
+          return true;
+        },
+        null,
+        true,
+      );
     }
 
-    if(this.options.fixed) {
+    if (this.options.fixed) {
       this.header.classList.add('fixed');
       this.toggleFrozenLayout();
 
@@ -74,7 +79,7 @@ export class TabbingLayoutContainer extends AParentLayoutContainer<ITabbingLayou
 
   protected defaultOptions(): ITabbingLayoutContainerOptions {
     return Object.assign(super.defaultOptions(), {
-      active: null
+      active: null,
     });
   }
 
@@ -87,31 +92,37 @@ export class TabbingLayoutContainer extends AParentLayoutContainer<ITabbingLayou
     if (this._active === child) {
       return;
     }
-    this.activeChanged(this._active, this._active = child);
+    this.activeChanged(this._active, (this._active = child));
   }
 
   private reorderAble(reorder: HTMLElement) {
-    DnDUtils.getInstance().dropAble(reorder, [ALayoutContainer.MIME_TYPE], (result) => {
-      const id = parseInt(result.data[ALayoutContainer.MIME_TYPE], 10);
-      console.assert(id >= 0);
-      //find id and move it here
-      const root = this.rootParent;
-      const toMove = root.find(id);
-      if (toMove === null || toMove === this || toMove instanceof AParentLayoutContainer && this.parents.indexOf(toMove) >= 0) {
-        //can't move parent into me
-        return false;
-      }
-      //next sibling = managed header
-      const index = this._children.findIndex((d) => d.header === reorder.nextSibling);
-      const alreadyChild = this._children.indexOf(toMove) >= 0;
-      if (alreadyChild) {
-        this.moveChild(toMove, index);
-      } else {
-        //not a child already
-        this.push(toMove, index);
-      }
-      return true;
-    }, null, true);
+    DnDUtils.getInstance().dropAble(
+      reorder,
+      [ALayoutContainer.MIME_TYPE],
+      (result) => {
+        const id = parseInt(result.data[ALayoutContainer.MIME_TYPE], 10);
+        console.assert(id >= 0);
+        // find id and move it here
+        const root = this.rootParent;
+        const toMove = root.find(id);
+        if (toMove === null || toMove === this || (toMove instanceof AParentLayoutContainer && this.parents.indexOf(toMove) >= 0)) {
+          // can't move parent into me
+          return false;
+        }
+        // next sibling = managed header
+        const index = this._children.findIndex((d) => d.header === reorder.nextSibling);
+        const alreadyChild = this._children.indexOf(toMove) >= 0;
+        if (alreadyChild) {
+          this.moveChild(toMove, index);
+        } else {
+          // not a child already
+          this.push(toMove, index);
+        }
+        return true;
+      },
+      null,
+      true,
+    );
   }
 
   protected addedChild(child: ILayoutContainer, index: number) {
@@ -147,25 +158,25 @@ export class TabbingLayoutContainer extends AParentLayoutContainer<ITabbingLayou
     const old = this._children.indexOf(child);
     const atEnd = index === this.length;
     if (old === index || (atEnd && old === index - 1)) {
-      //already at the right position
+      // already at the right position
       return;
     }
     this._children.splice(old, 1);
     if (old < index) {
-      index -= 1; //since we removed it already
+      index -= 1; // since we removed it already
     }
     this._children.splice(index, 0, child);
-    //update header
+    // update header
     const reorder = child.header.previousSibling;
     if (atEnd) {
-      //reorder
+      // reorder
       this.header.appendChild(reorder);
       this.header.appendChild(child.header);
       this.node.appendChild(child.node.parentElement);
       return;
     }
     const next = this._children[index + 1];
-    this.header.insertBefore(child.header, next.header.previousSibling); //2 extra items
+    this.header.insertBefore(child.header, next.header.previousSibling); // 2 extra items
     this.header.insertBefore(reorder, child.header);
     this.node.insertBefore(child.node.parentElement, next.node.parentElement);
     this.fire(ALayoutContainer.withChanged(LayoutContainerEvents.EVENT_TAB_REORDED), child, index);
@@ -183,10 +194,10 @@ export class TabbingLayoutContainer extends AParentLayoutContainer<ITabbingLayou
   protected takeDownChild(child: ILayoutContainer) {
     if (this.active === child) {
       const index = this._children.indexOf(child);
-      this.active = this.length === 1 ? null : (index === 0 ? this._children[1] : this._children[index - 1]!);
+      this.active = this.length === 1 ? null : index === 0 ? this._children[1] : this._children[index - 1]!;
     }
     child.header.onclick = null;
-    //reorder
+    // reorder
     this.header.removeChild(child.header.previousSibling);
     this.header.removeChild(child.header);
     this.node.removeChild(child.node.parentElement);
@@ -194,11 +205,14 @@ export class TabbingLayoutContainer extends AParentLayoutContainer<ITabbingLayou
   }
 
   get minSize() {
-    //max
-    return <ISize>this._children.reduce((a, c) => {
-      const cmin = c.minSize;
-      return [Math.max(a[0], cmin[0]), Math.max(a[1], cmin[1])];
-    }, [0, 0]);
+    // max
+    return <ISize>this._children.reduce(
+      (a, c) => {
+        const cmin = c.minSize;
+        return [Math.max(a[0], cmin[0]), Math.max(a[1], cmin[1])];
+      },
+      [0, 0],
+    );
   }
 
   private activeChanged(oldActive: ILayoutContainer | null, newActive: ILayoutContainer | null) {
@@ -224,7 +238,7 @@ export class TabbingLayoutContainer extends AParentLayoutContainer<ITabbingLayou
   persist() {
     return Object.assign(super.persist(), {
       type: 'tabbing',
-      active: this._active ? this._children.indexOf(this._active) : null
+      active: this._active ? this._children.indexOf(this._active) : null,
     });
   }
 
@@ -251,7 +265,8 @@ export class TabbingLayoutContainer extends AParentLayoutContainer<ITabbingLayou
   }
 
   private toggleFrozenLayout() {
-    if (this.children.length < 2) { // frozen layout to apply minimal style to the header and hide views
+    if (this.children.length < 2) {
+      // frozen layout to apply minimal style to the header and hide views
       this.header.classList.add('floating-header');
       this.header.addEventListener('mouseenter', this.mouseEnter);
       this.header.addEventListener('mouseleave', this.mouseLeave);

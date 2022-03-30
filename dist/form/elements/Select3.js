@@ -43,7 +43,7 @@ export class Select3Utils {
     static escapeRegex(re) {
         const reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
         const reHasRegExpChar = RegExp(reRegExpChar.source);
-        return (re && reHasRegExpChar.test(re)) ? re.replace(reRegExpChar, '\\$&') : re;
+        return re && reHasRegExpChar.test(re) ? re.replace(reRegExpChar, '\\$&') : re;
     }
     static equalArrays(a, b) {
         if (a.length !== b.length) {
@@ -59,6 +59,8 @@ export class Select3 extends EventHandler {
             document,
             width: '100%',
             required: false,
+            readonly: false,
+            disabled: false,
             pageSize: 30,
             minimumInputLength: 0,
             multiple: false,
@@ -85,7 +87,7 @@ export class Select3 extends EventHandler {
             defaultTokenSeparator: ' ',
             id: null,
             name: null,
-            queryDelay: 250
+            queryDelay: 250,
         };
         this.select2Options = {
             theme: 'bootstrap',
@@ -101,8 +103,8 @@ export class Select3 extends EventHandler {
                 dataType: 'json',
                 delay: this.options.queryDelay,
                 cache: true,
-                transport: this.searchImpl.bind(this)
-            }
+                transport: this.searchImpl.bind(this),
+            },
         };
         this.previousValue = [];
         this.lastSearchQuery = null;
@@ -114,7 +116,7 @@ export class Select3 extends EventHandler {
             if (this.options.equalValues(this.previousValue, next)) {
                 return;
             }
-            this.fire(Select3.EVENT_SELECT, this.previousValue, this.previousValue = next);
+            this.fire(Select3.EVENT_SELECT, this.previousValue, (this.previousValue = next));
         }, 20);
         // merge the default options with the given options
         Object.assign(this.options, options);
@@ -126,12 +128,13 @@ export class Select3 extends EventHandler {
             placeholder: this.options.placeholder,
             tags: Boolean(this.options.validate),
             ajax: Object.assign(this.select2Options.ajax, {
-                delay: this.options.queryDelay
-            })
+                // also override ajax options
+                delay: this.options.queryDelay,
+            }),
         });
         this.node = this.options.document.createElement('div');
+        this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''} ${this.options.readonly ? 'readonly' : ''} ${this.options.disabled ? 'disabled' : ''}></select>`;
         this.node.classList.add('select3');
-        this.node.innerHTML = `<select ${this.options.multiple ? 'multiple' : ''} ${this.options.required ? 'required' : ''}></select>`;
         this.$select = $('select', this.node);
         if (this.options.name != null) {
             this.$select.attr('name', this.options.name);
@@ -149,7 +152,7 @@ export class Select3 extends EventHandler {
             // the browser normalizes copy-paste data by its own but to avoid that we do it ourselves
             const value = evt.clipboardData ? evt.clipboardData.getData('Text') : '';
             if (!value) {
-                return;
+                return undefined;
             }
             const data = Select3Utils.splitEscaped(value, this.options.tokenSeparators, false).join(this.options.defaultTokenSeparator); // normalize
             this.setSearchQuery(data);
@@ -200,7 +203,7 @@ export class Select3 extends EventHandler {
         });
         node.addEventListener('drop', (evt) => {
             node.classList.remove('drag-over');
-            const files = evt.dataTransfer.files;
+            const { files } = evt.dataTransfer;
             if (files.length > 0) {
                 // mark success
                 evt.stopPropagation();
@@ -221,7 +224,7 @@ export class Select3 extends EventHandler {
     reformatItems() {
         const data = this.$select.select2('data');
         const current = Array.from(this.node.querySelectorAll('.select2-selection__choice'));
-        current.forEach((node, i) => node.innerHTML = node.firstElementChild.outerHTML + this.formatItem('selection', data[i], node));
+        current.forEach((node, i) => (node.innerHTML = node.firstElementChild.outerHTML + this.formatItem('selection', data[i], node)));
     }
     formatItem(mode, item, container) {
         const elem = container instanceof $ ? container[0] : container;
@@ -239,18 +242,18 @@ export class Select3 extends EventHandler {
             data,
             text: data.text,
             id: data.id,
-            verified: 'verified'
+            verified: 'verified',
         }));
     }
     searchImpl(x, success, failure) {
-        const q = x.data.q;
+        const { q } = x.data;
         this.lastSearchQuery = new RegExp(`(${Select3Utils.escapeRegex(q)})`, 'im');
         if (x.data.page === undefined) {
             x.data.page = 0; // init properly otherwise select2 will assume 1 instead of zero based
         }
-        //dummy wrapper for select2
+        // dummy wrapper for select2
         const result = {
-            status: 0
+            status: 0,
         };
         const cachedValue = this.resolveCachedValue(q, x.data.page);
         if (cachedValue) {
@@ -258,17 +261,20 @@ export class Select3 extends EventHandler {
             return result;
         }
         this.setBusy(true);
-        this.options.search(q, x.data.page, this.options.pageSize).then(({ items, more }) => {
+        this.options
+            .search(q, x.data.page, this.options.pageSize)
+            .then(({ items, more }) => {
             this.setBusy(false);
             const r = {
                 results: this.options.group(Select3.wrap(items), q, x.data.page),
                 pagination: {
-                    more
-                }
+                    more,
+                },
             };
             this.cacheValue(q, x.data.page, r);
             success(r);
-        }).catch((error) => {
+        })
+            .catch((error) => {
             console.error(`error fetching search results`, error);
             this.setBusy(false);
             failure();
@@ -307,7 +313,8 @@ export class Select3 extends EventHandler {
             // all cached
             return Promise.resolve(cached);
         }
-        return this.options.validate(terms)
+        return this.options
+            .validate(terms)
             .then((r) => cached.concat(Select3.wrap(r)))
             .catch((error) => {
             console.error(`error validating results:`, error);
@@ -315,42 +322,42 @@ export class Select3 extends EventHandler {
         });
     }
     tokenize(query, _options, addSelection) {
-        const term = query.term;
+        const { term } = query;
         if (term.length === 0) {
             return query;
         }
         const arr = Select3Utils.splitEscaped(term, this.options.tokenSeparators, true);
-        //filter to valid (non empty) entries
+        // filter to valid (non empty) entries
         const valid = Array.from(new Set(arr.map((a) => a.trim().toLowerCase()).filter((a) => a.length > 0)));
         if (arr.length <= 1) {
             return query; // single term
         }
-        //multiple terms validate all and return empty string
+        // multiple terms validate all and return empty string
         this.setBusy(true);
         valid.forEach((text) => {
             const item = {
                 id: text,
                 text,
                 data: null,
-                verified: 'processing'
+                verified: 'processing',
             };
             addSelection(item);
         });
-        this.validate(valid).then((valid) => {
-            const validated = new Map((valid.map((i) => [i.text.toLowerCase(), i])));
+        this.validate(valid).then((val) => {
+            const validated = new Map(val.map((i) => [i.text.toLowerCase(), i]));
             const processing = Array.from(this.node.querySelectorAll('.select2-selection__choice[data-verified=processing]'));
             const items = this.$select.select2('data');
             items.forEach((i) => {
                 const original = i.text;
-                const valid = validated.get(original.toLowerCase());
+                const v = validated.get(original.toLowerCase());
                 const dom = processing.find((d) => d.textContent.endsWith(original));
-                if (!valid && i.verified !== 'verified') {
+                if (!v && i.verified !== 'verified') {
                     i.verified = 'invalid';
                 }
                 else {
                     // remove key
                     validated.delete(i.text.toLowerCase());
-                    Object.assign(i, valid);
+                    Object.assign(i, v);
                     const o = i.element;
                     if (o) {
                         // sync option
@@ -368,7 +375,7 @@ export class Select3 extends EventHandler {
             this.setBusy(false);
         });
         return {
-            term: ''
+            term: '',
         };
     }
     focus() {

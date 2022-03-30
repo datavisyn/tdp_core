@@ -1,5 +1,5 @@
-/*********************************************************
- * Copyright (c) 2018 datavisyn GmbH, http://datavisyn.io
+/** *******************************************************
+ * Copyright (c) 2022 datavisyn GmbH, http://datavisyn.io
  *
  * This file is property of datavisyn.
  * Code and any other files associated with this project
@@ -7,7 +7,7 @@
  *
  * Proprietary and confidential. No warranty.
  *
- *********************************************************/
+ ******************************************************** */
 import * as React from 'react';
 import { IViewPluginDesc } from '../base';
 import { AReactView, ISelector } from './AReactView';
@@ -17,7 +17,7 @@ export interface IWrappedProps {
     itemSelector: ISelector;
 }
 export interface IComponentModule {
-    default: (new (props?: IWrappedProps, context?: any) => React.Component<IWrappedProps, any>);
+    default: new (props?: IWrappedProps, context?: any) => React.Component<IWrappedProps, any>;
 }
 export interface IReactViewWrapperPluginDesc extends IViewPluginDesc {
     itemType?: string;
@@ -35,3 +35,4 @@ export declare class ReactViewWrapper extends AReactView {
     protected getItemType(): any;
     render(inputSelection: string[], itemSelection: string[], itemSelector: ISelector): JSX.Element;
 }
+//# sourceMappingURL=ReactViewWrapper.d.ts.map

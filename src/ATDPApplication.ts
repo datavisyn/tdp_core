@@ -1,20 +1,20 @@
-import {AppHeaderLink, AppHeader} from './components';
 // TODO: Do we need a relative import?
 import './webpack/_bootstrap';
-import {EditProvenanceGraphMenu} from './utils/EditProvenanceGraphMenu';
-import {DialogUtils} from './base/dialogs';
-import {EXTENSION_POINT_TDP_APP_EXTENSION} from './base/extensions';
-import {IAppExtensionExtension} from './base/interfaces';
-import {TourManager} from './tour/TourManager';
-import {TemporarySessionList} from './utils/SessionList';
+import { merge } from 'lodash';
+import { AppHeaderLink, AppHeader } from './components';
+import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
+import { DialogUtils } from './clue/base/dialogs';
+import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
+import { IAppExtensionExtension } from './base/interfaces';
+import { TourManager } from './tour/TourManager';
+import { TemporarySessionList, ButtonModeSelector, CLUEGraphManager } from './clue';
 import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
-import {ACLUEWrapper} from './wrapper';
-import {LoginMenu} from './base';
-import {Ajax, BaseUtils, ButtonModeSelector, CLUEGraphManager} from './base';
-import {UserSession, PluginRegistry} from './app';
-import {I18nextManager} from './i18n';
-import {IMixedStorageProvenanceGraphManagerOptions, MixedStorageProvenanceGraphManager, ProvenanceGraph} from './provenance';
-import {VisLoader} from './vis';
+import { ACLUEWrapper } from './clue/wrapper';
+import { LoginMenu, Ajax } from './base';
+import { UserSession, PluginRegistry } from './app';
+import { I18nextManager } from './i18n';
+import { IMixedStorageProvenanceGraphManagerOptions, MixedStorageProvenanceGraphManager, ProvenanceGraph } from './clue/provenance';
+import { VisLoader } from './clue/provvis';
 
 export interface ITDPOptions {
   /**
@@ -66,7 +66,6 @@ export interface ITDPOptions {
    * @default: true
    */
   showProvenanceMenu?: boolean;
-
 
   /**
    * Show/hide the `Exploration`, `Authoring`, `Presentation` buttons in the header
@@ -128,18 +127,21 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showProvenanceMenu: true,
     showClueModeButtons: true,
     enableProvenanceUrlTracking: true,
-    clientConfig: null
+    clientConfig: null,
   };
 
   protected app: Promise<T> = null;
+
   protected header: AppHeader;
+
   protected loginMenu: LoginMenu;
+
   protected tourManager: TourManager;
 
   constructor(options: Partial<ITDPOptions> = {}) {
     super();
 
-    BaseUtils.mixin(this.options, options);
+    merge(this.options, options);
 
     this.initialize();
   }
@@ -156,22 +158,28 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     // Prefill the token manager with authorization configurations
     if (this.options.clientConfig?.tokenManager?.authorizationConfigurations) {
-      await TDPTokenManager.addAuthorizationConfiguration(Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({id, ...config})));
+      await TDPTokenManager.addAuthorizationConfiguration(
+        Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({ id, ...config })),
+      );
     }
 
-    await this.build(document.body, {replaceBody: false});
+    await this.build(document.body, { replaceBody: false });
 
     this.tourManager = new TourManager({
       doc: document,
       header: () => this.header,
-      app: () => this.app
+      app: () => this.app,
     });
 
     if (this.options.showTourLink && this.tourManager.hasTours()) {
-      const button = this.header.addRightMenu('<i class="fas fa-question-circle fa-fw"></i>', (evt) => {
-        evt.preventDefault();
-        return false;
-      }, '#');
+      const button = this.header.addRightMenu(
+        '<i class="fas fa-question-circle fa-fw"></i>',
+        (evt) => {
+          evt.preventDefault();
+          return false;
+        },
+        '#',
+      );
 
       button.dataset.bsToggle = 'modal';
       button.tabIndex = -1;
@@ -195,17 +203,17 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
    */
   public static async initializeClientConfig(options: ITDPOptions): Promise<ITDPOptions | null> {
     // If the clientConfig is falsy, assume no client configuration should be loaded.
-    if(!options?.clientConfig) {
+    if (!options?.clientConfig) {
       return null;
     }
     // Otherwise, load and merge the configuration into the existing one.
     const parsedConfig = await ATDPApplication.loadClientConfig();
-    options.clientConfig = BaseUtils.mixin(options?.clientConfig || {}, parsedConfig || {});
+    options.clientConfig = merge(options?.clientConfig || {}, parsedConfig || {});
     return options;
   }
 
   protected createHeader(parent: HTMLElement) {
-    //create the common header
+    // create the common header
     const header = AppHeader.create(parent, {
       showCookieDisclaimer: this.options.showCookieDisclaimer,
       showAboutLink: this.options.showAboutLink,
@@ -216,7 +224,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
         event.preventDefault();
         this.fire(ATDPApplication.EVENT_OPEN_START_MENU);
         return false;
-      })
+      }),
     });
 
     if (this.options.showResearchDisclaimer) {
@@ -224,7 +232,10 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       if (typeof this.options.showResearchDisclaimer === 'function') {
         this.options.showResearchDisclaimer(aboutDialogBody);
       } else {
-        aboutDialogBody.insertAdjacentHTML('afterbegin', `<div class="alert alert-warning" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.disclaimerMessage')}</span></div>`);
+        aboutDialogBody.insertAdjacentHTML(
+          'afterbegin',
+          `<div class="alert alert-warning" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.disclaimerMessage')}</span></div>`,
+        );
       }
     }
 
@@ -235,12 +246,12 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     this.header = this.createHeader(<HTMLElement>body.querySelector('div.box'));
 
     this.on('jumped_to,loaded_graph', () => this.header.ready());
-    //load all available provenance graphs
+    // load all available provenance graphs
     const manager = new MixedStorageProvenanceGraphManager({
       prefix: this.options.prefix,
       storage: localStorage,
       application: this.options.prefix,
-      ...(this.options.provenanceManagerOptions || {})
+      ...(this.options.provenanceManagerOptions || {}),
     });
 
     this.cleanUpOld(manager);
@@ -254,7 +265,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     this.loginMenu = new LoginMenu(this.header, {
       insertIntoHeader: true,
       loginForm: this.options.loginForm,
-      watch: true
+      watch: true,
     });
     this.loginMenu.on(LoginMenu.EVENT_LOGGED_OUT, () => {
       // reopen after logged out
@@ -266,44 +277,45 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       provenanceMenu = new EditProvenanceGraphMenu(clueManager, this.header.rightMenu);
     }
 
-
     const main = <HTMLElement>document.body.querySelector('main');
     const content = <HTMLElement>body.querySelector('div.content');
 
-    //wrapper around to better control when the graph will be resolved
+    // wrapper around to better control when the graph will be resolved
     let graphResolver: (graph: PromiseLike<ProvenanceGraph>) => void;
-    const graph = new Promise<ProvenanceGraph>((resolve, reject) => graphResolver = resolve);
+    const graph = new Promise<ProvenanceGraph>((resolve, reject) => {
+      graphResolver = resolve;
+    });
 
-    graph.catch((error: {graph: string}) => {
+    graph.catch((error: { graph: string }) => {
       DialogUtils.showProveanceGraphNotFoundDialog(clueManager, error.graph);
     });
 
-    graph.then((graph) => {
+    graph.then((g) => {
       if (this.options.showClueModeButtons) {
         const phoveaNavbar = document.body.querySelector('.phovea-navbar');
         const modeSelector = phoveaNavbar.appendChild(document.createElement('header'));
         modeSelector.classList.add('collapsed');
         modeSelector.classList.add('clue-modeselector');
         ButtonModeSelector.createButton(modeSelector, {
-          size: 'sm'
+          size: 'sm',
         });
       }
-      provenanceMenu?.setGraph(graph);
+      provenanceMenu?.setGraph(g);
     });
 
     const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {
       thumbnails: false,
       provVisCollapsed: true,
-      hideCLUEButtonsOnCollapse: true
+      hideCLUEButtonsOnCollapse: true,
     });
     const storyVis = VisLoader.loadStoryVis(graph, content, main, {
-      thumbnails: false
+      thumbnails: false,
     });
 
-    this.app = graph.then((graph) => this.createApp(graph, clueManager, main));
+    this.app = graph.then((g) => this.createApp(g, clueManager, main));
 
     const initSession = () => {
-      //logged in, so we can resolve the graph for real
+      // logged in, so we can resolve the graph for real
       graphResolver(clueManager.chooseLazy(true));
 
       this.app.then((appInstance) => this.initSessionImpl(appInstance));
@@ -317,13 +329,13 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       initSession();
     });
     if (!UserSession.getInstance().isLoggedIn()) {
-      //wait 1sec before the showing the login dialog to give the auto login mechanism a chance
+      // wait 1sec before the showing the login dialog to give the auto login mechanism a chance
       forceShowLoginDialogTimeout = setTimeout(() => this.loginMenu.forceShowDialog(), 1000);
     } else {
       initSession();
     }
 
-    return {graph, manager: clueManager, storyVis, provVis};
+    return { graph, manager: clueManager, storyVis, provVis };
   }
 
   /**
@@ -335,13 +347,13 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       return;
     }
     this.app.then((app) => {
-      Promise.all(plugins.map((d) => d.load())).then((plugins: IAppExtensionExtension[]) => {
-        for (const plugin of plugins) {
+      Promise.all(plugins.map((d) => d.load())).then((ps: IAppExtensionExtension[]) => {
+        for (const plugin of ps) {
           plugin.factory({
             header: this.header,
             content,
             main,
-            app
+            app,
           });
         }
       });

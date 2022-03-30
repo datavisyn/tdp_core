@@ -1,9 +1,7 @@
-import { IScoreRow } from '../base/interfaces';
+import { IDataRow, Ranking, LocalDataProvider } from 'lineupjs';
+import { IScoreRow, IScoreLoader } from '../base/interfaces';
 import { IParams, IRow } from '../base/rest';
-import { IDataRow } from 'lineupjs';
 import { IFormMultiMap, IFormRow } from '../form/elements/FormMap';
-import { IScoreLoader } from '../base/interfaces';
-import { Ranking, LocalDataProvider } from 'lineupjs';
 import { IRankingWrapper } from './IRankingWrapper';
 import { IPluginDesc } from '../base';
 /**
@@ -48,20 +46,6 @@ export declare class LineupUtils {
      * generator for a FormMap compatible badgeProvider based on the given database url
      */
     static previewFilterHint(database: string, view: string, extraParams?: () => any): (rows: IFormRow[]) => Promise<string>;
-    /**
-     * Returns the all items that are not in the given two arrays
-     * TODO improve performance of diff algorithm
-     * @param array1
-     * @param array2
-     * @returns {any}
-     */
-    static array_diff<T>(array1: T[], array2: T[]): T[];
-    /**
-     * Returns all elements from set1 which are not in set2
-     * @param set1
-     * @param set2
-     * @returns Set<T>
-     */
-    static set_diff<T>(set1: Set<T>, set2: Set<T>): Set<T>;
     static wrapRanking(data: LocalDataProvider, ranking: Ranking): IRankingWrapper;
 }
+//# sourceMappingURL=utils.d.ts.map

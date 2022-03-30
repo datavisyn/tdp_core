@@ -1,17 +1,13 @@
-import {select} from 'd3';
-import {IDType, IDTypeManager, SelectionUtils} from '../idtype';
-import {EventHandler, WebpackEnv} from '../base';
-import {Range} from '../range';
-import {I18nextManager} from '../i18n';
-import {IFormElementDesc} from '../form/interfaces';
-import {FormBuilder} from '../form/FormBuilder';
-import {AFormElement} from '../form/elements/AFormElement';
-import {ISelection, IView, IViewContext} from '../base/interfaces';
-import {ViewUtils} from './ViewUtils';
-import {ResolveUtils} from './ResolveUtils';
-import {EViewMode} from '../base/interfaces';
-import {IForm} from '../form/interfaces';
-import {ERenderAuthorizationStatus, IAuthorizationConfiguration, TokenManager, TDPTokenManager} from '../auth';
+import { select } from 'd3';
+import { IDType, IDTypeManager, SelectionUtils } from '../idtype';
+import { EventHandler, WebpackEnv } from '../base';
+import { I18nextManager } from '../i18n';
+import { IFormElementDesc, IForm } from '../form/interfaces';
+import { FormBuilder } from '../form/FormBuilder';
+import { AFormElement } from '../form/elements/AFormElement';
+import { ISelection, IView, IViewContext, EViewMode } from '../base/interfaces';
+import { ViewUtils } from './ViewUtils';
+import { ERenderAuthorizationStatus, IAuthorizationConfiguration, TokenManager, TDPTokenManager } from '../auth';
 
 /**
  * base class for all views
@@ -23,33 +19,42 @@ export abstract class AView extends EventHandler implements IView {
    * params(oldValue: ISelection, newSelection: ISelection)
    */
   static readonly EVENT_ITEM_SELECT = ViewUtils.VIEW_EVENT_ITEM_SELECT;
+
   /**
    * params(namedSet: INamedSet)
    */
   static readonly EVENT_UPDATE_ENTRY_POINT = ViewUtils.VIEW_EVENT_UPDATE_ENTRY_POINT;
+
   /**
    * params()
    */
   static readonly EVENT_LOADING_FINISHED = ViewUtils.VIEW_EVENT_LOADING_FINISHED;
+
   /**
    * params(name: string, oldValue: any, newValue: any)
    */
   static readonly EVENT_UPDATE_SHARED = ViewUtils.VIEW_EVENT_UPDATE_SHARED;
 
   readonly idType: IDType;
+
   readonly node: HTMLElement;
 
   private params: IForm;
+
   private readonly paramsFallback = new Map<string, any>();
+
   private readonly shared = new Map<string, any>();
-  private paramsChangeListener: ((name: string, value: any, previousValue: any) => Promise<any>);
+
+  private paramsChangeListener: (name: string, value: any, previousValue: any) => Promise<any>;
+
   private readonly itemSelections = new Map<string, ISelection>();
+
   private readonly selections = new Map<string, ISelection>();
 
   constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
     super();
     this.selections.set(AView.DEFAULT_SELECTION_NAME, selection);
-    this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, {idtype: null, range: Range.none()});
+    this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
 
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('tdp-view');
@@ -76,22 +81,29 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   protected setHint(visible: boolean, hintMessage?: string, hintCSSClass = 'hint') {
-    const conditionalData = this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'};
-    const defaultHintMessage = I18nextManager.getInstance().i18n.t('tdp:core.views.defaultHint', {...conditionalData});
+    const conditionalData = this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' };
+    const defaultHintMessage = I18nextManager.getInstance().i18n.t('tdp:core.views.defaultHint', { ...conditionalData });
     this.node.classList.toggle(`tdp-${hintCSSClass}`, visible);
     if (!visible) {
       delete this.node.dataset.hint;
     } else {
-      this.node.dataset.hint = hintMessage ? hintMessage : defaultHintMessage;
+      this.node.dataset.hint = hintMessage || defaultHintMessage;
     }
   }
 
   protected setNoMappingFoundHint(visible: boolean, hintMessage?: string) {
-    const conditionalData = {...this.selection.idtype ? {name: this.selection.idtype.name} : {context: 'unknown'}, id: this.idType ? this.idType.name : ''};
-    return this.setHint(visible, hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', {...conditionalData}), 'hint-mapping');
+    const conditionalData = {
+      ...(this.selection.idtype ? { name: this.selection.idtype.name } : { context: 'unknown' }),
+      id: this.idType ? this.idType.name : '',
+    };
+    return this.setHint(
+      visible,
+      hintMessage || I18nextManager.getInstance().i18n.t('tdp:core.views.noMappingFoundHint', { ...conditionalData }),
+      'hint-mapping',
+    );
   }
 
-  /*final*/
+  /* final */
   async init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any> {
     TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
       // If a authorization is removed, rerun the registered authorizations
@@ -133,12 +145,18 @@ export abstract class AView extends EventHandler implements IView {
           overlay.innerHTML = `
           ${
             error
-              ? `<div class="alert alert-info" role="alert">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationFailed')} ${error.toString()}</div>`
+              ? `<div class="alert alert-info" role="alert">${I18nextManager.getInstance().i18n.t(
+                  'tdp:core.views.authorizationFailed',
+                )} ${error.toString()}</div>`
               : ''
           }
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-                <p class="lead">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationRequired', {name: authConfiguration.name})}</p>
-                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${status === 'pending' ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading') : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')}</button>
+                <p class="lead">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationRequired', { name: authConfiguration.name })}</p>
+                <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${
+            status === 'pending'
+              ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading')
+              : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')
+          }</button>
             </div>`;
 
           overlay.querySelector('button').onclick = async () => {
@@ -169,8 +187,8 @@ export abstract class AView extends EventHandler implements IView {
   private buildParameterForm(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<IForm> {
     const builder = new FormBuilder(select(params), undefined, true);
 
-    //work on a local copy since we change it by adding an onChange handler
-    const descs = this.getParameterFormDescs().map((d) => Object.assign({}, d));
+    // work on a local copy since we change it by adding an onChange handler
+    const descs = this.getParameterFormDescs().map((d) => ({ ...d }));
 
     const onInit: (name: string, value: any, previousValue: any, isInitialzation: boolean) => void = <any>onParameterChange;
 
@@ -215,7 +233,7 @@ export abstract class AView extends EventHandler implements IView {
    * returns the value of the given parameter
    */
 
-  /*final*/
+  /* final */
   getParameter(name: string): any {
     const elem = this.getParameterElement(name);
     if (!elem) {
@@ -243,7 +261,7 @@ export abstract class AView extends EventHandler implements IView {
     await this.setParameter(name, value);
   }
 
-  /*final*/
+  /* final */
   setParameter(name: string, value: any) {
     const elem = this.getParameterElement(name);
     if (!elem) {
@@ -286,7 +304,7 @@ export abstract class AView extends EventHandler implements IView {
   setInputSelection(selection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
     const current = this.selections.get(name);
     if (current && ViewUtils.isSameSelection(current, selection)) {
-      return;
+      return undefined;
     }
     this.selections.set(name, selection);
     if (name === AView.DEFAULT_SELECTION_NAME) {
@@ -319,31 +337,8 @@ export abstract class AView extends EventHandler implements IView {
    * @returns {Promise<string[]>}
    */
   protected resolveSelection(idType = this.idType): Promise<string[]> {
-    return ResolveUtils.resolveIds(this.selection.idtype, this.selection.range, idType);
-  }
-
-  /**
-   * resolve the name of the current input selection
-   * @returns {Promise<string[]>}
-   */
-  protected resolveSelectionByName(idType = this.idType): Promise<string[]> {
-    return ResolveUtils.resolveNames(this.selection.idtype, this.selection.range, idType);
-  }
-
-  /**
-   * resolve the ids of the current input selection to all 1:n related names, not just the first one like `resolveSelection` does
-   * @returns {Promise<string[]>}
-   */
-  protected resolveMultipleSelections(idType = this.idType): Promise<string[][]> {
-    return ResolveUtils.resolveAllIds(this.selection.idtype, this.selection.range, idType);
-  }
-
-  /**
-   * resolve the names of the current input selection to all 1:n related names, not just the first one like `resolveSelectionByName` does
-   * @returns {Promise<string[]>}
-   */
-  protected resolveMultipleSelectionsByName(idType = this.idType): Promise<string[][]> {
-    return ResolveUtils.resolveAllNames(this.selection.idtype, this.selection.range, idType);
+    // return Promise.resolve(this.selection.ids);
+    return IDTypeManager.getInstance().mapNameToFirstName(this.selection.idtype, this.selection.ids, idType);
   }
 
   setItemSelection(selection: ISelection, name: string = AView.DEFAULT_SELECTION_NAME) {
@@ -351,29 +346,28 @@ export abstract class AView extends EventHandler implements IView {
     if (current && ViewUtils.isSameSelection(current, selection)) {
       return;
     }
-    const wasEmpty = current == null || current.idtype == null || current.range.isNone;
+    const wasEmpty = current == null || current.idtype == null || current.ids.length === 0;
     this.itemSelections.set(name, selection);
     // propagate
     if (selection.idtype) {
       if (name === AView.DEFAULT_SELECTION_NAME) {
-        if (selection.range.isNone) {
+        if ((selection.ids?.length || 0) === 0) {
           selection.idtype.clear(SelectionUtils.defaultSelectionType);
         } else {
-          selection.idtype.select(selection.range);
+          selection.idtype.select(selection.ids);
         }
+      } else if ((selection.ids?.length || 0) === 0) {
+        selection.idtype.clear(name);
       } else {
-        if (selection.range.isNone) {
-          selection.idtype.clear(name);
-        } else {
-          selection.idtype.select(name, selection.range);
-        }
+        selection.idtype.select(name, selection.ids);
       }
     }
-    const isEmpty = selection == null || selection.idtype == null || selection.range.isNone;
+    const isEmpty = selection == null || selection.idtype == null || (selection.ids?.length || 0) === 0;
     if (!(wasEmpty && isEmpty)) {
       // the selection has changed when we really have some new values not just another empty one
       this.itemSelectionChanged(name);
     }
+
     this.fire(AView.EVENT_ITEM_SELECT, current, selection, name);
   }
 
@@ -385,7 +379,7 @@ export abstract class AView extends EventHandler implements IView {
   }
 
   getItemSelection(name: string = AView.DEFAULT_SELECTION_NAME) {
-    return this.itemSelections.get(name) || {idtype: null, range: Range.none()};
+    return this.itemSelections.get(name) || { idtype: null, ids: [] };
   }
 
   modeChanged(mode: EViewMode) {

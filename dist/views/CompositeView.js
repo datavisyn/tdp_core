@@ -1,12 +1,11 @@
 import { IDTypeManager } from '../idtype';
-import { BaseUtils, EventHandler, ResolveNow, WebpackEnv } from '../base';
-import { Range } from '../range';
+import { BaseUtils, EventHandler, WebpackEnv } from '../base';
 import { I18nextManager } from '../i18n';
 import { PluginRegistry } from '../app';
 import { AView } from './AView';
 import { EViewMode } from '../base/interfaces';
 import { ViewUtils } from './ViewUtils';
-import { BuilderUtils, LayoutContainerEvents, LAYOUT_CONTAINER_WRAPPER } from '../layout';
+import { BuilderUtils, LayoutContainerEvents, LAYOUT_CONTAINER_WRAPPER, } from '../layout';
 export function isCompositeViewPluginDesc(desc) {
     return Array.isArray(desc.elements);
 }
@@ -20,7 +19,7 @@ function unprefix(name) {
     }
     return {
         key: name.slice(0, index),
-        rest: name.slice(index + 1)
+        rest: name.slice(index + 1),
     };
 }
 class WrapperView {
@@ -73,7 +72,7 @@ export class CompositeView extends EventHandler {
         this.context = context;
         this.selection = selection;
         this.options = {
-            showHeaders: false
+            showHeaders: false,
         };
         this.children = [];
         this.childrenLookup = new Map();
@@ -135,7 +134,7 @@ export class CompositeView extends EventHandler {
                 parent.active = layout;
             }
         };
-        return ResolveNow.resolveImmediately(this.createSetup()).then((setup) => {
+        return Promise.resolve(this.createSetup()).then((setup) => {
             this.setup = setup;
             const helper = this.node.ownerDocument.createElement('div');
             const links = setup.linkedSelections;
@@ -160,7 +159,7 @@ export class CompositeView extends EventHandler {
             this.setup.elements.forEach((d) => {
                 let s = this.selection;
                 if (links.length > 0 && !links.some((l) => l.fromKey === '_input' && l.toKey === d.key)) {
-                    s = { idtype: this.selection.idtype, range: Range.none() };
+                    s = { idtype: this.selection.idtype, ids: [] };
                 }
                 // Fix for nested CompositeViews:
                 // Previously, nested CompositeViews were not possible, i.e. when using a CompositeView as element of a CompositeView.
@@ -216,11 +215,14 @@ export class CompositeView extends EventHandler {
     }
     buildLayout(views, keys) {
         const buildImpl = (layout) => {
-            const l = typeof layout === 'string' ? layout : Object.assign({
-                type: 'vsplit',
-                ratios: keys.map(() => 1 / keys.length),
-                keys
-            }, layout || {});
+            const l = typeof layout === 'string'
+                ? layout
+                : {
+                    type: 'vsplit',
+                    ratios: keys.map(() => 1 / keys.length),
+                    keys,
+                    ...(layout || {}),
+                };
             if (typeof l === 'string') {
                 return views.get(l);
             }
@@ -230,7 +232,9 @@ export class CompositeView extends EventHandler {
             const ratio = l.ratios;
             switch (l.type) {
                 case 'hsplit':
+                    // eslint-disable-next-line no-case-declarations
                     const firstH = buildImpl(l.keys[0]);
+                    // eslint-disable-next-line no-case-declarations
                     const secondH = buildImpl(l.keys[1]);
                     return BuilderUtils.horizontalSplit(ratio[0], firstH, secondH).fixedLayout();
                 case 'hstack':
@@ -298,6 +302,7 @@ export class CompositeView extends EventHandler {
         if (WebpackEnv.__DEBUG__) {
             console.warn('invalid parameter detected', name, this.context.desc);
         }
+        return undefined;
     }
     setInputSelection(selection) {
         if (ViewUtils.isSameSelection(this.selection, selection)) {
@@ -311,7 +316,9 @@ export class CompositeView extends EventHandler {
             this.children.forEach(({ instance }) => instance.setInputSelection(selection));
             return;
         }
-        this.setup.linkedSelections.filter((d) => d.fromKey === '_input').forEach((d) => {
+        this.setup.linkedSelections
+            .filter((d) => d.fromKey === '_input')
+            .forEach((d) => {
             const instance = this.childrenLookup.get(d.toKey);
             if (!instance) {
                 return;
@@ -326,7 +333,7 @@ export class CompositeView extends EventHandler {
     }
     setItemSelection(selection) {
         this.itemSelection = selection;
-        const itemIDType = this.itemIDType;
+        const { itemIDType } = this;
         if (this.setup.linkedSelections.length === 0) {
             this.children.forEach(({ instance }) => {
                 if (instance.itemIDType === itemIDType) {
@@ -335,7 +342,9 @@ export class CompositeView extends EventHandler {
             });
             return;
         }
-        this.setup.linkedSelections.filter((d) => d.fromKey === '_item').forEach((d) => {
+        this.setup.linkedSelections
+            .filter((d) => d.fromKey === '_item')
+            .forEach((d) => {
             const instance = this.childrenLookup.get(d.toKey);
             if (!instance) {
                 return;
@@ -360,19 +369,19 @@ export class CompositeView extends EventHandler {
     }
     createSetup() {
         const desc = this.context.desc;
-        const toEntry = (desc) => {
-            const descOptions = desc.options || {};
-            return Promise.resolve(desc.loader()).then((instance) => ({
-                key: desc.key,
-                desc,
-                options: Object.assign({}, descOptions, this.options),
-                create: PluginRegistry.getInstance().getFactoryMethod(instance, desc.factory || 'create')
+        const toEntry = (d) => {
+            const descOptions = d.options || {};
+            return Promise.resolve(d.loader()).then((instance) => ({
+                key: d.key,
+                desc: d,
+                options: { ...descOptions, ...this.options },
+                create: PluginRegistry.getInstance().getFactoryMethod(instance, d.factory || 'create'),
             }));
         };
         return Promise.all((desc.elements || []).map(toEntry)).then((elements) => ({
             elements,
             layout: desc.layout,
-            linkedSelections: desc.linkedSelections || []
+            linkedSelections: desc.linkedSelections || [],
         }));
     }
     updateLineUpStats() {

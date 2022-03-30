@@ -1,4 +1,3 @@
-import { ResolveNow } from '../../base';
 import { RestStorageUtils } from '../rest';
 export class AttachemntUtils {
     /**
@@ -7,7 +6,7 @@ export class AttachemntUtils {
      * @returns {boolean}
      */
     static needToExternalize(data) {
-        //use a JSON file size heuristics
+        // use a JSON file size heuristics
         const size = JSON.stringify(data).length;
         return size >= AttachemntUtils.MAX_INPLACE_SIZE;
     }
@@ -18,7 +17,7 @@ export class AttachemntUtils {
      */
     static externalize(data) {
         if (!AttachemntUtils.needToExternalize(data)) {
-            return ResolveNow.resolveImmediately(data);
+            return Promise.resolve(data);
         }
         return RestStorageUtils.addAttachment(data).then((id) => `${AttachemntUtils.ATTACHMENT_PREFIX}${id}`);
     }
@@ -29,7 +28,7 @@ export class AttachemntUtils {
      */
     static resolveExternalized(attachment) {
         if (typeof attachment !== 'string' || !attachment.startsWith(AttachemntUtils.ATTACHMENT_PREFIX)) {
-            return ResolveNow.resolveImmediately(attachment);
+            return Promise.resolve(attachment);
         }
         const id = attachment.substring(AttachemntUtils.ATTACHMENT_PREFIX.length);
         return RestStorageUtils.getAttachment(id);

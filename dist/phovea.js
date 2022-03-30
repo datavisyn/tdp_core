@@ -2,6 +2,7 @@ import { FormElementType } from './form/interfaces';
 import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH, EP_TDP_CORE_FORM_ELEMENT } from './base/extensions';
 import { EP_PHOVEA_CORE_LOCALE, PluginRegistry, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT } from './app';
 export default function (registry) {
+    // eslint-disable-next-line @typescript-eslint/ban-types
     function actionFunction(id, factory, loader, options) {
         registry.push('actionFunction', id, loader, { factory, ...options });
     }
@@ -14,14 +15,14 @@ export default function (registry) {
     actionFunction('tdpInitSession', 'initSessionImpl', () => import('./utils/TDPApplicationUtils').then((t) => t.TDPApplicationUtils), {
         analytics: {
             category: 'session',
-            action: 'init'
-        }
+            action: 'init',
+        },
     });
     actionFunction('tdpSetParameter', 'setParameterImpl', () => import('./utils/TDPApplicationUtils').then((t) => t.TDPApplicationUtils), {
         analytics: {
             category: 'view',
-            action: 'setParameter'
-        }
+            action: 'setParameter',
+        },
     });
     actionCompressor('tdpCompressSetParameter', 'compressSetParameter', '(tdpSetParameter)', () => import('./utils/TDPApplicationUtils').then((t) => t.TDPApplicationUtils));
     // compatibility
@@ -31,14 +32,14 @@ export default function (registry) {
     actionFunction('tdpAddScore', 'addScoreImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
         analytics: {
             category: 'score',
-            action: 'add'
-        }
+            action: 'add',
+        },
     });
     actionFunction('tdpRemoveScore', 'removeScoreImpl', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils), {
         analytics: {
             category: 'score',
-            action: 'remove'
-        }
+            action: 'remove',
+        },
     });
     actionCompressor('tdpScoreCompressor', 'compress', '(tdpAddScore|tdpRemoveScore)', () => import('./lineup/internal/ScoreUtils').then((s) => s.ScoreUtils));
     // compatibility
@@ -48,69 +49,69 @@ export default function (registry) {
     actionFunction('lineupAddRanking', 'addRankingImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
         analytics: {
             category: 'lineup',
-            action: 'addRanking'
-        }
+            action: 'addRanking',
+        },
     });
     actionFunction('lineupSetRankingSortCriteria', 'setRankingSortCriteriaImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
         analytics: {
             category: 'lineup',
-            action: 'setRankingSortCriteria'
-        }
+            action: 'setRankingSortCriteria',
+        },
     });
     actionFunction('lineupSetAggregation', 'setAggregationImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
         analytics: {
             category: 'lineup',
-            action: 'setAggregation'
-        }
+            action: 'setAggregation',
+        },
     });
     actionFunction('lineupSetSortCriteria', 'setSortCriteriaImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
         analytics: {
             category: 'lineup',
-            action: 'setSortCriteria'
-        }
+            action: 'setSortCriteria',
+        },
     });
     actionFunction('lineupSetGroupCriteria', 'setGroupCriteriaImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
         analytics: {
             category: 'lineup',
-            action: 'setGroupCriteria'
-        }
+            action: 'setGroupCriteria',
+        },
     });
     actionFunction('lineupSetColumn', 'setColumnImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
         analytics: {
             category: 'lineup',
-            action: 'setColumn'
-        }
+            action: 'setColumn',
+        },
     });
     actionFunction('lineupAddColumn', 'addColumnImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
         analytics: {
             category: 'lineup',
-            action: 'addColumn'
-        }
+            action: 'addColumn',
+        },
     });
     actionFunction('lineupMoveColumn', 'moveColumnImpl', () => import('./lineup/internal/cmds').then((l) => l.LineupTrackingManager), {
         analytics: {
             category: 'lineup',
-            action: 'moveColumn'
-        }
+            action: 'moveColumn',
+        },
     });
     formElements(FormElementType.SELECT, () => import('./form/elements/FormSelect'), {
-        factory: 'new FormSelect'
+        factory: 'new FormSelect',
     });
     formElements(FormElementType.SELECT2, () => import('./form/elements/FormSelect2'), {
         factory: 'new FormSelect2',
-        selection: 'single'
+        selection: 'single',
     });
     formElements(FormElementType.SELECT2_MULTIPLE, () => import('./form/elements/FormSelect2'), {
         factory: 'new FormSelect2',
-        selection: 'multiple'
+        selection: 'multiple',
     });
     formElements(FormElementType.SELECT3, () => import('./form/elements/FormSelect3'), {
         factory: 'new FormSelect3',
-        selection: 'single'
+        selection: 'single',
     });
     formElements(FormElementType.SELECT3_MULTIPLE, () => import('./form/elements/FormSelect3'), {
         factory: 'new FormSelect3',
-        selection: 'multiple'
+        selection: 'multiple',
     });
     formElements(FormElementType.INPUT_TEXT, () => import('./form/elements/FormInputText'), {
         factory: 'new FormInputText',
@@ -134,23 +135,16 @@ export default function (registry) {
     });
     /* phovea_clue */
     /// #if include('clue', 'selection')
-    registry.push('actionFunction', 'select', function () { return import('./base/Selection').then((s) => s.Selection); }, {
-        'factory': 'select'
+    registry.push('actionFunction', 'select', function () {
+        return import('./base/Selection').then((s) => s.Selection);
+    }, {
+        factory: 'select',
     });
-    registry.push('actionCompressor', 'idtype-selection', function () { return import('./base/Selection').then((s) => s.Selection); }, {
-        'factory': 'compressSelection',
-        'matches': 'select'
-    });
-    /// #endif
-    /// #if include('clue', 'multiform')
-    registry.push('actionFunction', 'transform', function () { return import('./base/Multiform').then((m) => m.Multiform); }, {
-        'factory': 'transform'
-    });
-    registry.push('actionFunction', 'changeVis', function () { return import('./base/Multiform').then((m) => m.Multiform); }, {
-        'factory': 'changeVis'
-    });
-    registry.push('actionFunction', 'select', function () { return import('./base/Multiform').then((m) => m.Multiform); }, {
-        'factory': 'select'
+    registry.push('actionCompressor', 'idtype-selection', function () {
+        return import('./base/Selection').then((s) => s.Selection);
+    }, {
+        factory: 'compressSelection',
+        matches: 'select',
     });
     /// #endif
     registry.push(EP_PHOVEA_CORE_LOCALE, 'phoveaClueLocaleEN', function () {
@@ -159,106 +153,97 @@ export default function (registry) {
         ns: 'phovea',
     });
     /* phovea_core */
-    /// #if include('datatype', 'matrix')
-    registry.push('datatype', 'matrix', function () { return import('./matrix/Matrix').then((m) => m.Matrix); }, {
-        factory: 'create',
-        static: true
-    });
-    /// #endif
-    /// #if include('datatype', 'table')
-    registry.push('datatype', 'table', function () { return import('./table/Table').then((m) => m.Table); }, {
-        factory: 'create',
-        static: true
-    });
-    /// #endif
-    /// #if include('datatype', 'vector')
-    registry.push('datatype', 'vector', function () { return import('./vector/Vector').then((m) => m.Vector); }, {
-        factory: 'create',
-        static: true
-    });
-    /// #endif
-    /// #if include('datatype', 'stratification')
-    registry.push('datatype', 'stratification', function () { return import('./stratification/Stratification').then((m) => m.Stratification); }, {
-        factory: 'create'
-    });
-    /// #endif
     /// #if include('datatype', 'graph')
-    registry.push('datatype', 'graph', function () { return import('./graph/GraphProxy').then((m) => m.GraphProxy); }, {
-        factory: 'create'
-    });
-    /// #endif
-    /// #if include('datatype', 'atom')
-    registry.push('datatype', 'atom', function () { return import('./atom/Atom').then((m) => m.Atom); }, {
-        factory: 'create'
-    });
-    /// #endif
-    /// #if include('tabSyncer', 'selection')
-    registry.push('tabSyncer', 'selection', function () { return import('./sync/SelectionSyncer').then((m) => m.SelectionSyncerOptionUtils); }, {
-        factory: 'create'
-    });
-    /* tdp_react */
-    registry.push('tdpView', 'dummy_react', function () {
-        return import('./dummy/DummyReactView');
+    registry.push('datatype', 'graph', function () {
+        return import('./clue/graph/GraphProxy').then((m) => m.GraphProxy);
     }, {
-        name: 'Dummy React View',
-        factory: 'new DummyReactView',
-        idtype: 'IDTypeA',
-        selection: 'some'
+        factory: 'create',
     });
+    /// #endif
     /* tdp_matomo */
     registry.push(EP_PHOVEA_CORE_LOGIN, 'matomoLogin', () => import('./app/Matomo').then((m) => m.Matomo), {
-        factory: 'trackLogin'
+        factory: 'trackLogin',
     });
     registry.push(EP_PHOVEA_CORE_LOGOUT, 'matomoLogout', () => import('./app/Matomo').then((m) => m.Matomo), {
-        factory: 'trackLogout'
+        factory: 'trackLogout',
     });
     registry.push(EP_PHOVEA_CLUE_PROVENANCE_GRAPH, 'matomoAnalytics', () => import('./app/Matomo').then((m) => m.Matomo), {
-        factory: 'trackProvenance'
+        factory: 'trackProvenance',
     });
     /* phovea_importer */
     registry.push('importer_value_type', 'boolean', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
-        'factory': 'boolean',
-        'name': 'Boolean',
-        'priority': 30 // test first for boolean then for categorical
+        factory: 'boolean',
+        name: 'Boolean',
+        priority: 30, // test first for boolean then for categorical
     });
     registry.push('importer_value_type', 'categorical', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
-        'factory': 'categorical',
-        'name': 'Categorical',
-        'priority': 40 // test first for boolean then for categorical
+        factory: 'categorical',
+        name: 'Categorical',
+        priority: 40, // test first for boolean then for categorical
     });
     registry.push('importer_value_type', 'real', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
-        'factory': 'numerical',
-        'name': 'Float',
-        'priority': 10
+        factory: 'numerical',
+        name: 'Float',
+        priority: 10,
     });
     registry.push('importer_value_type', 'int', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
-        'factory': 'numerical',
-        'name': 'Integer',
-        'priority': 20
+        factory: 'numerical',
+        name: 'Integer',
+        priority: 20,
     });
     registry.push('importer_value_type', 'string', function () {
-        return import('./valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
+        return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
-        'factory': 'string_',
-        'name': 'String',
-        'priority': 100
+        factory: 'string_',
+        name: 'String',
+        priority: 100,
     });
     registry.push('importer_value_type', 'idType', function () {
-        return import('./valuetype/idtypes').then((v) => v.IDTypeUtils);
+        return import('./import/valuetype/idtypes').then((v) => v.IDTypeUtils);
     }, {
-        'factory': 'idType',
-        'name': 'IDType',
-        'priority': 50,
-        'implicit': true
+        factory: 'idType',
+        name: 'IDType',
+        priority: 50,
+        implicit: true,
     });
-    /// #endif
+    /*
+    registry.pushVisynView<DemoVisynViewPluginType>(
+      'LazyVisynDemoView',
+      () => import('./views/visyn/demo/LazyVisynDemoView').then((m) => m.createLazyVisynDemoView),
+      {
+        visynViewType: 'simple',
+        selection: 'any',
+        idtype: '.*',
+        name: 'Vis Demo (Lazy)',
+        description: 'Demo view showcasing Vis with randomly generated data',
+        includeInDashboardView: true,
+        group: {
+          name: 'Demo',
+          order: 99,
+        },
+      },
+    );
+  
+    registry.pushVisynView<DemoVisynViewPluginType>('VisynDemoView', () => import('./views/visyn/demo/VisynDemoView').then((m) => m.createVisynDemoView), {
+      visynViewType: 'simple',
+      selection: 'any',
+      idtype: '.*',
+      name: 'Vis Demo',
+      description: 'Demo view showcasing Vis with randomly generated data',
+      includeInDashboardView: true,
+      group: {
+        name: 'Demo',
+        order: 99,
+      },
+    });
+    */
 }
 //# sourceMappingURL=phovea.js.map

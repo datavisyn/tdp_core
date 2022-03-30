@@ -1,19 +1,21 @@
-import {Ajax} from '.';
-import {UserSession, AppContext} from '../app';
-import {I18nextManager} from '../i18n';
-import {IUser} from '../security';
-
+import { UserSession, AppContext } from '../app';
+import { I18nextManager } from '../i18n';
+import { IUser } from '../security';
+import { Ajax } from './ajax';
 
 export class LoginUtils {
-
-  static defaultLoginForm = () => (`<form class="form-signin" action="/login" method="post">
+  static defaultLoginForm = () => `<form class="form-signin" action="/login" method="post">
     <div class="mb-3">
       <label class="form-label" for="login_username">${I18nextManager.getInstance().i18n.t('phovea:security_flask.username')}</label>
-      <input type="text" class="form-control" id="login_username" placeholder="${I18nextManager.getInstance().i18n.t('phovea:security_flask.username')}" required="required" autofocus="autofocus" autocomplete="username">
+      <input type="text" class="form-control" id="login_username" placeholder="${I18nextManager.getInstance().i18n.t(
+        'phovea:security_flask.username',
+      )}" required="required" autofocus="autofocus" autocomplete="username">
     </div>
     <div class="mb-3">
       <label class="form-label" for="login_password"> ${I18nextManager.getInstance().i18n.t('phovea:security_flask.password')}</label>
-      <input type="password" class="form-control" id="login_password" placeholder="${I18nextManager.getInstance().i18n.t('phovea:security_flask.password')}" required="required" autocomplete="current-password">
+      <input type="password" class="form-control" id="login_password" placeholder="${I18nextManager.getInstance().i18n.t(
+        'phovea:security_flask.password',
+      )}" required="required" autocomplete="current-password">
     </div>
     <div class="mb-3">
       <div class="checkbox form-check">
@@ -23,8 +25,7 @@ export class LoginUtils {
     </div>
     <button type="submit" class="btn btn-primary"> ${I18nextManager.getInstance().i18n.t('phovea:security_flask.submit')}</button>
     </form>
-    `)
-
+    `;
 
   /**
    * try to login the given user
@@ -35,14 +36,14 @@ export class LoginUtils {
    */
   static login(username: string, password: string, remember = false) {
     UserSession.getInstance().reset();
-    const r = Ajax.send('/login', {username, password, remember}, 'post').then((user) => {
+    const r = Ajax.send('/login', { username, password, remember }, 'post').then((user) => {
       UserSession.getInstance().login(user);
       return user;
     });
-    //separate for multiple catch clauses
+    // separate for multiple catch clauses
     r.catch(() => {
       UserSession.getInstance().logout({
-        msg: 'Error logging in.'
+        msg: 'Error logging in.',
       });
     });
     return r;
@@ -54,28 +55,29 @@ export class LoginUtils {
    */
   static logout(): Promise<any> {
     if (!AppContext.getInstance().offline) {
-      return Ajax.send('/logout', {}, 'post').then((r) => {
-        UserSession.getInstance().logout(r);
-      }).catch(() => {
-        UserSession.getInstance().logout({
-          msg: 'Error logging out via server. Logging out manually.'
+      return Ajax.send('/logout', {}, 'post')
+        .then((r) => {
+          UserSession.getInstance().logout(r);
+        })
+        .catch(() => {
+          UserSession.getInstance().logout({
+            msg: 'Error logging out via server. Logging out manually.',
+          });
         });
-      });
     }
     UserSession.getInstance().logout({
-      msg: 'Logging out in offline mode'
+      msg: 'Logging out in offline mode',
     });
     return Promise.resolve(true);
   }
 
   static loggedInAs() {
-    return Ajax.send('/loggedinas', {}, 'POST')
-      .then((user) => {
-        if (user !== 'not_yet_logged_in' && user.name) {
-          return user;
-        }
-        return Promise.reject('invalid');
-      });
+    return Ajax.send('/loggedinas', {}, 'POST').then((user) => {
+      if (user !== 'not_yet_logged_in' && user.name) {
+        return user;
+      }
+      return Promise.reject('invalid');
+    });
   }
 
   /**
@@ -86,12 +88,14 @@ export class LoginUtils {
   static bindLoginForm(form: HTMLFormElement, callback: (error: any, user: IUser) => any, onSubmit?: () => void) {
     UserSession.getInstance().reset();
     if (!AppContext.getInstance().offline) {
-      LoginUtils.loggedInAs().then((user) => {
-        UserSession.getInstance().login(user);
-        callback(null, user);
-      }).catch(() => {
-        //ignore not yet logged in
-      });
+      LoginUtils.loggedInAs()
+        .then((user) => {
+          UserSession.getInstance().login(user);
+          callback(null, user);
+        })
+        .catch(() => {
+          // ignore not yet logged in
+        });
     }
     form.onsubmit = (event) => {
       if (onSubmit) {
@@ -103,8 +107,9 @@ export class LoginUtils {
       LoginUtils.login(username, password, rememberMe)
         .then((user) => callback(null, user))
         .catch((error) => {
-          if (error.response && error.response.status !== 401) { // 401 = Unauthorized
-            //server error
+          if (error.response && error.response.status !== 401) {
+            // 401 = Unauthorized
+            // server error
             callback('not_reachable', null);
           } else {
             callback(error, null);

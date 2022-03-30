@@ -23,7 +23,10 @@ export class LineUpFilterUtils {
      * @returns Returns true if filter should be serialized/restored or false if not.
      */
     static isLineUpStringFilter(filter) {
-        return filter && filter.hasOwnProperty('filter') && (LineUpFilterUtils.isLineUpStringFilterValue(filter.filter) || filter.filter instanceof RegExp) && filter.hasOwnProperty('filterMissing');
+        return (filter &&
+            filter.hasOwnProperty('filter') &&
+            (LineUpFilterUtils.isLineUpStringFilterValue(filter.filter) || filter.filter instanceof RegExp) &&
+            filter.hasOwnProperty('filterMissing'));
     }
     /**
      * This type guard checks if the `filter` parameter matches the `ISerializableLineUpFilter` type.
@@ -34,7 +37,10 @@ export class LineUpFilterUtils {
      * @returns Returns true if filter should be serialized/restored or false if not.
      */
     static isSerializedFilter(filter) {
-        return filter && filter.hasOwnProperty('filter') && (LineUpFilterUtils.isLineUpStringFilterValue(filter.filter) || LineUpFilterUtils.isIRegExpFilter(filter.filter)) && filter.hasOwnProperty('filterMissing');
+        return (filter &&
+            filter.hasOwnProperty('filter') &&
+            (LineUpFilterUtils.isLineUpStringFilterValue(filter.filter) || LineUpFilterUtils.isIRegExpFilter(filter.filter)) &&
+            filter.hasOwnProperty('filterMissing'));
     }
     /**
      * Serializes LineUp string filter, which can contain RegExp objects to an IRegexFilter object.
@@ -57,9 +63,9 @@ export class LineUpFilterUtils {
         return {
             filter: {
                 value: isRegExp ? value.toString() : value,
-                isRegExp
+                isRegExp,
             },
-            filterMissing: filter.filterMissing
+            filterMissing: filter.filterMissing,
         };
     }
     /**
@@ -75,6 +81,7 @@ export class LineUpFilterUtils {
         if (matches === null) {
             throw new Error('Unable to parse regular expression from string. The string does not seem to be a valid RegExp.');
         }
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         const [_full, regexString, regexFlags] = matches;
         return new RegExp(regexString, regexFlags);
     }
@@ -96,7 +103,7 @@ export class LineUpFilterUtils {
         if (LineUpFilterUtils.isLineUpStringFilterValue(filter)) {
             return { filter, filterMissing };
         }
-        else if (LineUpFilterUtils.isIRegExpFilter(filter) && filter.isRegExp === true) {
+        if (LineUpFilterUtils.isIRegExpFilter(filter) && filter.isRegExp === true) {
             if (typeof filter.value === 'string') {
                 return { filter: LineUpFilterUtils.restoreRegExp(filter.value), filterMissing };
             }
@@ -120,7 +127,7 @@ export class LineUpFilterUtils {
         if (type === 'regex') {
             return {
                 type,
-                values: values.map((value) => value.toString())
+                values: values.map((value) => value.toString()),
             };
         }
         return groupBy;
@@ -134,7 +141,7 @@ export class LineUpFilterUtils {
         if (type === 'regex') {
             return {
                 type,
-                values: values.map((value) => LineUpFilterUtils.restoreRegExp(value))
+                values: values.map((value) => LineUpFilterUtils.restoreRegExp(value)),
             };
         }
         return groupBy;

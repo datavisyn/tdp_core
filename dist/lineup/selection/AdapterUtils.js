@@ -24,7 +24,7 @@ export class AdapterUtils {
     static none() {
         return {
             parameterChanged: () => undefined,
-            selectionChanged: () => undefined
+            selectionChanged: () => undefined,
         };
     }
 }

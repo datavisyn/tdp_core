@@ -1,9 +1,18 @@
-import {LocalDataProvider, createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, IColumnDesc, ICategory, ICategoryNode, Column, createRankDesc} from 'lineupjs';
-import {extent} from 'd3';
-import {IServerColumn} from '../base/rest';
-import {IAdditionalColumnDesc} from '../base/interfaces';
-import {ValueTypeUtils} from '../data';
-import {IAnyVector} from '../vector';
+import {
+  LocalDataProvider,
+  createSelectionDesc,
+  createAggregateDesc,
+  DEFAULT_COLOR,
+  IColumnDesc,
+  ICategory,
+  ICategoryNode,
+  Column,
+  createRankDesc,
+} from 'lineupjs';
+import { extent } from 'd3';
+import { IServerColumn } from '../base/rest';
+import { IAdditionalColumnDesc } from '../base/interfaces';
+import { ValueTypeUtils } from '../data';
 
 export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'chooserGroup'> {
   /**
@@ -25,7 +34,7 @@ export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId'
   /**
    * extra arguments
    */
-  extras?: {[key: string]: any};
+  extras?: { [key: string]: any };
 }
 
 export interface IInitialRankingOptions {
@@ -36,24 +45,26 @@ export interface IInitialRankingOptions {
 }
 
 export class ColumnDescUtils {
-
   private static baseColumn(column: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
-    return Object.assign({
+    return {
       type: 'string',
+      // @ts-ignore
       column,
       label: column,
       color: '',
-      initialRanking: options.visible != null ? options.visible: true,
+      initialRanking: options.visible != null ? options.visible : true,
       width: -1,
-      selectedId: -1,
-      selectedSubtype: undefined
-    }, options, options.extras || {});
+      selectedId: null,
+      selectedSubtype: undefined,
+      ...options,
+      ...(options.extras || {}),
+    };
   }
 
   static numberColFromArray(column: string, rows: any[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
     return Object.assign(ColumnDescUtils.baseColumn(column, options), {
       type: 'number',
-      domain: extent(rows, (d) => d[column])
+      domain: extent(rows, (d) => d[column]),
     });
   }
 
@@ -68,10 +79,9 @@ export class ColumnDescUtils {
   static numberCol(column: string, min: number, max: number, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
     return Object.assign(ColumnDescUtils.baseColumn(column, options), {
       type: 'number',
-      domain: [min, max]
+      domain: [min, max],
     });
   }
-
 
   /**
    * creates a new LineUp description for a categorical column
@@ -80,22 +90,23 @@ export class ColumnDescUtils {
    * @param {Partial<IColumnOptions>} options
    * @returns {IAdditionalColumnDesc}
    */
-  static categoricalCol(column: string, categories: (string|Partial<ICategory>)[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+  static categoricalCol(column: string, categories: (string | Partial<ICategory>)[], options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
     if (ColumnDescUtils.isHierarchical(categories)) {
       return ColumnDescUtils.hierarchicalCol(column, ColumnDescUtils.deriveHierarchy(<any[]>categories), options);
     }
     return Object.assign(ColumnDescUtils.baseColumn(column, options), {
       type: 'categorical',
-      categories
+      categories,
     });
   }
 
   static hierarchicalCol(column: string, hierarchy: ICategoryNode, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
     return Object.assign(ColumnDescUtils.baseColumn(column, options), {
       type: 'hierarchy',
-      hierarchy
+      hierarchy,
     });
   }
+
   /**
    * creates a new LineUp description for a string column
    * @param {string} column the column name to use
@@ -116,10 +127,9 @@ export class ColumnDescUtils {
   static linkCol(column: string, linkPattern: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
     return Object.assign(ColumnDescUtils.stringCol(column, options), {
       type: 'link',
-      pattern: linkPattern
+      pattern: linkPattern,
     });
   }
-
 
   /**
    * creates a new LineUp description for a boolean column
@@ -129,50 +139,12 @@ export class ColumnDescUtils {
    */
   static booleanCol(column: string, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
     return Object.assign(ColumnDescUtils.baseColumn(column, options), {
-      type: 'boolean'
+      type: 'boolean',
     });
   }
 
-  static deriveCol(col: IAnyVector): IColumnDesc {
-    const r: any = {
-      column: col.desc.name
-    };
-    const desc = <any>col.desc;
-    if (desc.color) {
-      r.color = desc.color;
-    } else if (desc.cssClass) {
-      r.cssClass = desc.cssClass;
-    }
-    const val = desc.value;
-    switch (val.type) {
-      case ValueTypeUtils.VALUE_TYPE_STRING:
-        r.type = 'string';
-        break;
-      case ValueTypeUtils.VALUE_TYPE_CATEGORICAL:
-        r.type = 'categorical';
-        r.categories = desc.categories;
-        break;
-      case ValueTypeUtils.VALUE_TYPE_REAL:
-      case ValueTypeUtils.VALUE_TYPE_INT:
-        r.type = 'number';
-        r.domain = val.range;
-        break;
-      default:
-        r.type = 'string';
-        break;
-    }
-    return r;
-  }
-
-
-
   static createInitialRanking(provider: LocalDataProvider, options: Partial<IInitialRankingOptions> = {}) {
-    const o: Readonly<IInitialRankingOptions> = Object.assign({
-      aggregate: true,
-      selection: true,
-      rank: true,
-      order: []
-    }, options);
+    const o: Readonly<IInitialRankingOptions> = { aggregate: true, selection: true, rank: true, order: [], ...options };
 
     const ranking = provider.pushRanking();
     const r = ranking.find((d) => d.desc.type === 'rank');
@@ -213,19 +185,22 @@ export class ColumnDescUtils {
   }
 
   static deriveColumns(columns: IServerColumn[]) {
-    const niceName = (label: string) => label.split('_').map((l) => l[0].toUpperCase() + l.slice(1)).join(' ');
+    const niceName = (label: string) =>
+      label
+        .split('_')
+        .map((l) => l[0].toUpperCase() + l.slice(1))
+        .join(' ');
     return columns.map((col) => {
       switch (col.type) {
         case 'categorical':
-          return ColumnDescUtils.categoricalCol(col.column, col.categories, {label: niceName(col.label)});
+          return ColumnDescUtils.categoricalCol(col.column, col.categories, { label: niceName(col.label) });
         case 'number':
-          return ColumnDescUtils.numberCol(col.column, col.min, col.max, {label: niceName(col.label)});
+          return ColumnDescUtils.numberCol(col.column, col.min, col.max, { label: niceName(col.label) });
         default:
-          return ColumnDescUtils.stringCol(col.column, {label: niceName(col.label)});
+          return ColumnDescUtils.stringCol(col.column, { label: niceName(col.label) });
       }
     });
   }
-
 
   private static isHierarchical(categories: (string | Partial<ICategory>)[]) {
     if (categories.length === 0 || typeof categories[0] === 'string') {
@@ -240,18 +215,22 @@ export class ColumnDescUtils {
     categories.forEach((c) => {
       const p = c.parent || '';
       // set and fill up proxy
-      const item = Object.assign(<ICategoryNode>{
-        children: [],
-        label: c.name!,
-        name: c.name!,
-        color: DEFAULT_COLOR,
-        value: 0
-      }, lookup.get(c.name!) || {}, c);
+      const item = Object.assign(
+        <ICategoryNode>{
+          children: [],
+          label: c.name!,
+          name: c.name!,
+          color: DEFAULT_COLOR,
+          value: 0,
+        },
+        lookup.get(c.name!) || {},
+        c,
+      );
       lookup.set(c.name!, item);
 
       if (!lookup.has(p)) {
         // create proxy
-        lookup.set(p, {name: p, children: [], label: p, value: 0, color: DEFAULT_COLOR});
+        lookup.set(p, { name: p, children: [], label: p, value: 0, color: DEFAULT_COLOR });
       }
       lookup.get(p)!.children.push(item);
     });

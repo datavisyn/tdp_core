@@ -1,6 +1,11 @@
-import { IPluginDesc } from '../base';
-import { IViewPluginDesc, IViewContext, ISelection } from '../base/interfaces';
-import { IObjectRef, ProvenanceGraph } from '../provenance';
+import type { IViewContext, ISelection, IViewPluginDesc, IInstanceViewExtensionDesc, IBaseViewPluginDesc, IGroupData } from '../base/interfaces';
+import type { IObjectRef, ProvenanceGraph } from '../clue/provenance';
+import type { VisynViewPluginDesc } from './visyn/interfaces';
+import { IDType } from '../idtype';
+import { IPluginDesc } from '../base/plugin';
+export interface IGroupedViews<T extends IBaseViewPluginDesc> extends IGroupData {
+    views: T[];
+}
 export declare class ViewUtils {
     /**
      * event when one or more elements are selected for the next level
@@ -11,7 +16,7 @@ export declare class ViewUtils {
     static readonly VIEW_EVENT_UPDATE_ENTRY_POINT = "update_entry_point";
     static readonly VIEW_EVENT_LOADING_FINISHED = "loadingFinished";
     static readonly VIEW_EVENT_UPDATE_SHARED = "updateShared";
-    static toViewPluginDesc(p: IPluginDesc): IViewPluginDesc;
+    static toViewPluginDesc<ReturnType extends IViewPluginDesc | VisynViewPluginDesc = IViewPluginDesc>(p: IPluginDesc): ReturnType;
     static matchLength(s: any, length: number): boolean;
     /**
      * whether the view should be used as small multiple in case of multiple selections
@@ -33,4 +38,22 @@ export declare class ViewUtils {
      */
     static isSameSelection(a: ISelection, b: ISelection): boolean;
     static createContext(graph: ProvenanceGraph, desc: IPluginDesc, ref: IObjectRef<any>): IViewContext;
+    /**
+     * finds for the given IDType and selection matching views
+     * @param {IDType} idType the idtype to lookfor
+     * @param {string[]} selection the current input selection
+     * @returns {Promise<IViewPluginDesc[]>} list of views and whether the current selection count matches their requirements
+     */
+    static findViews(idType: IDType, selection: string[]): Promise<IViewPluginDesc[]>;
+    static findAllViews(idType?: IDType): Promise<(IViewPluginDesc & {
+        enabled: boolean;
+    })[]>;
+    static findVisynViews(idType?: IDType): Promise<VisynViewPluginDesc[]>;
+    private static findViewBase;
+    static canAccess(p: any): any;
+    static findInstantViews(idType: IDType): Promise<IInstanceViewExtensionDesc[]>;
+    private static caseInsensitiveCompare;
+    static resolveGroupData(): Map<string, IGroupData>;
+    static groupByCategory<Desc extends IBaseViewPluginDesc>(views: Desc[]): IGroupedViews<Desc>[];
 }
+//# sourceMappingURL=ViewUtils.d.ts.map

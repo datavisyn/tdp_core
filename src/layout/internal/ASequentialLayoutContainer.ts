@@ -1,8 +1,7 @@
-import {AParentLayoutContainer} from './AParentLayoutContainer';
-import {ILayoutContainer, ISize} from '../interfaces';
-import {ILayoutContainerOption} from './ALayoutContainer';
-import {EOrientation, IDropArea} from '../interfaces';
-import {LAYOUT_CONTAINER_WRAPPER} from '../constants';
+import { AParentLayoutContainer } from './AParentLayoutContainer';
+import { ILayoutContainer, ISize, EOrientation, IDropArea } from '../interfaces';
+import { ILayoutContainerOption } from './ALayoutContainer';
+import { LAYOUT_CONTAINER_WRAPPER } from '../constants';
 
 export interface ISequentialLayoutContainerOptions extends ILayoutContainerOption {
   readonly orientation: EOrientation;
@@ -17,12 +16,14 @@ export abstract class ASequentialLayoutContainer<T extends ISequentialLayoutCont
   }
 
   canDrop(area: IDropArea) {
-    return this.options.orientation === EOrientation.HORIZONTAL ? (area === 'left' || area === 'right' || area === 'horizontal-scroll') : (area === 'top' || area === 'bottom' || area === 'vertical-scroll');
+    return this.options.orientation === EOrientation.HORIZONTAL
+      ? area === 'left' || area === 'right' || area === 'horizontal-scroll'
+      : area === 'top' || area === 'bottom' || area === 'vertical-scroll';
   }
 
   defaultOptions() {
     return Object.assign(super.defaultOptions(), {
-      orientation: EOrientation.HORIZONTAL
+      orientation: EOrientation.HORIZONTAL,
     });
   }
 
@@ -39,23 +40,31 @@ export abstract class ASequentialLayoutContainer<T extends ISequentialLayoutCont
     const padding = this.getPadding();
     switch (this.options.orientation) {
       case EOrientation.HORIZONTAL:
-        return <ISize>this._children.reduce((a, c) => {
-          const cmin = c.minSize;
-          return [a[0] + cmin[0], Math.max(a[1], cmin[1])];
-        }, [padding, 0]);
+        return <ISize>this._children.reduce(
+          (a, c) => {
+            const cmin = c.minSize;
+            return [a[0] + cmin[0], Math.max(a[1], cmin[1])];
+          },
+          [padding, 0],
+        );
       case EOrientation.VERTICAL: {
-        return <ISize>this._children.reduce((a, c) => {
-          const cmin = c.minSize;
-          return [Math.max(a[0], cmin[0]), a[1] + cmin[1]];
-        }, [0, padding]);
+        return <ISize>this._children.reduce(
+          (a, c) => {
+            const cmin = c.minSize;
+            return [Math.max(a[0], cmin[0]), a[1] + cmin[1]];
+          },
+          [0, padding],
+        );
       }
+      default:
+        return undefined;
     }
   }
 
   persist() {
     return Object.assign(super.persist(), {
       type: 'sequence',
-      orientation: EOrientation[this.options.orientation]
+      orientation: EOrientation[this.options.orientation],
     });
   }
 

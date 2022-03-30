@@ -1,8 +1,6 @@
 import { EngineRenderer, LocalDataProvider, TaggleRenderer } from 'lineupjs';
 import { AView } from '../views/AView';
-import { IViewContext, ISelection } from '../base/interfaces';
-import { EViewMode } from '../base/interfaces';
-import { IScore, IAdditionalColumnDesc } from '../base/interfaces';
+import { IViewContext, ISelection, EViewMode, IScore, IAdditionalColumnDesc } from '../base/interfaces';
 import { IInitialRankingOptions } from './desc';
 import { IRankingWrapper } from './IRankingWrapper';
 import { IRow, IServerColumn, IServerColumnDesc } from '../base/rest';
@@ -28,20 +26,21 @@ export declare abstract class ARankingView extends AView {
     private readonly taggle;
     private readonly selectionHelper;
     private readonly panel;
+    private readonly generalVis;
     /**
      * clears and rebuilds this lineup instance from scratch
      * @returns {Promise<any[]>} promise when done
      */
-    protected rebuild: (...args: any[]) => void;
+    protected rebuild: () => Promise<unknown>;
     /**
      * similar to rebuild but just loads new data and keep the columns
      * @returns {Promise<any[]>} promise when done
      */
-    protected reloadData: (...args: any[]) => void;
+    protected reloadData: () => Promise<unknown>;
     /**
      * updates the list of available columns in the side panel
      */
-    protected updatePanelChooser: (...args: any[]) => void;
+    protected updatePanelChooser: () => Promise<unknown>;
     /**
      * promise resolved when everything is built
      * @type {any}
@@ -149,3 +148,4 @@ export declare abstract class ARankingView extends AView {
      */
     protected clear(): Promise<void>;
 }
+//# sourceMappingURL=ARankingView.d.ts.map

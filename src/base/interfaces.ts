@@ -1,25 +1,24 @@
-import {IColumnDesc, Column, LocalDataProvider} from 'lineupjs';
-import {AppHeader} from '../components';
-import {IAuthorizationConfiguration} from '../auth';
-import {PanelTab} from '../lineup/panel';
-import {IPluginDesc, IPlugin, IEventHandler} from '.';
-import {IDType} from '../idtype';
-import {ProvenanceGraph, IObjectRef} from '../provenance';
-import {RangeLike, Range} from '../range';
-import {IUser} from '../security';
-
-
-
+import * as React from 'react';
+import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
+import { IAuthorizationConfiguration } from '../auth';
+import { PanelTab } from '../lineup/panel';
+import { IDType } from '../idtype/IDType';
+import { IUser } from '../security';
+import type { IPlugin, IPluginDesc } from './plugin';
+import { IEventHandler } from './event';
+import { ProvenanceGraph } from '../clue/provenance/ProvenanceGraph';
+import { IObjectRef } from '../clue/provenance/ObjectNode';
+import { AppHeader } from '../components/header';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
    * used internally to match selections to column
-   * @default -1
+   * @default undefined
    */
-  selectedId: number;
+  selectedId: string;
   /**
    * used internally to match selections to multiple columns
-   * @default: undefined
+   * @default undefined
    */
   selectedSubtype?: string;
   /**
@@ -34,23 +33,32 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
      * the name of the parent group as defined in the `databaseColumnGroups` of the ranking.
      */
-    parent: string,
+    parent: string;
     /**
      * the rank of the current item in the group
      */
-    order?: number
+    order?: number;
   };
 }
 
 export function isAdditionalColumnDesc(item: IAdditionalColumnDesc | IColumnDesc): item is IAdditionalColumnDesc {
-  return (item as IAdditionalColumnDesc).selectedId !== undefined;
+  return (item as IAdditionalColumnDesc).selectedId != null;
 }
 
 /**
  * mode of the view depending on the view state
  */
 export enum EViewMode {
-  FOCUS, CONTEXT, HIDDEN
+  FOCUS,
+  CONTEXT,
+  HIDDEN,
+}
+
+export interface IViewWrapperDump {
+  hash: string;
+  plugin: string;
+  dumpReference: number;
+  parameters: object;
 }
 
 /**
@@ -77,16 +85,16 @@ export interface IScore<T> {
    * creates the LineUp column description
    * @returns {IColumnDesc & {[p: string]: any}}
    */
-  createDesc(extras?: object): IColumnDesc & {[key: string]: any};
+  createDesc(extras?: object): IColumnDesc & { [key: string]: any };
 
   /**
    * start the computation of the score for the given ids
-   * @param {RangeLike} ids the currently visible ids
+   * @param {string[]} ids the currently visible ids
    * @param {IDType} idtype of this idtype
    * @param {Object} extras extra arguments
    * @returns {Promise<IScoreRow<T>[]>} the scores
    */
-  compute(ids: RangeLike, idtype: IDType, extras?: object): Promise<IScoreRow<T>[]>;
+  compute(ids: string[], idtype: IDType, extras?: object): Promise<IScoreRow<T>[]>;
 
   /**
    * Hook to override returning which authorizations are required for this score.
@@ -134,7 +142,7 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
   /**
    * view group hint
    */
-  readonly group?: {name: string, order: number};
+  readonly group?: { name: string; order: number };
 
   load(): Promise<IPlugin & IScoreLoaderExtension>;
 }
@@ -157,8 +165,6 @@ export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
   load(): Promise<IPlugin & IScoreColumnPatcherExtension>;
 }
 
-
-
 export interface IRankingButtonExtension {
   desc: IRankingButtonExtensionDesc;
   factory(desc: IRankingButtonExtensionDesc, idType: IDType, extraArgs: object): Promise<IScoreParam>;
@@ -179,7 +185,6 @@ export interface IRankingButtonExtensionDesc extends IPluginDesc {
   faIcon: string;
   load(): Promise<IPlugin & IRankingButtonExtension>;
 }
-
 
 export interface IPanelTabExtension {
   desc: IPanelTabExtensionDesc;
@@ -243,7 +248,6 @@ export interface IGroupData {
   members?: string[];
 }
 
-
 /**
  * helper extension point for grouping views and provide meta data
  */
@@ -251,15 +255,22 @@ export interface IViewGroupExtensionDesc extends IPluginDesc {
   groups: IGroupData[];
 }
 
-
+/**
+ * Selections including an idtype and the corresponding selected ids.
+ */
 export interface ISelection {
-  readonly idtype: IDType; // see phovea_core/src/idtype/manager#resolve
-  readonly range: Range;
-
   /**
-   * other selections floating around in a multi selection environment
+   * ID type of the selection, i.e. `IDTypeManager.getInstance().resolveIdType('Ensembl')`.
    */
-  readonly all?: Map<IDType, Range>;
+  readonly idtype: IDType;
+  /**
+   * IDs of the selection matching the idtype, i.e. `['ENSG...', 'ENSG...']`.
+   */
+  ids: string[];
+  /**
+   * Other selections floating around in a multi selection environment
+   */
+  readonly all?: Map<IDType, string[]>;
 }
 
 export interface IViewContext {
@@ -353,12 +364,16 @@ export interface IView extends IEventHandler {
   destroy(): void;
 }
 
-
 export interface IViewClass {
-  new(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
+  new (context: IViewContext, selection: ISelection, parent: HTMLElement, options?: any): IView;
 }
 
-export interface IViewPluginDesc extends IPluginDesc {
+export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
+  load(): Promise<IViewPlugin>;
+}
+
+// TODO:: refactor the Omit here to Partial<Pick<.. in ts 4
+export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 'id' | 'load'>> {
   /**
    * how many selection this view can handle and requires
    */
@@ -367,50 +382,40 @@ export interface IViewPluginDesc extends IPluginDesc {
    * idType regex that is required by this view
    */
   idtype?: string;
-
-  load(): Promise<IViewPlugin>;
-
   /**
    * view group hint
    */
-  group: {name: string, order: number};
-
+  group: { name: string; order: number };
   /**
    * optional preview callback function returning a url promise, the preview image should have 320x180 px
    * @returns {Promise<string>}
    */
   preview?(): Promise<string>;
-
   /**
    * optional security check to show only certain views
    */
   security?: string | ((user: IUser) => boolean);
-
   /**
    * optional authorization configuration ensuring authorization exists before loading the view.
    * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
    */
   authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
-
   /**
    * a lot of topics/tags describing this view
    */
   topics?: string[];
-
   /**
    * a link to an external help page
    */
-  helpUrl?: string | {url: string, linkText: string, title: string};
+  helpUrl?: string | { url: string; linkText: string; title: string };
   /**
    * as an alternative an help text shown as pop up
    */
   helpText?: string;
-
   /**
    * a tour id to start a tour
    */
   helpTourId?: string;
-
   /**
    * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
    * @default false
@@ -442,13 +447,9 @@ export interface IInstantViewOptions {
   document: Document;
 }
 
-export interface IItemSelection extends ISelection {
-  readonly items: {_id: number, id: string, text: string}[];
-}
-
 export interface IInstanceViewExtension {
   desc: IInstanceViewExtensionDesc;
-  factory(selection: IItemSelection, options: Readonly<IInstantViewOptions>): IInstantView;
+  factory(selection: ISelection, options: Readonly<IInstantViewOptions>): IInstantView;
 }
 
 export interface IInstanceViewExtensionDesc extends IPluginDesc {
@@ -476,6 +477,5 @@ export interface IAppExtensionExtension {
 }
 
 export interface IAppExtensionExtensionDesc extends IPluginDesc {
-
   load(): Promise<IPlugin & IAppExtensionExtension>;
 }

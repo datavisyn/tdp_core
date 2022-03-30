@@ -1,5 +1,5 @@
+import { merge } from 'lodash';
 import { EventHandler } from './event';
-import { BaseUtils } from './BaseUtils';
 import { PluginRegistry } from '../app';
 import { I18nextManager } from '../i18n';
 import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM } from './extensions';
@@ -15,9 +15,9 @@ export class LoginMenu extends EventHandler {
         this.options = {
             loginForm: undefined,
             document,
-            watch: false
+            watch: false,
         };
-        BaseUtils.mixin(this.options, { document: header.rightMenu.ownerDocument }, options);
+        merge(this.options, { document: header.rightMenu.ownerDocument }, options);
         this.customizer = PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM);
         this.node = this.init();
         if (this.options.watch) {
@@ -81,7 +81,7 @@ export class LoginMenu extends EventHandler {
         this.header.showAndFocusOn('#loginDialog', '#login_username');
     }
     initLoginDialog(body) {
-        let loginForm = this.options.loginForm;
+        let { loginForm } = this.options;
         if (!loginForm) {
             const t = this.customizer.find((d) => d.template != null);
             if (t) {

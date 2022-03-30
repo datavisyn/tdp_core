@@ -8,10 +8,6 @@ export interface IRow {
      * id, e.g. ESNGxxxx
      */
     readonly id: string;
-    /**
-     * unique internal number id, e.g. 42
-     */
-    readonly _id: number;
     [key: string]: any;
 }
 /**
@@ -76,7 +72,7 @@ export interface IAllFilters {
     gte: IParams;
 }
 export interface ILookupItem {
-    _id: number;
+    _id?: never;
     id: string;
     text: string;
 }
@@ -150,19 +146,17 @@ export declare class RestBaseUtils {
      * @param {string} database the database connector key
      * @param {string} view the view id
      * @param {IParams} params additional parameters
-     * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
      * @returns {Promise<T[]>}
      */
-    static getTDPData<T>(database: string, view: string, params?: IParams, assignIds?: boolean): Promise<T[]>;
+    static getTDPData<T>(database: string, view: string, params?: IParams): Promise<T[]>;
     /**
      * query the TDP rest api to read data
      * @param {string} database the database connector key
      * @param {string} view the view id
      * @param {IParams} params additional parameters
-     * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
      * @returns {Promise<IRow[]>}
      */
-    static getTDPRows(database: string, view: string, params?: IParams, assignIds?: boolean): Promise<IRow[]>;
+    static getTDPRows(database: string, view: string, params?: IParams): Promise<IRow[]>;
     /**
      * Merges the "regular" parameters with filter parameters for the URL.
      * Filter parameters are prefixed accordingly to be accepted by the backend.
@@ -170,27 +164,27 @@ export declare class RestBaseUtils {
      * @param params URL parameters
      * @param filters URL filter parameters
      */
-    static mergeParamAndFilters(params: IParams, filters: IParams): IParams;
+    static mergeParamAndFilters(params: IParams, filters: IParams): {
+        [x: string]: string | number | boolean | number[] | string[] | boolean[];
+    };
     /**
      * query the TDP rest api to read data with additional given filters
      * @param {string} database the database connector key
      * @param {string} view the view id
      * @param {IParams} params additional parameters
      * @param {IParams} filters filters to use
-     * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
      * @returns {Promise<IRow[]>}
      */
-    static getTDPFilteredRows(database: string, view: string, params: IParams, filters: IParams, assignIds?: boolean): Promise<IRow[]>;
+    static getTDPFilteredRows(database: string, view: string, params: IParams, filters: IParams): Promise<IRow[]>;
     /**
      * query the TDP rest api to read data with additional given filters
      * @param {string} database the database connector key
      * @param {string} view the view id
      * @param {IParams} params additional parameters
      * @param {IAllFilters} filters object that contains all filter options
-     * @param {boolean} assignIds flag whether the server is supposed to assign ids automatically or not
      * @returns {Promise<IRow[]>}
      */
-    static getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters?: IAllFilters, assignIds?: boolean): Promise<IRow[]>;
+    static getTDPFilteredRowsWithLessGreater(database: string, view: string, params: IParams, filters?: IAllFilters): Promise<IRow[]>;
     /**
      * query the TDP rest api to read a score
      * @param {string} database the database connector key
@@ -233,8 +227,8 @@ export declare class RestBaseUtils {
      * @param {string} database the database connector key
      * @param {string} view the view id
      * @param {IParams} params additional parameters
-     * @param {boolean} assignIds
      * @returns {Promise<Readonly<ILookupResult>>}
      */
-    static getTDPLookup(database: string, view: string, params?: IParams, assignIds?: boolean): Promise<Readonly<ILookupResult>>;
+    static getTDPLookup(database: string, view: string, params?: IParams): Promise<Readonly<ILookupResult>>;
 }
+//# sourceMappingURL=rest.d.ts.map

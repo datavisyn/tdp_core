@@ -1,10 +1,7 @@
-/**
- * Created by Samuel Gratzl on 29.09.2016.
- */
+import { merge } from 'lodash';
 import * as papaparse from 'papaparse';
-import { BaseUtils } from '../base';
 const defaultOptions = {
-    skipEmptyLines: true
+    skipEmptyLines: true,
 };
 export class ParserUtils {
     /**
@@ -15,18 +12,18 @@ export class ParserUtils {
      */
     static parseCSV(data, options = {}) {
         return new Promise((resolve, reject) => {
-            papaparse.parse(data, BaseUtils.mixin({
+            papaparse.parse(data, merge({
                 complete: (result) => resolve({ data: result.data, meta: result.meta }),
-                error: (error) => reject(error)
+                error: (error) => reject(error),
             }, defaultOptions, options));
         });
     }
     static streamCSV(data, chunk, options = {}) {
         return new Promise((resolve, reject) => {
-            papaparse.parse(data, BaseUtils.mixin({
+            papaparse.parse(data, merge({
                 complete: (result) => resolve(null),
                 chunk: (result) => chunk({ data: result.data, meta: result.meta }),
-                error: (error) => reject(error)
+                error: (error) => reject(error),
             }, defaultOptions, options));
         });
     }

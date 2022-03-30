@@ -1,13 +1,10 @@
-/**
- * Created by Samuel Gratzl on 29.09.2016.
- */
-
-import {ParserUtils} from './parser';
 import * as d3 from 'd3';
-import {ValueTypeEditor} from '../valuetype/valuetypes';
-import {ImportUtils} from './ImportUtils';
-import {EventHandler, BaseUtils} from '../base';
-import {IDataDescription} from '../data';
+import { merge } from 'lodash';
+import { ParserUtils } from './parser';
+import { ValueTypeEditor } from './valuetype/valuetypes';
+import { ImportUtils } from './ImportUtils';
+import { EventHandler } from '../base';
+import { IDataDescription } from '../data';
 
 export interface IImporterOptions {
   /**
@@ -18,30 +15,31 @@ export interface IImporterOptions {
 
 export class Importer extends EventHandler {
   private options: IImporterOptions = {
-    type: 'table'
+    type: 'table',
   };
+
   private $parent: d3.Selection<any>;
 
-  private builder: ()=>{data: any, desc: IDataDescription};
+  private builder: () => { data: any; desc: IDataDescription };
 
   constructor(parent: Element, options: IImporterOptions = {}) {
     super();
-    BaseUtils.mixin(this.options, options);
+    merge(this.options, options);
     this.$parent = d3.select(parent).append('div').classed('caleydo-importer', true);
 
     this.build(this.$parent);
   }
 
   private selectedFile(file: File) {
-    let name = file.name;
-    name = name.substring(0, name.lastIndexOf('.')); //remove .csv
+    let { name } = file;
+    name = name.substring(0, name.lastIndexOf('.')); // remove .csv
 
     Promise.all([<any>ParserUtils.parseCSV(file), ValueTypeEditor.createValueTypeEditors()]).then((results) => {
       const editors = results[1];
-      const data = results[0].data;
+      const { data } = results[0];
       const header = data.shift();
 
-      switch(this.options.type) {
+      switch (this.options.type) {
         case 'matrix':
           ImportUtils.importMatrix(editors, this.$parent, header, data, name).then((b) => {
             this.builder = b;
@@ -74,7 +72,7 @@ export class Importer extends EventHandler {
     return new Importer(parent, options);
   }
 
-  static selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File)=>any, overCssClass = 'over') {
+  static selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File) => any, overCssClass = 'over') {
     function over() {
       const e = <Event>(<any>d3.event);
       e.stopPropagation();
@@ -90,10 +88,10 @@ export class Importer extends EventHandler {
     function select() {
       over();
       const e: any = d3.event;
-      //either drop or file select
+      // either drop or file select
       const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
       if (files.length > 0) {
-        //just the first file for now
+        // just the first file for now
         onFileSelected(files[0]);
       }
     }

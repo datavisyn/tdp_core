@@ -1,3 +1,4 @@
+import type { PluginRegistry } from '../app/PluginRegistry';
 
 /**
  * basic interface of a plugin
@@ -33,9 +34,10 @@ export interface IPluginDesc {
    *  * `<factorymethod>` the name of the factory method to use
    *  * `new <classname>` will create a new instance of the given class
    *  * `new` will create an instance of the default exported class of this module, same as `new default`
+   *  * `null` will not call any function in the module at all, and simply return the result of the `load()` with the desc attached
    * @default create
    */
-  readonly factory: string;
+  readonly factory: string | null;
 
   /**
    * function for loading this plugin
@@ -63,10 +65,7 @@ export interface IPlugin {
   factory(...args: any[]): any;
 }
 
-
-export interface IRegistry {
-  push(type: string, loader: () => any, desc?: any): void;
-  push(type: string, id: string, loader: () => any, desc?: any): void;
-  push(type: string, idOrLoader: string | (() => any), descOrLoader: any, desc?: any): void;
-}
-
+export type IRegistry = {
+  push: PluginRegistry['push'];
+  pushVisynView: PluginRegistry['pushVisynView'];
+};

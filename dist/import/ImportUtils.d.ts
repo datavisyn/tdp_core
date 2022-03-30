@@ -1,8 +1,5 @@
-/**
- * Created by Samuel Gratzl on 29.09.2016.
- */
 import * as d3 from 'd3';
-import { ITypeDefinition, ValueTypeEditor } from '../valuetype/valuetypes';
+import { ITypeDefinition, ValueTypeEditor } from './valuetype/valuetypes';
 import { IDataDescription } from '../data';
 export interface IColumnDefinition {
     name: string;
@@ -30,3 +27,4 @@ export declare class ImportUtils {
         desc: IDataDescription;
     }>;
 }
+//# sourceMappingURL=ImportUtils.d.ts.map

@@ -16,21 +16,23 @@ export class I18nextManager {
      *  Initialize I18next with the translation files
      */
     async initI18n() {
-        const plugins = await Promise.all(PluginRegistry.getInstance().listPlugins(EP_PHOVEA_CORE_LOCALE).map((pluginDesc) => {
+        const plugins = await Promise.all(PluginRegistry.getInstance()
+            .listPlugins(EP_PHOVEA_CORE_LOCALE)
+            .map((pluginDesc) => {
             return pluginDesc.load().then((locale) => {
                 return {
                     lng: pluginDesc.lng || I18nextManager.DEFAULT_LANGUAGE,
                     ns: pluginDesc.ns || I18nextManager.DEFAULT_NAMESPACE,
                     resources: locale.factory(),
-                    order: pluginDesc.order || 0
+                    order: pluginDesc.order || 0,
                 };
             });
         }));
-        return I18nextManager.getInstance().i18n
-            .use({
+        return I18nextManager.getInstance()
+            .i18n.use({
             type: 'postProcessor',
             name: 'showKeyDebugger',
-            process: (value, key, option, translator) => translator.options.debug ? key : value
+            process: (value, key, option, translator) => (translator.options.debug ? key : value),
         })
             .init({
             debug: false,
@@ -45,20 +47,22 @@ export class I18nextManager {
                         return value.toLowerCase();
                     }
                     return value;
-                }
+                },
             },
             ns: I18nextManager.DEFAULT_NAMESPACE,
             defaultNS: I18nextManager.DEFAULT_NAMESPACE,
             lng: I18nextManager.DEFAULT_LANGUAGE,
             fallbackLng: I18nextManager.DEFAULT_LANGUAGE,
-            postProcess: ['showKeyDebugger']
+            postProcess: ['showKeyDebugger'],
         })
             .then(() => {
             /* For each plugin add the resources to the i18next configuration
               If plugins have same language and namespace the  one with greater order
               overwrites the others
             */
-            plugins.sort((pluginA, pluginB) => pluginA.order - pluginB.order).forEach((plugin) => {
+            plugins
+                .sort((pluginA, pluginB) => pluginA.order - pluginB.order)
+                .forEach((plugin) => {
                 I18nextManager.getInstance().i18n.addResourceBundle(plugin.lng, plugin.ns, plugin.resources, true, true);
             });
         });
@@ -72,4 +76,5 @@ export class I18nextManager {
 }
 I18nextManager.DEFAULT_LANGUAGE = 'en';
 I18nextManager.DEFAULT_NAMESPACE = 'default_namespace';
+export const i18n = I18nextManager.getInstance();
 //# sourceMappingURL=I18nextManager.js.map

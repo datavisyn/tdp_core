@@ -3,7 +3,7 @@ export class TooltipUtils {
     static findTooltip(ensureExists = true) {
         let tooltip = document.querySelector(`div.tdp-tooltip`);
         if (!tooltip && ensureExists) {
-            tooltip = document.createElement('div'); //helper
+            tooltip = document.createElement('div'); // helper
             tooltip.innerHTML = TooltipUtils.template;
             tooltip = tooltip.childNodes[0];
             document.body.appendChild(tooltip);
@@ -16,35 +16,43 @@ export class TooltipUtils {
             p.destroy();
         }
         tooltip.style.display = 'block';
-        tooltip.__popper = new Popper(('x' in reference) && ('y' in reference) ?
-            {
+        tooltip.__popper = new Popper('x' in reference && 'y' in reference
+            ? {
                 clientHeight: 1,
                 clientWidth: 1,
                 getBoundingClientRect: () => ({
+                    x: reference.x,
+                    y: reference.y,
                     top: reference.y,
                     bottom: reference.y + 1,
                     left: reference.x,
                     right: reference.x + 1,
                     height: 1,
-                    width: 1
-                })
-            } : reference, tooltip, {
+                    width: 1,
+                    toJSON: () => {
+                        throw new Error('TS4 migration required this');
+                    },
+                }),
+            }
+            : reference, tooltip, {
             eventsEnabled: false,
             placement: 'top',
-            modifiers: simpleTooltip ? {
-                preventOverflow: {
-                    enabled: false
-                },
-                hide: {
-                    enabled: false
+            modifiers: simpleTooltip
+                ? {
+                    preventOverflow: {
+                        enabled: false,
+                    },
+                    hide: {
+                        enabled: false,
+                    },
                 }
-            } : {}
+                : {},
         });
     }
     static hideTooltip() {
         const tooltip = TooltipUtils.findTooltip(false);
         if (tooltip) {
-            //hide tooltip
+            // hide tooltip
             tooltip.style.display = null;
             const p = tooltip.__popper;
             if (p) {
@@ -101,7 +109,7 @@ export class TooltipUtils {
             if (TooltipUtils.isRelated(evt, reference) || TooltipUtils.isRelated(evt, tooltip)) {
                 return; // if we switch to the tooltip or vice versa ignore it
             }
-            TooltipUtils.showTooltip(typeof html === 'function' ? html() : html, coords ? coords : reference, simpleTooltip);
+            TooltipUtils.showTooltip(typeof html === 'function' ? html() : html, coords || reference, simpleTooltip);
             tooltip = TooltipUtils.findTooltip(true);
             tooltip.addEventListener('mouseleave', leave);
             reference.addEventListener('mouseleave', leave);
@@ -131,7 +139,7 @@ export class TooltipUtils {
         };
     }
 }
-//based on bootstrap tooltips
+// based on bootstrap tooltips
 TooltipUtils.template = `<div class="tdp-tooltip" role="tooltip">
     <div></div>
     <div x-arrow></div>

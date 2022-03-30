@@ -14,6 +14,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0;
 
     &::before {
       content: ' ';
@@ -41,7 +42,7 @@
    * Colors light theme
    */
   &.navbar-light {
-    border-bottom: 1px solid $gray-400;
+    border-bottom: 1px solid shade-color(map-get($theme-colors, "light"), 10%);
 
     .navbar-brand {
       color: map-get($theme-colors, "dark");
@@ -53,13 +54,13 @@
       &:hover,
       &:focus,
       &.hover { // add .hover class to set state programmatically from TDP tours
-        background-color: $gray-400;
+        background-color: shade-color(map-get($theme-colors, "light"), 10%);
         color: map-get($theme-colors, "dark");
       }
     }
 
     .active > .nav-link {
-      background-color: $gray-400;
+      background-color: shade-color(map-get($theme-colors, "light"), 10%);
       color: map-get($theme-colors, "dark");
     }
   }
@@ -68,7 +69,7 @@
    * Colors dark theme
    */
   &.navbar-dark {
-    border-bottom-color: $gray-800;
+    border-bottom-color: tint-color(map-get($theme-colors, "dark"), 10%);
 
     .navbar-brand {
       color: $white;
@@ -81,7 +82,7 @@
       &:hover,
       &:focus,
       &.hover { // add .hover class to set state programmatically from TDP tours
-        background-color: $gray-700;
+        background-color: tint-color(map-get($theme-colors, "dark"), 10%);
         color: map-get($theme-colors, "light");
       }
     }

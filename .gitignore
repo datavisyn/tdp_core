@@ -1,7 +1,9 @@
 # general things to ignore
 /.tscache
+/.eslintcache
 /.idea
 /build/
+/storybook-static/
 /dist/tsBuildInfoFile
 /lib/
 *.egg-info/

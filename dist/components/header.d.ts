@@ -1,4 +1,3 @@
-import '../webpack/_bootstrap';
 /**
  * Defines a header link
  */
@@ -126,3 +125,4 @@ export declare class AppHeader {
     showAndFocusOn(selector: string, focusSelector: string): void;
     static create(parent: HTMLElement, options?: IAppHeaderOptions): AppHeader;
 }
+//# sourceMappingURL=header.d.ts.map

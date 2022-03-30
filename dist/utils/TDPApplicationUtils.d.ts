@@ -1,4 +1,4 @@
-import { IObjectRef, ProvenanceGraph, ActionNode } from '../provenance';
+import { IObjectRef, ProvenanceGraph, ActionNode } from '../clue/provenance';
 import { ISecureItem } from '../security';
 export interface IPermissionFormOptions {
     /**
@@ -38,16 +38,17 @@ export declare class TDPApplicationUtils {
      * @param parameters
      */
     static initSessionImpl(_inputs: IObjectRef<any>[], parameters: object): {
-        inverse: import("../provenance").IAction;
+        inverse: import("../clue/provenance").IAction;
     };
-    static initSession(map: object): import("../provenance").IAction;
+    static initSession(map: object): import("../clue/provenance").IAction;
     static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): Promise<{
-        inverse: import("../provenance").IAction;
+        inverse: import("../clue/provenance").IAction;
     }>;
-    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): import("../provenance").IAction;
+    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): import("../clue/provenance").IAction;
     static compressSetParameter(path: ActionNode[]): ActionNode[];
     /**
      * @deprecated
      */
     static compressSetParameterOld(path: ActionNode[]): ActionNode[];
 }
+//# sourceMappingURL=TDPApplicationUtils.d.ts.map

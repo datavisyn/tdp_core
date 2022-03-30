@@ -20,14 +20,14 @@ export class UniqueIdManager {
         return v;
     }
     flagId(domain, id) {
-        if (isNaN(id) || id < 0) {
+        if (Number.isNaN(id) || id < 0) {
             return id;
         }
         if (!UniqueIdManager.getInstance().idCounter.has(domain)) {
             UniqueIdManager.getInstance().idCounter.set(domain, id + 1);
         }
         else {
-            UniqueIdManager.getInstance().idCounter.set(domain, Math.max(UniqueIdManager.getInstance().idCounter.get(domain), id + 1)); //use the next one afterwards
+            UniqueIdManager.getInstance().idCounter.set(domain, Math.max(UniqueIdManager.getInstance().idCounter.get(domain), id + 1)); // use the next one afterwards
         }
         return id;
     }

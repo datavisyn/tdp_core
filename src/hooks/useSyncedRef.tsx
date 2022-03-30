@@ -6,7 +6,7 @@ import * as React from 'react';
  * @returns Ref containing the always up-to-date value.
  */
 export function useSyncedRef<T>(value: T) {
-    const ref = React.useRef<T>(value);
-    ref.current = value;
-    return ref;
+  const ref = React.useRef<T>(value);
+  ref.current = value;
+  return ref;
 }
