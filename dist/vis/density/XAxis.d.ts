@@ -1,3 +1,4 @@
+/// <reference types="react" />
 export declare function XAxis({ xScale, yRange, vertPosition }: {
     xScale: any;
     yRange: any;

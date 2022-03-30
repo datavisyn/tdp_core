@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { VisColumn, IDensityConfig } from '../interfaces';
 interface HexagonalBinProps {
     config: IDensityConfig;

@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { ColumnInfo, VisColumn } from '../interfaces';
 interface MultiplesSelectProps {
     callback: (c: ColumnInfo) => void;

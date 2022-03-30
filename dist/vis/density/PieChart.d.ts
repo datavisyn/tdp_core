@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import * as d3 from 'd3v7';
 export interface PieChartProps {
     data: number[];
