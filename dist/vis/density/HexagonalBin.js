@@ -151,6 +151,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
                 ]);
             });
         }
+        // TODO: Im cheating a bit here by appending the id/color value to each hex, breaking the types.
+        // is there a better way to type this?
         return d3Hexbin(inputForHexbin);
     }, [currentColorColumn, currentX, d3Hexbin, xScale, yScale, currentY]);
     // simple radius scale for the hexes
@@ -222,18 +224,22 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         ]);
         // it does look like we are creating a ton of brush events without cleaning them up right here.
         // But d3.call will remove the previous brush event when called, so this actually works as expected.
-        d3.select(`#${id}brush`).call(brush.on('end', function (event) {
+        d3.select(`#${id}brush`).call(brush.on('end', (event) => {
             if (!event.sourceEvent)
                 return;
             if (!event.selection) {
                 selectionCallback([]);
                 return;
             }
+            // To figure out if brushing is finding hexes after changing the axis via pan/zoom, need to do this.
+            // Invert your "zoomed" scale to find the actual scaled values inside of your svg coords. Use the original scale to find the values.
+            const startX = xScale(xZoomedScale.current.invert(event.selection[0][0]));
+            const startY = xScale(xZoomedScale.current.invert(event.selection[0][1]));
+            const endX = xScale(xZoomedScale.current.invert(event.selection[1][0]));
+            const endY = xScale(xZoomedScale.current.invert(event.selection[1][1]));
+            // to find the selected hexes
             const selectedHexes = hexes.filter((currHex) => xZoomedScale.current
-                ? currHex.x >= xScale(xZoomedScale.current.invert(event.selection[0][0])) &&
-                    currHex.x <= xScale(xZoomedScale.current.invert(event.selection[1][0])) &&
-                    currHex.y >= yScale(yZoomedScale.current.invert(event.selection[0][1])) &&
-                    currHex.y <= yScale(yZoomedScale.current.invert(event.selection[1][1]))
+                ? currHex.x >= startX && currHex.x <= endX && currHex.y >= startY && currHex.y <= endY
                 : currHex.x >= event.selection[0][0] &&
                     currHex.x <= event.selection[1][0] &&
                     currHex.y >= event.selection[0][1] &&
@@ -243,6 +249,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             d3.select(this).call(brush.move, null);
         }));
     }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale, xScale, yScale]);
+    // TODO: svg elements seem weird with style/classNames. I can directly put on a transform to a g, for example, but it seems to work
+    // differently than if i use style to do so
     return (React.createElement("div", { ref: ref, className: "mw-100" },
         React.createElement("svg", { id: id, style: { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom } },
             React.createElement("defs", null,

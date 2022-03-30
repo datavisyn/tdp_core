@@ -4,9 +4,8 @@ import { EHexbinOptions } from '../interfaces';
 import { formatOptionLabel } from './utils';
 export function HexbinOptionSelect({ callback, currentSelected }) {
     const options = [
-        { id: EHexbinOptions.BAR, name: EHexbinOptions.BAR },
         { id: EHexbinOptions.COLOR, name: EHexbinOptions.COLOR },
-        { id: EHexbinOptions.LYINGPATHS, name: EHexbinOptions.LYINGPATHS },
+        { id: EHexbinOptions.BINS, name: EHexbinOptions.BINS },
         { id: EHexbinOptions.PIE, name: EHexbinOptions.PIE },
     ];
     return (React.createElement(React.Fragment, null,

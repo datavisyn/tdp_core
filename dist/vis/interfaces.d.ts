@@ -10,10 +10,9 @@ export declare enum ESupportedPlotlyVis {
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EHexbinOptions {
-    BAR = "Bar",
     COLOR = "Color",
     PIE = "Pie",
-    LYINGPATHS = "Lying Paths"
+    BINS = "Bins"
 }
 export declare enum EBarDisplayType {
     ABSOLUTE = "Absolute",

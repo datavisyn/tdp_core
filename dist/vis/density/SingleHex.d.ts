@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import * as hex from 'd3-hexbin';
 import * as d3 from 'd3v7';
 import { EHexbinOptions } from '../interfaces';

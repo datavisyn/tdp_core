@@ -28,7 +28,7 @@ export function SingleHex({ hexbinOption, hexData, d3Hexbin, isSizeScale, radius
     const hexDivisor = hexData.length / 6;
     let counter = 0;
     return (React.createElement(React.Fragment, null,
-        hexbinOption === EHexbinOptions.LYINGPATHS
+        hexbinOption === EHexbinOptions.BINS
             ? catMapKeys.sort().map((key) => {
                 const currPath = cutHex(d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius - 0.5), isSizeScale ? radiusScale(hexData.length) : hexRadius, counter, Math.ceil(catMap[key] / hexDivisor));
                 counter += Math.ceil(catMap[key] / hexDivisor);
@@ -49,6 +49,14 @@ export function SingleHex({ hexbinOption, hexData, d3Hexbin, isSizeScale, radius
                 strokeWidth: 2,
                 fillOpacity: isOpacityScale ? opacityScale(hexData.length) : '1',
             } })) : null,
-        hexbinOption === EHexbinOptions.PIE ? (React.createElement(PieChart, { data: catMapVals, dataCategories: catMapKeys, radius: isSizeScale ? radiusScale(hexData.length) / 2 : hexRadius / 2, transform: `translate(${hexData.x}px, ${hexData.y}px)`, colorScale: colorScale })) : null));
+        hexbinOption === EHexbinOptions.PIE ? (React.createElement(React.Fragment, null,
+            isOpacityScale ? (React.createElement("path", { d: d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius - 0.5), style: {
+                    fill: `${'black'}`,
+                    transform: `translate(${hexData.x}px, ${hexData.y}px)`,
+                    stroke: isSelected ? '#E29609' : 'white',
+                    strokeWidth: 2,
+                    fillOpacity: opacityScale(hexData.length),
+                } })) : null,
+            React.createElement(PieChart, { data: catMapVals, dataCategories: catMapKeys, radius: isSizeScale ? radiusScale(hexData.length) / 2 : hexRadius / 2, transform: `translate(${hexData.x}px, ${hexData.y}px)`, colorScale: colorScale }))) : null));
 }
 //# sourceMappingURL=SingleHex.js.map

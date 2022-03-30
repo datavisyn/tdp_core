@@ -32,7 +32,7 @@ export declare class CLUEGraphManager extends EventHandler {
     delete(graph: IProvenanceGraphDataDescription): PromiseLike<boolean>;
     startFromScratch(): void;
     importGraph(dump: any, remote?: boolean): void;
-    importExistingGraph(graph: IProvenanceGraphDataDescription, extras?: any, cleanUpLocal?: boolean): Promise<void>;
+    importExistingGraph(graph: IProvenanceGraphDataDescription, extras?: any, cleanUpLocal?: boolean): Promise<any>;
     migrateGraph(graph: ProvenanceGraph, extras?: any): PromiseLike<ProvenanceGraph>;
     editGraphMetaData(graph: IProvenanceGraphDataDescription, extras?: any): PromiseLike<IProvenanceGraphDataDescription>;
     setGraph(graph: ProvenanceGraph): ProvenanceGraph;

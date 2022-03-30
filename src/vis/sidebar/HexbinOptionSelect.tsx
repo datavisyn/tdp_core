@@ -1,8 +1,7 @@
 import * as React from 'react';
 import Select from 'react-select';
-import { ColumnInfo, EColumnTypes, VisColumn, ENumericalColorScaleType, EHexbinOptions } from '../interfaces';
-import { formatOptionLabel, getCol } from './utils';
-import { NumericalColorButtons } from './NumericalColorButtons';
+import { EHexbinOptions } from '../interfaces';
+import { formatOptionLabel } from './utils';
 
 interface HexbinOptionSelectProps {
   callback: (c: EHexbinOptions) => void;
@@ -11,9 +10,8 @@ interface HexbinOptionSelectProps {
 
 export function HexbinOptionSelect({ callback, currentSelected }: HexbinOptionSelectProps) {
   const options = [
-    { id: EHexbinOptions.BAR, name: EHexbinOptions.BAR },
     { id: EHexbinOptions.COLOR, name: EHexbinOptions.COLOR },
-    { id: EHexbinOptions.LYINGPATHS, name: EHexbinOptions.LYINGPATHS },
+    { id: EHexbinOptions.BINS, name: EHexbinOptions.BINS },
     { id: EHexbinOptions.PIE, name: EHexbinOptions.PIE },
   ];
   return (

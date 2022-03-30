@@ -17,9 +17,9 @@ const SortableMultiValue = SortableElement((props) => {
         e.stopPropagation();
     };
     const innerProps = { ...props.innerProps, onMouseDown };
-    return React.createElement(components.MultiValue, { ...props, innerProps: innerProps });
+    return React.createElement(components.MultiValue, Object.assign({}, props, { innerProps: innerProps }));
 });
-const SortableMultiValueLabel = SortableHandle((props) => React.createElement(components.MultiValueLabel, { ...props }));
+const SortableMultiValueLabel = SortableHandle((props) => React.createElement(components.MultiValueLabel, Object.assign({}, props)));
 const SortableSelect = SortableContainer(Select);
 export function NumericalColumnSelect({ callback, columns, currentSelected }) {
     const selectNumOptions = React.useMemo(() => {

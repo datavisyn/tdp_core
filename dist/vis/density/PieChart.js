@@ -11,6 +11,8 @@ export function PieChart({ data, dataCategories, radius, transform, colorScale }
     }, [radius]);
     const id = React.useMemo(() => uniqueId('PieNum'), []);
     return (React.createElement("g", { style: { transform } }, pie(data).map((slice, i) => {
+        // TODO: Why are indexes bad in the key? how else to do this?
+        // eslint-disable-next-line react/no-array-index-key
         return React.createElement("path", { key: `${id}, ${i}`, d: arc(slice), style: { fill: colorScale ? colorScale(dataCategories[i]) : 'cornflowerblue' } });
     })));
 }

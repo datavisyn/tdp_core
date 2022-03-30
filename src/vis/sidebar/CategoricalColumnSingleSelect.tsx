@@ -18,6 +18,7 @@ export function CategoricalColumnSingleSelect({ callback, columns, currentSelect
     <>
       <label className="pt-2 pb-1">Categorical Column</label>
       <Select
+        isClearable
         closeMenuOnSelect
         formatOptionLabel={formatOptionLabel}
         getOptionLabel={(option) => option.name}

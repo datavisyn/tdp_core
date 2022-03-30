@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { ColumnInfo, EHexbinOptions, ESupportedPlotlyVis, IDensityConfig, IPCPConfig, IVisConfig, VisColumn } from '../interfaces';
+import { ColumnInfo, EHexbinOptions, ESupportedPlotlyVis, IDensityConfig, IVisConfig, VisColumn } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { AllColumnSelect, CategoricalColumnSelect, NumericalColumnSelect } from '../sidebar';
+import { NumericalColumnSelect } from '../sidebar';
 import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
 import { HexSizeSlider } from '../sidebar/HexSizeSlider';
 import { HexSizeSwitch } from '../sidebar/HexSizeScaleSwitch';
@@ -57,11 +57,14 @@ export function DensityVisSidebar({
         currentSelected={config.numColumnsSelected || []}
       />
       <CategoricalColumnSingleSelect callback={(color: ColumnInfo) => setConfig({ ...config, color })} columns={columns} currentSelected={config.color} />
+      {config.color ? (
+        <HexbinOptionSelect callback={(hexbinOptions: EHexbinOptions) => setConfig({ ...config, hexbinOptions })} currentSelected={config.hexbinOptions} />
+      ) : null}
       <hr />
       <HexSizeSlider currentValue={config.hexRadius} callback={(hexRadius: number) => setConfig({ ...config, hexRadius })} />
       <HexSizeSwitch currentValue={config.isSizeScale} callback={(isSizeScale: boolean) => setConfig({ ...config, isSizeScale })} />
       <HexOpacitySwitch currentValue={config.isOpacityScale} callback={(isOpacityScale: boolean) => setConfig({ ...config, isOpacityScale })} />
-      <HexbinOptionSelect callback={(hexbinOptions: EHexbinOptions) => setConfig({ ...config, hexbinOptions })} currentSelected={config.hexbinOptions} />
+      {/* <HexbinOptionSelect callback={(hexbinOptions: EHexbinOptions) => setConfig({ ...config, hexbinOptions })} currentSelected={config.hexbinOptions} /> */}
       {mergedExtensions.preSidebar}
       {mergedExtensions.postSidebar}
     </div>

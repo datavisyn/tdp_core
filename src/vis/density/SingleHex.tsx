@@ -1,4 +1,3 @@
-import { uniqueId } from 'lodash';
 import * as React from 'react';
 import * as hex from 'd3-hexbin';
 import * as d3 from 'd3v7';
@@ -65,7 +64,7 @@ export function SingleHex({
 
   return (
     <>
-      {hexbinOption === EHexbinOptions.LYINGPATHS
+      {hexbinOption === EHexbinOptions.BINS
         ? catMapKeys.sort().map((key) => {
             const currPath = cutHex(
               d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius - 0.5),
@@ -105,13 +104,27 @@ export function SingleHex({
         />
       ) : null}
       {hexbinOption === EHexbinOptions.PIE ? (
-        <PieChart
-          data={catMapVals as number[]}
-          dataCategories={catMapKeys}
-          radius={isSizeScale ? radiusScale(hexData.length) / 2 : hexRadius / 2}
-          transform={`translate(${hexData.x}px, ${hexData.y}px)`}
-          colorScale={colorScale}
-        />
+        <>
+          {isOpacityScale ? (
+            <path
+              d={d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius - 0.5)}
+              style={{
+                fill: `${'black'}`,
+                transform: `translate(${hexData.x}px, ${hexData.y}px)`,
+                stroke: isSelected ? '#E29609' : 'white',
+                strokeWidth: 2,
+                fillOpacity: opacityScale(hexData.length),
+              }}
+            />
+          ) : null}
+          <PieChart
+            data={catMapVals as number[]}
+            dataCategories={catMapKeys}
+            radius={isSizeScale ? radiusScale(hexData.length) / 2 : hexRadius / 2}
+            transform={`translate(${hexData.x}px, ${hexData.y}px)`}
+            colorScale={colorScale}
+          />
+        </>
       ) : null}
     </>
   );

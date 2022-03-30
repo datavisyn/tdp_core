@@ -5,8 +5,8 @@ import { VisColumn, IVisConfig, IDensityConfig, EScatterSelectSettings } from '.
 import { DensityVisSidebar } from './DensityVisSidebar';
 // eslint-disable-next-line import/no-cycle
 import { HexagonalBin } from './HexagonalBin';
-import { BrushOptionButtons } from '../sidebar';
 import { HexBrushOptions } from '../sidebar/HexBrushOptions';
+import { InvalidCols } from '../general';
 
 interface DensityVisProps {
   config: IDensityConfig;
@@ -43,32 +43,38 @@ export function DensityVis({ config, extensions, columns, setConfig, selectionCa
         className="position-relative d-grid flex-grow-1"
         style={{ gridTemplateColumns: 'minmax(0, 1fr) '.repeat(config.numColumnsSelected.length < 3 ? 1 : config.numColumnsSelected.length) }}
       >
-        {config.numColumnsSelected.length > 2 ? (
-          config.numColumnsSelected.map((xCol) => {
-            return config.numColumnsSelected.map((yCol) => {
-              if (xCol.id !== yCol.id) {
-                return (
-                  <HexagonalBin
-                    selectionCallback={selectionCallback}
-                    selected={selected}
-                    config={config}
-                    columns={[columns.find((col) => col.info.id === xCol.id), columns.find((col) => col.info.id === yCol.id)]}
-                  />
-                );
-              }
-
-              return <div>hello world</div>;
-            });
-          })
+        {config.numColumnsSelected.length < 2 ? (
+          <InvalidCols message="Please select two numerical columns" />
         ) : (
           <>
-            <div className="position-absolute">
-              <HexBrushOptions callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
-            </div>
-            <HexagonalBin selectionCallback={selectionCallback} selected={selected} config={config} columns={columns} />
+            {config.numColumnsSelected.length > 2 ? (
+              config.numColumnsSelected.map((xCol) => {
+                return config.numColumnsSelected.map((yCol) => {
+                  if (xCol.id !== yCol.id) {
+                    return (
+                      <HexagonalBin
+                        selectionCallback={selectionCallback}
+                        selected={selected}
+                        config={config}
+                        columns={[columns.find((col) => col.info.id === xCol.id), columns.find((col) => col.info.id === yCol.id)]}
+                      />
+                    );
+                  }
+
+                  return <div key={`${xCol.id}hist`}>hello world</div>;
+                });
+              })
+            ) : (
+              <>
+                <div className="position-absolute">
+                  <HexBrushOptions callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
+                </div>
+                <HexagonalBin selectionCallback={selectionCallback} selected={selected} config={config} columns={columns} />
+              </>
+            )}
+            {mergedExtensions.postPlot}
           </>
         )}
-        {mergedExtensions.postPlot}
       </div>
       {!hideSidebar ? (
         <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">

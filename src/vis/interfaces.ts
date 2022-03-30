@@ -19,10 +19,9 @@ export const allVisTypes: ESupportedPlotlyVis[] = [
 ];
 
 export enum EHexbinOptions {
-  BAR = 'Bar',
   COLOR = 'Color',
   PIE = 'Pie',
-  LYINGPATHS = 'Lying Paths',
+  BINS = 'Bins',
 }
 
 export enum EBarDisplayType {

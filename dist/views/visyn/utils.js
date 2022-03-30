@@ -13,18 +13,23 @@ export function setStateActionCaller(valueOrFunction, currentValue) {
     return valueOrFunction;
 }
 export function isVisynViewPluginDesc(desc) {
-    return (desc === null || desc === void 0 ? void 0 : desc.type) === EXTENSION_POINT_VISYN_VIEW;
+    var _a;
+    return ((_a = desc) === null || _a === void 0 ? void 0 : _a.type) === EXTENSION_POINT_VISYN_VIEW;
 }
 export function isVisynSimpleViewDesc(desc) {
-    return isVisynViewPluginDesc(desc) && (desc === null || desc === void 0 ? void 0 : desc.visynViewType) === 'simple';
+    var _a;
+    return isVisynViewPluginDesc(desc) && ((_a = desc) === null || _a === void 0 ? void 0 : _a.visynViewType) === 'simple';
 }
 export function isVisynSimpleView(plugin) {
-    return isVisynViewPluginDesc(plugin === null || plugin === void 0 ? void 0 : plugin.desc) && (plugin === null || plugin === void 0 ? void 0 : plugin.viewType) === 'simple';
+    var _a, _b;
+    return isVisynViewPluginDesc((_a = plugin) === null || _a === void 0 ? void 0 : _a.desc) && ((_b = plugin) === null || _b === void 0 ? void 0 : _b.viewType) === 'simple';
 }
 export function isVisynDataViewDesc(desc) {
-    return isVisynViewPluginDesc(desc) && (desc === null || desc === void 0 ? void 0 : desc.visynViewType) === 'data';
+    var _a;
+    return isVisynViewPluginDesc(desc) && ((_a = desc) === null || _a === void 0 ? void 0 : _a.visynViewType) === 'data';
 }
 export function isVisynDataView(plugin) {
-    return isVisynViewPluginDesc(plugin === null || plugin === void 0 ? void 0 : plugin.desc) && (plugin === null || plugin === void 0 ? void 0 : plugin.viewType) === 'data';
+    var _a, _b;
+    return isVisynViewPluginDesc((_a = plugin) === null || _a === void 0 ? void 0 : _a.desc) && ((_b = plugin) === null || _b === void 0 ? void 0 : _b.viewType) === 'data';
 }
 //# sourceMappingURL=utils.js.map

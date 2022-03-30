@@ -8,6 +8,6 @@ export function CategoricalColumnSingleSelect({ callback, columns, currentSelect
     }, [columns]);
     return (React.createElement(React.Fragment, null,
         React.createElement("label", { className: "pt-2 pb-1" }, "Categorical Column"),
-        React.createElement(Select, { closeMenuOnSelect: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (e) => callback(e), name: "numColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => (currentSelected === null || currentSelected === void 0 ? void 0 : currentSelected.id) === c.id) })));
+        React.createElement(Select, { isClearable: true, closeMenuOnSelect: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (e) => callback(e), name: "numColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => (currentSelected === null || currentSelected === void 0 ? void 0 : currentSelected.id) === c.id) })));
 }
 //# sourceMappingURL=CategoricalColumnSingleSelect.js.map
