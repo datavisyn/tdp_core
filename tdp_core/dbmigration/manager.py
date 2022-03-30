@@ -200,7 +200,7 @@ class DBMigrationManager(object):
                 _log.info(f"Both dbKey and dbUrl defined for DBMigration {id} - falling back to dbUrl")
             elif db_key:
                 # Check if engine exists
-                if db_key not in db_manager():
+                if db_key not in db_manager().connectors:
                     _log.error(f"No engine called {db_key} found for DBMigration {id} - is your configuration up to date?")
                     continue
 

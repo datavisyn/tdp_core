@@ -30,6 +30,7 @@ class DisableSettings(BaseModel):
 
 class VisynServerSettings(BaseModel):
     disable: DisableSettings = DisableSettings()
+    enabled_plugins: List[str] = []
 
     # TODO: Proper typing. This is 1:1 passed to the logging.config.dictConfig(...).
     logging: Dict = Field(

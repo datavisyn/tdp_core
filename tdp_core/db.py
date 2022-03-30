@@ -24,9 +24,9 @@ def resolve(database):
     :param database: database key to lookup
     :return: (connector, engine)
     """
-    if database not in db_manager():
+    if database not in db_manager().connectors:
         abort(404, 'Database with id "{}" cannot be found'.format(database))
-    r = db_manager()[database]
+    r = db_manager().connector_and_engine(database)
     # derive needed columns
     connector, engine = r
     for view in connector.views.values():
@@ -41,7 +41,7 @@ def resolve_engine(database):
     :param database: database key to lookup
     :return: engine
     """
-    if database not in db_manager():
+    if database not in db_manager().connectors:
         abort(404, 'Database with id "{}" cannot be found'.format(database))
     return db_manager().engine(database)
 

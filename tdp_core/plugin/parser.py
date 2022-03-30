@@ -15,6 +15,9 @@ _log = logging.getLogger(__name__)
 def is_disabled_plugin(p):
     import re
 
+    if get_global_settings().tdp_core.enabled_plugins:
+        return p.id not in get_global_settings().tdp_core.enabled_plugins
+
     # TODO: Check if case insensitive
     def check(disable):
         return isinstance(disable, str) and re.match(disable, p.id)

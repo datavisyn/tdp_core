@@ -39,17 +39,6 @@ def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = No
     registry.__registry = registry.Registry(plugins)
     logging.info("Plugin registry successfully initialized")
 
-    # TODO: Allow custom command routine (i.e. for db-migrations)
-    from .cmd import parse_command_string
-
-    alternative_start_command = parse_command_string(get_global_settings().start_cmd)
-    if alternative_start_command:
-        logging.info(f"Received start command: {get_global_settings().start_cmd}")
-        alternative_start_command()
-        logging.info("Successfully executed command, exiting server...")
-        # TODO: How to properly exit here? Should a command support the "continuation" of the server, i.e. by returning True?
-        sys.exit(0)
-
     app = FastAPI(
         # TODO: Remove debug
         debug=get_global_settings().is_development_mode,
@@ -71,8 +60,22 @@ def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = No
     from ..security.manager import security_manager
 
     db_manager().init_app(app)
+    logging.info("DBManager successfully initialized")
     db_migration_manager().init_app(app, list_plugins("tdp-sql-database-migration"))
+    logging.info("DBMigrationManager successfully initialized")
     security_manager().init_app(app)
+    logging.info("SecurityManager successfully initialized")
+
+    # TODO: Allow custom command routine (i.e. for db-migrations)
+    from .cmd import parse_command_string
+
+    alternative_start_command = parse_command_string(get_global_settings().start_cmd)
+    if alternative_start_command:
+        logging.info(f"Received start command: {get_global_settings().start_cmd}")
+        alternative_start_command()
+        logging.info("Successfully executed command, exiting server...")
+        # TODO: How to properly exit here? Should a command support the "continuation" of the server, i.e. by returning True?
+        sys.exit(0)
 
     # Load all namespace plugins as WSGIMiddleware plugins
     from .utils import init_legacy_app, load_after_server_started_hooks

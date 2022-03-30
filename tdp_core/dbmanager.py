@@ -68,13 +68,13 @@ class DBManager(object):
 
         return engine
 
-    def __getitem__(self, item):
-        if item not in self:
+    def connector_and_engine(self, item):
+        if item not in self.connectors:
             raise NotImplementedError("missing db connector: " + item)
         return self.connectors[item], self._load_engine(item)
 
     def connector(self, item) -> DBConnector:
-        if item not in self:
+        if item not in self.connectors:
             raise NotImplementedError("missing db connector: " + item)
         return self.connectors[item]
 
@@ -82,7 +82,7 @@ class DBManager(object):
         if isinstance(item, Engine):
             return item
 
-        if item not in self:
+        if item not in self.connectors:
             raise NotImplementedError("missing db connector: " + item)
         return self._load_engine(item)
 
@@ -92,7 +92,6 @@ class DBManager(object):
     def create_web_session(self, engine_or_id: Union[Engine, str]) -> Session:
         """
         Create a session that is added to the request state as db_session, which automatically closes it in the db_session middleware.
-        For legacy compatibility, it also adds a @after_this_request for flask responses.
         """
         session = self.create_session(engine_or_id)
 
@@ -105,15 +104,8 @@ class DBManager(object):
 
         return session
 
-    def __contains__(self, item):
-        return item in self.connectors
-
-    def get(self, item, default=None):
-        if item not in self:
-            return default
-        return self[item]
-
 
 @lru_cache(maxsize=1)
 def db_manager() -> DBManager:
+    _log.info("Creating db_manager")
     return DBManager()
