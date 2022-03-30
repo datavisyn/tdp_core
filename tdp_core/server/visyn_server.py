@@ -2,7 +2,7 @@ import logging
 import logging.config
 import sys
 import threading
-from typing import Dict, Union
+from typing import Dict, Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
@@ -12,7 +12,9 @@ from pydantic.utils import deep_update
 from ..middleware.request_context_middleware import RequestContextMiddleware
 
 
-def create_visyn_server(*, fast_api_args: dict = {}, start_cmd: Union[str, None] = None, workspace_config: Dict = None) -> FastAPI:
+def create_visyn_server(
+    *, fast_api_args: Optional[Dict] = {}, start_cmd: Optional[str] = None, workspace_config: Optional[Dict] = None
+) -> FastAPI:
     """
     Create a new FastAPI instance while ensuring that the configuration and plugins are loaded, extension points are registered, database migrations are executed, ...
 

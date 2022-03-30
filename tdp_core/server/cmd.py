@@ -1,13 +1,13 @@
 import logging
 import shlex
-from typing import Callable, Union
+from typing import Callable, Optional, Union
 
 from ..plugin.registry import list_plugins
 
 _log = logging.getLogger(__name__)
 
 
-def parse_command_string(cmd: Union[str, None]) -> Union[Callable, None]:
+def parse_command_string(cmd: Optional[str]) -> Union[Callable, None]:
     """
     Parses an application command.
     Example using cmd entrypoint:
