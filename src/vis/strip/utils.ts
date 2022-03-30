@@ -82,8 +82,8 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
             color: '#337ab7',
           },
         },
-        xLabel: numCurr.info.name,
-        yLabel: numCurr.info.name,
+        xLabel: numCurr.info.description ? `${numCurr.info.name} - ${numCurr.info.description}` : `${numCurr.info.name}`,
+        yLabel: numCurr.info.description ? `${numCurr.info.name} - ${numCurr.info.description}` : `${numCurr.info.name}`,
       });
       plotCounter += 1;
     }
@@ -123,8 +123,8 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
             },
           ],
         },
-        xLabel: catCurr.info.name,
-        yLabel: numCurr.info.name,
+        xLabel: catCurr.info.description ? `${catCurr.info.name} - ${catCurr.info.description}` : `${catCurr.info.name}`,
+        yLabel: numCurr.info.description ? `${numCurr.info.name} - ${numCurr.info.description}` : `${numCurr.info.name}`,
       });
       plotCounter += 1;
     }

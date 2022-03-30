@@ -79,13 +79,13 @@ export async function createViolinTraces(columns: VisColumn[], config: IViolinCo
           meanline: {
             visible: true,
           },
-          name: `${numCurr.info.name}`,
+          name: numCurr.info.description ? `${numCurr.info.name} - ${numCurr.info.description}` : `${numCurr.info.name}`,
           hoverinfo: 'y',
           scalemode: 'width',
           showlegend: false,
         },
-        xLabel: numCurr.info.name,
-        yLabel: numCurr.info.name,
+        xLabel: numCurr.info.description ? `${numCurr.info.name} - ${numCurr.info.description}` : `${numCurr.info.name}`,
+        yLabel: numCurr.info.description ? `${numCurr.info.name} - ${numCurr.info.description}` : `${numCurr.info.name}`,
       });
       plotCounter += 1;
     }
@@ -106,7 +106,9 @@ export async function createViolinTraces(columns: VisColumn[], config: IViolinCo
           meanline: {
             visible: true,
           },
-          name: `${catCurr.info.name} + ${numCurr.info.name}`,
+          name: `${catCurr.info.description ? `${catCurr.info.name} - ${catCurr.info.description}` : `${catCurr.info.name}`} + ${
+            numCurr.info.description ? `${numCurr.info.name} - ${numCurr.info.description}` : `${numCurr.info.name}`
+          }`,
           scalemode: 'width',
           pointpos: 0,
           jitter: 0.3,
@@ -125,8 +127,8 @@ export async function createViolinTraces(columns: VisColumn[], config: IViolinCo
             },
           ],
         },
-        xLabel: catCurr.info.name,
-        yLabel: numCurr.info.name,
+        xLabel: catCurr.info.description ? `${catCurr.info.name} - ${catCurr.info.description}` : `${catCurr.info.name}`,
+        yLabel: numCurr.info.description ? `${numCurr.info.name} - ${numCurr.info.description}` : `${numCurr.info.name}`,
       });
       plotCounter += 1;
     }

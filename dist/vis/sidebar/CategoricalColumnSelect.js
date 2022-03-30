@@ -8,6 +8,6 @@ export function CategoricalColumnSelect({ callback, columns, currentSelected }) 
     }, [columns]);
     return (React.createElement(React.Fragment, null,
         React.createElement("label", { className: "pt-2 pb-1" }, "Categorical Columns"),
-        React.createElement(Select, { closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (e) => callback(e.map((c) => c)), name: "numColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => currentSelected.filter((d) => d.id === c.id).length > 0) })));
+        React.createElement(Select, { closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => (option.description ? `${option.name} - ${option.description}` : option.name), getOptionValue: (option) => option.id, onChange: (e) => callback(e.map((c) => c)), name: "numColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => currentSelected.filter((d) => d.id === c.id).length > 0) })));
 }
 //# sourceMappingURL=CategoricalColumnSelect.js.map

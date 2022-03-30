@@ -21,7 +21,7 @@ export function CategoricalColumnSelect({ callback, columns, currentSelected }: 
         closeMenuOnSelect={false}
         isMulti
         formatOptionLabel={formatOptionLabel}
-        getOptionLabel={(option) => option.name}
+        getOptionLabel={(option) => (option.description ? `${option.name} - ${option.description}` : option.name)}
         getOptionValue={(option) => option.id}
         onChange={(e) => callback(e.map((c) => c))}
         name="numColumns"

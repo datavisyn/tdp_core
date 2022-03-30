@@ -30,7 +30,7 @@ export function AllColumnSelect({ callback, columns, currentSelected }) {
     };
     return (React.createElement(React.Fragment, null,
         React.createElement("label", { className: "pt-2 pb-1" }, "Columns"),
-        React.createElement(SortableSelect, { useDragHandle: true, axis: "xy", onSortEnd: onSortEnd, distance: 4, getHelperDimensions: ({ node }) => node.getBoundingClientRect(), closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (newValue) => {
+        React.createElement(SortableSelect, { useDragHandle: true, axis: "xy", onSortEnd: onSortEnd, distance: 4, getHelperDimensions: ({ node }) => node.getBoundingClientRect(), closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => (option.description ? `${option.name} - ${option.description}` : option.name), getOptionValue: (option) => option.id, onChange: (newValue) => {
                 callback(newValue);
             }, components: {
                 MultiValue: SortableMultiValue,

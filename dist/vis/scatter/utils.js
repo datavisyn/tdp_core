@@ -51,6 +51,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     const numCols = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
     const plots = [];
     const validCols = await resolveColumnValues(numCols);
+    console.log(validCols);
     const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
     const colorCol = await resolveSingleColumn(getCol(columns, config.color));
     const shapeScale = config.shape
@@ -103,8 +104,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     size: 10,
                 },
             },
-            xLabel: validCols[0].info.name,
-            yLabel: validCols[1].info.name,
+            xLabel: validCols[0].info.description ? `${validCols[0].info.name} - ${validCols[0].info.description}` : validCols[0].info.name,
+            yLabel: validCols[1].info.description ? `${validCols[1].info.name} - ${validCols[1].info.description}` : validCols[1].info.name,
         });
     }
     else {
@@ -136,8 +137,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                             size: 10,
                         },
                     },
-                    xLabel: xCurr.info.name,
-                    yLabel: yCurr.info.name,
+                    xLabel: validCols[0].info.description ? `${validCols[0].info.name} - ${validCols[0].info.description}` : validCols[0].info.name,
+                    yLabel: validCols[1].info.description ? `${validCols[1].info.name} - ${validCols[1].info.description}` : validCols[1].info.name,
                 });
                 plotCounter += 1;
             }
@@ -181,8 +182,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     },
                 ],
             },
-            xLabel: validCols[0].info.name,
-            yLabel: validCols[0].info.name,
+            xLabel: validCols[0].info.description ? `${validCols[0].info.name} - ${validCols[0].info.description}` : validCols[0].info.name,
+            yLabel: validCols[1].info.description ? `${validCols[1].info.name} - ${validCols[1].info.description}` : validCols[1].info.name,
         });
     }
     // if we have a column for the shape, add a legendPlot that creates a legend.
@@ -224,8 +225,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     },
                 ],
             },
-            xLabel: validCols[0].info.name,
-            yLabel: validCols[0].info.name,
+            xLabel: validCols[0].info.description ? `${validCols[0].info.name} - ${validCols[0].info.description}` : validCols[0].info.name,
+            yLabel: validCols[1].info.description ? `${validCols[1].info.name} - ${validCols[1].info.description}` : validCols[1].info.name,
         });
     }
     return {

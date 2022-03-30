@@ -76,7 +76,7 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
 
         return {
           range: [0, uniqueList.length - 1],
-          label: c.info.name,
+          label: c.info.description ? `${c.info.name} - ${c.info.description}` : c.info.name,
           values: c.resolvedValues.map((curr) => uniqueList.indexOf(curr.val as string)),
           tickvals: [...uniqueList.keys()],
           ticktext: uniqueList,

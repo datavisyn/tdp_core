@@ -78,6 +78,7 @@ export async function createScatterTraces(
   const plots: PlotlyData[] = [];
 
   const validCols = await resolveColumnValues(numCols);
+  console.log(validCols);
   const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
   const colorCol = await resolveSingleColumn(getCol(columns, config.color));
 
@@ -141,8 +142,8 @@ export async function createScatterTraces(
           size: 10,
         },
       },
-      xLabel: validCols[0].info.name,
-      yLabel: validCols[1].info.name,
+      xLabel: validCols[0].info.description ? `${validCols[0].info.name} - ${validCols[0].info.description}` : validCols[0].info.name,
+      yLabel: validCols[1].info.description ? `${validCols[1].info.name} - ${validCols[1].info.description}` : validCols[1].info.name,
     });
   } else {
     for (const yCurr of validCols) {
@@ -175,8 +176,8 @@ export async function createScatterTraces(
               size: 10,
             },
           },
-          xLabel: xCurr.info.name,
-          yLabel: yCurr.info.name,
+          xLabel: validCols[0].info.description ? `${validCols[0].info.name} - ${validCols[0].info.description}` : validCols[0].info.name,
+          yLabel: validCols[1].info.description ? `${validCols[1].info.name} - ${validCols[1].info.description}` : validCols[1].info.name,
         });
 
         plotCounter += 1;
@@ -222,8 +223,8 @@ export async function createScatterTraces(
           },
         ],
       },
-      xLabel: validCols[0].info.name,
-      yLabel: validCols[0].info.name,
+      xLabel: validCols[0].info.description ? `${validCols[0].info.name} - ${validCols[0].info.description}` : validCols[0].info.name,
+      yLabel: validCols[1].info.description ? `${validCols[1].info.name} - ${validCols[1].info.description}` : validCols[1].info.name,
     });
   }
 
@@ -266,8 +267,8 @@ export async function createScatterTraces(
           },
         ],
       },
-      xLabel: validCols[0].info.name,
-      yLabel: validCols[0].info.name,
+      xLabel: validCols[0].info.description ? `${validCols[0].info.name} - ${validCols[0].info.description}` : validCols[0].info.name,
+      yLabel: validCols[1].info.description ? `${validCols[1].info.name} - ${validCols[1].info.description}` : validCols[1].info.name,
     });
   }
 

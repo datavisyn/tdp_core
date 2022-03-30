@@ -31,7 +31,7 @@ export function NumericalColumnSelect({ callback, columns, currentSelected }) {
     };
     return (React.createElement(React.Fragment, null,
         React.createElement("label", { className: "pt-2 pb-1" }, "Numerical Columns"),
-        React.createElement(SortableSelect, { useDragHandle: true, axis: "xy", onSortEnd: onSortEnd, distance: 4, getHelperDimensions: ({ node }) => node.getBoundingClientRect(), closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (e) => {
+        React.createElement(SortableSelect, { useDragHandle: true, axis: "xy", onSortEnd: onSortEnd, distance: 4, getHelperDimensions: ({ node }) => node.getBoundingClientRect(), closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => (option.summary ? `${option.name} - ${option.summary}` : option.name), getOptionValue: (option) => option.id, onChange: (e) => {
                 callback(e.map((c) => c));
             }, components: {
                 MultiValue: SortableMultiValue,

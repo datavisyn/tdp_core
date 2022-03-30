@@ -55,7 +55,7 @@ export function AllColumnSelect({ callback, columns, currentSelected }: AllColum
         closeMenuOnSelect={false}
         isMulti
         formatOptionLabel={formatOptionLabel}
-        getOptionLabel={(option) => option.name}
+        getOptionLabel={(option) => (option.description ? `${option.name} - ${option.description}` : option.name)}
         getOptionValue={(option) => option.id}
         onChange={(newValue: ColumnInfo[]) => {
           callback(newValue);

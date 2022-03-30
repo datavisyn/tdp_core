@@ -67,7 +67,7 @@ export async function createPCPTraces(columns, config) {
                 const uniqueList = [...new Set(c.resolvedValues.map((v) => v.val))];
                 return {
                     range: [0, uniqueList.length - 1],
-                    label: c.info.name,
+                    label: c.info.description ? `${c.info.name} - ${c.info.description}` : c.info.name,
                     values: c.resolvedValues.map((curr) => uniqueList.indexOf(curr.val)),
                     tickvals: [...uniqueList.keys()],
                     ticktext: uniqueList,

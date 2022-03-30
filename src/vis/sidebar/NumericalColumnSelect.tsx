@@ -55,7 +55,7 @@ export function NumericalColumnSelect({ callback, columns, currentSelected }: Nu
         closeMenuOnSelect={false}
         isMulti
         formatOptionLabel={formatOptionLabel}
-        getOptionLabel={(option) => option.name}
+        getOptionLabel={(option) => (option.summary ? `${option.name} - ${option.summary}` : option.name)}
         getOptionValue={(option) => option.id}
         onChange={(e: ColumnInfo[]) => {
           callback(e.map((c) => c));

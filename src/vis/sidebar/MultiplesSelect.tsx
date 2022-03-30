@@ -18,7 +18,7 @@ export function MultiplesSelect({ callback, columns, currentSelected }: Multiple
         onChange={(e) => callback(e)}
         name="multiplesSelect"
         formatOptionLabel={formatOptionLabel}
-        getOptionLabel={(option) => option.name}
+        getOptionLabel={(option) => (option.description ? `${option.name} - ${option.description}` : option.name)}
         getOptionValue={(option) => option.id}
         options={columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info)}
         value={currentSelected || []}
