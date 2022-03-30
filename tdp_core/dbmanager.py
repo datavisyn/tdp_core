@@ -1,6 +1,14 @@
 import logging
 from functools import lru_cache
+from typing import Dict, Union
 
+from fastapi import FastAPI
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
+
+from .dbview import DBConnector
+from .middleware.close_web_sessions_middleware import CloseWebSessionsMiddleware
+from .middleware.request_context_middleware import get_request
 from .plugin.registry import list_plugins
 from .settings import get_global_settings
 
@@ -11,14 +19,17 @@ class DBManager(object):
     def __init__(self):
         self._initialized = False
 
-        self.connectors = {}
+        self.connectors: Dict[str, DBConnector] = {}
         self._plugins = {}
         self._engines = dict()
         self._sessionmakers = dict()
 
+    def init_app(self, app: FastAPI):
+        app.add_middleware(CloseWebSessionsMiddleware)
+
         for p in list_plugins("tdp-sql-database-definition"):
             config = get_global_settings().get_nested(p.configKey)
-            connector = p.load().factory()
+            connector: DBConnector = p.load().factory()
             if not connector.dburl:
                 connector.dburl = config["dburl"]
             if not connector.statement_timeout:
@@ -36,20 +47,6 @@ class DBManager(object):
             self._plugins[p.id] = p
             self.connectors[p.id] = connector
 
-        for p in list_plugins("tdp-sql-database-extension"):
-            base_connector = self.connectors.get(p.base)
-            if not base_connector:
-                _log.critical("invalid database extension no base found: %s base: %s" % (p.id, p.base))
-                continue
-            connector = p.load().factory()
-            if not connector.statement_timeout:
-                connector.statement_timeout = base_connector.statement_timeout
-            if not connector.statement_timeout_query:
-                connector.statement_timeout_query = base_connector.statement_timeout_query
-
-            self._plugins[p.id] = p
-            self.connectors[p.id] = connector
-
     def _load_engine(self, item):
         if not self._initialized:
             self._initialized = True
@@ -60,13 +57,7 @@ class DBManager(object):
             return self._engines[item]
 
         p = self._plugins[item]
-        if p.type == "tdp-sql-database-extension":
-            engine = self._load_engine(p.base)
-            self._engines[item] = engine
-            return engine
-
         connector = self.connectors[item]
-        # _log.info('%s -> %s', p.id, connector.dburl)
         config = get_global_settings().get_nested(p.configKey)
 
         engine = connector.create_engine(config)
@@ -82,32 +73,35 @@ class DBManager(object):
             raise NotImplementedError("missing db connector: " + item)
         return self.connectors[item], self._load_engine(item)
 
-    def connector(self, item):
+    def connector(self, item) -> DBConnector:
         if item not in self:
             raise NotImplementedError("missing db connector: " + item)
         return self.connectors[item]
 
-    def engine(self, item):
+    def engine(self, item: Union[Engine, str]) -> Engine:
+        if isinstance(item, Engine):
+            return item
+
         if item not in self:
             raise NotImplementedError("missing db connector: " + item)
         return self._load_engine(item)
 
-    def create_session(self, engine):
-        return self._sessionmakers[engine]()
+    def create_session(self, engine_or_id: Union[Engine, str]) -> Session:
+        return self._sessionmakers[self.engine(engine_or_id)]()
 
-    def create_web_session(self, engine):
+    def create_web_session(self, engine_or_id: Union[Engine, str]) -> Session:
         """
-        create a session that is scoped by the current flask request.
-        Note: if an exception occurs in the debug mode, flask for debugging reason won't destroy it
+        Create a session that is added to the request state as db_session, which automatically closes it in the db_session middleware.
+        For legacy compatibility, it also adds a @after_this_request for flask responses.
         """
-        from flask import after_this_request
+        session = self.create_session(engine_or_id)
 
-        session = self.create_session(engine)
-
-        @after_this_request
-        def close_db(response_or_exc):
-            session.close()
-            return response_or_exc
+        try:
+            existing_session = get_request().state.db_sessions
+        except (KeyError, AttributeError):
+            existing_session = []
+            get_request().state.db_sessions = existing_session
+        existing_session.append(session)
 
         return session
 

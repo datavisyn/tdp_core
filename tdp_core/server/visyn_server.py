@@ -9,7 +9,7 @@ from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
 from pydantic.utils import deep_update
 
-from .request_context import RequestContextMiddleware
+from ..middleware.request_context_middleware import RequestContextMiddleware
 
 
 def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = None) -> FastAPI:
@@ -50,11 +50,6 @@ def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = No
         # TODO: How to properly exit here? Should a command support the "continuation" of the server, i.e. by returning True?
         sys.exit(0)
 
-    # Initialize global managers. TODO: Should we do that by loading all singletons in the registry?
-    from ..dbmigration.manager import db_migration_manager
-
-    db_migration_manager()
-
     app = FastAPI(
         # TODO: Remove debug
         debug=get_global_settings().is_development_mode,
@@ -69,8 +64,17 @@ def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = No
     # Add middleware to access Request "outside"
     app.add_middleware(RequestContextMiddleware)
 
-    # Load all namespace plugins as WSGIMiddleware plugins
+    # Initialize global managers. TODO: Should we do that by loading all singletons in the registry?
+    from ..dbmanager import db_manager
+    from ..dbmigration.manager import db_migration_manager
     from ..plugin.registry import list_plugins
+    from ..security.manager import security_manager
+
+    db_manager().init_app(app)
+    db_migration_manager().init_app(app, list_plugins("tdp-sql-database-migration"))
+    security_manager().init_app(app)
+
+    # Load all namespace plugins as WSGIMiddleware plugins
     from .utils import init_legacy_app, load_after_server_started_hooks
 
     namespace_plugins = list_plugins("namespace")
@@ -86,11 +90,6 @@ def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = No
     for p in router_plugins:
         logging.info(f"Registering router: {p.id}")
         app.include_router(p.load().factory())
-
-    # Initialize the login routes
-    from ..security.manager import security_manager
-
-    security_manager().init_app(app)
 
     # load `after_server_started` extension points which are run immediately after server started,
     # so all plugins should have been loaded at this point of time

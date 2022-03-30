@@ -7,9 +7,10 @@ from typing import Dict, List, Optional
 
 import alembic.command
 import alembic.config
+from fastapi import FastAPI
 
 from ..db import db_manager
-from ..plugin.registry import AExtensionDesc, list_plugins
+from ..plugin.registry import AExtensionDesc
 from ..settings import get_global_settings
 
 __author__ = "Datavisyn"
@@ -152,9 +153,10 @@ class DBMigrationManager(object):
     - Plugin configuration
     """
 
-    def __init__(self, plugins: List[AExtensionDesc] = []):
+    def __init__(self):
         self._migrations: Dict[str, DBMigration] = dict()
 
+    def init_app(self, app: FastAPI, plugins: List[AExtensionDesc] = []):
         _log.info("Initializing DBMigrationManager")
 
         auto_upgrade_default = get_global_settings().tdp_core.migrations.autoUpgrade
@@ -244,7 +246,7 @@ class DBMigrationManager(object):
 @lru_cache(maxsize=1)
 def db_migration_manager() -> DBMigrationManager:
     _log.info("Creating db_migration_manager")
-    return DBMigrationManager(list_plugins("tdp-sql-database-migration"))
+    return DBMigrationManager()
 
 
 def create_migration_command(parser):

@@ -8,8 +8,8 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
+from ..middleware.request_context_middleware import get_request
 from ..plugin import registry
-from ..server.request_context import get_request
 from ..settings import get_global_settings
 from .constants import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, ANONYMOUS, SECRET_KEY
 from .model import ANONYMOUS_USER, LogoutReturnValue, Token, User

@@ -2,6 +2,10 @@ import logging
 import re
 from collections import OrderedDict
 
+import sqlalchemy
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import sessionmaker
+
 from tdp_core.security import current_user, is_logged_in
 
 from .utils import clean_query
@@ -612,13 +616,9 @@ class DBConnector(object):
         self.description = ""
 
     def dump(self, name):
-        from collections import OrderedDict
-
         return OrderedDict(name=name, description=self.description)
 
-    def create_engine(self, config):
-        import sqlalchemy
-
+    def create_engine(self, config) -> Engine:
         engine_options = config.get("engine", {})
         engine = sqlalchemy.create_engine(self.dburl, **engine_options)
         # Assuming that gevent monkey patched the builtin
@@ -631,7 +631,5 @@ class DBConnector(object):
 
         return engine
 
-    def create_sessionmaker(self, engine):
-        from sqlalchemy.orm import sessionmaker
-
+    def create_sessionmaker(self, engine) -> sessionmaker:
         return sessionmaker(bind=engine)
