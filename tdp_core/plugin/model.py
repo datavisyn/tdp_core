@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Type
+from fastapi import FastAPI
 
 from pydantic import BaseSettings
 
@@ -28,6 +29,9 @@ class RegHelper(object):
 class AVisynPlugin(ABC):
     @abstractmethod
     def register(self, registry: RegHelper):
+        pass
+
+    def init_app(self, app: FastAPI):
         pass
 
     @property

@@ -103,6 +103,10 @@ def create_visyn_server(*, fast_api_args: dict = {}, workspace_config: Dict = No
     # TODO: Check mainapp.py what it does and transfer them here. Currently, we cannot mount a flask app at root, such that the flask app is now mounted at /app/
     from .mainapp import build_info, health
 
+    # Call init_app callback for every plugin
+    for p in plugins:
+        p.plugin.init_app(app)
+
     # TODO: Move up?
     app.add_api_route("/health", health)
     app.add_api_route("/buildInfo.json", build_info)

@@ -103,8 +103,12 @@ export class GraphEdge extends AttributeContainer {
         return this._id;
     }
     init() {
-        this.source.outgoing.push(this);
-        this.target.incoming.push(this);
+        if (this.source) {
+            this.source.outgoing.push(this);
+        }
+        if (this.target) {
+            this.target.incoming.push(this);
+        }
     }
     takeDown() {
         if (this.source) {
@@ -118,11 +122,12 @@ export class GraphEdge extends AttributeContainer {
         return `${this.source} ${this.type} ${this.target}`;
     }
     persist() {
+        var _a, _b;
         const r = super.persist();
         r.type = this.type;
         r.id = this.id;
-        r.source = this.source.id;
-        r.target = this.target.id;
+        r.source = (_a = this.source) === null || _a === void 0 ? void 0 : _a.id;
+        r.target = (_b = this.target) === null || _b === void 0 ? void 0 : _b.id;
         return r;
     }
     restore(p, nodes) {
