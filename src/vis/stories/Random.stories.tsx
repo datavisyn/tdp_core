@@ -126,13 +126,11 @@ BarChart.args = {
     display: EBarDisplayType.ABSOLUTE,
     groupType: EBarGroupingType.GROUP,
     numColumnsSelected: [],
-    catColumnsSelected: [
-      {
-        description: '',
-        id: 'category',
-        name: 'category',
-      },
-    ],
+    catColumnSelected: {
+      description: '',
+      id: 'category',
+      name: 'category',
+    },
   },
 };
 
