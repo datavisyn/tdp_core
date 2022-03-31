@@ -1,10 +1,11 @@
+/// <reference types="react" />
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
-    SCATTER = "Scatter",
-    PCP = "Parallel Coordinates",
-    VIOLIN = "Violin",
-    STRIP = "Strip",
-    BAR = "Bar"
+    SCATTER = "Scatter Plot",
+    PCP = "Parallel Coordinates Plot",
+    VIOLIN = "Violin Plot",
+    STRIP = "Strip Plot",
+    BAR = "Bar Chart"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EBarDisplayType {
@@ -77,7 +78,7 @@ export interface IPCPConfig {
     allColumnsSelected: ColumnInfo[];
 }
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
-declare type ValueGetter<T> = () => Promise<T>;
+declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**
      * Visyn id of the row.
@@ -107,6 +108,7 @@ export declare type PlotlyInfo = {
     rows: number;
     cols: number;
     errorMessage: string;
+    errorMessageHeader: string;
 };
 export declare type PlotlyData = {
     data: Partial<Plotly.PlotData>;
@@ -121,5 +123,12 @@ export declare type ColumnInfo = {
 export declare type Scales = {
     color: any;
 };
+/**
+ * Common props for all vis sidebars.
+ */
+export interface ICommonVisSideBarProps {
+    style?: React.CSSProperties | undefined;
+    className?: string | undefined;
+}
 export {};
 //# sourceMappingURL=interfaces.d.ts.map

@@ -1,10 +1,10 @@
 export var ESupportedPlotlyVis;
 (function (ESupportedPlotlyVis) {
-    ESupportedPlotlyVis["SCATTER"] = "Scatter";
-    ESupportedPlotlyVis["PCP"] = "Parallel Coordinates";
-    ESupportedPlotlyVis["VIOLIN"] = "Violin";
-    ESupportedPlotlyVis["STRIP"] = "Strip";
-    ESupportedPlotlyVis["BAR"] = "Bar";
+    ESupportedPlotlyVis["SCATTER"] = "Scatter Plot";
+    ESupportedPlotlyVis["PCP"] = "Parallel Coordinates Plot";
+    ESupportedPlotlyVis["VIOLIN"] = "Violin Plot";
+    ESupportedPlotlyVis["STRIP"] = "Strip Plot";
+    ESupportedPlotlyVis["BAR"] = "Bar Chart";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
 export const allVisTypes = [
     ESupportedPlotlyVis.SCATTER,

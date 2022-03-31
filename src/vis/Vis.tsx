@@ -149,7 +149,17 @@ export function Vis({
         />
       ) : null}
 
-      {isStrip(visConfig) ? <StripVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
+      {isStrip(visConfig) ? (
+        <StripVis
+          config={visConfig}
+          selectionCallback={selectionCallback}
+          setConfig={setVisConfig}
+          selected={selectedMap}
+          columns={columns}
+          scales={scales}
+          hideSidebar={hideSidebar}
+        />
+      ) : null}
 
       {isPCP(visConfig) ? <PCPVis config={visConfig} selected={selectedMap} setConfig={setVisConfig} columns={columns} hideSidebar={hideSidebar} /> : null}
 
