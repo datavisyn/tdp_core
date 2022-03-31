@@ -46,29 +46,6 @@ interface BarVisProps {
   hideSidebar?: boolean;
 }
 
-const defaultConfig = {
-  group: {
-    enable: true,
-    customComponent: null,
-  },
-  multiples: {
-    enable: true,
-    customComponent: null,
-  },
-  direction: {
-    enable: true,
-    customComponent: null,
-  },
-  groupType: {
-    enable: true,
-    customComponent: null,
-  },
-  display: {
-    enable: true,
-    customComponent: null,
-  },
-};
-
 const defaultExtensions = {
   prePlot: null,
   postPlot: null,

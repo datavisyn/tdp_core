@@ -30,7 +30,7 @@ const defaultConfig: IScatterConfig = {
   numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
   shape: null,
   isRectBrush: true,
-  alphaSliderVal: 1,
+  alphaSliderVal: 0.5,
 };
 
 export function scatterMergeDefaultConfig(columns: VisColumn[], config: IScatterConfig): IVisConfig {

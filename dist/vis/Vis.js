@@ -1,7 +1,7 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { useMemo, useEffect } from 'react';
-import { ESupportedPlotlyVis, ENumericalColorScaleType } from './interfaces';
+import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
@@ -20,15 +20,26 @@ export function Vis({ columns, selected = [], colors = [
     getCssValue('visyn-c9'),
     getCssValue('visyn-c10'),
 ], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null, hideSidebar = false, }) {
-    const [visConfig, setVisConfig] = React.useState(externalConfig || {
-        type: ESupportedPlotlyVis.SCATTER,
-        numColumnsSelected: [],
-        color: null,
-        numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
-        shape: null,
-        isRectBrush: true,
-        alphaSliderVal: 0.5,
-    });
+    const [visConfig, setVisConfig] = React.useState(externalConfig || columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1
+        ? {
+            type: ESupportedPlotlyVis.SCATTER,
+            numColumnsSelected: [],
+            color: null,
+            numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+            shape: null,
+            isRectBrush: true,
+            alphaSliderVal: 0.5,
+        }
+        : {
+            type: ESupportedPlotlyVis.BAR,
+            multiples: null,
+            group: null,
+            direction: EBarDirection.VERTICAL,
+            display: EBarDisplayType.ABSOLUTE,
+            groupType: EBarGroupingType.STACK,
+            numColumnsSelected: [],
+            catColumnSelected: null,
+        });
     React.useEffect(() => {
         if (isScatter(visConfig)) {
             setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
