@@ -11,22 +11,22 @@ export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
     resolvedValues: (import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[];
     type: import("../interfaces").EColumnTypes.NUMERICAL;
     info: import("../interfaces").ColumnInfo;
-    values: () => Promise<(import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[]>;
+    values: () => (import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[] | Promise<(import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[]>;
 } | {
     resolvedValues: (import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[];
     type: import("../interfaces").EColumnTypes.CATEGORICAL;
     info: import("../interfaces").ColumnInfo;
-    values: () => Promise<(import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[]>;
+    values: () => (import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[] | Promise<(import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[]>;
 })[]>;
 export declare function resolveSingleColumn(column: VisColumn): Promise<{
     resolvedValues: (import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[];
     type: import("../interfaces").EColumnTypes.NUMERICAL;
     info: import("../interfaces").ColumnInfo;
-    values: () => Promise<(import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[]>;
+    values: () => (import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[] | Promise<(import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[]>;
 } | {
     resolvedValues: (import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[];
     type: import("../interfaces").EColumnTypes.CATEGORICAL;
     info: import("../interfaces").ColumnInfo;
-    values: () => Promise<(import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[]>;
+    values: () => (import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[] | Promise<(import("../interfaces").VisCategoricalValue | import("../interfaces").VisNumericalValue)[]>;
 }>;
 //# sourceMappingURL=layoutUtils.d.ts.map
