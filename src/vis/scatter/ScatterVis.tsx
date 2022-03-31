@@ -64,8 +64,6 @@ export function ScatterVis({
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
 
-  console.log(config);
-
   useEffect(() => {
     if (hideSidebar) {
       return;
