@@ -1,7 +1,7 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { useMemo, useEffect } from 'react';
-import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, } from './interfaces';
+import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
@@ -27,7 +27,7 @@ export function Vis({ columns, selected = [], colors = [
             color: null,
             numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
             shape: null,
-            isRectBrush: true,
+            dragMode: EScatterSelectSettings.RECTANGLE,
             alphaSliderVal: 0.5,
         }
         : {

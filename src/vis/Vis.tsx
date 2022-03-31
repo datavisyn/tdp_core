@@ -12,6 +12,7 @@ import {
   EBarDirection,
   EBarDisplayType,
   EBarGroupingType,
+  EScatterSelectSettings,
 } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
@@ -76,7 +77,7 @@ export function Vis({
           color: null,
           numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
           shape: null,
-          isRectBrush: true,
+          dragMode: EScatterSelectSettings.RECTANGLE,
           alphaSliderVal: 0.5,
         }
       : {
