@@ -7,7 +7,7 @@ import { DensityVisSidebar } from './DensityVisSidebar';
 import { HexagonalBin } from './HexagonalBin';
 import { HexBrushOptions } from '../sidebar/HexBrushOptions';
 import { InvalidCols } from '../general';
-import {I18nextManager} from '../../i18n/I18nextManager';
+import { I18nextManager } from '../../i18n/I18nextManager';
 
 interface DensityVisProps {
   config: IDensityConfig;
