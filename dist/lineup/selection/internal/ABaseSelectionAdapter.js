@@ -1,12 +1,11 @@
 import { difference } from 'lodash';
-import { ResolveNow } from '../../../base';
 export class ABaseSelectionAdapter {
     constructor() {
         this.waitingForSelection = null;
         this.waitingForParameter = null;
     }
-    addDynamicColumns(context, _ids, ids) {
-        return Promise.all(_ids.map((_id, i) => this.createColumnsFor(context, _id, ids[i]))).then((columns) => {
+    addDynamicColumns(context, ids) {
+        return Promise.all(ids.map((id) => this.createColumnsFor(context, id))).then((columns) => {
             // sort new columns to insert them in the correct order
             const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
             flattenedColumns.sort(({ d: a, i: ai }, { d: b, i: bi }) => {
@@ -19,18 +18,18 @@ export class ABaseSelectionAdapter {
             context.add(flattenedColumns.map((d) => d.d));
         });
     }
-    removeDynamicColumns(context, _ids) {
+    removeDynamicColumns(context, ids) {
         const { columns } = context;
-        context.remove([].concat(..._ids.map((_id) => {
-            context.freeColor(_id);
-            return columns.filter((d) => d.desc.selectedId === _id);
+        context.remove([].concat(...ids.map((id) => {
+            context.freeColor(id);
+            return columns.filter((d) => d.desc.selectedId === id);
         })));
     }
     selectionChanged(waitForIt, context) {
         if (this.waitingForSelection) {
             return this.waitingForSelection;
         }
-        return (this.waitingForSelection = ResolveNow.resolveImmediately(waitForIt)
+        return (this.waitingForSelection = Promise.resolve(waitForIt)
             .then(() => this.selectionChangedImpl(context()))
             .then(() => {
             this.waitingForSelection = null;
@@ -43,7 +42,7 @@ export class ABaseSelectionAdapter {
         if (this.waitingForParameter) {
             return this.waitingForParameter;
         }
-        return (this.waitingForParameter = ResolveNow.resolveImmediately(waitForIt)
+        return (this.waitingForParameter = Promise.resolve(waitForIt)
             .then(() => {
             if (this.waitingForSelection) {
                 return undefined; // abort selection more important
@@ -55,8 +54,8 @@ export class ABaseSelectionAdapter {
         }));
     }
     selectionChangedImpl(context) {
-        const selectedIds = context.selection.range.dim(0).asList();
-        const usedCols = context.columns.filter((d) => d.desc.selectedId !== -1 && d.desc.selectedId !== undefined);
+        const selectedIds = context.selection.ids;
+        const usedCols = context.columns.filter((d) => d.desc.selectedId != null);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
         // compute the difference
         const diffAdded = difference(selectedIds, lineupColIds);
@@ -70,8 +69,7 @@ export class ABaseSelectionAdapter {
         if (diffAdded.length <= 0) {
             return null;
         }
-        // console.log('add columns', diffAdded);
-        return context.selection.idtype.unmap(diffAdded).then((names) => this.addDynamicColumns(context, diffAdded, names));
+        return this.addDynamicColumns(context, diffAdded);
     }
     static patchDesc(desc, selectedId) {
         desc.selectedId = selectedId;

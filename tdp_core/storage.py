@@ -4,7 +4,6 @@ from pymongo.collection import ReturnDocument
 from phovea_server.ns import Namespace, request, abort, etag
 from phovea_server.util import jsonify
 import phovea_server.security as security
-import phovea_server.range as ranges
 import logging
 
 __author__ = 'Samuel Gratzl'
@@ -29,7 +28,7 @@ def list_namedset():
     creator = request.values.get('creator', security.current_username())
     permissions = int(request.values.get('permissions', security.DEFAULT_PERMISSION))
     id_type = request.values.get('idType', '')
-    ids = ranges.parse(request.values.get('ids', ''))[0].tolist()
+    ids = request.values.getlist('ids[]') or []
     description = request.values.get('description', '')
     sub_type_key = request.values.get('subTypeKey', '')
     sub_type_value = request.values.get('subTypeValue', '')
@@ -73,7 +72,7 @@ def get_namedset(namedset_id):
       if key in request.form:
         values[key] = request.form[key]
     if 'ids' in request.form:
-      values['ids'] = ranges.parse(request.form['ids'])[0].tolist()
+      values['ids'] = request.form['ids']
     for key in ['permissions', 'type']:
       if key in request.form:
         values[key] = int(request.form[key])
@@ -149,13 +148,6 @@ def get_attachment(attachment_id):
     query = {'$set': dict(data=request.data)}
     db.attachments.find_one_and_update(filter, query)
     return attachment_id
-
-
-# @app.route('/delete_legacy_namedsets/', methods=['GET'])
-# def delete_legacy_namedsets():
-#  db = MongoClient(c.host, c.port)[c.db_namedsets]
-#  result = db.namedsets.remove({'id': {'$exists': False}}) # find all entries without id
-#  return jsonify(result['n'])  # number of deleted documents
 
 
 def create():

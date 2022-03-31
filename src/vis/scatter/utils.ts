@@ -80,6 +80,8 @@ export async function createScatterTraces(
     rows: 0,
     cols: 0,
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
+
     formList: ['color', 'shape', 'bubble', 'opacity'],
   };
 
@@ -317,5 +319,6 @@ export async function createScatterTraces(
     rows: Math.sqrt(plots.length),
     cols: Math.sqrt(plots.length),
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
   };
 }

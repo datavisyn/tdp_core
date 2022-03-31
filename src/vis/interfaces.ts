@@ -107,7 +107,7 @@ export interface IPCPConfig {
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 
-type ValueGetter<T> = () => Promise<T>;
+type ValueGetter<T> = () => T | Promise<T>;
 
 export interface IVisCommonValue<Type extends number | string> {
   /**
@@ -145,6 +145,7 @@ export type PlotlyInfo = {
   rows: number;
   cols: number;
   errorMessage: string;
+  errorMessageHeader: string;
 };
 
 export type PlotlyData = {

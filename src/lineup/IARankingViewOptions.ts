@@ -30,7 +30,11 @@ export interface IARankingViewOptions {
    * additional attributes for stored named sets
    */
   subType: { key: string; value: string };
-
+  /**
+   * enables CLUE for the ranking, leading to tracking of all ranking relevant features like sorting, filtering, and adding columns.
+   * @default true
+   */
+  clueifyRanking: boolean;
   /**
    * enable taggle overview mode switcher
    * @default true

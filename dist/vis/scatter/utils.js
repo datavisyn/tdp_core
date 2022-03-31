@@ -48,6 +48,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
         rows: 0,
         cols: 0,
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+        errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
         formList: ['color', 'shape', 'bubble', 'opacity'],
     };
     if (!config.numColumnsSelected) {
@@ -266,6 +267,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
         rows: Math.sqrt(plots.length),
         cols: Math.sqrt(plots.length),
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+        errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
 }
 //# sourceMappingURL=utils.js.map
