@@ -47,6 +47,7 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
       rows: 0,
       cols: 0,
       errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
+      errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
   }
 
@@ -87,7 +88,7 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
           },
           unselected: {
             marker: {
-              color: '2e2e2e',
+              color: '#2e2e2e',
               opacity: 0.5,
             },
           },
@@ -96,7 +97,7 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
             visible: true,
           },
           line: {
-            color: 'rgba(255,255,255,0)',
+            color: 'rgba(255, 255, 255, 0)',
           },
         },
         xLabel: numCurr.info.name,
@@ -144,7 +145,7 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
             visible: true,
           },
           line: {
-            color: 'rgb(255, 255, 255, 0)',
+            color: '#FFFFFF',
           },
           meanline: {
             visible: true,
@@ -169,5 +170,6 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
     rows: numColValues.length,
     cols: catColValues.length > 0 ? catColValues.length : 1,
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
   };
 }

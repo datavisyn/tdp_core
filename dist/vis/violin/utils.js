@@ -28,6 +28,7 @@ export async function createViolinTraces(columns, config, scales) {
             rows: 0,
             cols: 0,
             errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.violinError'),
+            errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
         };
     }
     const numCols = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
@@ -112,6 +113,7 @@ export async function createViolinTraces(columns, config, scales) {
         rows: numColValues.length,
         cols: catColValues.length > 0 ? catColValues.length : 1,
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.violinError'),
+        errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
 }
 //# sourceMappingURL=utils.js.map

@@ -27,6 +27,7 @@ export async function createStripTraces(columns, config, selected, scales) {
             rows: 0,
             cols: 0,
             errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
+            errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
         };
     }
     const numCols = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
@@ -64,7 +65,7 @@ export async function createStripTraces(columns, config, selected, scales) {
                     },
                     unselected: {
                         marker: {
-                            color: '2e2e2e',
+                            color: '#2e2e2e',
                             opacity: 0.5,
                         },
                     },
@@ -73,7 +74,7 @@ export async function createStripTraces(columns, config, selected, scales) {
                         visible: true,
                     },
                     line: {
-                        color: 'rgba(255,255,255,0)',
+                        color: 'rgba(255, 255, 255, 0)',
                     },
                 },
                 xLabel: numCurr.info.name,
@@ -120,7 +121,7 @@ export async function createStripTraces(columns, config, selected, scales) {
                         visible: true,
                     },
                     line: {
-                        color: 'rgb(255, 255, 255, 0)',
+                        color: '#FFFFFF',
                     },
                     meanline: {
                         visible: true,
@@ -144,6 +145,7 @@ export async function createStripTraces(columns, config, selected, scales) {
         rows: numColValues.length,
         cols: catColValues.length > 0 ? catColValues.length : 1,
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
+        errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
 }
 //# sourceMappingURL=utils.js.map

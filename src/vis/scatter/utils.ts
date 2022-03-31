@@ -80,6 +80,8 @@ export async function createScatterTraces(
     rows: 0,
     cols: 0,
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
+
     formList: ['color', 'shape', 'bubble', 'opacity'],
   };
 
@@ -155,7 +157,7 @@ export async function createScatterTraces(
               )
             : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
           opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
-          size: 10,
+          size: 8,
         },
       },
       xLabel: validCols[0].info.name,
@@ -211,7 +213,7 @@ export async function createScatterTraces(
                     )
                   : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
                 opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
-                size: 10,
+                size: 8,
               },
             },
             xLabel: xCurr.info.name,
@@ -246,7 +248,7 @@ export async function createScatterTraces(
             width: 0,
           },
           symbol: 'circle',
-          size: 10,
+          size: 8,
           color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
           opacity: config.alphaSliderVal,
         },
@@ -290,7 +292,7 @@ export async function createScatterTraces(
             width: 0,
           },
           opacity: config.alphaSliderVal,
-          size: 10,
+          size: 8,
           symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
           color: '#2e2e2e',
         },
@@ -317,5 +319,6 @@ export async function createScatterTraces(
     rows: Math.sqrt(plots.length),
     cols: Math.sqrt(plots.length),
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
   };
 }

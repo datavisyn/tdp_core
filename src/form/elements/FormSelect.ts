@@ -49,6 +49,36 @@ export interface IFormSelectElement extends IFormElement {
 }
 
 /**
+ * ResolveNow executes the result without an intermediate tick, and because FormSelect#resolveData is sometimes used
+ * as dependency for FormMap for example, the result needs to be there immediately as otherwise the dependents
+ * receive null as value. This is some form of race-condition, as the dependents are executed before the value is resolved and set.
+ * See https://github.com/datavisyn/tdp_core/issues/675 for details.
+ */
+class ResolveNow<T> implements PromiseLike<T> {
+  constructor(private readonly v: T) {}
+
+  // When using Typescript v2.7+ the typing can be further specified as `then<TResult1 = T, TResult2 = never>(...`
+  then<TResult1, TResult2>(
+    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null,
+  ): PromiseLike<TResult1 | TResult2> {
+    return ResolveNow.resolveImmediately(onfulfilled(this.v));
+  }
+
+  /**
+   * similar to Promise.resolve but executes the result immediately without an intermediate tick
+   * @param {PromiseLike<T> | T} result
+   * @returns {PromiseLike<T>}
+   */
+  static resolveImmediately<T>(result: T | PromiseLike<T>): PromiseLike<T> {
+    if (result instanceof Promise || (result && typeof (<any>result).then === 'function')) {
+      return <PromiseLike<T>>result;
+    }
+    return <PromiseLike<T>>new ResolveNow(result);
+  }
+}
+
+/**
  * Select form element instance
  * Propagates the changes from the DOM select element using the internal `change` event
  */
@@ -238,10 +268,10 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     data?: IHierarchicalSelectOptions | ((dependents: any[]) => IHierarchicalSelectOptions),
   ): (dependents: any[]) => PromiseLike<(IFormSelectOption | IFormSelectOptionGroup)[]> {
     if (data === undefined) {
-      return () => Promise.resolve([]);
+      return () => ResolveNow.resolveImmediately([]);
     }
     if (Array.isArray(data)) {
-      return () => Promise.resolve(data.map(this.toOption));
+      return () => ResolveNow.resolveImmediately(data.map(this.toOption));
     }
     if (data instanceof Promise) {
       return () => data.then((r) => r.map(this.toOption));
@@ -253,9 +283,9 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
         return r.then((a) => a.map(this.toOption));
       }
       if (Array.isArray(r)) {
-        return Promise.resolve(r.map(this.toOption));
+        return ResolveNow.resolveImmediately(r.map(this.toOption));
       }
-      return Promise.resolve(r);
+      return ResolveNow.resolveImmediately(r);
     };
   }
 }
