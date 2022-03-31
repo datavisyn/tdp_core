@@ -4,7 +4,7 @@ export class Session {
          * Use the browser's sessionStorage
          * @type {Storage}
          */
-        this.context = sessionStorage;
+        this.context = window.sessionStorage;
     }
     /**
      * Store any value for a given key and returns the previous stored value.

@@ -7,7 +7,6 @@ function arrayMove(array, from, to) {
     slicedArray.splice(to < 0 ? array.length + to : to, 0, slicedArray.splice(from, 1)[0]);
     return slicedArray;
 }
-// tslint:disable-next-line:variable-name
 const SortableMultiValue = SortableElement((props) => {
     // this prevents the menu from being opened/closed when the user clicks
     // on a value to begin dragging it. ideally, detecting a click (instead of
@@ -17,11 +16,9 @@ const SortableMultiValue = SortableElement((props) => {
         e.stopPropagation();
     };
     const innerProps = { ...props.innerProps, onMouseDown };
-    return React.createElement(components.MultiValue, Object.assign({}, props, { innerProps: innerProps }));
+    return React.createElement(components.MultiValue, { ...props, innerProps: innerProps });
 });
-// tslint:disable-next-line:variable-name
-const SortableMultiValueLabel = SortableHandle((props) => React.createElement(components.MultiValueLabel, Object.assign({}, props)));
-// tslint:disable-next-line:variable-name
+const SortableMultiValueLabel = SortableHandle((props) => React.createElement(components.MultiValueLabel, { ...props }));
 const SortableSelect = SortableContainer(Select);
 export function AllColumnSelect({ callback, columns, currentSelected }) {
     const selectNumOptions = React.useMemo(() => {

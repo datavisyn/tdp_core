@@ -1,4 +1,3 @@
-import { ParseRangeUtils, Range1D } from '../range';
 export var SelectOperation;
 (function (SelectOperation) {
     SelectOperation[SelectOperation["SET"] = 0] = "SET";
@@ -50,22 +49,17 @@ export class SelectionUtils {
         }
         return +v;
     }
-    static fillWithNone(r, ndim) {
-        while (r.ndim < ndim) {
-            r.dims[r.ndim] = Range1D.none();
+    static integrateSelection(current, next, op = SelectOperation.SET) {
+        if (op === SelectOperation.SET) {
+            return next;
         }
-        return r;
-    }
-    static integrateSelection(current, additional, operation = SelectOperation.SET) {
-        const next = ParseRangeUtils.parseRangeLike(additional);
-        switch (operation) {
-            case SelectOperation.ADD:
-                return current.union(next);
-            case SelectOperation.REMOVE:
-                return current.without(next);
-            default:
-                return next;
+        if (SelectOperation.ADD) {
+            return Array.from(new Set([...current, ...next]));
         }
+        if (SelectOperation.REMOVE) {
+            return current.filter((s) => !next.includes(s));
+        }
+        return [];
     }
 }
 SelectionUtils.defaultSelectionType = 'selected';

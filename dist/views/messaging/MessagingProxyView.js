@@ -1,7 +1,5 @@
 import { AView } from '../AView';
-import { ResolveUtils } from '../ResolveUtils';
 import { IDTypeManager } from '../../idtype';
-import { ParseRangeUtils, Range } from '../../range';
 import { I18nextManager } from '../../i18n';
 export class MessagingProxyView extends AView {
     constructor(context, selection, parent, options = {}) {
@@ -26,15 +24,13 @@ export class MessagingProxyView extends AView {
                     const { ids } = payload;
                     const idType = payload.idType ? IDTypeManager.getInstance().resolveIdType(payload.idType) : this.itemIDType;
                     if (!ids || ids.length === 0) {
-                        this.setItemSelection({ idtype: idType, range: Range.none() }, name);
+                        this.setItemSelection({ idtype: idType, ids: [] }, name);
                     }
                     if (!idType) {
                         console.warn('cannot set item selection since of unknown idType');
                         return;
                     }
-                    idType.map(ids).then((r) => {
-                        this.setItemSelection({ idtype: idType, range: ParseRangeUtils.parseRangeLike(r) }, name);
-                    });
+                    this.setItemSelection({ idtype: idType, ids }, name);
                     return;
                 }
                 case 'tdpSetParameter': {
@@ -104,20 +100,18 @@ export class MessagingProxyView extends AView {
             return;
         }
         const selection = this.getInputSelection(name);
-        ResolveUtils.resolveIds(selection.idtype, selection.range).then((ids) => {
-            if (!ids || ids.length === 0) {
-                this.setNoMappingFoundHint(true);
-                return;
-            }
-            this.setNoMappingFoundHint(false);
-            this.sendMessage({
-                type: 'tdpSetInputSelection',
-                payload: {
-                    name,
-                    idType: this.idType.id,
-                    ids,
-                },
-            });
+        if (!selection.ids || selection.ids.length === 0) {
+            this.setNoMappingFoundHint(true);
+            return;
+        }
+        this.setNoMappingFoundHint(false);
+        this.sendMessage({
+            type: 'tdpSetInputSelection',
+            payload: {
+                name,
+                idType: this.idType.id,
+                ids: selection.ids,
+            },
         });
     }
     sendMessage(msg, queueIfNotExisting = false) {
@@ -132,7 +126,7 @@ export class MessagingProxyView extends AView {
     }
     sendItemSelectionMessage(name) {
         const s = this.getItemSelection(name);
-        if (!s || s.range.isNone) {
+        if (!s || s.ids.length === 0) {
             this.sendMessage({
                 type: 'tdpSetItemSelection',
                 payload: {
@@ -141,9 +135,11 @@ export class MessagingProxyView extends AView {
                     ids: [],
                 },
             }, true);
-            return;
+            return undefined;
         }
-        ResolveUtils.resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
+        return IDTypeManager.getInstance()
+            .mapNameToFirstName(s.idtype, s.ids, this.itemIDType)
+            .then((ids) => {
             this.sendMessage({
                 type: 'tdpSetItemSelection',
                 payload: {

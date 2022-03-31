@@ -1,4 +1,5 @@
 import { EngineRenderer, defaultOptions, isGroup, LocalDataProvider, deriveColors, TaggleRenderer, spaceFillingRule, updateLodRules, } from 'lineupjs';
+import { merge } from 'lodash';
 import { AView } from '../views/AView';
 import { EViewMode } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -14,7 +15,7 @@ import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
-import { BaseUtils, debounceAsync } from '../base';
+import { debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { LineupVisWrapper } from '../vis';
@@ -70,6 +71,7 @@ export class ARankingView extends AView {
             additionalScoreParameter: null,
             additionalComputeScoreParameter: null,
             subType: { key: '', value: '' },
+            clueifyRanking: true,
             enableOverviewMode: true,
             enableZoom: true,
             enableVisPanel: true,
@@ -129,7 +131,7 @@ export class ARankingView extends AView {
         const names = options.itemName
             ? { itemNamePlural: typeof options.itemName === 'function' ? () => `${options.itemName()}s` : `${options.itemName}s` }
             : {};
-        BaseUtils.mixin(this.options, idTypeNames, names, options);
+        merge(this.options, idTypeNames, names, options);
         this.node.classList.add('lineup', 'lu-taggle', 'lu');
         this.node.insertAdjacentHTML('beforeend', `<div></div>`);
         this.stats = this.node.ownerDocument.createElement('div');
@@ -140,7 +142,7 @@ export class ARankingView extends AView {
         // so by setting `.data` on the reference it is actually set by the sub-class (e.g. by the `AEmbeddedRanking` view)
         this.context.ref.value.data = this.provider;
         this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
-        const taggleOptions = BaseUtils.mixin(defaultOptions(), this.options.customOptions, {
+        const taggleOptions = merge(defaultOptions(), this.options.customOptions, {
             summaryHeader: this.options.enableHeaderSummary,
             labelRotation: this.options.enableHeaderRotation ? 45 : 0,
         }, options.customOptions);
@@ -295,11 +297,11 @@ export class ARankingView extends AView {
             columns,
             selection: this.selection,
             freeColor: (id) => this.colors.freeColumnColor(id),
-            add: (cols) => this.withoutTracking(() => {
-                cols.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
+            add: (c) => this.withoutTracking(() => {
+                c.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
             }),
-            remove: (cols) => this.withoutTracking(() => {
-                cols.forEach((c) => c.removeMe());
+            remove: (c) => this.withoutTracking(() => {
+                c.forEach((col) => col.removeMe());
             }),
         };
     }
@@ -358,7 +360,7 @@ export class ARankingView extends AView {
         NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
         this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
     }
-    addColumn(colDesc, data, id = -1, position) {
+    addColumn(colDesc, data, id = null, position) {
         // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
         colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : this.colors.getColumnColor(id);
         return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
@@ -457,7 +459,7 @@ export class ARankingView extends AView {
                 }
             })();
         });
-        const r = this.addColumn(colDesc, data, -1, position);
+        const r = this.addColumn(colDesc, data, null, position);
         columnResolve(r.col);
         // use _score function to reload the score
         colDesc._score = () => {
@@ -546,8 +548,10 @@ export class ARankingView extends AView {
         })
             .then(() => {
             this.builtLineUp(this.provider);
-            // record after the initial one
-            LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+            if (this.options.clueifyRanking) {
+                // record after the initial one
+                LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+            }
             this.setBusy(false);
             this.update();
         })
