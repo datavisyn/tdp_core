@@ -1,9 +1,8 @@
 import { EngineRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, Column, isMapAbleColumn, mappingFunctions, StringColumn, DateColumn, } from 'lineupjs';
 import { isEqual } from 'lodash';
 import { LineUpFilterUtils } from './lineUpFilter';
-import { ResolveNow } from '../../base';
 import { I18nextManager } from '../../i18n';
-import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../provenance';
+import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../clue/provenance';
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 var LineUpTrackAndUntrackActions;
 (function (LineUpTrackAndUntrackActions) {
@@ -87,7 +86,7 @@ export class LineupTrackingManager {
         };
     }
     static async addRankingImpl(inputs, parameter) {
-        const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+        const p = await Promise.resolve((await inputs[0].v).data);
         const { index } = parameter;
         if (!parameter.dump) {
             // remove
@@ -135,7 +134,7 @@ export class LineupTrackingManager {
         };
     }
     static async setRankingSortCriteriaImpl(inputs, parameter) {
-        const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+        const p = await Promise.resolve((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         const bak = LineupTrackingManager.getInstance().toSortObject(ranking.getSortCriteria());
         LineupTrackingManager.getInstance().ignoreNext = Ranking.EVENT_SORT_CRITERIA_CHANGED;
@@ -153,7 +152,7 @@ export class LineupTrackingManager {
         });
     }
     static async setSortCriteriaImpl(inputs, parameter) {
-        const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+        const p = await Promise.resolve((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         const waitForSorted = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
         let current;
@@ -180,7 +179,7 @@ export class LineupTrackingManager {
         });
     }
     static async setGroupCriteriaImpl(inputs, parameter) {
-        const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+        const p = await Promise.resolve((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         const current = ranking.getGroupCriteria().map((d) => d.fqpath);
         const columns = parameter.columns.map((a) => ranking.findByPath(a));
@@ -205,7 +204,7 @@ export class LineupTrackingManager {
         });
     }
     static async setAggregationImpl(inputs, parameter) {
-        const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+        const p = await Promise.resolve((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         LineupTrackingManager.getInstance().ignoreNext = LocalDataProvider.EVENT_GROUP_AGGREGATION_CHANGED;
         const waiter = new Promise((resolve) => {
@@ -234,7 +233,7 @@ export class LineupTrackingManager {
         }));
     }
     static async setColumnImpl(inputs, parameter) {
-        const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+        const p = await Promise.resolve((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         const prop = parameter.prop[0].toUpperCase() + parameter.prop.slice(1);
         let bak = null;
@@ -265,7 +264,6 @@ export class LineupTrackingManager {
                     break;
                 case LineUpTrackAndUntrackActions.filter:
                     bak = source[`get${prop}`]();
-                    console.log(parameter.value);
                     // restore serialized regular expression before passing to LineUp
                     // eslint-disable-next-line no-case-declarations
                     const value = LineUpFilterUtils.isSerializedFilter(parameter.value) ? LineUpFilterUtils.restoreLineUpFilter(parameter.value) : parameter.value;
@@ -307,7 +305,7 @@ export class LineupTrackingManager {
         });
     }
     static async addColumnImpl(inputs, parameter) {
-        const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+        const p = await Promise.resolve((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         let parent = ranking;
         const waitForSorted = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
@@ -334,7 +332,7 @@ export class LineupTrackingManager {
         });
     }
     static async moveColumnImpl(inputs, parameter) {
-        const p = await ResolveNow.resolveImmediately((await inputs[0].v).data);
+        const p = await Promise.resolve((await inputs[0].v).data);
         const ranking = p.getRankings()[parameter.rid];
         let parent = ranking;
         const waitForSorted = LineupTrackingManager.getInstance().dirtyRankingWaiter(ranking);
@@ -756,7 +754,7 @@ export class LineupTrackingManager {
      * @returns Returns a promise that is waiting for the object reference (LineUp instance)
      */
     async clueify(lineup, objectRef, graph) {
-        const p = await ResolveNow.resolveImmediately((await objectRef.v).data);
+        const p = await Promise.resolve((await objectRef.v).data);
         p.on(`${LocalDataProvider.EVENT_ADD_RANKING}.track`, (ranking, index) => {
             if (LineupTrackingManager.getInstance().ignore(LocalDataProvider.EVENT_ADD_RANKING, objectRef)) {
                 return;
@@ -786,7 +784,7 @@ export class LineupTrackingManager {
      * @returns Returns a promise that is waiting for the object reference (LineUp instance)
      */
     async untrack(objectRef) {
-        const p = await ResolveNow.resolveImmediately((await objectRef.v).data);
+        const p = await Promise.resolve((await objectRef.v).data);
         p.on([`${LocalDataProvider.EVENT_ADD_RANKING}.track`, `${LocalDataProvider.EVENT_REMOVE_RANKING}.track`], null);
         p.getRankings().forEach(LineupTrackingManager.getInstance().untrackRanking);
     }
@@ -798,7 +796,7 @@ export class LineupTrackingManager {
      */
     withoutTracking(objectRef, func) {
         return objectRef.v
-            .then((d) => ResolveNow.resolveImmediately(d.data))
+            .then((d) => Promise.resolve(d.data))
             .then((p) => {
             LineupTrackingManager.getInstance().temporaryUntracked.add(objectRef.hash);
             const r = func();

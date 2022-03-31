@@ -76,4 +76,5 @@ export class I18nextManager {
 }
 I18nextManager.DEFAULT_LANGUAGE = 'en';
 I18nextManager.DEFAULT_NAMESPACE = 'default_namespace';
+export const i18n = I18nextManager.getInstance();
 //# sourceMappingURL=I18nextManager.js.map

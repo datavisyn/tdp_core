@@ -11,9 +11,6 @@ def _replace_named_sets_in_ids(v):
   :return:
   """
   from . import storage
-  import phovea_server.plugin
-
-  manager = phovea_server.plugin.lookup('idmanager')
 
   union = set()
 
@@ -21,9 +18,7 @@ def _replace_named_sets_in_ids(v):
     # convert named sets to the primary ids
     namedset_id = vi
     namedset = storage.get_namedset_by_id(namedset_id)
-    uids = namedset['ids']
-    id_type = namedset['idType']
-    ids = manager.unmap(uids, id_type)
+    ids = namedset['ids']
     for id in ids:
       union.add(id)
 
@@ -36,18 +31,15 @@ def _replace_named_sets_in_ids(v):
 
 
 def _replace_range_in_ids(v, id_type, target_id_type):
-  from phovea_server.dataset import get_mappingmanager, get_idmanager
-  from phovea_server.range import parse
+  from phovea_server.dataset import get_mappingmanager
 
-  manager = get_idmanager()
   mappingmanager = get_mappingmanager()
 
   union = set()
 
   def add_range(r):
     # convert named sets to the primary ids
-    uids = parse(r)[0].tolist()
-    ids = manager.unmap(uids, id_type)
+    ids = r
     if id_type != target_id_type:
       # need to map the ids
       mapped_ids = mappingmanager(id_type, target_id_type, ids)

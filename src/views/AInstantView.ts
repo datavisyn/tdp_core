@@ -1,9 +1,9 @@
-import { IInstantView, IInstantViewOptions, IItemSelection } from '../base/interfaces';
+import { IInstantView, IInstantViewOptions, ISelection } from '../base/interfaces';
 
 export class AInstantView implements IInstantView {
   readonly node: HTMLElement;
 
-  constructor(protected readonly selection: IItemSelection, options: Readonly<IInstantViewOptions>) {
+  constructor(protected readonly selection: ISelection, options: Readonly<IInstantViewOptions>) {
     this.node = options.document.createElement('article');
     this.node.classList.add('tdp-instant-view');
 

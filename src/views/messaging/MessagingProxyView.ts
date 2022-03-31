@@ -1,9 +1,7 @@
 import { AView } from '../AView';
 import { IViewContext, ISelection } from '../../base/interfaces';
-import { ResolveUtils } from '../ResolveUtils';
 import { ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage } from './interfaces';
 import { IDTypeManager } from '../../idtype';
-import { ParseRangeUtils, Range } from '../../range';
 import { I18nextManager } from '../../i18n';
 
 export interface IPartialProxyViewOptions {
@@ -91,16 +89,14 @@ export class MessagingProxyView extends AView {
         const { ids } = payload;
         const idType = payload.idType ? IDTypeManager.getInstance().resolveIdType(payload.idType) : this.itemIDType;
         if (!ids || ids.length === 0) {
-          this.setItemSelection({ idtype: idType, range: Range.none() }, name);
+          this.setItemSelection({ idtype: idType, ids: [] }, name);
         }
 
         if (!idType) {
           console.warn('cannot set item selection since of unknown idType');
           return;
         }
-        idType.map(ids).then((r) => {
-          this.setItemSelection({ idtype: idType, range: ParseRangeUtils.parseRangeLike(r) }, name);
-        });
+        this.setItemSelection({ idtype: idType, ids }, name);
         return;
       }
       case 'tdpSetParameter': {
@@ -143,20 +139,18 @@ export class MessagingProxyView extends AView {
     }
 
     const selection = this.getInputSelection(name);
-    ResolveUtils.resolveIds(selection.idtype, selection.range).then((ids) => {
-      if (!ids || ids.length === 0) {
-        this.setNoMappingFoundHint(true);
-        return;
-      }
-      this.setNoMappingFoundHint(false);
-      this.sendMessage({
-        type: 'tdpSetInputSelection',
-        payload: {
-          name,
-          idType: this.idType.id,
-          ids,
-        },
-      });
+    if (!selection.ids || selection.ids.length === 0) {
+      this.setNoMappingFoundHint(true);
+      return;
+    }
+    this.setNoMappingFoundHint(false);
+    this.sendMessage({
+      type: 'tdpSetInputSelection',
+      payload: {
+        name,
+        idType: this.idType.id,
+        ids: selection.ids,
+      },
     });
   }
 
@@ -173,7 +167,7 @@ export class MessagingProxyView extends AView {
 
   private sendItemSelectionMessage(name: string) {
     const s = this.getItemSelection(name);
-    if (!s || s.range.isNone) {
+    if (!s || s.ids.length === 0) {
       this.sendMessage(
         {
           type: 'tdpSetItemSelection',
@@ -185,22 +179,24 @@ export class MessagingProxyView extends AView {
         },
         true,
       );
-      return;
+      return undefined;
     }
 
-    ResolveUtils.resolveIds(s.idtype, s.range, this.itemIDType).then((ids) => {
-      this.sendMessage(
-        {
-          type: 'tdpSetItemSelection',
-          payload: {
-            name,
-            idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
-            ids,
+    return IDTypeManager.getInstance()
+      .mapNameToFirstName(s.idtype, s.ids, this.itemIDType)
+      .then((ids) => {
+        this.sendMessage(
+          {
+            type: 'tdpSetItemSelection',
+            payload: {
+              name,
+              idType: this.itemIDType ? this.itemIDType.id : s.idtype.id,
+              ids,
+            },
           },
-        },
-        true,
-      );
-    });
+          true,
+        );
+      });
   }
 
   private sendParameterMessage(name: string) {

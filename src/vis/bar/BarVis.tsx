@@ -112,11 +112,6 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             divId={`plotlyDiv${id}`}
             data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
             layout={layout}
-            onClick={(e) => {
-              if (e) {
-                console.log(e);
-              }
-            }}
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
@@ -130,7 +125,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             }}
           />
         ) : traceStatus !== 'pending' ? (
-          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
       </div>

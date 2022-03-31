@@ -1,4 +1,3 @@
-import '../webpack/_bootstrap';
 /**
  * Defines a header link
  */

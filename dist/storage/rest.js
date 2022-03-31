@@ -2,7 +2,6 @@ import { AppContext, UserSession } from '../app';
 import { Ajax } from '../base';
 import { RestBaseUtils } from '../base/rest';
 import { IDTypeManager } from '../idtype';
-import { ParseRangeUtils } from '../range';
 import { Permission } from '../security';
 import { ENamedSetType } from './interfaces';
 export class RestStorageUtils {
@@ -26,7 +25,7 @@ export class RestStorageUtils {
             creator: UserSession.getInstance().currentUserNameOrAnonymous(),
             permissions: Permission.ALL_READ_NONE,
             idType: IDTypeManager.getInstance().resolveIdType(idType).id,
-            ids: ParseRangeUtils.parseRangeLike(ids).toString(),
+            ids,
             subTypeKey: subType.key,
             subTypeValue: subType.value,
             description,

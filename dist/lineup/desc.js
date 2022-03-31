@@ -1,19 +1,20 @@
 import { createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, createRankDesc, } from 'lineupjs';
 import { extent } from 'd3';
-import { ValueTypeUtils } from '../data';
 export class ColumnDescUtils {
     static baseColumn(column, options = {}) {
-        // eslint-disable-next-line prefer-object-spread
-        return Object.assign({
+        return {
             type: 'string',
+            // @ts-ignore
             column,
             label: column,
             color: '',
             initialRanking: options.visible != null ? options.visible : true,
             width: -1,
-            selectedId: -1,
+            selectedId: null,
             selectedSubtype: undefined,
-        }, options, options.extras || {});
+            ...options,
+            ...(options.extras || {}),
+        };
     }
     static numberColFromArray(column, rows, options = {}) {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
@@ -89,37 +90,6 @@ export class ColumnDescUtils {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
             type: 'boolean',
         });
-    }
-    static deriveCol(col) {
-        const r = {
-            column: col.desc.name,
-        };
-        const desc = col.desc;
-        if (desc.color) {
-            r.color = desc.color;
-        }
-        else if (desc.cssClass) {
-            r.cssClass = desc.cssClass;
-        }
-        const val = desc.value;
-        switch (val.type) {
-            case ValueTypeUtils.VALUE_TYPE_STRING:
-                r.type = 'string';
-                break;
-            case ValueTypeUtils.VALUE_TYPE_CATEGORICAL:
-                r.type = 'categorical';
-                r.categories = desc.categories;
-                break;
-            case ValueTypeUtils.VALUE_TYPE_REAL:
-            case ValueTypeUtils.VALUE_TYPE_INT:
-                r.type = 'number';
-                r.domain = val.range;
-                break;
-            default:
-                r.type = 'string';
-                break;
-        }
-        return r;
     }
     static createInitialRanking(provider, options = {}) {
         const o = { aggregate: true, selection: true, rank: true, order: [], ...options };
