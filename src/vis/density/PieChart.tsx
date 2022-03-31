@@ -25,9 +25,9 @@ export function PieChart({ data, dataCategories, radius, transform, colorScale }
   return (
     <g style={{ transform }}>
       {pie(data).map((slice, i) => {
-        // TODO: Why are indexes bad in the key? how else to do this?
+        // TODO: Why are indexes bad in the key? how else to do this? Also, I think the typings for arc are wrong, which is why im typing slice to any
         // eslint-disable-next-line react/no-array-index-key
-        return <path key={`${id}, ${i}`} d={arc(slice)} style={{ fill: colorScale ? colorScale(dataCategories[i]) : 'cornflowerblue' }} />;
+        return <path key={`${id}, ${i}`} d={arc(slice as any)} style={{ fill: colorScale ? colorScale(dataCategories[i]) : 'cornflowerblue' }} />;
       })}
     </g>
   );
