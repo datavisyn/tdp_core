@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from 'd3v3';
 import { BaseUtils } from '../../base';
 import { IFormElement, IForm, IFormElementDesc } from '../interfaces';
 

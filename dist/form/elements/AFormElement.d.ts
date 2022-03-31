@@ -1,4 +1,4 @@
-import { Selection } from 'd3';
+import { Selection } from 'd3v3';
 import { IFormElementDesc, IForm, IFormElement } from '../interfaces';
 import { EventHandler, IPluginDesc } from '../../base';
 /**

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3';
+import d3 from 'd3v3';
 import { useMemo, useEffect } from 'react';
 import { ESupportedPlotlyVis, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, EHexbinOptions, } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';

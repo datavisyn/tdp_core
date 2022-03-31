@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { selection } from 'd3';
+import { selection } from 'd3v3';
 import { I18nextManager } from '../../i18n';
 import {
   PlotlyInfo,

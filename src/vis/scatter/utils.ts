@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import d3 from 'd3';
+import d3 from 'd3v3';
 import {
   PlotlyInfo,
   PlotlyData,

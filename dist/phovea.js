@@ -176,14 +176,14 @@ export default function (registry) {
     }, {
         factory: 'boolean',
         name: 'Boolean',
-        priority: 30,
+        priority: 30, // test first for boolean then for categorical
     });
     registry.push('importer_value_type', 'categorical', function () {
         return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);
     }, {
         factory: 'categorical',
         name: 'Categorical',
-        priority: 40,
+        priority: 40, // test first for boolean then for categorical
     });
     registry.push('importer_value_type', 'real', function () {
         return import('./import/valuetype/valuetypes').then((v) => v.PHOVEA_IMPORTER_ValueTypeUtils);

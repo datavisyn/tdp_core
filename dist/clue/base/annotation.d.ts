@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from 'd3v3';
 import { SlideNode, ProvenanceGraph } from '../provenance';
 export declare class Renderer {
     private $main;

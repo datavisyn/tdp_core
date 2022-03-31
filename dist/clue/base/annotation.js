@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from 'd3v3';
 import marked from 'marked';
 import { merge } from 'lodash';
 import { ModeWrapper } from './mode';
@@ -535,7 +535,7 @@ export class Renderer {
                 $svg
                     .attr({
                     width: (d) => 30 + Math.abs(d.at[0]),
-                    height: (d) => 30 + Math.abs(d.at[1]),
+                    height: (d) => 30 + Math.abs(d.at[1]), // TODO yminmax[1] - yminmax[0],
                 })
                     .style({
                     left: (d) => `${-15 + Math.min(0, d.at[0])}px`,
