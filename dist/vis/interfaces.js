@@ -49,7 +49,7 @@ export var EFilterOptions;
 (function (EFilterOptions) {
     EFilterOptions["IN"] = "Filter In";
     EFilterOptions["OUT"] = "Filter Out";
-    EFilterOptions["CLEAR"] = "Clear Filter";
+    EFilterOptions["CLEAR"] = "Clear";
 })(EFilterOptions || (EFilterOptions = {}));
 export var ENumericalColorScaleType;
 (function (ENumericalColorScaleType) {

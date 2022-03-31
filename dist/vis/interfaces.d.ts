@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter",
@@ -37,7 +36,7 @@ export declare enum EGeneralFormType {
 export declare enum EFilterOptions {
     IN = "Filter In",
     OUT = "Filter Out",
-    CLEAR = "Clear Filter"
+    CLEAR = "Clear"
 }
 export declare enum ENumericalColorScaleType {
     SEQUENTIAL = "Sequential",
@@ -78,7 +77,7 @@ export interface IPCPConfig {
     allColumnsSelected: ColumnInfo[];
 }
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
-declare type ValueGetter<T> = () => T | Promise<T>;
+declare type ValueGetter<T> = () => Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**
      * Visyn id of the row.
@@ -108,7 +107,6 @@ export declare type PlotlyInfo = {
     rows: number;
     cols: number;
     errorMessage: string;
-    errorMessageHeader: string;
 };
 export declare type PlotlyData = {
     data: Partial<Plotly.PlotData>;
@@ -123,12 +121,5 @@ export declare type ColumnInfo = {
 export declare type Scales = {
     color: any;
 };
-/**
- * Common props for all vis sidebars.
- */
-export interface ICommonVisSideBarProps {
-    style?: React.CSSProperties | undefined;
-    className?: string | undefined;
-}
 export {};
 //# sourceMappingURL=interfaces.d.ts.map
