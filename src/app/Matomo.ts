@@ -1,5 +1,5 @@
 import md5 from 'md5';
-import { ActionNode, ProvenanceGraph } from '../provenance';
+import { ActionNode, ProvenanceGraph } from '../clue/provenance';
 import { IUser } from '../security';
 import { AppContext } from './AppContext';
 import { PluginRegistry } from './PluginRegistry';

@@ -15,8 +15,8 @@ export class LineUpColors {
             .filter((_d, i) => i % 2 === 1));
     }
     getColumnColor(id) {
-        if (id < 0) {
-            id = this.colorMap.size;
+        if (id == null) {
+            id = `${this.colorMap.size}`;
         }
         let color = '';
         if (!this.colorMap.has(id)) {

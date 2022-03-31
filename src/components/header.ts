@@ -1,7 +1,5 @@
-import { BaseUtils } from '../base/BaseUtils';
+import { merge } from 'lodash';
 import { I18nextManager } from '../i18n';
-// TODO: Why?
-import '../webpack/_bootstrap';
 import { BuildInfo } from './buildInfo';
 import { AppMetaDataUtils } from './metaData';
 
@@ -360,7 +358,7 @@ export class AppHeader {
    * @param options
    */
   constructor(private parent: HTMLElement, options: IAppHeaderOptions = {}) {
-    BaseUtils.mixin(this.options, options);
+    merge(this.options, options);
     this.addEUCookieDisclaimer();
     this.build();
   }

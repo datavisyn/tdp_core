@@ -88,7 +88,7 @@ export function PCPVis({ config, extensions, columns, setConfig, selected = {}, 
             // change opacity on update, instead of just in a use effect
           />
         ) : traceStatus !== 'pending' ? (
-          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
       </div>

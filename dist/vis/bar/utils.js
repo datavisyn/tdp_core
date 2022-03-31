@@ -169,6 +169,7 @@ export async function createBarTraces(columns, config, scales) {
             rows: 0,
             cols: 0,
             errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
+            errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
         };
     }
     const plots = [];
@@ -195,6 +196,7 @@ export async function createBarTraces(columns, config, scales) {
         rows,
         cols,
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
+        errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
 }
 //# sourceMappingURL=utils.js.map

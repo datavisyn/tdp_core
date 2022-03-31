@@ -1,5 +1,4 @@
 import { IEventHandler } from '../base';
-import { IHasUniqueId } from '../idtype';
 /**
  * [width, height]
  */
@@ -27,7 +26,11 @@ export declare class LayoutContainerEvents {
 /**
  * base interface for the container
  */
-export interface ILayoutContainer extends IEventHandler, IHasUniqueId {
+export interface ILayoutContainer extends IEventHandler {
+    /**
+     * Unique id of the layout container.
+     */
+    id: number;
     /**
      * the container type
      */

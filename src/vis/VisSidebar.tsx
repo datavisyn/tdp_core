@@ -11,6 +11,7 @@ import { BarVisSidebar } from './bar/BarVisSidebar';
 import { StripVisSidebar } from './strip/StripVisSidebar';
 import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
+import { useSyncedRef } from '../hooks';
 
 export type VisSidebarProps = {
   /**
@@ -37,10 +38,10 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
       alphaSliderVal: 1,
     },
   );
-
+  const setExternalConfigRef = useSyncedRef(setExternalConfig);
   useEffect(() => {
-    setExternalConfig(visConfig);
-  }, [visConfig, setExternalConfig]);
+    setExternalConfigRef.current?.(visConfig);
+  }, [visConfig, setExternalConfigRef]);
 
   useEffect(() => {
     if (isScatter(visConfig)) {

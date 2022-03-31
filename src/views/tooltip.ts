@@ -30,12 +30,17 @@ export class TooltipUtils {
             clientHeight: 1,
             clientWidth: 1,
             getBoundingClientRect: () => ({
+              x: (<any>reference).x,
+              y: (<any>reference).y,
               top: (<any>reference).y,
               bottom: (<any>reference).y + 1,
               left: (<any>reference).x,
               right: (<any>reference).x + 1,
               height: 1,
               width: 1,
+              toJSON: () => {
+                throw new Error('TS4 migration required this');
+              },
             }),
           }
         : <HTMLElement>reference,
