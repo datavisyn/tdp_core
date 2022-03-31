@@ -57,28 +57,24 @@ class MongoGraph(phovea_server.graph.AGraph):
 
     return MongoGraph(entry, db)
 
-  def nodes(self, range=None):
+  def nodes(self):
     if self._nodes is None:
       data = self._db.graph_data.find_one(self._find_data, {'nodes': 1})
       self._nodes = [phovea_server.graph.GraphNode(n['type'], n['id'], n.get('attrs', None)) for n in data['nodes']]
 
-    if range is None:
-      return self._nodes
-    return self._nodes[range.asslice()]
+    return self._nodes
 
   @property
   def nnodes(self):
     return self._entry['nnodes']
 
-  def edges(self, range=None):
+  def edges(self):
     if self._edges is None:
       data = self._db.graph_data.find_one(self._find_data, {'edges': 1})
       self._edges = [phovea_server.graph.GraphEdge(n['type'], n['id'], n['source'], n['target'], n.get('attrs', None))
                      for n in data['edges']]
 
-    if range is None:
-      return self._edges
-    return self._edges[range.asslice()]
+    return self._edges
 
   @property
   def nedges(self):

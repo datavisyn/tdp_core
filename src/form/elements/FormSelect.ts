@@ -2,7 +2,7 @@ import * as d3 from 'd3';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
 import { UserSession } from '../../app';
-import { IPluginDesc, ResolveNow } from '../../base';
+import { IPluginDesc } from '../../base';
 
 export interface IFormSelectOption {
   name: string;
@@ -46,6 +46,36 @@ export interface IFormSelectElement extends IFormElement {
   getSelectedIndex(): number;
 
   updateOptionElements(data: (string | IFormSelectOption | IFormSelectOptionGroup)[]): void;
+}
+
+/**
+ * ResolveNow executes the result without an intermediate tick, and because FormSelect#resolveData is sometimes used
+ * as dependency for FormMap for example, the result needs to be there immediately as otherwise the dependents
+ * receive null as value. This is some form of race-condition, as the dependents are executed before the value is resolved and set.
+ * See https://github.com/datavisyn/tdp_core/issues/675 for details.
+ */
+class ResolveNow<T> implements PromiseLike<T> {
+  constructor(private readonly v: T) {}
+
+  // When using Typescript v2.7+ the typing can be further specified as `then<TResult1 = T, TResult2 = never>(...`
+  then<TResult1, TResult2>(
+    onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null,
+  ): PromiseLike<TResult1 | TResult2> {
+    return ResolveNow.resolveImmediately(onfulfilled(this.v));
+  }
+
+  /**
+   * similar to Promise.resolve but executes the result immediately without an intermediate tick
+   * @param {PromiseLike<T> | T} result
+   * @returns {PromiseLike<T>}
+   */
+  static resolveImmediately<T>(result: T | PromiseLike<T>): PromiseLike<T> {
+    if (result instanceof Promise || (result && typeof (<any>result).then === 'function')) {
+      return <PromiseLike<T>>result;
+    }
+    return <PromiseLike<T>>new ResolveNow(result);
+  }
 }
 
 /**

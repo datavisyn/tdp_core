@@ -1,5 +1,5 @@
+import { merge } from 'lodash';
 import { IDTypeManager } from '../idtype';
-import { BaseUtils } from '../base';
 import { I18nextManager } from '../i18n';
 import { FormElementType } from '../form/interfaces';
 import { AD3View } from './AD3View';
@@ -31,7 +31,7 @@ export class ProxyView extends AD3View {
             openExternally: false,
         };
         this.naturalSize = [1280, 800];
-        BaseUtils.mixin(this.options, context.desc, options);
+        merge(this.options, context.desc, options);
         this.$node.classed('proxy_view', true);
         this.openExternally = parent.ownerDocument.createElement('p');
     }
@@ -128,7 +128,7 @@ export class ProxyView extends AD3View {
         this.$node.selectAll('p').remove();
         this.$node.selectAll('iframe').remove();
         this.setBusy(true);
-        const args = BaseUtils.mixin(this.options.extra, { [this.options.argument]: selectedItemId });
+        const args = merge(this.options.extra, { [this.options.argument]: selectedItemId });
         const url = this.createUrl(args);
         if (ProxyView.isNoNSecurePage(url)) {
             this.showNoHttpsMessage(url);

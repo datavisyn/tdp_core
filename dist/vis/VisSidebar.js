@@ -11,6 +11,7 @@ import { BarVisSidebar } from './bar/BarVisSidebar';
 import { StripVisSidebar } from './strip/StripVisSidebar';
 import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
+import { useSyncedRef } from '../hooks';
 export function VisSidebar({ columns, filterCallback = () => null, externalConfig = null, setExternalConfig = null, className, style }) {
     const [visConfig, setVisConfig] = useState(externalConfig || {
         type: ESupportedPlotlyVis.SCATTER,
@@ -21,9 +22,11 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
         isRectBrush: true,
         alphaSliderVal: 1,
     });
+    const setExternalConfigRef = useSyncedRef(setExternalConfig);
     useEffect(() => {
-        setExternalConfig(visConfig);
-    }, [visConfig, setExternalConfig]);
+        var _a;
+        (_a = setExternalConfigRef.current) === null || _a === void 0 ? void 0 : _a.call(setExternalConfigRef, visConfig);
+    }, [visConfig, setExternalConfigRef]);
     useEffect(() => {
         if (isScatter(visConfig)) {
             setVisConfig(scatterMergeDefaultConfig(columns, visConfig));

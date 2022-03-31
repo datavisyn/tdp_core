@@ -1,5 +1,6 @@
 import '../webpack/_bootstrap';
 import $ from 'jquery';
+import { merge } from 'lodash';
 import { I18nextManager } from '../i18n';
 import { BaseUtils } from '../base/BaseUtils';
 export class Dialog {
@@ -108,7 +109,7 @@ export class Dialog {
         if (typeof options === 'string') {
             options = { title: options };
         }
-        BaseUtils.mixin(o, options);
+        merge(o, options);
         return new Promise((resolve) => {
             const dialog = Dialog.generateDialog(o.title, o.primaryBtnText, o.additionalCSSClasses);
             if (o.multiline) {
@@ -144,7 +145,6 @@ Dialog.openDialogs = 0;
 export class PHOVEA_UI_FormDialog extends Dialog {
     constructor(title, primaryBtnText = 'OK', formId = `form${BaseUtils.randomId(5)}`, additionalCSSClasses = '') {
         super(title, primaryBtnText, additionalCSSClasses);
-        this.formId = formId;
         this.body.innerHTML = `<form id="${formId}"></form>`;
         const b = this.footer.querySelector('button');
         b.setAttribute('type', 'submit');
@@ -174,7 +174,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
         if (typeof options === 'string') {
             options = { title: options };
         }
-        BaseUtils.mixin(o, options);
+        merge(o, options);
         return new Promise((resolve) => {
             const dialog = Dialog.generateDialog(o.title, o.primaryBtnText, o.additionalCSSClasses);
             const option = items.map((d) => `<option value="${d}">${d}</option>`).join('\n');
@@ -212,7 +212,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
         if (typeof options === 'string') {
             options = { title: options };
         }
-        BaseUtils.mixin(o, options);
+        merge(o, options);
         return new Promise((resolve) => {
             const dialog = Dialog.generateDialog(o.title, o.cancelButton, o.additionalCSSClasses);
             dialog.body.innerHTML = msg;

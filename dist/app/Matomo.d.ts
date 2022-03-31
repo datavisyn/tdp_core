@@ -1,4 +1,4 @@
-import { ActionNode, ProvenanceGraph } from '../provenance';
+import { ActionNode, ProvenanceGraph } from '../clue/provenance';
 import { IUser } from '../security';
 /**
  * Trackable Matomo event
