@@ -1,6 +1,6 @@
 import * as hex from 'd3-hexbin';
 import { HexbinBin } from 'd3-hexbin';
-import * as d3 from 'd3v7';
+import * as d3v7 from 'd3v7';
 import { D3BrushEvent, D3ZoomEvent } from 'd3v7';
 import { uniqueId } from 'lodash';
 import * as React from 'react';
@@ -60,8 +60,8 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
   const ref = useRef(null);
   const [height, setHeight] = useState<number>(0);
   const [width, setWidth] = useState<number>(0);
-  const xZoomedScale = useRef<d3.ScaleLinear<number, number, never>>(null);
-  const yZoomedScale = useRef<d3.ScaleLinear<number, number, never>>(null);
+  const xZoomedScale = useRef<d3v7.ScaleLinear<number, number, never>>(null);
+  const yZoomedScale = useRef<d3v7.ScaleLinear<number, number, never>>(null);
   const [xZoomTransform, setXZoomTransform] = useState(0);
   const [yZoomTransform, setYZoomTransform] = useState(0);
   const [xRescaleFunc, setXRescaleFunc] = useState<any>(null);
@@ -141,10 +141,10 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
   // create x scale
   const xScale = useMemo(() => {
     if (currentX?.allValues) {
-      const min = d3.min<number>(currentX.allValues.map((c) => c.val as number));
-      const max = d3.max<number>(currentX.allValues.map((c) => c.val as number));
+      const min = d3v7.min<number>(currentX.allValues.map((c) => c.val as number));
+      const max = d3v7.max<number>(currentX.allValues.map((c) => c.val as number));
 
-      const newScale = d3
+      const newScale = d3v7
         .scaleLinear()
         .domain([min, max])
         .range([margin.left, margin.left + width]);
@@ -163,10 +163,10 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
   // create y scale
   const yScale = useMemo(() => {
     if (currentY?.allValues) {
-      const min = d3.min<number>(currentY.allValues.map((c) => c.val as number));
-      const max = d3.max<number>(currentY.allValues.map((c) => c.val as number));
+      const min = d3v7.min<number>(currentY.allValues.map((c) => c.val as number));
+      const max = d3v7.max<number>(currentY.allValues.map((c) => c.val as number));
 
-      const newScale = d3
+      const newScale = d3v7
         .scaleLinear()
         .domain([min, max])
         .range([margin.top + height, margin.top]);
@@ -216,10 +216,10 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
   // simple radius scale for the hexes
   const radiusScale = useMemo(() => {
     if (colsStatus === 'success') {
-      const min = d3.min(hexes.map((h) => h.length));
-      const max = d3.max(hexes.map((h) => h.length));
+      const min = d3v7.min(hexes.map((h) => h.length));
+      const max = d3v7.max(hexes.map((h) => h.length));
 
-      return d3
+      return d3v7
         .scaleLinear()
         .domain([min, max])
         .range([config.hexRadius / 2, config.hexRadius]);
@@ -231,10 +231,10 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
   // simple opacity scale for the hexes
   const opacityScale = useMemo(() => {
     if (colsStatus === 'success') {
-      const min = d3.min(hexes.map((h) => h.length));
-      const max = d3.max(hexes.map((h) => h.length));
+      const min = d3v7.min(hexes.map((h) => h.length));
+      const max = d3v7.max(hexes.map((h) => h.length));
 
-      return d3.scaleLinear().domain([min, max]).range([0.1, 1]);
+      return d3v7.scaleLinear().domain([min, max]).range([0.1, 1]);
     }
 
     return null;
@@ -248,7 +248,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
 
     const colorOptions = currentColorColumn.allValues.map((val) => val.val as string);
 
-    return d3.scaleOrdinal<string, string>(d3.schemeCategory10).domain(Array.from(new Set<string>(colorOptions)));
+    return d3v7.scaleOrdinal<string, string>(d3v7.schemeCategory10).domain(Array.from(new Set<string>(colorOptions)));
   }, [colsStatus, currentColorColumn?.allValues]);
 
   // memoize the actual hexes since they do not need to change on zoom/drag
@@ -278,7 +278,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
 
   // // apply zoom/panning
   useEffect(() => {
-    const zoom = d3.zoom();
+    const zoom = d3v7.zoom();
 
     if (!xScale || !yScale || config.dragMode === EScatterSelectSettings.RECTANGLE) {
       return;
@@ -303,24 +303,24 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
       setYZoomTransform(transform.y);
     });
 
-    d3.select(`#${id}zoom`).call(zoom);
+    d3v7.select(`#${id}zoom`).call(zoom);
   }, [id, xScale, yScale, height, width, config.dragMode]);
 
   // apply brushing
   useEffect(() => {
     if (config.dragMode !== EScatterSelectSettings.RECTANGLE) {
-      d3.select(`#${id}brush`).selectAll('rect').remove();
+      d3v7.select(`#${id}brush`).selectAll('rect').remove();
       return;
     }
 
-    const brush = d3.brush().extent([
+    const brush = d3v7.brush().extent([
       [margin.left, margin.top],
       [margin.left + width, margin.top + height],
     ]);
     // it does look like we are creating a ton of brush events without cleaning them up right here.
-    // But d3.call will remove the previous brush event when called, so this actually works as expected.
-    d3.select(`#${id}brush`).call(
-      // this is a real function and not a => so that I can use d3.select(this) inside to clear the brush
+    // But d3v7.call will remove the previous brush event when called, so this actually works as expected.
+    d3v7.select(`#${id}brush`).call(
+      // this is a real function and not a => so that I can use d3v7.select(this) inside to clear the brush
       brush.on('end', function (event: D3BrushEvent<any>) {
         if (!event.sourceEvent) return;
         if (!event.selection) {
@@ -349,7 +349,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
 
         selectionCallback(allSelectedPoints);
 
-        d3.select(this).call(brush.move, null);
+        d3v7.select(this).call(brush.move, null);
       }),
     );
   }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale, xScale, yScale]);
