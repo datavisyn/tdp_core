@@ -14,12 +14,12 @@ import {
 } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { GroupSelect } from '../sidebar/GroupSelect';
 import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
 import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
 import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
+import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
 
 const defaultConfig = {
   group: {
@@ -105,10 +105,10 @@ export function BarVisSidebar({
       <WarningMessage />
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />
-      <CategoricalColumnSelect
-        callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
+      <CategoricalColumnSingleSelect
+        callback={(catColumnSelected: ColumnInfo) => setConfig({ ...config, catColumnSelected })}
         columns={columns}
-        currentSelected={config.catColumnsSelected || []}
+        currentSelected={config.catColumnSelected}
       />
       <hr />
       {mergedExtensions.preSidebar}

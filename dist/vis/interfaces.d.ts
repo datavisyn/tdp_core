@@ -71,7 +71,7 @@ export interface IBarConfig {
     display: EBarDisplayType;
     groupType: EBarGroupingType;
     numColumnsSelected: ColumnInfo[];
-    catColumnsSelected: ColumnInfo[];
+    catColumnSelected: ColumnInfo;
 }
 export interface IPCPConfig {
     type: ESupportedPlotlyVis.PCP;

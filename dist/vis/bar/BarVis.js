@@ -38,9 +38,6 @@ const defaultExtensions = {
     postSidebar: null,
 };
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }) {
-    const mergedOptionsConfig = React.useMemo(() => {
-        return merge({}, defaultConfig, optionsConfig);
-    }, [optionsConfig]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
