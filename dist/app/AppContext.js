@@ -1,7 +1,7 @@
-import { RemoveNodeObserver } from '../internal/RemoveNodeObserver';
+import { merge } from 'lodash';
+import { RemoveNodeObserver } from '../components/RemoveNodeObserver';
 import { HashProperties } from '../base/HashProperties';
 import { PropertyHandler } from '../base/PropertyHandler';
-import { BaseUtils } from '../base/BaseUtils';
 import { Ajax } from '../base/ajax';
 import { WebpackEnv } from '../base/WebpackEnv';
 export class AppContext {
@@ -41,7 +41,7 @@ export class AppContext {
      * @param config
      */
     init(config = {}) {
-        config = BaseUtils.mixin({
+        config = merge({
             offline: this.offline,
             server_url: this.server_url,
             server_json_suffix: this.server_json_suffix,

@@ -47,6 +47,7 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
       rows: 0,
       cols: 0,
       errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
+      errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
   }
 
@@ -169,5 +170,6 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
     rows: numColValues.length,
     cols: catColValues.length > 0 ? catColValues.length : 1,
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
   };
 }

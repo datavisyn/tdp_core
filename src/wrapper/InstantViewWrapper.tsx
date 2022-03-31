@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { IInstanceViewExtensionDesc, IItemSelection, IInstanceViewExtension, IInstantView } from '../base';
+import { IInstanceViewExtensionDesc, IInstanceViewExtension, IInstantView, ISelection } from '../base';
 import { useAsync } from '../hooks';
-import { FindViewUtils } from '../views';
+import { ViewUtils } from '../views';
 
-const loadInstantView = (view: IInstanceViewExtensionDesc, selection: IItemSelection) =>
+const loadInstantView = (view: IInstanceViewExtensionDesc, selection: ISelection) =>
   view.load().then((r: IInstanceViewExtension) => r.factory(selection, { document }));
 
 /**
@@ -16,14 +16,14 @@ export function InstantViewWrapper({
   /**
    * Current selection passed to the InstantView.
    */
-  selection: IItemSelection;
+  selection: ISelection;
   /**
    * Optional style for the root element.
    */
   style?: React.CSSProperties;
 }) {
   const { value: views } = useAsync(
-    selection?.idtype ? FindViewUtils.findInstantViews : () => [] as IInstanceViewExtensionDesc[],
+    selection?.idtype ? ViewUtils.findInstantViews : () => [] as IInstanceViewExtensionDesc[],
     selection?.idtype ? [selection.idtype] : undefined,
   );
   const [activeView, setActiveView] = React.useState<IInstanceViewExtensionDesc | null>(null);

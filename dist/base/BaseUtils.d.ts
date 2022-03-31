@@ -1,74 +1,5 @@
-import { IIterable } from './IIterable';
 export declare class BaseUtils {
-    /**
-     * integrate b into a and override all duplicates
-     * @param {Object} a
-     * @param {Object} bs
-     * @returns {Object} a with extended b
-     */
-    static mixin<T, U>(a: T, b: U, ...bs: any[]): T & U;
-    /**
-     * @deprecated use obj === undefined directly
-     * @param obj
-     * @return {boolean}
-     */
-    static isUndefined(obj: any): boolean;
     static mod(n: number, m: number): number;
-    /**
-     * binds the given function to the given context / this arg
-     * @deprecated use Function.prototype.bind directly
-     * @param f
-     * @param thisArg
-     * @returns {function(): any}
-     */
-    static bind(f: () => any, thisArg: any, ...args: any[]): any;
-    /**
-     * getter generator by name or index
-     * @deprecated too simple to write
-     */
-    static getter(...attr: (number | string)[]): (obj: any) => any;
-    /**
-     * @deprecated use `typeof(f) === 'function`
-     * @param f
-     * @return {boolean}
-     */
-    static isFunction(f: any): boolean;
-    /**
-     * @deprecated use `(d) => d`
-     * identity function
-     */
-    static identity(d: any): any;
-    /**
-     * a dummy function, which does exactly nothing, i.e. used as default
-     * @deprecated use `()=>undefined`
-     */
-    static noop(): void;
-    /**
-     * just returns the argument in any case
-     * @deprecated use `() => x`
-     * @param r - the value to return
-     * @returns {*}
-     */
-    static constant(r: any): () => any;
-    /**
-     * special constant function which returns always true, i.e., as a default for a filter function
-     * @deprecated use ()=>true
-     * @returns {boolean}
-     */
-    static constantTrue(): boolean;
-    /**
-     * special constant function which returns always false, i.e., as a default for a filter function
-     * @deprecated use ()=>false
-     * @returns {boolean}
-     */
-    static constantFalse(): boolean;
-    /**
-     * copies a plain object into a function and call a specific method onto direct call
-     * @param obj - the
-     * @param f
-     * @deprecated
-     */
-    static callable(obj: any, f: string): () => () => void;
     /**
      * generates a random id of the given length
      * @param length length of the id
@@ -81,12 +12,6 @@ export declare class BaseUtils {
      * @return {string}
      */
     static fixId(name: string): string;
-    /**
-     * extends class copied from TypeScript compiler
-     * @param subClass
-     * @param baseClass
-     */
-    static extendClass(subClass: any, baseClass: any): void;
     /**
      * create a debounce call, can be called multiple times but only the last one at most delayed by timeToDelay will be executed
      * @param callback
@@ -126,7 +51,7 @@ export declare class BaseUtils {
      * @param arr the array
      * @return {[number,number]} [min, max]
      */
-    static extent(arr: IIterable<number>): [number, number];
+    static extent(arr: number[]): [number, number];
 }
 /**
  * Debounces a function returning a promise and properly returns a promise resolving when the function is finally evaluated.

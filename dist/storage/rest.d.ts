@@ -1,5 +1,4 @@
 import { IDType } from '../idtype';
-import { RangeLike } from '../range';
 import { ISecureItem } from '../security';
 import { IStoredNamedSet } from './interfaces';
 export declare class RestStorageUtils {
@@ -9,7 +8,7 @@ export declare class RestStorageUtils {
         name: string;
         value: string;
     }[]>;
-    static saveNamedSet(name: string, idType: IDType | string, ids: RangeLike, subType: {
+    static saveNamedSet(name: string, idType: IDType | string, ids: string[], subType: {
         key: string;
         value: string;
     }, description?: string, sec?: Partial<ISecureItem>): Promise<any>;

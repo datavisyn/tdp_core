@@ -1,5 +1,6 @@
 import '../webpack/_bootstrap';
 import $ from 'jquery';
+import { merge } from 'lodash';
 import { I18nextManager } from '../i18n';
 import { BaseUtils } from '../base/BaseUtils';
 
@@ -146,7 +147,7 @@ export class Dialog {
     if (typeof options === 'string') {
       options = { title: options };
     }
-    BaseUtils.mixin(o, options);
+    merge(o, options);
     return new Promise((resolve) => {
       const dialog = Dialog.generateDialog(o.title, o.primaryBtnText, o.additionalCSSClasses);
       if (o.multiline) {
@@ -179,7 +180,7 @@ export class Dialog {
 
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_UI_FormDialog extends Dialog {
-  constructor(title: string, primaryBtnText = 'OK', private readonly formId = `form${BaseUtils.randomId(5)}`, additionalCSSClasses = '') {
+  constructor(title: string, primaryBtnText = 'OK', formId = `form${BaseUtils.randomId(5)}`, additionalCSSClasses = '') {
     super(title, primaryBtnText, additionalCSSClasses);
 
     this.body.innerHTML = `<form id="${formId}"></form>`;
@@ -215,7 +216,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
     if (typeof options === 'string') {
       options = { title: options };
     }
-    BaseUtils.mixin(o, options);
+    merge(o, options);
 
     return new Promise((resolve) => {
       const dialog = Dialog.generateDialog(o.title, o.primaryBtnText, o.additionalCSSClasses);
@@ -254,7 +255,7 @@ export class PHOVEA_UI_FormDialog extends Dialog {
     if (typeof options === 'string') {
       options = { title: options };
     }
-    BaseUtils.mixin(o, options);
+    merge(o, options);
 
     return new Promise((resolve) => {
       const dialog = Dialog.generateDialog(o.title, o.cancelButton, o.additionalCSSClasses);

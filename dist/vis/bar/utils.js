@@ -103,7 +103,6 @@ async function setPlotsWithGroups(columns, catCols, config, plots, scales, plotC
 }
 async function setPlotsWithMultiples(columns, catCols, config, plots, plotCounter) {
     let plotCounterEdit = plotCounter;
-    console.log('in multiples');
     const catColValues = await resolveColumnValues(catCols);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
@@ -170,11 +169,11 @@ export async function createBarTraces(columns, config, scales) {
             rows: 0,
             cols: 0,
             errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
+            errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
         };
     }
     const plots = [];
     const catCols = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
-    console.log(config);
     if (catCols.length > 0) {
         if (config.group && config.multiples) {
             plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, scales, plotCounter);
@@ -197,6 +196,7 @@ export async function createBarTraces(columns, config, scales) {
         rows,
         cols,
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.barError'),
+        errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
 }
 //# sourceMappingURL=utils.js.map

@@ -5,7 +5,7 @@ export class LineUpColors {
   /**
    * Map that assigns each selection ID a color, which is used as color for columns
    */
-  private readonly colorMap = new Map<number, { color: string; items: number }>();
+  private readonly colorMap = new Map<string, { color: string; items: number }>();
 
   private colors: string[] = scale
     .category10()
@@ -17,9 +17,9 @@ export class LineUpColors {
         .filter((_d, i) => i % 2 === 1),
     );
 
-  getColumnColor(id: number): string {
-    if (id < 0) {
-      id = this.colorMap.size;
+  getColumnColor(id: string): string {
+    if (id == null) {
+      id = `${this.colorMap.size}`;
     }
 
     let color = '';
@@ -35,7 +35,7 @@ export class LineUpColors {
     return color;
   }
 
-  freeColumnColor(id: number): void {
+  freeColumnColor(id: string): void {
     if (this.colorMap.has(id)) {
       const value = this.colorMap.get(id);
 
