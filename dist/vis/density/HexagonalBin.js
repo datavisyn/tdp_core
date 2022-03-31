@@ -86,7 +86,6 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     // resize observer for setting size of the svg and updating on size change
     useEffect(() => {
         const ro = new ResizeObserver((entries) => {
-            console.log('setting sizes');
             setHeight(entries[0].contentRect.height - margin.top - margin.bottom);
             setWidth(entries[0].contentRect.width - margin.left - margin.right);
         });
@@ -212,7 +211,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         });
         d3.select(`#${id}zoom`).call(zoom);
     }, [id, xScale, yScale, height, width, config.dragMode]);
-    // // apply brushing
+    // apply brushing
     useEffect(() => {
         if (config.dragMode !== EScatterSelectSettings.RECTANGLE) {
             d3.select(`#${id}brush`).selectAll('rect').remove();
@@ -224,7 +223,9 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         ]);
         // it does look like we are creating a ton of brush events without cleaning them up right here.
         // But d3.call will remove the previous brush event when called, so this actually works as expected.
-        d3.select(`#${id}brush`).call(brush.on('end', (event) => {
+        d3.select(`#${id}brush`).call(
+        // this is a real function and not a => so that I can use d3.select(this) inside to clear the brush
+        brush.on('end', function (event) {
             if (!event.sourceEvent)
                 return;
             if (!event.selection) {
@@ -233,10 +234,10 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
             }
             // To figure out if brushing is finding hexes after changing the axis via pan/zoom, need to do this.
             // Invert your "zoomed" scale to find the actual scaled values inside of your svg coords. Use the original scale to find the values.
-            const startX = xScale(xZoomedScale.current.invert(event.selection[0][0]));
-            const startY = xScale(xZoomedScale.current.invert(event.selection[0][1]));
-            const endX = xScale(xZoomedScale.current.invert(event.selection[1][0]));
-            const endY = xScale(xZoomedScale.current.invert(event.selection[1][1]));
+            const startX = xZoomedScale.current ? xScale(xZoomedScale.current.invert(event.selection[0][0])) : event.selection[0][0];
+            const startY = yZoomedScale.current ? yScale(yZoomedScale.current.invert(event.selection[0][1])) : event.selection[0][1];
+            const endX = xZoomedScale.current ? xScale(xZoomedScale.current.invert(event.selection[1][0])) : event.selection[1][0];
+            const endY = yZoomedScale.current ? yScale(yZoomedScale.current.invert(event.selection[1][1])) : event.selection[1][1];
             // to find the selected hexes
             const selectedHexes = hexes.filter((currHex) => xZoomedScale.current
                 ? currHex.x >= startX && currHex.x <= endX && currHex.y >= startY && currHex.y <= endY
