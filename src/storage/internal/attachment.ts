@@ -1,4 +1,3 @@
-import { ResolveNow } from '../../base';
 import { RestStorageUtils } from '../rest';
 
 export class AttachemntUtils {
@@ -24,7 +23,7 @@ export class AttachemntUtils {
    */
   static externalize(data: object): PromiseLike<string | object> {
     if (!AttachemntUtils.needToExternalize(data)) {
-      return ResolveNow.resolveImmediately(data);
+      return Promise.resolve(data);
     }
     return RestStorageUtils.addAttachment(data).then((id) => `${AttachemntUtils.ATTACHMENT_PREFIX}${id}`);
   }
@@ -36,7 +35,7 @@ export class AttachemntUtils {
    */
   static resolveExternalized(attachment: string | object): PromiseLike<object> {
     if (typeof attachment !== 'string' || !attachment.startsWith(AttachemntUtils.ATTACHMENT_PREFIX)) {
-      return ResolveNow.resolveImmediately(<object>attachment);
+      return Promise.resolve(<object>attachment);
     }
     const id = attachment.substring(AttachemntUtils.ATTACHMENT_PREFIX.length);
     return RestStorageUtils.getAttachment(id);

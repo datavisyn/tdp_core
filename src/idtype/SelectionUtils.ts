@@ -1,5 +1,3 @@
-import { ParseRangeUtils, Range, Range1D, RangeLike } from '../range';
-
 export enum SelectOperation {
   SET,
   ADD,
@@ -69,22 +67,16 @@ export class SelectionUtils {
     return +v;
   }
 
-  static fillWithNone(r: Range, ndim: number) {
-    while (r.ndim < ndim) {
-      r.dims[r.ndim] = Range1D.none();
+  static integrateSelection(current: string[], next: string[], op: SelectOperation = SelectOperation.SET): string[] {
+    if (op === SelectOperation.SET) {
+      return next;
     }
-    return r;
-  }
-
-  static integrateSelection(current: Range, additional: RangeLike, operation: SelectOperation = SelectOperation.SET) {
-    const next = ParseRangeUtils.parseRangeLike(additional);
-    switch (operation) {
-      case SelectOperation.ADD:
-        return current.union(next);
-      case SelectOperation.REMOVE:
-        return current.without(next);
-      default:
-        return next;
+    if (SelectOperation.ADD) {
+      return Array.from(new Set([...current, ...next]));
     }
+    if (SelectOperation.REMOVE) {
+      return current.filter((s) => !next.includes(s));
+    }
+    return [];
   }
 }

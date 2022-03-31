@@ -16,6 +16,7 @@ import {
   UIntTypedArray,
   IGroupSearchItem,
 } from 'lineupjs';
+import { merge } from 'lodash';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection, EViewMode, IScore, IScoreRow, IAdditionalColumnDesc } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -36,12 +37,11 @@ import { LineupUtils } from './utils';
 import { ISearchOption } from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
-import { BaseUtils, debounceAsync } from '../base';
+import { debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { ISecureItem } from '../security';
 import { LineupVisWrapper } from '../vis';
-import { Range } from '../range';
 
 /**
  * base class for views based on LineUp
@@ -104,6 +104,7 @@ export abstract class ARankingView extends AView {
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
     subType: { key: '', value: '' },
+    clueifyRanking: true,
     enableOverviewMode: true,
     enableZoom: true,
     enableVisPanel: true,
@@ -181,7 +182,7 @@ export abstract class ARankingView extends AView {
     const names = options.itemName
       ? { itemNamePlural: typeof options.itemName === 'function' ? () => `${(<any>options.itemName)()}s` : `${options.itemName}s` }
       : {};
-    BaseUtils.mixin(this.options, idTypeNames, names, options);
+    merge(this.options, idTypeNames, names, options);
 
     this.node.classList.add('lineup', 'lu-taggle', 'lu');
     this.node.insertAdjacentHTML('beforeend', `<div></div>`);
@@ -196,7 +197,7 @@ export abstract class ARankingView extends AView {
 
     this.provider.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => this.updateLineUpStats());
 
-    const taggleOptions: ITaggleOptions = BaseUtils.mixin(
+    const taggleOptions: ITaggleOptions = merge(
       defaultOptions(),
       this.options.customOptions,
       <Partial<ITaggleOptions>>{
@@ -378,14 +379,14 @@ export abstract class ARankingView extends AView {
     return {
       columns,
       selection: this.selection,
-      freeColor: (id: number) => this.colors.freeColumnColor(id),
-      add: (cols: ISelectionColumn[]) =>
+      freeColor: (id: string) => this.colors.freeColumnColor(id),
+      add: (c: ISelectionColumn[]) =>
         this.withoutTracking(() => {
-          cols.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
+          c.forEach((col) => this.addColumn(col.desc, col.data, col.id, col.position));
         }),
-      remove: (cols: Column[]) =>
+      remove: (c: Column[]) =>
         this.withoutTracking(() => {
-          cols.forEach((c) => c.removeMe());
+          c.forEach((col) => col.removeMe());
         }),
     };
   }
@@ -453,7 +454,7 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id = -1, position?: number): ILazyLoadedColumn {
+  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id: string = null, position?: number): ILazyLoadedColumn {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
     colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : this.colors.getColumnColor(id);
     return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
@@ -558,7 +559,7 @@ export abstract class ARankingView extends AView {
       })();
     });
 
-    const r = this.addColumn(colDesc, data, -1, position);
+    const r = this.addColumn(colDesc, data, null, position);
     columnResolve(r.col);
 
     // use _score function to reload the score
@@ -673,8 +674,10 @@ export abstract class ARankingView extends AView {
       .then(() => {
         this.builtLineUp(this.provider);
 
-        // record after the initial one
-        LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+        if (this.options.clueifyRanking) {
+          // record after the initial one
+          LineupTrackingManager.getInstance().clueify(this.taggle, this.context.ref, this.context.graph);
+        }
         this.setBusy(false);
         this.update();
       })
