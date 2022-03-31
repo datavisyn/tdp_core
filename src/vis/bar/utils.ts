@@ -158,7 +158,6 @@ async function setPlotsWithMultiples(
   plotCounter: number,
 ): Promise<number> {
   let plotCounterEdit = plotCounter;
-  console.log('in multiples');
   const catColValues = await resolveColumnValues(catCols);
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
@@ -252,7 +251,6 @@ export async function createBarTraces(columns: VisColumn[], config: IBarConfig, 
 
   const catCols: VisCategoricalColumn[] = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisCategoricalColumn);
 
-  console.log(config);
   if (catCols.length > 0) {
     if (config.group && config.multiples) {
       plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCols, config, plots, scales, plotCounter);
