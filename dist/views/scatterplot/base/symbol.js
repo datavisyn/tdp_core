@@ -1,5 +1,4 @@
-import { line as d3line, symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolStar, symbolTriangle, symbolWye, } from 'd3-shape';
-import { bisector as d3bisector } from 'd3-array';
+import { line as d3line, symbolCircle, symbolCross, symbolDiamond, symbolSquare, symbolStar, symbolTriangle, symbolWye, bisector as d3bisector, } from 'd3v4';
 /**
  * rendering mode for different kind of renderings
  */

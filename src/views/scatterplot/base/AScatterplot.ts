@@ -1,5 +1,6 @@
-import { AxisScale, Axis } from 'd3-axis';
 import {
+  AxisScale,
+  Axis,
   extent,
   format,
   select,
