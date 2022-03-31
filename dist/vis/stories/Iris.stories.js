@@ -98,7 +98,7 @@ BarChart.args = {
         multiples: null,
         group: null,
         direction: EBarDirection.VERTICAL,
-        display: EBarDisplayType.DEFAULT,
+        display: EBarDisplayType.ABSOLUTE,
         groupType: EBarGroupingType.GROUP,
         numColumnsSelected: [],
         catColumnsSelected: [

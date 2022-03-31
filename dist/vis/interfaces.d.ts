@@ -9,7 +9,7 @@ export declare enum ESupportedPlotlyVis {
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EBarDisplayType {
-    DEFAULT = "Default",
+    ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
 }
 export declare enum EBarDirection {

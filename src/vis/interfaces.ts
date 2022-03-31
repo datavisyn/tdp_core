@@ -17,7 +17,7 @@ export const allVisTypes: ESupportedPlotlyVis[] = [
 ];
 
 export enum EBarDisplayType {
-  DEFAULT = 'Default',
+  ABSOLUTE = 'Absolute',
   NORMALIZED = 'Normalized',
 }
 
