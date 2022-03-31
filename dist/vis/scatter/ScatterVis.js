@@ -53,7 +53,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces, config.dragMode]);
-    console.log(layout);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,

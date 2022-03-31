@@ -1,6 +1,6 @@
 import React from 'react';
 import { Vis } from '../Vis';
-import { EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
+import { EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, EScatterSelectSettings, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
 function fetchData(numberOfPoints) {
     const dataGetter = async () => ({
         value: Array(numberOfPoints)
@@ -94,7 +94,7 @@ ScatterPlot.args = {
         color: null,
         numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
         shape: null,
-        isRectBrush: true,
+        dragMode: EScatterSelectSettings.RECTANGLE,
         alphaSliderVal: 1,
     },
 };
