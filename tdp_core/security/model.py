@@ -18,11 +18,11 @@ class LogoutReturnValue(BaseModel):
 
 class User(BaseModel):
     id: str
-    name: str
     roles: List[str] = []
 
-    def get_id(self):
-        return str(self.id)
+    @property
+    def name(self):
+        return self.id
 
     @property
     def is_anonymous(self):

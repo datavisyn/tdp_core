@@ -54,8 +54,6 @@ def create_visyn_server(
         redoc_url="/api/redoc",
         **fast_api_args,
     )
-    # Add middleware to access Request "outside"
-    app.add_middleware(RequestContextMiddleware)
 
     # Initialize global managers. TODO: Should we do that by loading all singletons in the registry?
     from ..plugin.registry import get_registry, list_plugins
@@ -116,6 +114,9 @@ def create_visyn_server(
     # Call init_app callback for every plugin
     for p in plugins:
         p.plugin.init_app(app)
+
+    # Add middleware to access Request "outside"
+    app.add_middleware(RequestContextMiddleware)
 
     # TODO: Move up?
     app.add_api_route("/health", health)
