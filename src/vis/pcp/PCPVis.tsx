@@ -76,9 +76,6 @@ export function PCPVis({ config, extensions, columns, setConfig, selected = {}, 
         {traceStatus === 'success' && traces?.plots.length > 0 ? (
           <PlotlyComponent
             divId={`plotlyDiv${id}`}
-            onRestyle={(style) => {
-              console.log(style);
-            }}
             data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
             layout={layout}
             config={{ responsive: true, displayModeBar: false }}
