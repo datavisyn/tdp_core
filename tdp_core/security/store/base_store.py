@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import Request
+from fastapi import FastAPI, Request
 
 from ..model import LogoutReturnValue, User
 
@@ -9,14 +9,14 @@ class BaseStore(object):
     def __init__(self):
         pass
 
-    def init_app(self, app):
+    def init_app(self, app: FastAPI):
         return None
 
     def load_from_request(self, request: Request) -> User:
         return None
 
-    def login(self, username, extra_fields={}) -> User:
+    def login(self, username: str, extra_fields={}) -> User:
         return None
 
-    def logout(self, user) -> Union[LogoutReturnValue, None]:
+    def logout(self, user: User) -> Union[LogoutReturnValue, None]:
         pass

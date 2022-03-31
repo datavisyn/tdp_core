@@ -147,7 +147,7 @@ class SecurityManager:
 
             # And as cookie
             # TODO: Set max-age and so on
-            response.set_cookie("dv_jwt", access_token, httponly=True, samesite="strict")
+            response.set_cookie("dv_access_token", access_token, httponly=True, samesite="strict")
 
             return response
 

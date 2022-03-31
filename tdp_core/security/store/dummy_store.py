@@ -34,23 +34,16 @@ def from_env_var(k, v):
 
 class DummyStore(BaseStore):
     def __init__(self):
-        import os
-
-        # define users via env variables
-        env_users = [from_env_var(k, v) for k, v in os.environ.items() if k.startswith("PHOVEA_USER_")]
-        if env_users:
-            self._users = env_users
-        else:
-            self._users = [
-                DummyUser(
-                    id=v["name"],
-                    name=v["name"],
-                    roles=v["roles"],
-                    password=v["password"],
-                    salt=v["salt"],
-                )
-                for v in get_global_settings().tdp_core.users
-            ]
+        self._users = [
+            DummyUser(
+                id=v["name"],
+                name=v["name"],
+                roles=v["roles"],
+                password=v["password"],
+                salt=v["salt"],
+            )
+            for v in get_global_settings().tdp_core.users
+        ]
 
     def load_from_request(self, request: Request):
         api_key = request.headers.get("Authorization")

@@ -40,7 +40,7 @@ class JWTStore(BaseStore):
                 return user
 
         # Load from cookie
-        token_from_cookie = request.cookies.get("dv_jwt")
+        token_from_cookie = request.cookies.get("dv_access_token")
         if token_from_cookie:
             return get_user_from_token(token_from_cookie)
 
@@ -50,7 +50,7 @@ class JWTStore(BaseStore):
         return None
 
     def logout(self, user):
-        return LogoutReturnValue(cookies=[{"key": "dv_jwt", "value": "", "expires": -1}])
+        return LogoutReturnValue(cookies=[{"key": "dv_access_token", "value": "", "expires": -1}])
 
 
 def create():

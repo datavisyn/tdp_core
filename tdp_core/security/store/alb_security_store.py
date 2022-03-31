@@ -15,9 +15,6 @@ class ALBSecurityStore(object):
         self.cookie_name = cookie_name
         self.signout_url: Optional[str] = signout_url
 
-    def load(self, id):
-        return None
-
     def load_from_request(self, req):
         if "X-Amzn-Oidc-Identity" in req.headers and "X-Amzn-Oidc-Accesstoken" in req.headers and "X-Amzn-Oidc-Data" in req.headers:
             try:
@@ -31,9 +28,6 @@ class ALBSecurityStore(object):
             except Exception:
                 _log.exception("Error in load_from_request")
                 return None
-        return None
-
-    def load_from_key(self, token):
         return None
 
     def login(self, username, extra_fields={}):
