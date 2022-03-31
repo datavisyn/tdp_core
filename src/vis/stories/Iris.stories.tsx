@@ -7,6 +7,7 @@ import {
   EBarGroupingType,
   EColumnTypes,
   ENumericalColorScaleType,
+  EScatterSelectSettings,
   ESupportedPlotlyVis,
   EViolinOverlay,
   VisColumn,
@@ -103,7 +104,7 @@ ScatterPlot.args = {
     },
     numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
     shape: null,
-    isRectBrush: true,
+    dragMode: EScatterSelectSettings.RECTANGLE,
     alphaSliderVal: 1,
   },
 };

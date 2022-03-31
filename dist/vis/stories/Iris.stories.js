@@ -1,6 +1,6 @@
 import React from 'react';
 import { Vis } from '../Vis';
-import { EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
+import { EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, EScatterSelectSettings, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
 function fetchIrisData() {
     const dataPromise = import('./irisData').then((m) => m.iris);
     return [
@@ -87,7 +87,7 @@ ScatterPlot.args = {
         },
         numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
         shape: null,
-        isRectBrush: true,
+        dragMode: EScatterSelectSettings.RECTANGLE,
         alphaSliderVal: 1,
     },
 };

@@ -2,7 +2,7 @@ import * as React from 'react';
 import d3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
-import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn } from '../interfaces';
+import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../layoutUtils';
@@ -107,8 +107,6 @@ export function ScatterVis({
 
     return beautifyLayout(traces, innerLayout);
   }, [traces, config.dragMode]);
-
-  console.log(layout);
 
   return (
     <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
