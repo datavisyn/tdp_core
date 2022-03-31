@@ -6,6 +6,7 @@ import { DensityVisSidebar } from './DensityVisSidebar';
 import { HexagonalBin } from './HexagonalBin';
 import { HexBrushOptions } from '../sidebar/HexBrushOptions';
 import { InvalidCols } from '../general';
+import { I18nextManager } from '../../i18n/I18nextManager';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -18,7 +19,7 @@ export function DensityVis({ config, extensions, columns, setConfig, selectionCa
     }, [extensions]);
     const id = React.useMemo(() => uniqueId('PCPVis'), []);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
-        React.createElement("div", { className: "position-relative d-grid flex-grow-1", style: { gridTemplateColumns: 'minmax(0, 1fr) '.repeat(config.numColumnsSelected.length < 3 ? 1 : config.numColumnsSelected.length) } }, config.numColumnsSelected.length < 2 ? (React.createElement(InvalidCols, { message: "Please select two numerical columns" })) : (React.createElement(React.Fragment, null,
+        React.createElement("div", { className: "position-relative d-grid flex-grow-1", style: { gridTemplateColumns: 'minmax(0, 1fr) '.repeat(config.numColumnsSelected.length < 3 ? 1 : config.numColumnsSelected.length) } }, config.numColumnsSelected.length < 2 ? (React.createElement(InvalidCols, { headerMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'), bodyMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError') })) : (React.createElement(React.Fragment, null,
             config.numColumnsSelected.length > 2 ? (config.numColumnsSelected.map((xCol) => {
                 return config.numColumnsSelected.map((yCol) => {
                     if (xCol.id !== yCol.id) {

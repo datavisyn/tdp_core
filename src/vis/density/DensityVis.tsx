@@ -7,6 +7,7 @@ import { DensityVisSidebar } from './DensityVisSidebar';
 import { HexagonalBin } from './HexagonalBin';
 import { HexBrushOptions } from '../sidebar/HexBrushOptions';
 import { InvalidCols } from '../general';
+import {I18nextManager} from '../../i18n/I18nextManager';
 
 interface DensityVisProps {
   config: IDensityConfig;
@@ -44,7 +45,10 @@ export function DensityVis({ config, extensions, columns, setConfig, selectionCa
         style={{ gridTemplateColumns: 'minmax(0, 1fr) '.repeat(config.numColumnsSelected.length < 3 ? 1 : config.numColumnsSelected.length) }}
       >
         {config.numColumnsSelected.length < 2 ? (
-          <InvalidCols message="Please select two numerical columns" />
+          <InvalidCols
+            headerMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader')}
+            bodyMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError')}
+          />
         ) : (
           <>
             {config.numColumnsSelected.length > 2 ? (
