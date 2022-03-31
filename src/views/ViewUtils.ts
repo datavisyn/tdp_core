@@ -106,7 +106,7 @@ export class ViewUtils {
     if (aNull || bNull) {
       return aNull === bNull;
     }
-    const base = a.idtype.id === b.idtype.id && isEqual(a.ids?.sort(), b.ids?.sort());
+    const base = a.idtype.id === b.idtype.id && isEqual(a.ids?.slice()?.sort(), b.ids?.slice()?.sort());
     if (!base) {
       return false;
     }
