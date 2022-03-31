@@ -1,7 +1,7 @@
 import { AxisScale, Axis } from 'd3-axis';
 import { extent } from 'd3-array';
 import { format } from 'd3-format';
-import { select, mouse, event as d3event } from 'd3-selection';
+import { select, mouse, event as d3event } from 'd3v4';
 import { zoom as d3zoom, ZoomScale, ZoomTransform, D3ZoomEvent, zoomIdentity, ZoomBehavior } from 'd3-zoom';
 import { drag as d3drag } from 'd3-drag';
 import { scaleLinear } from 'd3-scale';

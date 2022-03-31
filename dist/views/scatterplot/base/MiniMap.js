@@ -1,7 +1,7 @@
 /**
  * Created by sam on 19.12.2016.
  */
-import { select, event as d3event } from 'd3-selection';
+import { select, event as d3event } from 'd3v4';
 import { scaleLinear } from 'd3-scale';
 import { brushX, brushY, brush } from 'd3-brush';
 import { Scatterplot } from './Scatterplot';
