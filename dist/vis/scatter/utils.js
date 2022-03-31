@@ -34,6 +34,12 @@ export function scatterMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
+export function moveSelectedToFront(col, selectedMap) {
+    const selectedVals = col.filter((v) => selectedMap[v.id]);
+    const remainingVals = col.filter((v) => !selectedMap[v.id]);
+    const sortedCol = [...remainingVals, ...selectedVals];
+    return sortedCol;
+}
 export async function createScatterTraces(columns, selected, config, scales, shapes) {
     let plotCounter = 1;
     const emptyVal = {
@@ -53,6 +59,9 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     const validCols = await resolveColumnValues(numCols);
     const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
     const colorCol = await resolveSingleColumn(getCol(columns, config.color));
+    validCols.forEach((c) => {
+        c.resolvedValues = moveSelectedToFront(c.resolvedValues, selected);
+    });
     const shapeScale = config.shape
         ? d3.scale
             .ordinal()
@@ -99,7 +108,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     color: colorCol
                         ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
                         : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
-                    opacity: config.alphaSliderVal,
+                    opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
                     size: 10,
                 },
             },
@@ -132,7 +141,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                             color: colorCol
                                 ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
                                 : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
-                            opacity: config.alphaSliderVal,
+                            opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
                             size: 10,
                         },
                     },
@@ -167,7 +176,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     symbol: 'circle',
                     size: 10,
                     color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
-                    opacity: 0.5,
+                    opacity: config.alphaSliderVal,
                 },
                 transforms: [
                     {

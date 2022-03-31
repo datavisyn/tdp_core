@@ -4,9 +4,9 @@ export declare class LineupVisWrapper {
         provider: LocalDataProvider;
         /**
          * Callback when the selection in a vis changed.
-         * @param ids Selected ids.
+         * @param visynIds Selected visyn ids.
          */
-        selectionCallback(ids: string[]): void;
+        selectionCallback(visynIds: string[]): void;
         doc: Document;
     };
     /**
@@ -19,14 +19,12 @@ export declare class LineupVisWrapper {
         provider: LocalDataProvider;
         /**
          * Callback when the selection in a vis changed.
-         * @param ids Selected ids.
+         * @param visynIds Selected visyn ids.
          */
-        selectionCallback(ids: string[]): void;
+        selectionCallback(visynIds: string[]): void;
         doc: Document;
     });
-    getSelectionMap: () => {
-        [id: string]: boolean;
-    };
+    getSelectedList: () => string[];
     filterCallback: (s: string) => void;
     updateCustomVis: () => void;
     toggleCustomVis: () => void;

@@ -11,7 +11,7 @@ import { getCssValue } from '../utils';
 
 export function Vis({
   columns,
-  selected = {},
+  selected = [],
   colors = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
@@ -35,9 +35,9 @@ export function Vis({
    */
   columns: VisColumn[];
   /**
-   * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
+   * Optional Prop for identifying which points are selected. Any ids that are in this array will be considered selected.
    */
-  selected?: { [id: string]: boolean };
+  selected?: string[];
   /**
    * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme
    */
@@ -49,7 +49,7 @@ export function Vis({
   /**
    * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
    */
-  selectionCallback?: (ids: string[]) => void;
+  selectionCallback?: (s: string[]) => void;
   /**
    * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
    */
@@ -65,7 +65,7 @@ export function Vis({
       numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
       shape: null,
       isRectBrush: true,
-      alphaSliderVal: 1,
+      alphaSliderVal: 0.5,
     },
   );
 
@@ -95,6 +95,16 @@ export function Vis({
     }
   }, [externalConfig]);
 
+  const selectedMap = useMemo(() => {
+    const currMap = {};
+
+    selected.forEach((s) => {
+      currMap[s] = true;
+    });
+
+    return currMap;
+  }, [selected]);
+
   const scales: Scales = useMemo(() => {
     const colorScale = d3.scale.ordinal().range(colors);
 
@@ -117,7 +127,7 @@ export function Vis({
           setConfig={setVisConfig}
           filterCallback={filterCallback}
           selectionCallback={selectionCallback}
-          selected={selected}
+          selected={selectedMap}
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}
@@ -141,7 +151,7 @@ export function Vis({
 
       {isStrip(visConfig) ? <StripVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
 
-      {isPCP(visConfig) ? <PCPVis config={visConfig} setConfig={setVisConfig} columns={columns} hideSidebar={hideSidebar} /> : null}
+      {isPCP(visConfig) ? <PCPVis config={visConfig} selected={selectedMap} setConfig={setVisConfig} columns={columns} hideSidebar={hideSidebar} /> : null}
 
       {isBar(visConfig) ? <BarVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
     </>

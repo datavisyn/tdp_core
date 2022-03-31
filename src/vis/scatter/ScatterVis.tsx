@@ -57,7 +57,7 @@ export function ScatterVis({
   columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
   selectionCallback?: (ids: string[]) => void;
-  selected?: { [key: number]: boolean };
+  selected?: { [key: string]: boolean };
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   hideSidebar?: boolean;

@@ -11,6 +11,8 @@ import {
   VisColumn,
   IScatterConfig,
   ENumericalColorScaleType,
+  VisCategoricalValue,
+  VisNumericalValue,
 } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
@@ -50,9 +52,21 @@ export function scatterMergeDefaultConfig(columns: VisColumn[], config: IScatter
   return merged;
 }
 
+export function moveSelectedToFront(
+  col: (VisCategoricalValue | VisNumericalValue)[],
+  selectedMap: { [key: string]: boolean },
+): (VisCategoricalValue | VisNumericalValue)[] {
+  const selectedVals = col.filter((v) => selectedMap[v.id]);
+  const remainingVals = col.filter((v) => !selectedMap[v.id]);
+
+  const sortedCol = [...remainingVals, ...selectedVals];
+
+  return sortedCol;
+}
+
 export async function createScatterTraces(
   columns: VisColumn[],
-  selected: { [id: string]: boolean },
+  selected: { [key: string]: boolean },
   config: IScatterConfig,
   scales: Scales,
   shapes: string[] | null,
@@ -80,6 +94,10 @@ export async function createScatterTraces(
   const validCols = await resolveColumnValues(numCols);
   const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
   const colorCol = await resolveSingleColumn(getCol(columns, config.color));
+
+  validCols.forEach((c) => {
+    c.resolvedValues = moveSelectedToFront(c.resolvedValues, selected);
+  });
 
   const shapeScale = config.shape
     ? d3.scale
@@ -137,7 +155,7 @@ export async function createScatterTraces(
                 selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
               )
             : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
-          opacity: config.alphaSliderVal,
+          opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
           size: 10,
         },
       },
@@ -171,7 +189,7 @@ export async function createScatterTraces(
                     selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
                   )
                 : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
-              opacity: config.alphaSliderVal,
+              opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
               size: 10,
             },
           },
@@ -208,7 +226,7 @@ export async function createScatterTraces(
           symbol: 'circle',
           size: 10,
           color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
-          opacity: 0.5,
+          opacity: config.alphaSliderVal,
         },
         transforms: [
           {
