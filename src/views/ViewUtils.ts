@@ -124,7 +124,8 @@ export class ViewUtils {
       if (!other) {
         return false;
       }
-      return isEqual(value?.sort(), other?.sort());
+
+      return isEqual(value?.slice()?.sort(), other?.slice()?.sort());
     });
   }
 
