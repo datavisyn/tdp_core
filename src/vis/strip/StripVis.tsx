@@ -21,6 +21,8 @@ interface StripVisProps {
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
+  selectionCallback?: (s: string[]) => void;
+  selected?: { [key: string]: boolean };
   hideSidebar?: boolean;
 }
 
@@ -31,12 +33,21 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function StripVis({ config, extensions, columns, setConfig, scales, hideSidebar = false }: StripVisProps) {
+export function StripVis({
+  config,
+  extensions,
+  columns,
+  setConfig,
+  selectionCallback = () => null,
+  selected = {},
+  scales,
+  hideSidebar = false,
+}: StripVisProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
-  const { value: traces, status: traceStatus, error: traceError } = useAsync(createStripTraces, [columns, config, scales]);
+  const { value: traces, status: traceStatus, error: traceError } = useAsync(createStripTraces, [columns, config, selected, scales]);
 
   const id = React.useMemo(() => uniqueId('StripVis'), []);
 
@@ -82,6 +93,7 @@ export function StripVis({ config, extensions, columns, setConfig, scales, hideS
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
       violingap: 0,
+      dragmode: 'select',
     };
 
     return beautifyLayout(traces, innerLayout);
@@ -104,6 +116,9 @@ export function StripVis({ config, extensions, columns, setConfig, scales, hideS
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
+            onSelected={(sel) => {
+              selectionCallback(sel ? sel.points.map((d) => (d as any).id) : []);
+            }}
             // plotly redraws everything on updates, so you need to reappend title and
             onUpdate={() => {
               for (const p of traces.plots) {

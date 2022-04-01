@@ -18,6 +18,7 @@ interface PCPVisProps {
   };
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
+  selected?: { [key: string]: boolean };
   hideSidebar?: boolean;
 }
 
@@ -28,12 +29,12 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function PCPVis({ config, extensions, columns, setConfig, hideSidebar = false }: PCPVisProps) {
+export function PCPVis({ config, extensions, columns, setConfig, selected = {}, hideSidebar = false }: PCPVisProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
-  const { value: traces, status: traceStatus, error: traceError } = useAsync(createPCPTraces, [columns, config]);
+  const { value: traces, status: traceStatus, error: traceError } = useAsync(createPCPTraces, [columns, config, selected]);
 
   const id = React.useMemo(() => uniqueId('PCPVis'), []);
 

@@ -3,12 +3,12 @@ import { useMemo } from 'react';
 import { merge } from 'lodash';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { GroupSelect } from '../sidebar/GroupSelect';
 import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
 import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
 import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
+import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
 const defaultConfig = {
     group: {
         enable: true,
@@ -48,14 +48,19 @@ export function BarVisSidebar({ config, optionsConfig, extensions, columns, setC
         React.createElement(WarningMessage, null),
         React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
         React.createElement("hr", null),
-        React.createElement(CategoricalColumnSelect, { callback: (catColumnsSelected) => setConfig({ ...config, catColumnsSelected }), columns: columns, currentSelected: config.catColumnsSelected || [] }),
+        React.createElement(CategoricalColumnSingleSelect, { callback: (catColumnSelected) => setConfig({
+                ...config,
+                catColumnSelected,
+                multiples: config.multiples && config.multiples.id === catColumnSelected.id ? null : config.multiples,
+                group: config.group && config.group.id === catColumnSelected.id ? null : config.group,
+            }), columns: columns, currentSelected: config.catColumnSelected }),
         React.createElement("hr", null),
         mergedExtensions.preSidebar,
         mergedOptionsConfig.group.enable
-            ? mergedOptionsConfig.group.customComponent || (React.createElement(GroupSelect, { callback: (group) => setConfig({ ...config, group }), columns: columns, currentSelected: config.group }))
+            ? mergedOptionsConfig.group.customComponent || (React.createElement(GroupSelect, { callback: (group) => setConfig({ ...config, group }), columns: columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id), currentSelected: config.group }))
             : null,
         mergedOptionsConfig.multiples.enable
-            ? mergedOptionsConfig.multiples.customComponent || (React.createElement(MultiplesSelect, { callback: (multiples) => setConfig({ ...config, multiples }), columns: columns, currentSelected: config.multiples }))
+            ? mergedOptionsConfig.multiples.customComponent || (React.createElement(MultiplesSelect, { callback: (multiples) => setConfig({ ...config, multiples }), columns: columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id), currentSelected: config.multiples }))
             : null,
         React.createElement("hr", null),
         mergedOptionsConfig.direction.enable

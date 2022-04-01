@@ -80,11 +80,12 @@ export class ViewUtils {
         }
         // same size but not empty check entries
         return Array.from(a.all.entries()).every(([key, value]) => {
+            var _a, _b;
             const other = b.all.get(key);
             if (!other) {
                 return false;
             }
-            return isEqual(value === null || value === void 0 ? void 0 : value.sort(), other === null || other === void 0 ? void 0 : other.sort());
+            return isEqual((_a = value === null || value === void 0 ? void 0 : value.slice()) === null || _a === void 0 ? void 0 : _a.sort(), (_b = other === null || other === void 0 ? void 0 : other.slice()) === null || _b === void 0 ? void 0 : _b.sort());
         });
     }
     static createContext(graph, desc, ref) {
