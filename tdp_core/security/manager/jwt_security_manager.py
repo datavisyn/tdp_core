@@ -5,14 +5,14 @@ from datetime import datetime, timedelta, timezone
 from functools import wraps
 from typing import Dict, Optional
 
-from flask import request, abort, jsonify, render_template_string, Flask, Request, Blueprint, current_app, _request_ctx_stack
+from flask import request, abort, jsonify, render_template_string, Flask, Request, Blueprint
 from flask_jwt_extended import JWTManager, get_jwt, unset_jwt_cookies, get_current_user, set_access_cookies, \
     create_access_token, verify_jwt_in_request
 
 from phovea_server.config import view as configview
 from phovea_server.ns import no_cache
 from phovea_server.plugin import list as list_plugins
-from phovea_server.security import SecurityManager as PhoveaServerSecurityManager, User as PhoveaServerUser, manager as phoveaSecurityManager
+from phovea_server.security import SecurityManager as PhoveaServerSecurityManager, User as PhoveaServerUser, manager as phovea_security_manager
 from ..store.dummy_store import create as create_dummy_store
 
 _log = logging.getLogger(__name__)
@@ -25,6 +25,10 @@ class UserStore(ABC):
     def login(self, username, extra_fields={}) -> Optional[PhoveaServerUser]: return None
     def logout(self, user) -> Optional[Dict]: pass
     def init_app(self, app: Flask): pass
+
+
+def create_access_token_from_user(user: PhoveaServerUser):
+    return create_access_token(user.name, additional_claims={"roles": user.roles})
 
 
 class JWTSecurityManager(PhoveaServerSecurityManager):
@@ -52,14 +56,7 @@ class JWTSecurityManager(PhoveaServerSecurityManager):
 
         @self.jwt.additional_claims_loader
         def additional_claims(identity):
-            claims = {}
-            try:
-                claims.update({"additional_claims": {'roles': get_current_user().roles}})
-            except RuntimeError:
-                pass
-            if app.config.get("JWT_ADDITIONAL_CLAIMS"):
-                claims.update(app.config.get("JWT_ADDITIONAL_CLAIMS"))
-            return claims
+            return app.config.get("JWT_ADDITIONAL_CLAIMS", {})
 
         # TODO: We allow loading of custom metadata into the token via the init_jwt in security stores,
         # are we planning to do the same in the other direction, i.e. modify the user object via the received payload?
@@ -73,26 +70,31 @@ class JWTSecurityManager(PhoveaServerSecurityManager):
         @blp.after_request
         def refresh_expiring_jwts(response):
             try:
-                # TODO: Check if we actually want to do this here?
-                # verify_jwt_in_request(optional=True)
                 exp_timestamp = get_jwt()["exp"]
                 now = datetime.now(timezone.utc)
                 target_timestamp = datetime.timestamp(now + timedelta(minutes=30))
                 if target_timestamp > exp_timestamp:
-                    access_token = create_access_token(self.current_user.name)
+                    access_token = create_access_token_from_user(self.current_user)
                     set_access_cookies(response, access_token)
                 return response
             except (RuntimeError, KeyError):
                 # Case where there is not a valid JWT. Just return the original respone
                 return response
 
-        self._delegate_stores_until_not_none("init_app")
+        self._delegate_stores_until_not_none("init_app", self.app)
 
     @property
     def current_user(self) -> Optional[PhoveaServerUser]:
         with self.app.app_context():  # used for jwt request
-            verify_jwt_in_request()
-            return get_current_user() or self._api_key_from_headers() or self._delegate_stores_until_not_none("load_from_request", request)
+            user = None
+            try:
+                # Load the user preferably from the provided JWT
+                verify_jwt_in_request()
+                user = get_current_user()
+            except RuntimeError:
+                pass
+            # Otherwise, try loading from stores
+            return user or self._api_key_from_headers() or self._delegate_stores_until_not_none("load_from_request", request)
 
     def logout(self):
         u = self.current_user
@@ -136,7 +138,7 @@ def login_required(f=None, *, users=(), roles=()):
     def login_required_inner(fn=None):
         @wraps(fn)
         def decorator(*args, **kwargs):
-            u = phoveaSecurityManager().current_user
+            u = phovea_security_manager().current_user
             # Allow access only if a user is available
             if not u:
                 return abort(401, {'message': 'No user in login_required request'})
@@ -179,25 +181,24 @@ def get_login_mask():
 @no_cache
 def login():
     # Login the user with the current username/password
-    user = phoveaSecurityManager().login(request.values['username'], request.values)
+    user = phovea_security_manager().login(request.values['username'], request.values)
     if not user:
         return abort(401)  # 401 Unauthorized
 
     # Create a new user response with the name and roles
     response = jsonify(name=user.name, roles=user.roles)
     # Create a new access token for this user
-    access_token = create_access_token(user.name)
+    access_token = create_access_token_from_user(user)
     # Append the access token as cookie
     set_access_cookies(response, access_token)
     return response
 
 
-@login_required()
+@login_required
 @blp.route('/logout', methods=['GET', 'POST'])
 @no_cache
 def logout():
-    verify_jwt_in_request()
-    payload, cookies = phoveaSecurityManager().logout()
+    payload, cookies = phovea_security_manager().logout()
     # Create response and add security store payload
     response = jsonify(msg='Bye Bye', **payload)
     # Handle cookie changes from the security stores
@@ -214,8 +215,7 @@ def logout():
 @blp.route('/loggedinas', methods=['GET', 'POST'])
 @no_cache
 def loggedinas():
-    verify_jwt_in_request()
-    u = phoveaSecurityManager().current_user
+    u = phovea_security_manager().current_user
     return jsonify(name=u.name, roles=u.roles) if u else abort(401)
 
 

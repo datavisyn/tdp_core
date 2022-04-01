@@ -12,49 +12,21 @@ def hash_password(password, salt):
 
 class User(PhoveaServerUser):
   def __init__(self, id, password, salt, roles):
-    super(User, self).__init__(id)
-    self.name = id
+    super().__init__(id=id, name=id, roles=roles)
     self._password = password
     self._salt = salt
-    self.roles = roles
-
-  @property
-  def is_authenticated(self):
-    return True
-
-  @property
-  def is_active(self):
-    return True
 
   def is_password(self, given):
     given_h = hash_password(given, self._salt)
     return given_h == self._password
 
 
-def from_env_var(k, v):
-  elems = v.split(';')
-  name = k[12:]  # PHOVEA_USER_
-  salt = elems[0]
-  password = elems[1]
-  roles = elems[2:]
-  return User(name, password, salt, roles)
-
-
 class UserStore(object):
   def __init__(self):
     import phovea_server.config
-    import os
 
     # define users via env variables
-    env_users = [from_env_var(k, v) for k, v in os.environ.items() if k.startswith('PHOVEA_USER_')]
-    if env_users:
-      self._users = env_users
-    else:
-      self._users = [User(v['name'], v['password'], v['salt'], v['roles']) for v in
-                     phovea_server.config.get('tdp_core.users')]
-
-  def load(self, id):
-    return next((u for u in self._users if u.id == id), None)
+    self._users = [User(v['name'], v['password'], v['salt'], v['roles']) for v in phovea_server.config.get('tdp_core.users')]
 
   def load_from_key(self, api_key):
     parts = api_key.split(':')
@@ -64,9 +36,6 @@ class UserStore(object):
 
   def login(self, username, extra_fields={}):
     return next((u for u in self._users if u.id == username and u.is_password(extra_fields['password'])), None)
-
-  def logout(self, user):
-    pass
 
 
 def create():
