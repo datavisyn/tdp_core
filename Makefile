@@ -29,9 +29,9 @@ lint:
 test:
 	pytest $(pkg_src)
 
-.PHONEY: sphinx ## Generate API docs using sphinx
-sphinx: 
-	sphinx-apidoc -o docs -f ./$(pkg_src) && sphinx-build ./docs build/docs
+.PHONEY: mkdocs ## Shortcut for mkdocs command
+mkdocs: 
+	mkdocs build
 
 .PHONY: install  ## Install the requirements
 install:
