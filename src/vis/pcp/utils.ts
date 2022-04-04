@@ -31,7 +31,7 @@ export function pcpMergeDefaultConfig(columns: VisColumn[], config: IPCPConfig):
   return merged;
 }
 
-export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig): Promise<PlotlyInfo> {
+export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig, selectedMap: { [key: string]: boolean }): Promise<PlotlyInfo> {
   if (!config.allColumnsSelected) {
     return {
       plots: [],
@@ -39,6 +39,7 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
       rows: 0,
       cols: 0,
       errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
+      errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
   }
 
@@ -51,6 +52,7 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
       rows: 0,
       cols: 0,
       errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
+      errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
   }
 
@@ -61,6 +63,15 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
     yLabel: null,
     data: {
       type: 'parcoords',
+      // leaving this code here to show how you could change the colors of selected values.
+      // But this is useless without opacity, and the colorscale does not support alpha values.
+      // line: {
+      //   color: allColValues[0].resolvedValues.map((v) => (selectedMap[v.id] ? 0 : 1)),
+      //   colorscale: [
+      //     [0, 'rgba(215, 212, 206, 1)'],
+      //     [1, 'rgba(215, 212, 206, 0.32)'],
+      //   ],
+      // },
       // @ts-ignore
       dimensions: allColValues.map((c) => {
         if (c.type === EColumnTypes.NUMERICAL) {
@@ -89,5 +100,6 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig):
     rows: 1,
     cols: 1,
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.pcpError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
   };
 }

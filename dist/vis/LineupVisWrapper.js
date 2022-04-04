@@ -6,13 +6,9 @@ import { EColumnTypes, EFilterOptions } from './interfaces';
 export class LineupVisWrapper {
     constructor(props) {
         this.props = props;
-        this.getSelectionMap = () => {
-            const selectedMap = {};
+        this.getSelectedList = () => {
             const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection());
-            selectedRows.forEach((row) => {
-                selectedMap[row.id] = true;
-            });
-            return selectedMap;
+            return selectedRows.map((r) => r.id.toString());
         };
         this.filterCallback = (s) => {
             const selectedIds = this.props.provider.getSelection();
@@ -29,7 +25,7 @@ export class LineupVisWrapper {
             const ranking = this.props.provider.getFirstRanking();
             const data = this.props.provider.viewRawRows(ranking.getOrder());
             const cols = [];
-            const selectedMap = this.getSelectionMap();
+            const selectedList = this.getSelectedList();
             const getColumnInfo = (column) => {
                 return {
                     // This regex strips any html off of the label and summary, leaving only the center text. For example, <div><span>Hello</span></div> would be Hello.
@@ -39,6 +35,7 @@ export class LineupVisWrapper {
                 };
             };
             const mapData = (innerData, column) => {
+                // TODO: This should be _visyn_id?
                 return innerData.map((d) => ({ id: d.v.id, val: column.getRaw(d) }));
             };
             const getColumnValue = async (column) => {
@@ -74,8 +71,8 @@ export class LineupVisWrapper {
             }
             ReactDOM.render(React.createElement(Vis, {
                 columns: cols,
-                selected: selectedMap,
-                selectionCallback: (ids) => this.props.selectionCallback(ids),
+                selected: selectedList,
+                selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
                 filterCallback: (s) => this.filterCallback(s),
             }), this.node);
         };

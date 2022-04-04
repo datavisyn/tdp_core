@@ -2,8 +2,8 @@ import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
-import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn } from '../interfaces';
-import { InvalidCols } from '../InvalidCols';
+import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
+import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
@@ -57,7 +57,7 @@ export function ScatterVis({
   columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
   selectionCallback?: (ids: string[]) => void;
-  selected?: { [key: number]: boolean };
+  selected?: { [key: string]: boolean };
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   hideSidebar?: boolean;
@@ -102,11 +102,11 @@ export function ScatterVis({
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
       violingap: 0,
-      dragmode: config.isRectBrush ? 'select' : 'lasso',
+      dragmode: config.dragMode,
     };
 
     return beautifyLayout(traces, innerLayout);
-  }, [traces, config.isRectBrush]);
+  }, [traces, config.dragMode]);
 
   return (
     <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
@@ -145,10 +145,10 @@ export function ScatterVis({
             }}
           />
         ) : traceStatus !== 'pending' ? (
-          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         <div className="position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x">
-          <BrushOptionButtons callback={(e: boolean) => setConfig({ ...config, isRectBrush: e })} isRectBrush={config.isRectBrush} />
+          <BrushOptionButtons callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
           <OpacitySlider callback={(e) => setConfig({ ...config, alphaSliderVal: e })} currentValue={config.alphaSliderVal} />
         </div>
         {mergedExtensions.postPlot}

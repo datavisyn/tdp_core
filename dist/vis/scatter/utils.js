@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import d3 from 'd3';
-import { EColumnTypes, ESupportedPlotlyVis, ENumericalColorScaleType, } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
@@ -14,8 +14,8 @@ const defaultConfig = {
     color: null,
     numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
     shape: null,
-    isRectBrush: true,
-    alphaSliderVal: 1,
+    dragMode: EScatterSelectSettings.RECTANGLE,
+    alphaSliderVal: 0.5,
 };
 export function scatterMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);
@@ -34,6 +34,12 @@ export function scatterMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
+export function moveSelectedToFront(col, selectedMap) {
+    const selectedVals = col.filter((v) => selectedMap[v.id]);
+    const remainingVals = col.filter((v) => !selectedMap[v.id]);
+    const sortedCol = [...remainingVals, ...selectedVals];
+    return sortedCol;
+}
 export async function createScatterTraces(columns, selected, config, scales, shapes) {
     let plotCounter = 1;
     const emptyVal = {
@@ -42,6 +48,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
         rows: 0,
         cols: 0,
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+        errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
         formList: ['color', 'shape', 'bubble', 'opacity'],
     };
     if (!config.numColumnsSelected) {
@@ -52,6 +59,9 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     const validCols = await resolveColumnValues(numCols);
     const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
     const colorCol = await resolveSingleColumn(getCol(columns, config.color));
+    validCols.forEach((c) => {
+        c.resolvedValues = moveSelectedToFront(c.resolvedValues, selected);
+    });
     const shapeScale = config.shape
         ? d3.scale
             .ordinal()
@@ -98,8 +108,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     color: colorCol
                         ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
                         : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
-                    opacity: config.alphaSliderVal,
-                    size: 10,
+                    opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
+                    size: 8,
                 },
             },
             xLabel: validCols[0].info.name,
@@ -109,35 +119,59 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     else {
         for (const yCurr of validCols) {
             for (const xCurr of validCols) {
-                plots.push({
-                    data: {
-                        x: xCurr.resolvedValues.map((v) => v.val),
-                        y: yCurr.resolvedValues.map((v) => v.val),
-                        ids: xCurr.resolvedValues.map((v) => v.id.toString()),
-                        xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
-                        yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-                        type: 'scattergl',
-                        mode: 'markers',
-                        hoverlabel: {
-                            namelength: 5,
-                        },
-                        showlegend: false,
-                        text: validCols[0].resolvedValues.map((v) => v.id.toString()),
-                        marker: {
-                            line: {
-                                width: 0,
+                // if on the diagonal, make a histogram.
+                if (xCurr.info.id === yCurr.info.id) {
+                    plots.push({
+                        data: {
+                            x: xCurr.resolvedValues.map((v) => v.val),
+                            xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                            yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+                            type: 'histogram',
+                            hoverlabel: {
+                                namelength: 5,
                             },
-                            symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                            color: colorCol
-                                ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
-                                : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
+                            showlegend: false,
+                            marker: {
+                                color: '#2e2e2e',
+                            },
                             opacity: config.alphaSliderVal,
-                            size: 10,
                         },
-                    },
-                    xLabel: xCurr.info.name,
-                    yLabel: yCurr.info.name,
-                });
+                        xLabel: xCurr.info.name,
+                        yLabel: yCurr.info.name,
+                    });
+                    // otherwise, make a scatterplot
+                }
+                else {
+                    plots.push({
+                        data: {
+                            x: xCurr.resolvedValues.map((v) => v.val),
+                            y: yCurr.resolvedValues.map((v) => v.val),
+                            ids: xCurr.resolvedValues.map((v) => v.id.toString()),
+                            xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+                            yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+                            type: 'scattergl',
+                            mode: 'markers',
+                            hoverlabel: {
+                                namelength: 5,
+                            },
+                            showlegend: false,
+                            text: validCols[0].resolvedValues.map((v) => v.id.toString()),
+                            marker: {
+                                line: {
+                                    width: 0,
+                                },
+                                symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
+                                color: colorCol
+                                    ? colorCol.resolvedValues.map((v) => selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
+                                    : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
+                                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
+                                size: 8,
+                            },
+                        },
+                        xLabel: xCurr.info.name,
+                        yLabel: yCurr.info.name,
+                    });
+                }
                 plotCounter += 1;
             }
         }
@@ -164,9 +198,9 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                         width: 0,
                     },
                     symbol: 'circle',
-                    size: 10,
+                    size: 8,
                     color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
-                    opacity: 0.5,
+                    opacity: config.alphaSliderVal,
                 },
                 transforms: [
                     {
@@ -207,7 +241,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                         width: 0,
                     },
                     opacity: config.alphaSliderVal,
-                    size: 10,
+                    size: 8,
                     symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
                     color: '#2e2e2e',
                 },
@@ -233,6 +267,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
         rows: Math.sqrt(plots.length),
         cols: Math.sqrt(plots.length),
         errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError'),
+        errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
 }
 //# sourceMappingURL=utils.js.map

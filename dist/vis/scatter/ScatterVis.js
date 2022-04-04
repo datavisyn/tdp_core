@@ -2,7 +2,7 @@ import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
-import { InvalidCols } from '../InvalidCols';
+import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
@@ -49,10 +49,10 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
             violingap: 0,
-            dragmode: config.isRectBrush ? 'select' : 'lasso',
+            dragmode: config.dragMode,
         };
         return beautifyLayout(traces, innerLayout);
-    }, [traces, config.isRectBrush]);
+    }, [traces, config.dragMode]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
@@ -71,9 +71,9 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                         d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
                         d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
-                } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { message: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
+                } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
             React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x" },
-                React.createElement(BrushOptionButtons, { callback: (e) => setConfig({ ...config, isRectBrush: e }), isRectBrush: config.isRectBrush }),
+                React.createElement(BrushOptionButtons, { callback: (dragMode) => setConfig({ ...config, dragMode }), dragMode: config.dragMode }),
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
             mergedExtensions.postPlot),
         !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
