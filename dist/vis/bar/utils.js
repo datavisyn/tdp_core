@@ -22,8 +22,12 @@ const defaultConfig = {
 export function barMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);
     const catCols = columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
+    const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (!merged.catColumnSelected && catCols.length > 0) {
         merged.catColumnSelected = catCols[catCols.length - 1].info;
+    }
+    if (!merged.aggregateColumn && numCols.length > 0) {
+        merged.aggregateColumn = numCols[numCols.length - 1].info;
     }
     return merged;
 }

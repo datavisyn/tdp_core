@@ -1,8 +1,8 @@
 import * as React from 'react';
+import Highlighter from 'react-highlight-words';
 import Select from 'react-select';
 import { ColumnInfo, EAggregateTypes, EColumnTypes, VisColumn } from '../interfaces';
 import { SingleColumnSelect } from './SingleColumnSelect';
-import { formatOptionLabel } from './utils';
 
 interface AggregateTypeSelectProps {
   aggregateTypeSelectCallback: (s: EAggregateTypes) => void;
@@ -10,6 +10,16 @@ interface AggregateTypeSelectProps {
   aggregateColumnSelectCallback: (c: ColumnInfo) => void;
   columns: VisColumn[];
   currentSelected: EAggregateTypes;
+}
+
+function formatOptionLabel(option, ctx) {
+  return (
+    <>
+      <Highlighter searchWords={[ctx.inputValue]} autoEscape textToHighlight={option.name} />
+      {option.description && <span className="small text-muted ms-1">{option.description}</span>}
+      {option.disabled ? <i className="ms-1 fas fa-question-circle" title="No numerical columns available for this aggregation type" /> : null}
+    </>
+  );
 }
 
 export function AggregateTypeSelect({
@@ -21,13 +31,13 @@ export function AggregateTypeSelect({
 }: AggregateTypeSelectProps) {
   const selectOptions = React.useMemo(() => {
     return [
-      { name: EAggregateTypes.COUNT, id: EAggregateTypes.COUNT },
-      { name: EAggregateTypes.AVG, id: EAggregateTypes.AVG },
-      { name: EAggregateTypes.MIN, id: EAggregateTypes.MIN },
-      { name: EAggregateTypes.MAX, id: EAggregateTypes.MAX },
-      { name: EAggregateTypes.MED, id: EAggregateTypes.MED },
+      { disabled: false, id: EAggregateTypes.COUNT, name: EAggregateTypes.COUNT },
+      { disabled: !aggregateColumn, id: EAggregateTypes.AVG, name: EAggregateTypes.AVG },
+      { disabled: !aggregateColumn, id: EAggregateTypes.MIN, name: EAggregateTypes.MIN },
+      { disabled: !aggregateColumn, id: EAggregateTypes.MAX, name: EAggregateTypes.MAX },
+      { disabled: !aggregateColumn, id: EAggregateTypes.MED, name: EAggregateTypes.MED },
     ];
-  }, []);
+  }, [aggregateColumn]);
 
   return (
     <>
@@ -39,8 +49,9 @@ export function AggregateTypeSelect({
         getOptionValue={(option) => option.id}
         onChange={(e) => aggregateTypeSelectCallback(e.id)}
         name="numColumns"
-        options={selectOptions}
-        value={{ name: currentSelected, id: currentSelected }}
+        options={selectOptions || []}
+        isOptionDisabled={(option) => (option.id === EAggregateTypes.COUNT ? false : !aggregateColumn)}
+        value={{ label: currentSelected, id: currentSelected, name: currentSelected || '' }}
       />
       {currentSelected !== EAggregateTypes.COUNT ? (
         <SingleColumnSelect
