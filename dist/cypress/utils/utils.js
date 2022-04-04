@@ -1,11 +1,12 @@
-import { cy, Cypress } from 'local-cypress';
+import * as cypress from 'local-cypress';
 /**
  * Check if typing text in form input element has been completed
  * @param {string} input - input string that should be inserted
  * @param {string} selector - the selector of the element as returned by cypress studio
  */
 export function checkIfInputCompleted(input, selector) {
-    cy.get(selector)
+    cypress.cy
+        .get(selector)
         .invoke('val')
         .then((text) => {
         return text === input;
@@ -17,8 +18,8 @@ export function checkIfInputCompleted(input, selector) {
  * @param {string} text - text that should be inserted into the form input
  */
 export function fillInForm(selector, text) {
-    cy.get(selector).should('be.visible');
-    cy.get(selector).click().type(text, { delay: 0 }); // use delay to ensure that complete text is filled in
+    cypress.cy.get(selector).should('be.visible');
+    cypress.cy.get(selector).click().type(text, { delay: 0 }); // use delay to ensure that complete text is filled in
     return checkIfInputCompleted(text, selector);
 }
 /**
@@ -26,7 +27,7 @@ export function fillInForm(selector, text) {
  * @param {string} selector - the selector of the element as returned by cypress studio
  */
 export function clearInputForm(selector) {
-    return cy.get(selector).should('be.visible').clear();
+    return cypress.cy.get(selector).should('be.visible').clear();
 }
 /**
  * This function must be used to select elements from selet2 multi select form elements.
@@ -42,15 +43,15 @@ export function select2MultiSelect(id, searchString) {
     else {
         searchStrings = searchString;
     }
-    cy.get(`[data-testid="${id}"] .select2-hidden-accessible`).select([], { force: true });
+    cypress.cy.get(`[data-testid="${id}"] .select2-hidden-accessible`).select([], { force: true });
     // iterate over search strings and select resulting options
     searchStrings.forEach((searchTerm) => {
-        cy.get(`[data-testid="${id}"] [data-testid=select2-search-field]`).type(searchTerm);
+        cypress.cy.get(`[data-testid="${id}"] [data-testid=select2-search-field]`).type(searchTerm);
         // flake solution: wait for the search for the searchString to finish
-        cy.get('.select2-results__option').should('not.have.length', 0);
-        cy.contains('.select2-results__option', searchTerm).should('be.visible').click();
+        cypress.cy.get('.select2-results__option').should('not.have.length', 0);
+        cypress.cy.contains('.select2-results__option', searchTerm).should('be.visible').click();
         // confirm Select2 widget renders the name
-        cy.get(`[data-testid="${id}"] .select2-container`).should('include.text', searchTerm);
+        cypress.cy.get(`[data-testid="${id}"] .select2-container`).should('include.text', searchTerm);
     });
 }
 /**
@@ -59,8 +60,8 @@ export function select2MultiSelect(id, searchString) {
  * @param {string} searchString - either a single string or an array of strings if multiselect is possible
  */
 export function select2SingleSelect(id, searchString) {
-    cy.get(`[data-testid="${id}"] .select2-selection--single`).click();
-    cy.get('.select2-results__option').contains(searchString).click();
+    cypress.cy.get(`[data-testid="${id}"] .select2-selection--single`).click();
+    cypress.cy.get('.select2-results__option').contains(searchString).click();
 }
 /**
  * This function must be used to select elements in form maps.
@@ -68,19 +69,19 @@ export function select2SingleSelect(id, searchString) {
  * @param {string} selectOption - either a single string or an array of strings if multiselect is possible
  */
 export function formSelect(rowId, selectOption) {
-    return cy.get(`[data-testid=${rowId}] [data-testid=form-select]`).select(selectOption);
+    return cypress.cy.get(`[data-testid=${rowId}] [data-testid=form-select]`).select(selectOption);
 }
 /**
  * Wait until phovea-busy and loading icon are hidden
  */
 export function waitPhoveaNotBusy() {
-    return cy.get('.phovea-busy').should('have.attr', 'hidden');
+    return cypress.cy.get('.phovea-busy').should('have.attr', 'hidden');
 }
 /**
  * Wait until phovea-busy and loading icon are hidden
  */
 export function waitTdpNotBusy() {
-    return cy.get('.tdp-busy').should('not.exist');
+    return cypress.cy.get('.tdp-busy').should('not.exist');
 }
 /**
  * Scroll an Element into the center of the viewport (mainly for presentation purposes)
@@ -89,25 +90,25 @@ export function waitTdpNotBusy() {
  */
 export function scrollElementIntoCenter(selector = '', waitAfterScroll = 1000) {
     // calculate half of viewport height
-    const offestTop = -Cypress.config().viewportHeight / 2;
+    const offestTop = -cypress.Cypress.config().viewportHeight / 2;
     // Wee need to set the offset, because by default it is scrolled such that the element is on top
-    cy.get(selector).scrollIntoView({ offset: { top: offestTop, left: 0 } });
-    cy.wait(waitAfterScroll);
-    return cy.get(selector);
+    cypress.cy.get(selector).scrollIntoView({ offset: { top: offestTop, left: 0 } });
+    cypress.cy.wait(waitAfterScroll);
+    return cypress.cy.get(selector);
 }
 /**
  * Submit Login Form of Ordino Public
  */
 export function loginPublic() {
     // Check if form is visible and the two inputs are not empty (so not to click too fast on the button)
-    cy.get('.form-signin').should('be.visible');
-    cy.get('.form-signin #login_username').invoke('val').should('not.be.empty');
-    cy.get('.form-signin #login_password').invoke('val').should('not.be.empty');
+    cypress.cy.get('.form-signin').should('be.visible');
+    cypress.cy.get('.form-signin #login_username').invoke('val').should('not.be.empty');
+    cypress.cy.get('.form-signin #login_password').invoke('val').should('not.be.empty');
     // Add a small wait just for safety
-    cy.wait(1000);
-    cy.get('.form-signin button[type="submit"]').click();
+    cypress.cy.wait(1000);
+    cypress.cy.get('.form-signin button[type="submit"]').click();
     // Check that login disappears
-    cy.get('.form-signin button[type=submit]').should('not.be.visible');
+    cypress.cy.get('.form-signin button[type=submit]').should('not.be.visible');
 }
 /**
  * Waits for the specified api calls. Try using this if you need long waits at positions where many api calls are done.
@@ -116,9 +117,9 @@ export function loginPublic() {
 export function waitForApiCalls(apiCalls) {
     const waitVariables = [];
     apiCalls.forEach((apiCall) => {
-        cy.intercept(apiCall).as(`${apiCall}`);
+        cypress.cy.intercept(apiCall).as(`${apiCall}`);
         waitVariables.push(`@${apiCall}`);
     });
-    cy.wait(waitVariables);
+    cypress.cy.wait(waitVariables);
 }
 //# sourceMappingURL=utils.js.map
