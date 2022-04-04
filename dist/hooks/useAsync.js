@@ -35,7 +35,8 @@ export const useAsync = (asyncFunction, immediate = null) => {
     // on every render, but only if asyncFunction changes.
     const execute = React.useCallback((...args) => {
         setStatus('pending');
-        setValue(null);
+        // Do not unset the value, as we mostly want to retain the last value to avoid flickering, i.e. for "silent" updates.
+        // setValue(null);
         setError(null);
         const currentPromise = Promise.resolve(asyncFunction(...args))
             .then((response) => {
@@ -47,6 +48,7 @@ export const useAsync = (asyncFunction, immediate = null) => {
         })
             .catch((e) => {
             if (currentPromise === latestPromiseRef.current) {
+                setValue(null);
                 setError(e);
                 setStatus('error');
             }
