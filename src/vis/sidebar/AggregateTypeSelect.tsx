@@ -51,7 +51,7 @@ export function AggregateTypeSelect({
         name="numColumns"
         options={selectOptions || []}
         isOptionDisabled={(option) => (option.id === EAggregateTypes.COUNT ? false : !aggregateColumn)}
-        value={{ label: currentSelected, id: currentSelected, name: currentSelected || '' }}
+        value={{ label: currentSelected, id: currentSelected, name: currentSelected }}
       />
       {currentSelected !== EAggregateTypes.COUNT ? (
         <SingleColumnSelect

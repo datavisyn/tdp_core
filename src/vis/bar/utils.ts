@@ -56,39 +56,80 @@ export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig):
   return merged;
 }
 
-async function getAggregateValues(aggType: EAggregateTypes, categoricalColumn: VisCategoricalColumn, aggregateColumn: VisNumericalColumn) {
-  const catColValues = await resolveSingleColumn(categoricalColumn);
-  const aggColValues = await resolveSingleColumn(aggregateColumn);
-
-  const categoricalOptions = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
+function getAggregateValues(aggType: EAggregateTypes, catColValues: VisCategoricalValue[], aggColValues: VisNumericalValue[]) {
+  const categoricalOptions = [...new Set(catColValues.map((v) => v.val))];
 
   const categoricalMap = {};
 
-  catColValues.resolvedValues.forEach((val) => {
+  catColValues.forEach((val) => {
     categoricalMap[val.id] = val.val;
   });
 
   if (aggType === EAggregateTypes.COUNT) {
-    return categoricalOptions.map((curr) => (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === curr).length);
+    return categoricalOptions.map((curr) => (catColValues as VisCategoricalValue[]).filter((c) => c.val === curr).length);
   }
   if (aggType === EAggregateTypes.AVG) {
     return categoricalOptions.map((curr) =>
-      mean((aggColValues.resolvedValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
+      mean((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
     );
   }
   if (aggType === EAggregateTypes.MIN) {
     return categoricalOptions.map((curr) =>
-      min((aggColValues.resolvedValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
+      min((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
     );
   }
   if (aggType === EAggregateTypes.MED) {
     return categoricalOptions.map((curr) =>
-      median((aggColValues.resolvedValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
+      median((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
     );
   }
 
   return categoricalOptions.map((curr) =>
-    max((aggColValues.resolvedValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
+    max((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
+  );
+}
+
+function getTotalAggregateValues(
+  aggType: EAggregateTypes,
+  categoricalOptions: string[],
+  catColValues: VisCategoricalValue[],
+  aggColValues: VisNumericalValue[],
+) {
+  const categoricalMap = {};
+
+  catColValues.forEach((val) => {
+    categoricalMap[val.id] = val.val;
+  });
+
+  if (aggType === EAggregateTypes.COUNT) {
+    return sum(categoricalOptions.map((curr) => (catColValues as VisCategoricalValue[]).filter((c) => c.val === curr).length));
+  }
+  if (aggType === EAggregateTypes.AVG) {
+    return sum(
+      categoricalOptions.map(
+        (curr) => mean((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0,
+      ),
+    );
+  }
+  if (aggType === EAggregateTypes.MIN) {
+    return sum(
+      categoricalOptions.map(
+        (curr) => min((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0,
+      ),
+    );
+  }
+  if (aggType === EAggregateTypes.MED) {
+    return sum(
+      categoricalOptions.map(
+        (curr) => median((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0,
+      ),
+    );
+  }
+
+  return sum(
+    categoricalOptions.map(
+      (curr) => max((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0,
+    ),
   );
 }
 
@@ -151,12 +192,16 @@ async function setPlotsWithGroupsAndMultiples(
 async function setPlotsWithGroups(
   columns: VisColumn[],
   catCol: VisCategoricalColumn,
+  aggType: EAggregateTypes,
+  aggColumn: VisNumericalColumn,
   config: IBarConfig,
   plots: PlotlyData[],
   scales: Scales,
   plotCounter: number,
 ): Promise<number> {
   const catColValues = await resolveSingleColumn(catCol);
+  const aggColValues = await resolveSingleColumn(aggColumn);
+
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
   const groupColumn = await resolveSingleColumn(getCol(columns, config.group));
@@ -165,18 +210,30 @@ async function setPlotsWithGroups(
   const uniqueColVals: string[] = [...new Set(catColValues.resolvedValues.map((v) => v.val))] as string[];
 
   uniqueGroupVals.forEach((uniqueVal) => {
-    const groupedLength = uniqueColVals.map((v) => {
-      const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v).map((c) => c.id);
-      const allGroupObjs = (groupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
-      const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
+    const finalAggregateValues = uniqueColVals
+      .map((v) => {
+        const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v);
+        const allGroupObjs = (groupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal);
+        const joinedObjs = allObjs.filter((allVal) => allGroupObjs.find((groupVal) => groupVal.id === allVal.id));
 
-      return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
-    });
+        const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues.resolvedValues as VisNumericalValue[]);
+        const ungroupedAggregateValues = getTotalAggregateValues(
+          aggType,
+          uniqueGroupVals,
+          groupColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)) as VisCategoricalValue[],
+          aggColValues.resolvedValues as VisNumericalValue[],
+        );
+
+        console.log(ungroupedAggregateValues);
+
+        return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
+      })
+      .flat();
 
     plots.push({
       data: {
-        x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : groupedLength,
-        y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : groupedLength,
+        x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
+        y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
         orientation: vertFlag ? 'v' : 'h',
         xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
         yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -187,8 +244,8 @@ async function setPlotsWithGroups(
           color: scales.color(uniqueVal),
         },
       },
-      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catColValues.info.name,
+      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
+      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
     });
   });
 
@@ -198,12 +255,16 @@ async function setPlotsWithGroups(
 async function setPlotsWithMultiples(
   columns: VisColumn[],
   catCol: VisCategoricalColumn,
+  aggType: EAggregateTypes,
+  aggColumn: VisNumericalColumn,
   config: IBarConfig,
   plots: PlotlyData[],
   plotCounter: number,
 ): Promise<number> {
   let plotCounterEdit = plotCounter;
   const catColValues = await resolveSingleColumn(catCol);
+  const aggColValues = await resolveSingleColumn(aggColumn);
+
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
   const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
@@ -212,18 +273,27 @@ async function setPlotsWithMultiples(
   const uniqueColVals: string[] = [...new Set(catColValues.resolvedValues.map((v) => v.val))] as string[];
 
   uniqueMultiplesVals.forEach((uniqueVal) => {
-    const multiplesLength = uniqueColVals.map((v) => {
-      const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v).map((c) => c.id);
-      const allMultiplesObjs = (multiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id);
-      const joinedObjs = allObjs.filter((c) => allMultiplesObjs.includes(c));
+    const finalAggregateValues = uniqueColVals
+      .map((v) => {
+        const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v);
+        const allMultiplesObjs = (multiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal);
+        const joinedObjs = allObjs.filter((c) => allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
 
-      return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
-    });
+        const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues.resolvedValues as VisNumericalValue[]);
+        const ungroupedAggregateValues = getTotalAggregateValues(
+          aggType,
+          uniqueMultiplesVals,
+          multiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)) as VisCategoricalValue[],
+          aggColValues.resolvedValues as VisNumericalValue[],
+        );
+        return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues[0]) * 100 : aggregateValues;
+      })
+      .flat();
 
     plots.push({
       data: {
-        x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : multiplesLength,
-        y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : multiplesLength,
+        x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
+        y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
         orientation: vertFlag ? 'v' : 'h',
         xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
         yaxis: plotCounterEdit === 1 ? 'y' : `y${plotCounterEdit}`,
@@ -231,8 +301,8 @@ async function setPlotsWithMultiples(
         type: 'bar',
         name: uniqueVal,
       },
-      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catColValues.info.name,
+      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
+      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
     });
     plotCounterEdit += 1;
   });
@@ -252,17 +322,17 @@ async function setPlotsBasic(
 ): Promise<number> {
   let plotCounterEdit = plotCounter;
   const catColValues = await resolveSingleColumn(catCol);
+  const aggColValues = await resolveSingleColumn(aggregateColumn);
+
   const vertFlag = config.direction === EBarDirection.VERTICAL;
-  const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
 
-  const aggValues = await getAggregateValues(aggType, catCol, aggregateColumn);
+  const aggValues = getAggregateValues(aggType, catColValues.resolvedValues as VisCategoricalValue[], aggColValues.resolvedValues as VisNumericalValue[]);
 
-  const countTotal = sum(aggValues);
   const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))];
   plots.push({
     data: {
-      x: vertFlag ? valArr : normalizedFlag ? aggValues.map((c) => c / countTotal) : aggValues,
-      y: !vertFlag ? valArr : normalizedFlag ? aggValues.map((c) => c / countTotal) : aggValues,
+      x: vertFlag ? valArr : aggValues,
+      y: !vertFlag ? valArr : aggValues,
       ids: valArr,
       orientation: vertFlag ? 'v' : 'h',
       xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
@@ -270,8 +340,8 @@ async function setPlotsBasic(
       type: 'bar',
       name: catColValues.info.name,
     },
-    xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-    yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catColValues.info.name,
+    xLabel: vertFlag ? catColValues.info.name : aggType,
+    yLabel: vertFlag ? aggType : catColValues.info.name,
   });
   plotCounterEdit += 1;
 
@@ -303,9 +373,9 @@ export async function createBarTraces(columns: VisColumn[], config: IBarConfig, 
     if (config.group && config.multiples) {
       plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCol, config, plots, scales, plotCounter);
     } else if (config.group) {
-      plotCounter = await setPlotsWithGroups(columns, catCol, config, plots, scales, plotCounter);
+      plotCounter = await setPlotsWithGroups(columns, catCol, config.aggregateType, aggregateColumn, config, plots, scales, plotCounter);
     } else if (config.multiples) {
-      plotCounter = await setPlotsWithMultiples(columns, catCol, config, plots, plotCounter);
+      plotCounter = await setPlotsWithMultiples(columns, catCol, config.aggregateType, aggregateColumn, config, plots, plotCounter);
     } else {
       plotCounter = await setPlotsBasic(columns, config.aggregateType, aggregateColumn, catCol, config, plots, scales, plotCounter);
     }
