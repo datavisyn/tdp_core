@@ -21,6 +21,13 @@ export declare enum EViolinOverlay {
     STRIP = "Strip",
     BOX = "Box"
 }
+export declare enum EAggregateTypes {
+    COUNT = "Count",
+    MIN = "Minimum",
+    AVG = "Average",
+    MED = "Median",
+    MAX = "Maximum"
+}
 export declare enum EBarGroupingType {
     STACK = "Stacked",
     GROUP = "Grouped"
@@ -78,6 +85,8 @@ export interface IBarConfig {
     groupType: EBarGroupingType;
     numColumnsSelected: ColumnInfo[];
     catColumnSelected: ColumnInfo;
+    aggregateType: EAggregateTypes;
+    aggregateColumn: ColumnInfo | null;
 }
 export interface IPCPConfig {
     type: ESupportedPlotlyVis.PCP;

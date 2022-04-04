@@ -11,6 +11,8 @@ import {
   IVisConfig,
   VisColumn,
   ICommonVisSideBarProps,
+  EAggregateTypes,
+  EColumnTypes,
 } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
@@ -19,7 +21,8 @@ import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
 import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
 import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
-import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
+import { SingleColumnSelect } from '../sidebar/SingleColumnSelect';
+import { AggregateTypeSelect } from '../sidebar/AggregateTypeSelect';
 
 const defaultConfig = {
   group: {
@@ -105,7 +108,7 @@ export function BarVisSidebar({
       <WarningMessage />
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />
-      <CategoricalColumnSingleSelect
+      <SingleColumnSelect
         callback={(catColumnSelected: ColumnInfo) =>
           setConfig({
             ...config,
@@ -116,6 +119,15 @@ export function BarVisSidebar({
         }
         columns={columns}
         currentSelected={config.catColumnSelected}
+        type={[EColumnTypes.CATEGORICAL]}
+        label="Categorical Column"
+      />
+      <AggregateTypeSelect
+        aggregateTypeSelectCallback={(aggregateType: EAggregateTypes) => setConfig({ ...config, aggregateType })}
+        aggregateColumnSelectCallback={(aggregateColumn: ColumnInfo) => setConfig({ ...config, aggregateColumn })}
+        columns={columns}
+        currentSelected={config.aggregateType}
+        aggregateColumn={config.aggregateColumn}
       />
       <hr />
       {mergedExtensions.preSidebar}

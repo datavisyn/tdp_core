@@ -1,4 +1,5 @@
-import { merge, sum } from 'lodash';
+import { merge, sum, mean, min, max } from 'lodash';
+import { median } from 'd3v7';
 import { I18nextManager } from '../../i18n';
 import {
   PlotlyInfo,
@@ -14,6 +15,9 @@ import {
   EBarGroupingType,
   EBarDisplayType,
   EBarDirection,
+  EAggregateTypes,
+  VisNumericalColumn,
+  VisNumericalValue,
 } from '../interfaces';
 import { resolveSingleColumn } from '../general/layoutUtils';
 import { getCol } from '../sidebar';
@@ -31,6 +35,8 @@ const defaultConfig: IBarConfig = {
   multiples: null,
   display: EBarDisplayType.ABSOLUTE,
   direction: EBarDirection.VERTICAL,
+  aggregateColumn: null,
+  aggregateType: EAggregateTypes.COUNT,
 };
 
 export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig): IVisConfig {
@@ -43,6 +49,42 @@ export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig):
   }
 
   return merged;
+}
+
+async function getAggregateValues(aggType: EAggregateTypes, categoricalColumn: VisCategoricalColumn, aggregateColumn: VisNumericalColumn) {
+  const catColValues = await resolveSingleColumn(categoricalColumn);
+  const aggColValues = await resolveSingleColumn(aggregateColumn);
+
+  const categoricalOptions = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
+
+  const categoricalMap = {};
+
+  catColValues.resolvedValues.forEach((val) => {
+    categoricalMap[val.id] = val.val;
+  });
+
+  if (aggType === EAggregateTypes.COUNT) {
+    return categoricalOptions.map((curr) => (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === curr).length);
+  }
+  if (aggType === EAggregateTypes.AVG) {
+    return categoricalOptions.map((curr) =>
+      mean((aggColValues.resolvedValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
+    );
+  }
+  if (aggType === EAggregateTypes.MIN) {
+    return categoricalOptions.map((curr) =>
+      min((aggColValues.resolvedValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
+    );
+  }
+  if (aggType === EAggregateTypes.MED) {
+    return categoricalOptions.map((curr) =>
+      median((aggColValues.resolvedValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
+    );
+  }
+
+  return categoricalOptions.map((curr) =>
+    max((aggColValues.resolvedValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
+  );
 }
 
 async function setPlotsWithGroupsAndMultiples(
@@ -195,6 +237,8 @@ async function setPlotsWithMultiples(
 
 async function setPlotsBasic(
   columns: VisColumn[],
+  aggType: EAggregateTypes,
+  aggregateColumn: VisNumericalColumn | null,
   catCol: VisCategoricalColumn,
   config: IBarConfig,
   plots: PlotlyData[],
@@ -206,15 +250,14 @@ async function setPlotsBasic(
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
 
-  const count = [...new Set(catColValues.resolvedValues.map((v) => v.val))].map(
-    (curr) => (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === curr).length,
-  );
-  const countTotal = sum(count);
+  const aggValues = await getAggregateValues(aggType, catCol, aggregateColumn);
+
+  const countTotal = sum(aggValues);
   const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))];
   plots.push({
     data: {
-      x: vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
-      y: !vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
+      x: vertFlag ? valArr : normalizedFlag ? aggValues.map((c) => c / countTotal) : aggValues,
+      y: !vertFlag ? valArr : normalizedFlag ? aggValues.map((c) => c / countTotal) : aggValues,
       ids: valArr,
       orientation: vertFlag ? 'v' : 'h',
       xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
@@ -247,6 +290,9 @@ export async function createBarTraces(columns: VisColumn[], config: IBarConfig, 
   const plots: PlotlyData[] = [];
 
   const catCol: VisCategoricalColumn = columns.find((c) => c.info.id === config.catColumnSelected.id) as VisCategoricalColumn;
+  const aggregateColumn: VisNumericalColumn = config.aggregateColumn
+    ? (columns.find((c) => c.info.id === config.aggregateColumn.id) as VisNumericalColumn)
+    : null;
 
   if (catCol) {
     if (config.group && config.multiples) {
@@ -256,7 +302,7 @@ export async function createBarTraces(columns: VisColumn[], config: IBarConfig, 
     } else if (config.multiples) {
       plotCounter = await setPlotsWithMultiples(columns, catCol, config, plots, plotCounter);
     } else {
-      plotCounter = await setPlotsBasic(columns, catCol, config, plots, scales, plotCounter);
+      plotCounter = await setPlotsBasic(columns, config.aggregateType, aggregateColumn, catCol, config, plots, scales, plotCounter);
     }
   }
 

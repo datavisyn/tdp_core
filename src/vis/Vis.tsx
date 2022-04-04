@@ -13,6 +13,7 @@ import {
   EBarDisplayType,
   EBarGroupingType,
   EScatterSelectSettings,
+  EAggregateTypes,
 } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
@@ -89,6 +90,8 @@ export function Vis({
           groupType: EBarGroupingType.STACK,
           numColumnsSelected: [],
           catColumnSelected: null,
+          aggregateColumn: null,
+          aggregateType: EAggregateTypes.COUNT,
         },
   );
 
