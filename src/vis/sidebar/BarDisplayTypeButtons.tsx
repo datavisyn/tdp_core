@@ -7,7 +7,7 @@ interface BarDisplayProps {
 }
 
 export function BarDisplayButtons({ callback, currentSelected }: BarDisplayProps) {
-  const options = [EBarDisplayType.DEFAULT, EBarDisplayType.NORMALIZED];
+  const options = [EBarDisplayType.ABSOLUTE, EBarDisplayType.NORMALIZED];
   return (
     <div key="barDirectionGroup" className="btn-group w-100 px-2 pt-3" role="group" aria-label="Basic outlined example">
       {options.map((opt) => {

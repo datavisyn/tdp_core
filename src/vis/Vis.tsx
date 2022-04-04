@@ -1,7 +1,19 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { useMemo, useEffect } from 'react';
-import { ESupportedPlotlyVis, IVisConfig, Scales, VisColumn, EFilterOptions, ENumericalColorScaleType } from './interfaces';
+import {
+  ESupportedPlotlyVis,
+  IVisConfig,
+  Scales,
+  VisColumn,
+  EFilterOptions,
+  ENumericalColorScaleType,
+  EColumnTypes,
+  EBarDirection,
+  EBarDisplayType,
+  EBarGroupingType,
+  EScatterSelectSettings,
+} from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
@@ -11,7 +23,7 @@ import { getCssValue } from '../utils';
 
 export function Vis({
   columns,
-  selected = {},
+  selected = [],
   colors = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
@@ -35,9 +47,9 @@ export function Vis({
    */
   columns: VisColumn[];
   /**
-   * Optional Prop for identifying which points are selected. The keys of the map should be the same ids that are passed into the columns prop.
+   * Optional Prop for identifying which points are selected. Any ids that are in this array will be considered selected.
    */
-  selected?: { [id: string]: boolean };
+  selected?: string[];
   /**
    * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme
    */
@@ -49,7 +61,7 @@ export function Vis({
   /**
    * Optional Prop which is called when a selection is made in the scatterplot visualization. Passes in the selected points.
    */
-  selectionCallback?: (ids: string[]) => void;
+  selectionCallback?: (s: string[]) => void;
   /**
    * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
    */
@@ -58,15 +70,26 @@ export function Vis({
   hideSidebar?: boolean;
 }) {
   const [visConfig, setVisConfig] = React.useState<IVisConfig>(
-    externalConfig || {
-      type: ESupportedPlotlyVis.SCATTER,
-      numColumnsSelected: [],
-      color: null,
-      numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
-      shape: null,
-      isRectBrush: true,
-      alphaSliderVal: 1,
-    },
+    externalConfig || columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1
+      ? {
+          type: ESupportedPlotlyVis.SCATTER,
+          numColumnsSelected: [],
+          color: null,
+          numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+          shape: null,
+          dragMode: EScatterSelectSettings.RECTANGLE,
+          alphaSliderVal: 0.5,
+        }
+      : {
+          type: ESupportedPlotlyVis.BAR,
+          multiples: null,
+          group: null,
+          direction: EBarDirection.VERTICAL,
+          display: EBarDisplayType.ABSOLUTE,
+          groupType: EBarGroupingType.STACK,
+          numColumnsSelected: [],
+          catColumnSelected: null,
+        },
   );
 
   React.useEffect(() => {
@@ -95,6 +118,16 @@ export function Vis({
     }
   }, [externalConfig]);
 
+  const selectedMap = useMemo(() => {
+    const currMap = {};
+
+    selected.forEach((s) => {
+      currMap[s] = true;
+    });
+
+    return currMap;
+  }, [selected]);
+
   const scales: Scales = useMemo(() => {
     const colorScale = d3.scale.ordinal().range(colors);
 
@@ -117,7 +150,7 @@ export function Vis({
           setConfig={setVisConfig}
           filterCallback={filterCallback}
           selectionCallback={selectionCallback}
-          selected={selected}
+          selected={selectedMap}
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}
@@ -139,9 +172,19 @@ export function Vis({
         />
       ) : null}
 
-      {isStrip(visConfig) ? <StripVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
+      {isStrip(visConfig) ? (
+        <StripVis
+          config={visConfig}
+          selectionCallback={selectionCallback}
+          setConfig={setVisConfig}
+          selected={selectedMap}
+          columns={columns}
+          scales={scales}
+          hideSidebar={hideSidebar}
+        />
+      ) : null}
 
-      {isPCP(visConfig) ? <PCPVis config={visConfig} setConfig={setVisConfig} columns={columns} hideSidebar={hideSidebar} /> : null}
+      {isPCP(visConfig) ? <PCPVis config={visConfig} selected={selectedMap} setConfig={setVisConfig} columns={columns} hideSidebar={hideSidebar} /> : null}
 
       {isBar(visConfig) ? <BarVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
     </>

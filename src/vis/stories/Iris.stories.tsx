@@ -7,6 +7,7 @@ import {
   EBarGroupingType,
   EColumnTypes,
   ENumericalColorScaleType,
+  EScatterSelectSettings,
   ESupportedPlotlyVis,
   EViolinOverlay,
   VisColumn,
@@ -103,7 +104,7 @@ ScatterPlot.args = {
     },
     numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
     shape: null,
-    isRectBrush: true,
+    dragMode: EScatterSelectSettings.RECTANGLE,
     alphaSliderVal: 1,
   },
 };
@@ -115,16 +116,14 @@ BarChart.args = {
     multiples: null,
     group: null,
     direction: EBarDirection.VERTICAL,
-    display: EBarDisplayType.DEFAULT,
+    display: EBarDisplayType.ABSOLUTE,
     groupType: EBarGroupingType.GROUP,
     numColumnsSelected: [],
-    catColumnsSelected: [
-      {
-        description: '',
-        id: 'species',
-        name: 'Species',
-      },
-    ],
+    catColumnSelected: {
+      description: '',
+      id: 'species',
+      name: 'Species',
+    },
   },
 };
 

@@ -14,12 +14,12 @@ import {
 } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
-import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { GroupSelect } from '../sidebar/GroupSelect';
 import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
 import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
 import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
+import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
 
 const defaultConfig = {
   group: {
@@ -105,22 +105,37 @@ export function BarVisSidebar({
       <WarningMessage />
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />
-      <CategoricalColumnSelect
-        callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
+      <CategoricalColumnSingleSelect
+        callback={(catColumnSelected: ColumnInfo) =>
+          setConfig({
+            ...config,
+            catColumnSelected,
+            multiples: config.multiples && config.multiples.id === catColumnSelected.id ? null : config.multiples,
+            group: config.group && config.group.id === catColumnSelected.id ? null : config.group,
+          })
+        }
         columns={columns}
-        currentSelected={config.catColumnsSelected || []}
+        currentSelected={config.catColumnSelected}
       />
       <hr />
       {mergedExtensions.preSidebar}
 
       {mergedOptionsConfig.group.enable
         ? mergedOptionsConfig.group.customComponent || (
-            <GroupSelect callback={(group: ColumnInfo) => setConfig({ ...config, group })} columns={columns} currentSelected={config.group} />
+            <GroupSelect
+              callback={(group: ColumnInfo) => setConfig({ ...config, group })}
+              columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
+              currentSelected={config.group}
+            />
           )
         : null}
       {mergedOptionsConfig.multiples.enable
         ? mergedOptionsConfig.multiples.customComponent || (
-            <MultiplesSelect callback={(multiples: ColumnInfo) => setConfig({ ...config, multiples })} columns={columns} currentSelected={config.multiples} />
+            <MultiplesSelect
+              callback={(multiples: ColumnInfo) => setConfig({ ...config, multiples })}
+              columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
+              currentSelected={config.multiples}
+            />
           )
         : null}
       <hr />
