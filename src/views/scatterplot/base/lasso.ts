@@ -75,7 +75,6 @@ export class Lasso {
     const [y0, y1] = extent(polygon, (d) => d[1]);
     return {
       test: (x: number, y: number) => polygonContains(polygon, [x, y]),
-      // @ts-ignore
       testArea: QuadtreeUtils.hasOverlap(x0!, y0!, x1!, y1!),
     };
   }
