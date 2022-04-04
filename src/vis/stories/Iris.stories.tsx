@@ -2,6 +2,7 @@ import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { Vis } from '../Vis';
 import {
+  EAggregateTypes,
   EBarDirection,
   EBarDisplayType,
   EBarGroupingType,
@@ -124,6 +125,8 @@ BarChart.args = {
       id: 'species',
       name: 'Species',
     },
+    aggregateColumn: null,
+    aggregateType: EAggregateTypes.COUNT,
   },
 };
 
