@@ -23,15 +23,6 @@ class DummyUser(User):
         return given_h == self.password
 
 
-def from_env_var(k, v):
-    elems = v.split(";")
-    name = k[12:]  # PHOVEA_USER_
-    salt = elems[0]
-    password = elems[1]
-    roles = elems[2:]
-    return DummyUser(id=name, name=name, roles=roles, password=password, salt=salt)
-
-
 class DummyStore(BaseStore):
     def __init__(self):
         self._users = [

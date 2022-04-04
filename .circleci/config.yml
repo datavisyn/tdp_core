@@ -55,7 +55,7 @@ jobs:
           name: API Doc generation
           command: |
             . ~/venv/bin/activate
-            make sphinx
+            make mkdocs
       - run:
           name: Build wheel
           command: |

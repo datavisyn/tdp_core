@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional
 
 from fastapi import FastAPI, Request
 
@@ -18,5 +18,5 @@ class BaseStore(object):
     def login(self, username: str, extra_fields={}) -> User:
         return None
 
-    def logout(self, user: User) -> Union[LogoutReturnValue, None]:
+    def logout(self, user: User) -> Optional[LogoutReturnValue]:
         pass
