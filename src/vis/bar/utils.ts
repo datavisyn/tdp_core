@@ -169,13 +169,13 @@ async function setPlotsWithGroupsAndMultiples(
             (c) => allGroupObjs.find((groupObj) => groupObj.id === c.id) && allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id),
           );
 
-          const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues.resolvedValues as VisNumericalValue[]);
+          const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
 
           const ungroupedAggregateValues = getTotalAggregateValues(
             aggType,
             uniqueMultiplesVals,
             currMultiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)) as VisCategoricalValue[],
-            aggColValues.resolvedValues as VisNumericalValue[],
+            aggColValues?.resolvedValues as VisNumericalValue[],
           );
           return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
         })
@@ -232,12 +232,12 @@ async function setPlotsWithGroups(
         const allGroupObjs = (groupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal);
         const joinedObjs = allObjs.filter((allVal) => allGroupObjs.find((groupVal) => groupVal.id === allVal.id));
 
-        const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues.resolvedValues as VisNumericalValue[]);
+        const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
         const ungroupedAggregateValues = getTotalAggregateValues(
           aggType,
           uniqueGroupVals,
           groupColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)) as VisCategoricalValue[],
-          aggColValues.resolvedValues as VisNumericalValue[],
+          aggColValues?.resolvedValues as VisNumericalValue[],
         );
 
         return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
@@ -293,12 +293,12 @@ async function setPlotsWithMultiples(
         const allMultiplesObjs = (multiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal);
         const joinedObjs = allObjs.filter((c) => allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
 
-        const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues.resolvedValues as VisNumericalValue[]);
+        const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
         const ungroupedAggregateValues = getTotalAggregateValues(
           aggType,
           uniqueMultiplesVals,
           multiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)) as VisCategoricalValue[],
-          aggColValues.resolvedValues as VisNumericalValue[],
+          aggColValues?.resolvedValues as VisNumericalValue[],
         );
         return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
       })
@@ -340,7 +340,7 @@ async function setPlotsBasic(
 
   const vertFlag = config.direction === EBarDirection.VERTICAL;
 
-  const aggValues = getAggregateValues(aggType, catColValues.resolvedValues as VisCategoricalValue[], aggColValues.resolvedValues as VisNumericalValue[]);
+  const aggValues = getAggregateValues(aggType, catColValues.resolvedValues as VisCategoricalValue[], aggColValues?.resolvedValues as VisNumericalValue[]);
 
   const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))];
   plots.push({

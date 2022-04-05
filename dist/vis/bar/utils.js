@@ -89,8 +89,8 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggType, aggregat
                 const allGroupObjs = currGroupColumn.resolvedValues.filter((c) => c.val === uniqueGroup);
                 const allMultiplesObjs = currMultiplesColumn.resolvedValues.filter((c) => c.val === uniqueMultiples);
                 const joinedObjs = allObjs.filter((c) => allGroupObjs.find((groupObj) => groupObj.id === c.id) && allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
-                const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues.resolvedValues);
-                const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueMultiplesVals, currMultiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues.resolvedValues);
+                const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+                const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueMultiplesVals, currMultiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
                 return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
             })
                 .flat();
@@ -130,8 +130,8 @@ async function setPlotsWithGroups(columns, catCol, aggType, aggColumn, config, p
             const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
             const allGroupObjs = groupColumn.resolvedValues.filter((c) => c.val === uniqueVal);
             const joinedObjs = allObjs.filter((allVal) => allGroupObjs.find((groupVal) => groupVal.id === allVal.id));
-            const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues.resolvedValues);
-            const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueGroupVals, groupColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues.resolvedValues);
+            const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+            const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueGroupVals, groupColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
             return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
         })
             .flat();
@@ -170,8 +170,8 @@ async function setPlotsWithMultiples(columns, catCol, aggType, aggColumn, config
             const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
             const allMultiplesObjs = multiplesColumn.resolvedValues.filter((c) => c.val === uniqueVal);
             const joinedObjs = allObjs.filter((c) => allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
-            const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues.resolvedValues);
-            const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueMultiplesVals, multiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues.resolvedValues);
+            const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+            const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueMultiplesVals, multiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
             return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
         })
             .flat();
@@ -198,7 +198,7 @@ async function setPlotsBasic(columns, aggType, aggregateColumn, catCol, config, 
     const catColValues = await resolveSingleColumn(catCol);
     const aggColValues = await resolveSingleColumn(aggregateColumn);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
-    const aggValues = getAggregateValues(aggType, catColValues.resolvedValues, aggColValues.resolvedValues);
+    const aggValues = getAggregateValues(aggType, catColValues.resolvedValues, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
     const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     plots.push({
         data: {
