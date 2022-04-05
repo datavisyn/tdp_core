@@ -38,9 +38,6 @@ jobs:
             . ~/venv/bin/activate
             pip list || true
       - run:
-          name: Clear dist folder
-          command: rm -rf dist && mkdir dist
-      - run:
           name: Linting
           command: |
             . ~/venv/bin/activate
@@ -55,14 +52,14 @@ jobs:
           name: API Doc generation
           command: |
             . ~/venv/bin/activate
-            make mkdocs
+            make documentation
       - run:
           name: Build wheel
           command: |
             . ~/venv/bin/activate
             make build
       - store_artifacts:
-          path: dist
+          path: dist_python
           destination: dist-python
       - persist_to_workspace:
           root: ~/.
@@ -90,7 +87,7 @@ jobs:
           name: Publish package
           command: |
             . ~/venv/bin/activate
-            twine upload dist/*
+            twine upload dist_python/*
   web-build:
     executor: node-executor
     steps:

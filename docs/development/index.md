@@ -20,10 +20,10 @@ Use `make test` to run the available test-suites using pytest.
 
 ### Commands
 
-* `make mkdocs new [dir-name]` - Create a new project.
-* `make mkdocs serve` - Start the live-reloading docs server.
-* `make mkdocs build` - Build the documentation site.
-* `make mkdocs -h` - Print help message and exit.
+* `mkdocs new [dir-name]` - Create a new project.
+* `mkdocs serve` - Start the live-reloading docs server.
+* `mkdocs build` - Build the documentation site.
+* `mkdocs -h` - Print help message and exit.
 
 ### Project layout
 
