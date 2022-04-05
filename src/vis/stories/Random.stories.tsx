@@ -133,7 +133,11 @@ BarChart.args = {
       id: 'category',
       name: 'category',
     },
-    aggregateColumn: null,
+    aggregateColumn: {
+      description: '',
+      id: 'sepalLength',
+      name: 'Sepal Length',
+    },
     aggregateType: EAggregateTypes.COUNT,
   },
 };
