@@ -9,28 +9,6 @@ import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';
 import { createBarTraces } from './utils';
 import { BarVisSidebar } from './BarVisSidebar';
-const defaultConfig = {
-    group: {
-        enable: true,
-        customComponent: null,
-    },
-    multiples: {
-        enable: true,
-        customComponent: null,
-    },
-    direction: {
-        enable: true,
-        customComponent: null,
-    },
-    groupType: {
-        enable: true,
-        customComponent: null,
-    },
-    display: {
-        enable: true,
-        customComponent: null,
-    },
-};
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -38,9 +16,6 @@ const defaultExtensions = {
     postSidebar: null,
 };
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }) {
-    const mergedOptionsConfig = React.useMemo(() => {
-        return merge({}, defaultConfig, optionsConfig);
-    }, [optionsConfig]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);

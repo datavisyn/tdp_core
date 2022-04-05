@@ -1,15 +1,15 @@
 /// <reference types="react" />
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
-    SCATTER = "Scatter",
-    PCP = "Parallel Coordinates",
-    VIOLIN = "Violin",
-    STRIP = "Strip",
-    BAR = "Bar"
+    SCATTER = "Scatter Plot",
+    PCP = "Parallel Coordinates Plot",
+    VIOLIN = "Violin Plot",
+    STRIP = "Strip Plot",
+    BAR = "Bar Chart"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EBarDisplayType {
-    DEFAULT = "Default",
+    ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
 }
 export declare enum EBarDirection {
@@ -37,11 +37,17 @@ export declare enum EGeneralFormType {
 export declare enum EFilterOptions {
     IN = "Filter In",
     OUT = "Filter Out",
-    CLEAR = "Clear Filter"
+    CLEAR = "Clear"
 }
 export declare enum ENumericalColorScaleType {
     SEQUENTIAL = "Sequential",
     DIVERGENT = "Divergent"
+}
+export declare enum EScatterSelectSettings {
+    RECTANGLE = "select",
+    LASSO = "lasso",
+    ZOOM = "zoom",
+    PAN = "pan"
 }
 export interface IViolinConfig {
     type: ESupportedPlotlyVis.VIOLIN;
@@ -60,7 +66,7 @@ export interface IScatterConfig {
     color: ColumnInfo | null;
     numColorScaleType: ENumericalColorScaleType;
     shape: ColumnInfo | null;
-    isRectBrush: boolean;
+    dragMode: EScatterSelectSettings;
     alphaSliderVal: number;
 }
 export interface IBarConfig {
@@ -71,7 +77,7 @@ export interface IBarConfig {
     display: EBarDisplayType;
     groupType: EBarGroupingType;
     numColumnsSelected: ColumnInfo[];
-    catColumnsSelected: ColumnInfo[];
+    catColumnSelected: ColumnInfo;
 }
 export interface IPCPConfig {
     type: ESupportedPlotlyVis.PCP;

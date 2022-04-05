@@ -30,13 +30,6 @@ interface ViolinVisProps {
   hideSidebar?: boolean;
 }
 
-const defaultConfig = {
-  overlay: {
-    enable: true,
-    customComponent: null,
-  },
-};
-
 const defaultExtensions = {
   prePlot: null,
   postPlot: null,

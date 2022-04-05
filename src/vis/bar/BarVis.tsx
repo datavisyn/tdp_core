@@ -46,29 +46,6 @@ interface BarVisProps {
   hideSidebar?: boolean;
 }
 
-const defaultConfig = {
-  group: {
-    enable: true,
-    customComponent: null,
-  },
-  multiples: {
-    enable: true,
-    customComponent: null,
-  },
-  direction: {
-    enable: true,
-    customComponent: null,
-  },
-  groupType: {
-    enable: true,
-    customComponent: null,
-  },
-  display: {
-    enable: true,
-    customComponent: null,
-  },
-};
-
 const defaultExtensions = {
   prePlot: null,
   postPlot: null,
@@ -77,10 +54,6 @@ const defaultExtensions = {
 };
 
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }: BarVisProps) {
-  const mergedOptionsConfig = React.useMemo(() => {
-    return merge({}, defaultConfig, optionsConfig);
-  }, [optionsConfig]);
-
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
