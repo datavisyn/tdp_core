@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useMemo } from 'react';
 import Highlighter from 'react-highlight-words';
 import Select from 'react-select';
 import { ColumnInfo, EAggregateTypes, EColumnTypes, VisColumn } from '../interfaces';
@@ -29,15 +30,19 @@ export function AggregateTypeSelect({
   currentSelected,
   aggregateColumn,
 }: AggregateTypeSelectProps) {
+  const hasNumCols = useMemo(() => {
+    return !!columns.find((col) => col.type === EColumnTypes.NUMERICAL);
+  }, [columns]);
+
   const selectOptions = React.useMemo(() => {
     return [
       { disabled: false, id: EAggregateTypes.COUNT, name: EAggregateTypes.COUNT },
-      { disabled: !aggregateColumn, id: EAggregateTypes.AVG, name: EAggregateTypes.AVG },
-      { disabled: !aggregateColumn, id: EAggregateTypes.MIN, name: EAggregateTypes.MIN },
-      { disabled: !aggregateColumn, id: EAggregateTypes.MAX, name: EAggregateTypes.MAX },
-      { disabled: !aggregateColumn, id: EAggregateTypes.MED, name: EAggregateTypes.MED },
+      { disabled: !hasNumCols, id: EAggregateTypes.AVG, name: EAggregateTypes.AVG },
+      { disabled: !hasNumCols, id: EAggregateTypes.MIN, name: EAggregateTypes.MIN },
+      { disabled: !hasNumCols, id: EAggregateTypes.MAX, name: EAggregateTypes.MAX },
+      { disabled: !hasNumCols, id: EAggregateTypes.MED, name: EAggregateTypes.MED },
     ];
-  }, [aggregateColumn]);
+  }, [hasNumCols]);
 
   return (
     <>
@@ -50,7 +55,7 @@ export function AggregateTypeSelect({
         onChange={(e) => aggregateTypeSelectCallback(e.id)}
         name="numColumns"
         options={selectOptions || []}
-        isOptionDisabled={(option) => (option.id === EAggregateTypes.COUNT ? false : !aggregateColumn)}
+        isOptionDisabled={(option) => (option.id === EAggregateTypes.COUNT ? false : !hasNumCols)}
         value={{ label: currentSelected, id: currentSelected, name: currentSelected }}
       />
       {currentSelected !== EAggregateTypes.COUNT ? (

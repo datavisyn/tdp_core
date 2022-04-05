@@ -123,7 +123,13 @@ export function BarVisSidebar({
         label="Categorical Column"
       />
       <AggregateTypeSelect
-        aggregateTypeSelectCallback={(aggregateType: EAggregateTypes) => setConfig({ ...config, aggregateType })}
+        aggregateTypeSelectCallback={(aggregateType: EAggregateTypes) => {
+          if (config.aggregateColumn === null) {
+            setConfig({ ...config, aggregateType, aggregateColumn: columns.find((col) => col.type === EColumnTypes.NUMERICAL).info });
+          } else {
+            setConfig({ ...config, aggregateType });
+          }
+        }}
         aggregateColumnSelectCallback={(aggregateColumn: ColumnInfo) => setConfig({ ...config, aggregateColumn })}
         columns={columns}
         currentSelected={config.aggregateType}

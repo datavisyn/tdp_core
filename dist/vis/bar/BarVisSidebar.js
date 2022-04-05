@@ -56,7 +56,14 @@ export function BarVisSidebar({ config, optionsConfig, extensions, columns, setC
                 multiples: config.multiples && config.multiples.id === catColumnSelected.id ? null : config.multiples,
                 group: config.group && config.group.id === catColumnSelected.id ? null : config.group,
             }), columns: columns, currentSelected: config.catColumnSelected, type: [EColumnTypes.CATEGORICAL], label: "Categorical Column" }),
-        React.createElement(AggregateTypeSelect, { aggregateTypeSelectCallback: (aggregateType) => setConfig({ ...config, aggregateType }), aggregateColumnSelectCallback: (aggregateColumn) => setConfig({ ...config, aggregateColumn }), columns: columns, currentSelected: config.aggregateType, aggregateColumn: config.aggregateColumn }),
+        React.createElement(AggregateTypeSelect, { aggregateTypeSelectCallback: (aggregateType) => {
+                if (config.aggregateColumn === null) {
+                    setConfig({ ...config, aggregateType, aggregateColumn: columns.find((col) => col.type === EColumnTypes.NUMERICAL).info });
+                }
+                else {
+                    setConfig({ ...config, aggregateType });
+                }
+            }, aggregateColumnSelectCallback: (aggregateColumn) => setConfig({ ...config, aggregateColumn }), columns: columns, currentSelected: config.aggregateType, aggregateColumn: config.aggregateColumn }),
         React.createElement("hr", null),
         mergedExtensions.preSidebar,
         mergedOptionsConfig.group.enable
