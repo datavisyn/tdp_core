@@ -45,7 +45,7 @@ setup(
     'Programming Language :: Python :: 3.10'
   ],
 
-  python_requires='>=3',
+  python_requires='>=3.10',
 
   # You can just specify the packages manually here if your project is
   # simple. Or you can use find_packages().
@@ -60,12 +60,9 @@ setup(
     'develop': requirements('requirements_dev.txt'),
   },
 
-  # If there are data files included in your packages that need to be
-  # installed, specify them here.  If using Python 2.6 or less, then these
-  # have to be included in MANIFEST.in as well.
-  package_data={
-    pkg['name']: ['*/**/*']
-  },
+  # Include all files from the MANIFEST.in file.
+  include_package_data=True,
+  package_data={},
 
   # Although 'package_data' is the preferred approach, in some case you may
   # need to place data files outside of your packages. See:
