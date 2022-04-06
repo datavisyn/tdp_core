@@ -82,15 +82,16 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggType, aggregat
     const uniqueMultiplesVals = [...new Set(currMultiplesColumn.resolvedValues.map((v) => v.val))];
     const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     uniqueMultiplesVals.forEach((uniqueMultiples) => {
+        const allMultiplesObjsIds = new Set(currMultiplesColumn.resolvedValues.filter((c) => c.val === uniqueMultiples).map((c) => c.id));
         uniqueGroupVals.forEach((uniqueGroup) => {
+            const allGroupObjsIds = new Set(currGroupColumn.resolvedValues.filter((c) => c.val === uniqueGroup).map((c) => c.id));
             const aggregateVals = uniqueColVals
                 .map((v) => {
                 const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
-                const allGroupObjs = currGroupColumn.resolvedValues.filter((c) => c.val === uniqueGroup);
-                const allMultiplesObjs = currMultiplesColumn.resolvedValues.filter((c) => c.val === uniqueMultiples);
-                const joinedObjs = allObjs.filter((c) => allGroupObjs.find((groupObj) => groupObj.id === c.id) && allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
+                const allObjsIds = new Set(allObjs.map((o) => o.id));
+                const joinedObjs = allObjs.filter((c) => allGroupObjsIds.has(c.id) && allMultiplesObjsIds.has(c.id));
                 const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
-                const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueMultiplesVals, currMultiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+                const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueMultiplesVals, currMultiplesColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
                 return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
             })
                 .flat();
@@ -132,13 +133,14 @@ async function setPlotsWithGroups(columns, catCol, aggType, aggColumn, config, p
     const uniqueGroupVals = [...new Set(groupColumn.resolvedValues.map((v) => v.val))];
     const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     uniqueGroupVals.forEach((uniqueVal) => {
-        const allGroupObjs = groupColumn.resolvedValues.filter((c) => c.val === uniqueVal);
+        const allGroupObjsIds = new Set(groupColumn.resolvedValues.filter((c) => c.val === uniqueVal).map((c) => c.id));
         const finalAggregateValues = uniqueColVals
             .map((v) => {
             const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
-            const joinedObjs = allObjs.filter((allVal) => allGroupObjs.find((groupVal) => groupVal.id === allVal.id));
+            const allObjsIds = new Set(allObjs.map((o) => o.id));
+            const joinedObjs = allObjs.filter((allVal) => allGroupObjsIds.has(allVal.id));
             const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
-            const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueGroupVals, groupColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+            const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueGroupVals, groupColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
             return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
         })
             .flat();
@@ -173,16 +175,16 @@ async function setPlotsWithMultiples(columns, catCol, aggType, aggColumn, config
     let plotCounterEdit = plotCounter;
     const catColValues = await resolveSingleColumn(catCol);
     const aggColValues = await resolveSingleColumn(aggColumn);
-    const vertFlag = config.direction === EBarDirection.VERTICAL;
     const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
+    const vertFlag = config.direction === EBarDirection.VERTICAL;
     const uniqueMultiplesVals = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))];
     const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     uniqueMultiplesVals.forEach((uniqueVal) => {
+        const allMultiplesObjsIds = new Set(multiplesColumn.resolvedValues.filter((c) => c.val === uniqueVal).map((c) => c.id));
         const finalAggregateValues = uniqueColVals
             .map((v) => {
             const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
-            const allMultiplesObjs = multiplesColumn.resolvedValues.filter((c) => c.val === uniqueVal);
-            const joinedObjs = allObjs.filter((c) => allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
+            const joinedObjs = allObjs.filter((c) => allMultiplesObjsIds.has(c.id));
             const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
             return joinedObjs.length === 0 ? [0] : aggregateValues;
         })

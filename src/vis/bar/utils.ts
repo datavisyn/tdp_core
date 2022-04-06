@@ -158,23 +158,27 @@ async function setPlotsWithGroupsAndMultiples(
   const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))] as string[];
 
   uniqueMultiplesVals.forEach((uniqueMultiples) => {
+    const allMultiplesObjsIds = new Set(
+      (currMultiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueMultiples).map((c) => c.id),
+    );
+
     uniqueGroupVals.forEach((uniqueGroup) => {
+      const allGroupObjsIds = new Set((currGroupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueGroup).map((c) => c.id));
+
       const aggregateVals = uniqueColVals
         .map((v) => {
           const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v);
-          const allGroupObjs = (currGroupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueGroup);
-          const allMultiplesObjs = (currMultiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueMultiples);
+          const allObjsIds = new Set(allObjs.map((o) => o.id));
 
-          const joinedObjs = allObjs.filter(
-            (c) => allGroupObjs.find((groupObj) => groupObj.id === c.id) && allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id),
-          );
+
+          const joinedObjs = allObjs.filter((c) => allGroupObjsIds.has(c.id) && allMultiplesObjsIds.has(c.id));
 
           const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
 
           const ungroupedAggregateValues = getTotalAggregateValues(
             aggType,
             uniqueMultiplesVals,
-            currMultiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)) as VisCategoricalValue[],
+            currMultiplesColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)) as VisCategoricalValue[],
             aggColValues?.resolvedValues as VisNumericalValue[],
           );
           return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
@@ -233,17 +237,19 @@ async function setPlotsWithGroups(
   const uniqueColVals: string[] = [...new Set(catColValues.resolvedValues.map((v) => v.val))] as string[];
 
   uniqueGroupVals.forEach((uniqueVal) => {
-    const allGroupObjs = (groupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal);
+    const allGroupObjsIds = new Set((groupColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id));
     const finalAggregateValues = uniqueColVals
       .map((v) => {
         const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v);
-        const joinedObjs = allObjs.filter((allVal) => allGroupObjs.find((groupVal) => groupVal.id === allVal.id));
+        const allObjsIds = new Set(allObjs.map((o) => o.id));
+
+        const joinedObjs = allObjs.filter((allVal) => allGroupObjsIds.has(allVal.id));
 
         const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
         const ungroupedAggregateValues = getTotalAggregateValues(
           aggType,
           uniqueGroupVals,
-          groupColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)) as VisCategoricalValue[],
+          groupColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)) as VisCategoricalValue[],
           aggColValues?.resolvedValues as VisNumericalValue[],
         );
 
@@ -292,19 +298,20 @@ async function setPlotsWithMultiples(
   let plotCounterEdit = plotCounter;
   const catColValues = await resolveSingleColumn(catCol);
   const aggColValues = await resolveSingleColumn(aggColumn);
+  const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
 
   const vertFlag = config.direction === EBarDirection.VERTICAL;
-  const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
 
   const uniqueMultiplesVals: string[] = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))] as string[];
   const uniqueColVals: string[] = [...new Set(catColValues.resolvedValues.map((v) => v.val))] as string[];
 
   uniqueMultiplesVals.forEach((uniqueVal) => {
+    const allMultiplesObjsIds = new Set((multiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal).map((c) => c.id));
+
     const finalAggregateValues = uniqueColVals
       .map((v) => {
         const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v);
-        const allMultiplesObjs = (multiplesColumn.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === uniqueVal);
-        const joinedObjs = allObjs.filter((c) => allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
+        const joinedObjs = allObjs.filter((c) => allMultiplesObjsIds.has(c.id));
 
         const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
 
