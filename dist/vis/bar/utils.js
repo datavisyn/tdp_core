@@ -2,7 +2,7 @@ import { merge, sum, mean, min, max } from 'lodash';
 import { median } from 'd3';
 import { I18nextManager } from '../../i18n';
 import { EColumnTypes, ESupportedPlotlyVis, EBarGroupingType, EBarDisplayType, EBarDirection, EAggregateTypes, } from '../interfaces';
-import { resolveSingleColumn } from '../general/layoutUtils';
+import { resolveSingleColumn, truncateText } from '../general/layoutUtils';
 import { getCol } from '../sidebar';
 export function isBar(s) {
     return s.type === ESupportedPlotlyVis.BAR;
@@ -96,8 +96,11 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggType, aggregat
                 .flat();
             plots.push({
                 data: {
-                    x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : aggregateVals,
-                    y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : aggregateVals,
+                    x: vertFlag ? uniqueColVals : aggregateVals,
+                    y: !vertFlag ? uniqueColVals : aggregateVals,
+                    text: uniqueColVals,
+                    textposition: 'none',
+                    hoverinfo: vertFlag ? 'y+text' : 'x+text',
                     orientation: vertFlag ? 'v' : 'h',
                     xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
                     yaxis: plotCounterEdit === 1 ? 'y' : `y${plotCounterEdit}`,
@@ -110,6 +113,10 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggType, aggregat
                 },
                 xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
                 yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
+                xTicks: vertFlag ? uniqueColVals : null,
+                xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
+                yTicks: !vertFlag ? uniqueColVals : null,
+                yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
             });
         });
         plotCounterEdit += 1;
@@ -124,19 +131,14 @@ async function setPlotsWithGroups(columns, catCol, aggType, aggColumn, config, p
     const groupColumn = await resolveSingleColumn(getCol(columns, config.group));
     const uniqueGroupVals = [...new Set(groupColumn.resolvedValues.map((v) => v.val))];
     const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
-    console.log('START');
     uniqueGroupVals.forEach((uniqueVal) => {
         const allGroupObjs = groupColumn.resolvedValues.filter((c) => c.val === uniqueVal);
         const finalAggregateValues = uniqueColVals
             .map((v) => {
-            console.log('slow part start');
             const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
             const joinedObjs = allObjs.filter((allVal) => allGroupObjs.find((groupVal) => groupVal.id === allVal.id));
-            console.log('slow part finish');
-            console.log('aggregate part start');
             const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
             const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueGroupVals, groupColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
-            console.log('aggregate part finish');
             return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
         })
             .flat();
@@ -144,6 +146,9 @@ async function setPlotsWithGroups(columns, catCol, aggType, aggColumn, config, p
             data: {
                 x: vertFlag ? uniqueColVals : finalAggregateValues,
                 y: !vertFlag ? uniqueColVals : finalAggregateValues,
+                text: uniqueColVals,
+                textposition: 'none',
+                hoverinfo: vertFlag ? 'y+text' : 'x+text',
                 orientation: vertFlag ? 'v' : 'h',
                 xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
                 yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -156,10 +161,12 @@ async function setPlotsWithGroups(columns, catCol, aggType, aggColumn, config, p
             },
             xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
             yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
+            xTicks: vertFlag ? uniqueColVals : null,
+            xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
+            yTicks: !vertFlag ? uniqueColVals : null,
+            yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
         });
-        console.log('ONE GROUP DONE');
     });
-    console.log('FINISHED');
     return plotCounter;
 }
 async function setPlotsWithMultiples(columns, catCol, aggType, aggColumn, config, plots, plotCounter) {
@@ -167,7 +174,6 @@ async function setPlotsWithMultiples(columns, catCol, aggType, aggColumn, config
     const catColValues = await resolveSingleColumn(catCol);
     const aggColValues = await resolveSingleColumn(aggColumn);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
-    const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
     const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
     const uniqueMultiplesVals = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))];
     const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
@@ -183,17 +189,24 @@ async function setPlotsWithMultiples(columns, catCol, aggType, aggColumn, config
             .flat();
         plots.push({
             data: {
-                x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
-                y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
+                x: vertFlag ? uniqueColVals : finalAggregateValues,
+                y: !vertFlag ? uniqueColVals : finalAggregateValues,
+                text: uniqueColVals,
+                textposition: 'none',
+                hoverinfo: vertFlag ? 'y+text' : 'x+text',
                 orientation: vertFlag ? 'v' : 'h',
                 xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
                 yaxis: plotCounterEdit === 1 ? 'y' : `y${plotCounterEdit}`,
-                showlegend: plotCounterEdit === 1,
+                showlegend: false,
                 type: 'bar',
                 name: uniqueVal,
             },
-            xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
-            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
+            xLabel: vertFlag ? catColValues.info.name : aggType,
+            yLabel: vertFlag ? aggType : catColValues.info.name,
+            xTicks: vertFlag ? uniqueColVals : null,
+            xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
+            yTicks: !vertFlag ? uniqueColVals : null,
+            yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
         });
         plotCounterEdit += 1;
     });
@@ -208,17 +221,25 @@ async function setPlotsBasic(columns, aggType, aggregateColumn, catCol, config, 
     const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     plots.push({
         data: {
-            x: vertFlag ? valArr.map((v) => v) : aggValues,
-            y: !vertFlag ? valArr.map((v) => v) : aggValues,
+            x: vertFlag ? valArr : aggValues,
+            y: !vertFlag ? valArr : aggValues,
+            text: valArr,
+            textposition: 'none',
+            hoverinfo: vertFlag ? 'y+text' : 'x+text',
             ids: valArr,
             orientation: vertFlag ? 'v' : 'h',
             xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
             yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
             type: 'bar',
             name: catColValues.info.name,
+            showlegend: false,
         },
         xLabel: vertFlag ? catColValues.info.name : aggType,
         yLabel: vertFlag ? aggType : catColValues.info.name,
+        xTicks: vertFlag ? valArr : null,
+        xTickLabels: vertFlag ? valArr.map((v) => truncateText(v, 8)) : null,
+        yTicks: !vertFlag ? valArr : null,
+        yTickLabels: !vertFlag ? valArr.map((v) => truncateText(v, 8)) : null,
     });
     plotCounterEdit += 1;
     return plotCounterEdit;

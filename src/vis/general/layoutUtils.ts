@@ -7,7 +7,7 @@ import { Plotly } from '../Plot';
  * @param maxLength Maximum text length (default: 50)
  */
 export function truncateText(text: string, maxLength = 50) {
-  return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+  return text.length > maxLength ? `${text.substring(0, maxLength)}..` : text;
 }
 
 /**
@@ -21,6 +21,10 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
   layoutEdit.annotations = [];
   traces.plots.forEach((t, i) => {
     layoutEdit[`xaxis${i > 0 ? i + 1 : ''}`] = {
+      automargin: true,
+      tickvals: t.xTicks,
+      ticktext: t.xTickLabels,
+      text: t.xTicks,
       showline: false,
       showspikes: true,
       spikecolor: 'black',
@@ -29,7 +33,7 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
       fixedrange: true,
       ticks: 'outside',
       title: {
-        standoff: 5,
+        standoff: 10,
         text: traces.plots.length > 1 ? truncateText(t.xLabel, 15) : truncateText(t.xLabel, 50),
         font: {
           family: 'Courier New, monospace',
@@ -40,6 +44,10 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
     };
 
     layoutEdit[`yaxis${i > 0 ? i + 1 : ''}`] = {
+      automargin: true,
+      tickvals: t.yTicks,
+      ticktext: t.yTickLabels,
+      text: t.yTicks,
       showline: false,
       showspikes: true,
       spikecolor: 'black',
@@ -48,6 +56,7 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
       ticks: 'outside',
       fixedrange: true,
       title: {
+        standoff: 10,
         text: traces.plots.length > 1 ? truncateText(t.yLabel, 15) : truncateText(t.yLabel, 50),
         font: {
           family: 'Courier New, monospace',
