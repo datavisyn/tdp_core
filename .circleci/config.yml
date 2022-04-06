@@ -47,12 +47,6 @@ jobs:
           command: |
             . ~/venv/bin/activate
             make test
-      # TODO: This should be in a hook or something?
-      - run:
-          name: API Doc generation
-          command: |
-            . ~/venv/bin/activate
-            make documentation
       - run:
           name: Build wheel
           command: |
