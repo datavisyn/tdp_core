@@ -7,8 +7,6 @@ import { WarningMessage } from '../sidebar/WarningMessage';
 import { GroupSelect } from '../sidebar/GroupSelect';
 import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
-import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
-import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
 import { SingleColumnSelect } from '../sidebar/SingleColumnSelect';
 import { AggregateTypeSelect } from '../sidebar/AggregateTypeSelect';
 const defaultConfig = {
@@ -67,7 +65,7 @@ export function BarVisSidebar({ config, optionsConfig, extensions, columns, setC
         React.createElement("hr", null),
         mergedExtensions.preSidebar,
         mergedOptionsConfig.group.enable
-            ? mergedOptionsConfig.group.customComponent || (React.createElement(GroupSelect, { callback: (group) => setConfig({ ...config, group }), columns: columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id), currentSelected: config.group }))
+            ? mergedOptionsConfig.group.customComponent || (React.createElement(GroupSelect, { groupColumnSelectCallback: (group) => setConfig({ ...config, group }), groupTypeSelectCallback: (groupType) => setConfig({ ...config, groupType }), groupDisplaySelectCallback: (display) => setConfig({ ...config, display }), displayType: config.display, groupType: config.groupType, columns: columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id), currentSelected: config.group }))
             : null,
         mergedOptionsConfig.multiples.enable
             ? mergedOptionsConfig.multiples.customComponent || (React.createElement(MultiplesSelect, { callback: (multiples) => setConfig({ ...config, multiples }), columns: columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id), currentSelected: config.multiples }))
@@ -75,12 +73,6 @@ export function BarVisSidebar({ config, optionsConfig, extensions, columns, setC
         React.createElement("hr", null),
         mergedOptionsConfig.direction.enable
             ? mergedOptionsConfig.direction.customComponent || (React.createElement(BarDirectionButtons, { callback: (direction) => setConfig({ ...config, direction }), currentSelected: config.direction }))
-            : null,
-        mergedOptionsConfig.groupType.enable
-            ? mergedOptionsConfig.groupType.customComponent || (React.createElement(BarGroupTypeButtons, { callback: (groupType) => setConfig({ ...config, groupType }), currentSelected: config.groupType }))
-            : null,
-        mergedOptionsConfig.display.enable
-            ? mergedOptionsConfig.display.customComponent || (React.createElement(BarDisplayButtons, { callback: (display) => setConfig({ ...config, display }), currentSelected: config.display }))
             : null,
         mergedExtensions.postSidebar));
 }

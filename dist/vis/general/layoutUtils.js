@@ -3,7 +3,7 @@
  * @param text Input text to be truncated
  * @param maxLength Maximum text length (default: 50)
  */
-function truncateText(text, maxLength = 50) {
+export function truncateText(text, maxLength = 50) {
     return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
 }
 /**

@@ -47,7 +47,7 @@ export function Vis({ columns, selected = [], colors = DEFAULTCOLORS, shapes = D
                     type: ESupportedPlotlyVis.BAR,
                     multiples: null,
                     group: null,
-                    direction: EBarDirection.VERTICAL,
+                    direction: EBarDirection.HORIZONTAL,
                     display: EBarDisplayType.ABSOLUTE,
                     groupType: EBarGroupingType.STACK,
                     numColumnsSelected: [],

@@ -15,7 +15,7 @@ const defaultConfig = {
     groupType: EBarGroupingType.STACK,
     multiples: null,
     display: EBarDisplayType.ABSOLUTE,
-    direction: EBarDirection.VERTICAL,
+    direction: EBarDirection.HORIZONTAL,
     aggregateColumn: null,
     aggregateType: EAggregateTypes.COUNT,
 };
@@ -124,21 +124,26 @@ async function setPlotsWithGroups(columns, catCol, aggType, aggColumn, config, p
     const groupColumn = await resolveSingleColumn(getCol(columns, config.group));
     const uniqueGroupVals = [...new Set(groupColumn.resolvedValues.map((v) => v.val))];
     const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
+    console.log('START');
     uniqueGroupVals.forEach((uniqueVal) => {
+        const allGroupObjs = groupColumn.resolvedValues.filter((c) => c.val === uniqueVal);
         const finalAggregateValues = uniqueColVals
             .map((v) => {
+            console.log('slow part start');
             const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
-            const allGroupObjs = groupColumn.resolvedValues.filter((c) => c.val === uniqueVal);
             const joinedObjs = allObjs.filter((allVal) => allGroupObjs.find((groupVal) => groupVal.id === allVal.id));
+            console.log('slow part finish');
+            console.log('aggregate part start');
             const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
             const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueGroupVals, groupColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+            console.log('aggregate part finish');
             return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
         })
             .flat();
         plots.push({
             data: {
-                x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
-                y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
+                x: vertFlag ? uniqueColVals : finalAggregateValues,
+                y: !vertFlag ? uniqueColVals : finalAggregateValues,
                 orientation: vertFlag ? 'v' : 'h',
                 xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
                 yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -152,7 +157,9 @@ async function setPlotsWithGroups(columns, catCol, aggType, aggColumn, config, p
             xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
             yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
         });
+        console.log('ONE GROUP DONE');
     });
+    console.log('FINISHED');
     return plotCounter;
 }
 async function setPlotsWithMultiples(columns, catCol, aggType, aggColumn, config, plots, plotCounter) {
@@ -171,8 +178,7 @@ async function setPlotsWithMultiples(columns, catCol, aggType, aggColumn, config
             const allMultiplesObjs = multiplesColumn.resolvedValues.filter((c) => c.val === uniqueVal);
             const joinedObjs = allObjs.filter((c) => allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
             const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
-            const ungroupedAggregateValues = getTotalAggregateValues(aggType, uniqueMultiplesVals, multiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
-            return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
+            return joinedObjs.length === 0 ? [0] : aggregateValues;
         })
             .flat();
         plots.push({
@@ -202,8 +208,8 @@ async function setPlotsBasic(columns, aggType, aggregateColumn, catCol, config, 
     const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     plots.push({
         data: {
-            x: vertFlag ? valArr : aggValues,
-            y: !vertFlag ? valArr : aggValues,
+            x: vertFlag ? valArr.map((v) => v) : aggValues,
+            y: !vertFlag ? valArr.map((v) => v) : aggValues,
             ids: valArr,
             orientation: vertFlag ? 'v' : 'h',
             xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,

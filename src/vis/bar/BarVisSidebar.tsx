@@ -141,7 +141,11 @@ export function BarVisSidebar({
       {mergedOptionsConfig.group.enable
         ? mergedOptionsConfig.group.customComponent || (
             <GroupSelect
-              callback={(group: ColumnInfo) => setConfig({ ...config, group })}
+              groupColumnSelectCallback={(group: ColumnInfo) => setConfig({ ...config, group })}
+              groupTypeSelectCallback={(groupType: EBarGroupingType) => setConfig({ ...config, groupType })}
+              groupDisplaySelectCallback={(display: EBarDisplayType) => setConfig({ ...config, display })}
+              displayType={config.display}
+              groupType={config.groupType}
               columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
               currentSelected={config.group}
             />
@@ -160,18 +164,6 @@ export function BarVisSidebar({
       {mergedOptionsConfig.direction.enable
         ? mergedOptionsConfig.direction.customComponent || (
             <BarDirectionButtons callback={(direction: EBarDirection) => setConfig({ ...config, direction })} currentSelected={config.direction} />
-          )
-        : null}
-
-      {mergedOptionsConfig.groupType.enable
-        ? mergedOptionsConfig.groupType.customComponent || (
-            <BarGroupTypeButtons callback={(groupType: EBarGroupingType) => setConfig({ ...config, groupType })} currentSelected={config.groupType} />
-          )
-        : null}
-
-      {mergedOptionsConfig.display.enable
-        ? mergedOptionsConfig.display.customComponent || (
-            <BarDisplayButtons callback={(display: EBarDisplayType) => setConfig({ ...config, display })} currentSelected={config.display} />
           )
         : null}
 
