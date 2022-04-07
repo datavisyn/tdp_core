@@ -91,6 +91,7 @@ class JWTSecurityManager(PhoveaServerSecurityManager):
                 # Load the user preferably from the provided JWT
                 verify_jwt_in_request()
                 user = get_current_user()
+                user.name = user.name or user.id
             except RuntimeError:
                 pass
             # Otherwise, try loading from stores
