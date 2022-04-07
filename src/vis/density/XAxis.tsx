@@ -19,9 +19,9 @@ export function XAxis({ xScale, yRange, vertPosition }) {
           <line y2={`${-(yRange[1] - yRange[0])}`} stroke={`${value === 0 ? 'black' : 'lightgray'}`} />
           <text
             key={value}
+            fontSize="10px"
+            textAnchor="middle"
             style={{
-              fontSize: '10px',
-              textAnchor: 'middle',
               transform: 'translateY(20px)',
             }}
           >

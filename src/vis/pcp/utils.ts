@@ -1,4 +1,4 @@
-import d3 from 'd3v3';
+import * as d3v7 from 'd3v7';
 import { merge } from 'lodash';
 import { I18nextManager } from '../../i18n';
 import { PlotlyInfo, PlotlyData, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisColumn, IPCPConfig } from '../interfaces';
@@ -8,13 +8,13 @@ export function isPCP(s: IVisConfig): s is IPCPConfig {
   return s.type === ESupportedPlotlyVis.PCP;
 }
 
-const defaultConfig: IPCPConfig = {
+export const defaultPCPConfig: IPCPConfig = {
   type: ESupportedPlotlyVis.PCP,
   allColumnsSelected: [],
 };
 
 export function pcpMergeDefaultConfig(columns: VisColumn[], config: IPCPConfig): IVisConfig {
-  const merged = merge({}, defaultConfig, config);
+  const merged = merge({}, defaultPCPConfig, config);
 
   if (merged.allColumnsSelected.length === 0 && columns.length > 1) {
     // FIXME It is always selecting the last two columns, no matter their type. (@see https://github.com/datavisyn/reprovisyn/issues/199)
@@ -76,7 +76,7 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig, 
       dimensions: allColValues.map((c) => {
         if (c.type === EColumnTypes.NUMERICAL) {
           return {
-            range: [d3.min(c.resolvedValues.map((v) => v.val) as number[]), d3.max(c.resolvedValues.map((v) => v.val) as number[])],
+            range: [d3v7.min(c.resolvedValues.map((v) => v.val) as number[]), d3v7.max(c.resolvedValues.map((v) => v.val) as number[])],
             label: c.info.name,
             values: c.resolvedValues.map((v) => v.val),
           };

@@ -5,14 +5,14 @@ import { I18nextManager } from '../../i18n';
 export function isViolin(s) {
     return s.type === ESupportedPlotlyVis.VIOLIN;
 }
-const defaultConfig = {
+export const defaultViolinConfig = {
     type: ESupportedPlotlyVis.VIOLIN,
     numColumnsSelected: [],
     catColumnsSelected: [],
     violinOverlay: EViolinOverlay.NONE,
 };
 export function violinMergeDefaultConfig(columns, config) {
-    const merged = merge({}, defaultConfig, config);
+    const merged = merge({}, defaultViolinConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 0) {
         merged.numColumnsSelected.push(numCols[numCols.length - 1].info);

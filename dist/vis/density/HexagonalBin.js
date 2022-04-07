@@ -177,6 +177,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     }, [colsStatus, hexes]);
     // Create a default color scale
     const colorScale = useMemo(() => {
+        console.log(colsStatus);
         if (colsStatus !== 'success' || !(currentColorColumn === null || currentColorColumn === void 0 ? void 0 : currentColorColumn.allValues)) {
             return null;
         }
@@ -253,7 +254,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     // TODO: svg elements seem weird with style/classNames. I can directly put on a transform to a g, for example, but it seems to work
     // differently than if i use style to do so
     return (React.createElement("div", { ref: ref, className: "mw-100" },
-        React.createElement("svg", { id: id, style: { width: width + margin.left + margin.right, height: height + margin.top + margin.bottom } },
+        React.createElement("svg", { id: id, width: width + margin.left + margin.right, height: height + margin.top + margin.bottom },
             React.createElement("defs", null,
                 React.createElement("clipPath", { id: "clip" },
                     React.createElement("rect", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` }, width: width, height: height }))),
@@ -263,17 +264,13 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
                         React.createElement("g", null, hexObjects)))),
             xScale ? React.createElement(XAxis, { vertPosition: height + margin.top, yRange: [margin.top, height + margin.top], xScale: xZoomedScale.current || xScale }) : null,
             yScale ? React.createElement(YAxis, { horizontalPosition: margin.left, xRange: [margin.left, width + margin.left], yScale: yZoomedScale.current || yScale }) : null,
-            React.createElement("text", { style: {
-                    dominantBaseline: 'middle',
-                    textAnchor: 'middle',
+            React.createElement("text", { dominantBaseline: "middle", textAnchor: "middle", style: {
                     transform: `translate(${margin.left + width / 2}px, ${margin.top + height + 30}px)`,
                 } }, (_a = config.numColumnsSelected[0]) === null || _a === void 0 ? void 0 : _a.name),
-            React.createElement("text", { style: {
-                    dominantBaseline: 'middle',
-                    textAnchor: 'middle',
+            React.createElement("text", { dominantBaseline: "middle", textAnchor: "middle", style: {
                     transform: `translate(10px, ${margin.top + height / 2}px) rotate(-90deg)`,
                 } }, (_b = config.numColumnsSelected[1]) === null || _b === void 0 ? void 0 : _b.name),
-            React.createElement("rect", { id: `${id}zoom`, style: { width, height, opacity: 0, pointerEvents: config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none' } })),
+            React.createElement("rect", { id: `${id}zoom`, width: width, height: height, opacity: 0, pointerEvents: config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none' })),
         React.createElement("div", { className: "position-absolute", style: { left: margin.left + width, top: margin.top } },
             React.createElement(Legend, { categories: colorScale ? colorScale.domain() : [], filteredCategories: colorScale ? filteredCategories : [], colorScale: colorScale || null, onClick: (s) => filteredCategories.includes(s)
                     ? setFilteredCategories(filteredCategories.filter((f) => f !== s))

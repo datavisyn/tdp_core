@@ -3,7 +3,6 @@ import { merge, uniqueId } from 'lodash';
 import { useMemo } from 'react';
 import { VisColumn, IVisConfig, IDensityConfig, EScatterSelectSettings } from '../interfaces';
 import { DensityVisSidebar } from './DensityVisSidebar';
-// eslint-disable-next-line import/no-cycle
 import { HexagonalBin } from './HexagonalBin';
 import { HexBrushOptions } from '../sidebar/HexBrushOptions';
 import { InvalidCols } from '../general';
@@ -60,17 +59,17 @@ export function DensityVis({ config, extensions, columns, setConfig, selectionCa
                         selectionCallback={selectionCallback}
                         selected={selected}
                         config={config}
-                        columns={[columns.find((col) => col.info.id === xCol.id), columns.find((col) => col.info.id === yCol.id)]}
+                        columns={columns.filter((col) => col.info.id === xCol.id || col.info.id === yCol.id || col.info.id === config.color?.id)}
                       />
                     );
                   }
 
-                  return <div key={`${xCol.id}hist`}>hello world</div>;
+                  return <div key={`${xCol.id}hist`} />;
                 });
               })
             ) : (
               <>
-                <div className="position-absolute">
+                <div className="position-absolute top-0 start-50 translate-middle-x">
                   <HexBrushOptions callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
                 </div>
                 <HexagonalBin selectionCallback={selectionCallback} selected={selected} config={config} columns={columns} />

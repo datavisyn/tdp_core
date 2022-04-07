@@ -1,5 +1,4 @@
 import { merge } from 'lodash';
-import { selection } from 'd3v3';
 import { I18nextManager } from '../../i18n';
 import {
   PlotlyInfo,
@@ -19,14 +18,14 @@ export function isStrip(s: IVisConfig): s is IStripConfig {
   return s.type === ESupportedPlotlyVis.STRIP;
 }
 
-const defaultConfig: IStripConfig = {
+export const defaultStripConfig: IStripConfig = {
   type: ESupportedPlotlyVis.STRIP,
   numColumnsSelected: [],
   catColumnsSelected: [],
 };
 
 export function stripMergeDefaultConfig(columns: VisColumn[], config: IStripConfig): IVisConfig {
-  const merged = merge({}, defaultConfig, config);
+  const merged = merge({}, defaultStripConfig, config);
 
   const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
 

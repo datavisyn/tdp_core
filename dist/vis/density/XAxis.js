@@ -13,9 +13,7 @@ export function XAxis({ xScale, yRange, vertPosition }) {
         ticks.map(({ value, xOffset }) => (React.createElement("g", { key: value, transform: `translate(${xOffset}, ${vertPosition})` },
             React.createElement("line", { y2: "6", stroke: "currentColor" }),
             React.createElement("line", { y2: `${-(yRange[1] - yRange[0])}`, stroke: `${value === 0 ? 'black' : 'lightgray'}` }),
-            React.createElement("text", { key: value, style: {
-                    fontSize: '10px',
-                    textAnchor: 'middle',
+            React.createElement("text", { key: value, fontSize: "10px", textAnchor: "middle", style: {
                     transform: 'translateY(20px)',
                 } }, value))))));
 }

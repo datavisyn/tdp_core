@@ -242,6 +242,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
 
   // Create a default color scale
   const colorScale = useMemo(() => {
+    console.log(colsStatus);
     if (colsStatus !== 'success' || !currentColorColumn?.allValues) {
       return null;
     }
@@ -358,7 +359,7 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
   // differently than if i use style to do so
   return (
     <div ref={ref} className="mw-100">
-      <svg id={id} style={{ width: width + margin.left + margin.right, height: height + margin.top + margin.bottom }}>
+      <svg id={id} width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
         <defs>
           <clipPath id="clip">
             <rect style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }} width={width} height={height} />
@@ -375,24 +376,24 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         {yScale ? <YAxis horizontalPosition={margin.left} xRange={[margin.left, width + margin.left]} yScale={yZoomedScale.current || yScale} /> : null}
 
         <text
+          dominantBaseline="middle"
+          textAnchor="middle"
           style={{
-            dominantBaseline: 'middle',
-            textAnchor: 'middle',
             transform: `translate(${margin.left + width / 2}px, ${margin.top + height + 30}px)`,
           }}
         >
           {config.numColumnsSelected[0]?.name}
         </text>
         <text
+          dominantBaseline="middle"
+          textAnchor="middle"
           style={{
-            dominantBaseline: 'middle',
-            textAnchor: 'middle',
             transform: `translate(10px, ${margin.top + height / 2}px) rotate(-90deg)`,
           }}
         >
           {config.numColumnsSelected[1]?.name}
         </text>
-        <rect id={`${id}zoom`} style={{ width, height, opacity: 0, pointerEvents: config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none' }} />
+        <rect id={`${id}zoom`} width={width} height={height} opacity={0} pointerEvents={config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none'} />
       </svg>
       <div className="position-absolute" style={{ left: margin.left + width, top: margin.top }}>
         <Legend

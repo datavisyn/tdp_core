@@ -1,9 +1,9 @@
 import * as React from 'react';
-import d3 from 'd3v3';
+import * as d3v7 from 'd3v7';
 import { useMemo, useEffect } from 'react';
-import { ESupportedPlotlyVis, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, EHexbinOptions, } from './interfaces';
-import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
-import { barMergeDefaultConfig, isBar, BarVis } from './bar';
+import { EColumnTypes, } from './interfaces';
+import { defaultScatterConfig, isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
+import { barMergeDefaultConfig, isBar, BarVis, defaultBarConfig } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
@@ -22,27 +22,7 @@ export function Vis({ columns, selected = [], colors = [
     getCssValue('visyn-c9'),
     getCssValue('visyn-c10'),
 ], shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, filterCallback = () => null, externalConfig = null, hideSidebar = false, }) {
-    const [visConfig, setVisConfig] = React.useState(externalConfig || columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1
-        ? {
-            type: ESupportedPlotlyVis.DENSITY,
-            numColumnsSelected: [],
-            color: null,
-            isOpacityScale: true,
-            isSizeScale: false,
-            hexRadius: 16,
-            hexbinOptions: EHexbinOptions.COLOR,
-            dragMode: EScatterSelectSettings.RECTANGLE,
-        }
-        : {
-            type: ESupportedPlotlyVis.BAR,
-            multiples: null,
-            group: null,
-            direction: EBarDirection.VERTICAL,
-            display: EBarDisplayType.ABSOLUTE,
-            groupType: EBarGroupingType.STACK,
-            numColumnsSelected: [],
-            catColumnSelected: null,
-        });
+    const [visConfig, setVisConfig] = React.useState(externalConfig || columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1 ? defaultScatterConfig : defaultBarConfig);
     React.useEffect(() => {
         if (isScatter(visConfig)) {
             setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
@@ -78,7 +58,7 @@ export function Vis({ columns, selected = [], colors = [
         return currMap;
     }, [selected]);
     const scales = useMemo(() => {
-        const colorScale = d3.scale.ordinal().range(colors);
+        const colorScale = d3v7.scaleOrdinal().range(colors);
         return {
             color: colorScale,
         };

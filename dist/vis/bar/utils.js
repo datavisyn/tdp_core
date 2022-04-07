@@ -6,7 +6,7 @@ import { getCol } from '../sidebar';
 export function isBar(s) {
     return s.type === ESupportedPlotlyVis.BAR;
 }
-const defaultConfig = {
+export const defaultBarConfig = {
     type: ESupportedPlotlyVis.BAR,
     numColumnsSelected: [],
     catColumnSelected: null,
@@ -17,7 +17,7 @@ const defaultConfig = {
     direction: EBarDirection.VERTICAL,
 };
 export function barMergeDefaultConfig(columns, config) {
-    const merged = merge({}, defaultConfig, config);
+    const merged = merge({}, defaultBarConfig, config);
     const catCols = columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
     if (!merged.catColumnSelected && catCols.length > 0) {
         merged.catColumnSelected = catCols[catCols.length - 1].info;

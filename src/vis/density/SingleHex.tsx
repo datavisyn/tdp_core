@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as hex from 'd3-hexbin';
-import * as d3 from 'd3v7';
+import * as d3v7 from 'd3v7';
 import { useMemo } from 'react';
 import { PieChart } from './PieChart';
 import { cutHex } from './utils';
@@ -11,11 +11,11 @@ export interface SingleHexProps {
   hexData: hex.HexbinBin<[number, number, string, string]>;
   d3Hexbin: hex.Hexbin<[number, number]>;
   isSizeScale: boolean;
-  radiusScale: d3.ScaleLinear<number, number, never> | null;
+  radiusScale: d3v7.ScaleLinear<number, number, never> | null;
   isOpacityScale: boolean;
-  opacityScale: d3.ScaleLinear<number, number, never> | null;
+  opacityScale: d3v7.ScaleLinear<number, number, never> | null;
   hexRadius: number;
-  colorScale: d3.ScaleOrdinal<string, string, never>;
+  colorScale: d3v7.ScaleOrdinal<string, string, never>;
   selected?: { [key: string]: boolean };
 }
 

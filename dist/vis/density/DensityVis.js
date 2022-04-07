@@ -2,7 +2,6 @@ import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
 import { useMemo } from 'react';
 import { DensityVisSidebar } from './DensityVisSidebar';
-// eslint-disable-next-line import/no-cycle
 import { HexagonalBin } from './HexagonalBin';
 import { HexBrushOptions } from '../sidebar/HexBrushOptions';
 import { InvalidCols } from '../general';
@@ -23,12 +22,12 @@ export function DensityVis({ config, extensions, columns, setConfig, selectionCa
             config.numColumnsSelected.length > 2 ? (config.numColumnsSelected.map((xCol) => {
                 return config.numColumnsSelected.map((yCol) => {
                     if (xCol.id !== yCol.id) {
-                        return (React.createElement(HexagonalBin, { selectionCallback: selectionCallback, selected: selected, config: config, columns: [columns.find((col) => col.info.id === xCol.id), columns.find((col) => col.info.id === yCol.id)] }));
+                        return (React.createElement(HexagonalBin, { selectionCallback: selectionCallback, selected: selected, config: config, columns: columns.filter((col) => { var _a; return col.info.id === xCol.id || col.info.id === yCol.id || col.info.id === ((_a = config.color) === null || _a === void 0 ? void 0 : _a.id); }) }));
                     }
-                    return React.createElement("div", { key: `${xCol.id}hist` }, "hello world");
+                    return React.createElement("div", { key: `${xCol.id}hist` });
                 });
             })) : (React.createElement(React.Fragment, null,
-                React.createElement("div", { className: "position-absolute" },
+                React.createElement("div", { className: "position-absolute top-0 start-50 translate-middle-x" },
                     React.createElement(HexBrushOptions, { callback: (dragMode) => setConfig({ ...config, dragMode }), dragMode: config.dragMode })),
                 React.createElement(HexagonalBin, { selectionCallback: selectionCallback, selected: selected, config: config, columns: columns }))),
             mergedExtensions.postPlot))),

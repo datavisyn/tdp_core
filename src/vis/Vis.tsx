@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3v3';
+import * as d3v7 from 'd3v7';
 import { useMemo, useEffect } from 'react';
 import {
   ESupportedPlotlyVis,
@@ -7,7 +7,6 @@ import {
   Scales,
   VisColumn,
   EFilterOptions,
-  ENumericalColorScaleType,
   EColumnTypes,
   EBarDirection,
   EBarDisplayType,
@@ -15,8 +14,8 @@ import {
   EScatterSelectSettings,
   EHexbinOptions,
 } from './interfaces';
-import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
-import { barMergeDefaultConfig, isBar, BarVis } from './bar';
+import { defaultScatterConfig, isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
+import { barMergeDefaultConfig, isBar, BarVis, defaultBarConfig } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
@@ -73,27 +72,7 @@ export function Vis({
   hideSidebar?: boolean;
 }) {
   const [visConfig, setVisConfig] = React.useState<IVisConfig>(
-    externalConfig || columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1
-      ? {
-          type: ESupportedPlotlyVis.DENSITY,
-          numColumnsSelected: [],
-          color: null,
-          isOpacityScale: true,
-          isSizeScale: false,
-          hexRadius: 16,
-          hexbinOptions: EHexbinOptions.COLOR,
-          dragMode: EScatterSelectSettings.RECTANGLE,
-        }
-      : {
-          type: ESupportedPlotlyVis.BAR,
-          multiples: null,
-          group: null,
-          direction: EBarDirection.VERTICAL,
-          display: EBarDisplayType.ABSOLUTE,
-          groupType: EBarGroupingType.STACK,
-          numColumnsSelected: [],
-          catColumnSelected: null,
-        },
+    externalConfig || columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1 ? defaultScatterConfig : defaultBarConfig,
   );
 
   React.useEffect(() => {
@@ -136,7 +115,7 @@ export function Vis({
   }, [selected]);
 
   const scales: Scales = useMemo(() => {
-    const colorScale = d3.scale.ordinal().range(colors);
+    const colorScale = d3v7.scaleOrdinal().range(colors);
 
     return {
       color: colorScale,
