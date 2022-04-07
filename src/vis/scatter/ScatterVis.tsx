@@ -130,11 +130,11 @@ export function ScatterVis({
             // plotly redraws everything on updates, so you need to reappend title and
             // change opacity on update, instead of just in a use effect
             onInitialized={() => {
-              d3.selectAll('g .traces').style('opacity', config.alphaSliderVal);
+              d3.selectAll('g .traces').style('opacity', 1);
               d3.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
             }}
             onUpdate={() => {
-              d3.selectAll('g .traces').style('opacity', config.alphaSliderVal);
+              d3.selectAll('g .traces').style('opacity', 1);
               d3.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
 
               for (const p of traces.plots) {
