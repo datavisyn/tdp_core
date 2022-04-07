@@ -170,7 +170,6 @@ async function setPlotsWithGroupsAndMultiples(
           const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v);
           const allObjsIds = new Set(allObjs.map((o) => o.id));
 
-
           const joinedObjs = allObjs.filter((c) => allGroupObjsIds.has(c.id) && allMultiplesObjsIds.has(c.id));
 
           const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
