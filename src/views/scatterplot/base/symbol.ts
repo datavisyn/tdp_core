@@ -10,7 +10,7 @@ import {
   symbolWye,
   SymbolType,
   bisector as d3bisector,
-} from 'd3v4';
+} from 'd3v7';
 
 /**
  * a symbol renderer renderes a bunch of data points using `render` at the end `done` will be called

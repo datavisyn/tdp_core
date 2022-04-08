@@ -1,4 +1,4 @@
-import { extent, format, select, mouse, event as d3event, zoom as d3zoom, zoomIdentity, drag as d3drag, scaleLinear, quadtree, } from 'd3v4';
+import { extent, format, select, mouse, event as d3event, zoom as d3zoom, zoomIdentity, drag as d3drag, scaleLinear, quadtree, } from 'd3v7';
 import { EventEmitter } from 'eventemitter3';
 import { ObjectUtils } from './ObjectUtils';
 import { QuadtreeUtils } from './quadtree';

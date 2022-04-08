@@ -2,7 +2,7 @@
  * Created by sam on 19.12.2016.
  */
 
-import { select, event as d3event, ScaleLinear, scaleLinear, brushX, brushY, brush, D3BrushEvent, BrushBehavior } from 'd3v4';
+import { select, event as d3event, ScaleLinear, scaleLinear, brushX, brushY, brush, D3BrushEvent, BrushBehavior } from 'd3v7';
 import { Scatterplot } from './Scatterplot';
 import { TDP_SCATTERPLOT_CSS_PREFIX } from './constants';
 import { EScaleAxes, IMinMax, IWindow } from './AScatterplot';

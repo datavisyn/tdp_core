@@ -1,4 +1,4 @@
-import { axisLeft, axisBottom, scaleLinear, select, quadtree } from 'd3v4';
+import { axisLeft, axisBottom, scaleLinear, select, quadtree } from 'd3v7';
 import { ERenderMode, SymbolUtils } from './symbol';
 import { QuadtreeUtils } from './quadtree';
 import { TDP_SCATTERPLOT_CSS_PREFIX, TDP_SCATTERPLOT_DEBUG, TDP_SCATTERPLOT_DEBUGLOG } from './constants';

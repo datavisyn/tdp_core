@@ -18,7 +18,7 @@ import {
   Quadtree,
   QuadtreeInternalNode,
   QuadtreeLeaf,
-} from 'd3v4';
+} from 'd3v7';
 import { EventEmitter } from 'eventemitter3';
 import { ISymbol, ISymbolRenderer } from './symbol';
 import { ObjectUtils } from './ObjectUtils';

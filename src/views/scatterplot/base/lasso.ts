@@ -1,4 +1,4 @@
-import { line as d3line, curveLinearClosed, polygonHull, polygonContains, extent } from 'd3v4';
+import { line as d3line, curveLinearClosed, polygonHull, polygonContains, extent } from 'd3v7';
 import { QuadtreeUtils, ITester } from './quadtree';
 import { ObjectUtils } from './ObjectUtils';
 
