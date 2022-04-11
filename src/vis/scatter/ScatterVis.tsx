@@ -27,7 +27,8 @@ export function ScatterVis({
   shapes = ['circle', 'square', 'triangle-up', 'star'],
   filterCallback = () => null,
   selectionCallback = () => null,
-  selected = {},
+  selectedMap = {},
+  selectedList = [],
   setConfig,
   hideSidebar = false,
   scales,
@@ -57,7 +58,8 @@ export function ScatterVis({
   columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
   selectionCallback?: (ids: string[]) => void;
-  selected?: { [key: string]: boolean };
+  selectedMap?: { [key: string]: boolean };
+  selectedList: string[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   hideSidebar?: boolean;
@@ -84,7 +86,7 @@ export function ScatterVis({
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
-  const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selected, config, scales, shapes]);
+  const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selectedMap, config, scales, shapes]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -127,6 +129,15 @@ export function ScatterVis({
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
+            onClick={(event) => {
+              console.log(event);
+              const clickedId = event.points[0].id;
+              if (selectedMap[clickedId]) {
+                selectionCallback(selectedList.filter((s) => s !== clickedId));
+              } else {
+                selectionCallback([...selectedList, clickedId]);
+              }
+            }}
             onSelected={(sel) => {
               selectionCallback(sel ? sel.points.map((d) => (d as any).id) : []);
             }}

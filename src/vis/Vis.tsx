@@ -150,7 +150,8 @@ export function Vis({
           setConfig={setVisConfig}
           filterCallback={filterCallback}
           selectionCallback={selectionCallback}
-          selected={selectedMap}
+          selectedMap={selectedMap}
+          selectedList={selected}
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}
