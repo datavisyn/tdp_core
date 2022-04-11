@@ -98,6 +98,9 @@ export function ScatterVis({
         itemclick: false,
         itemdoubleclick: false,
       },
+      font: {
+        family: 'Roboto',
+      },
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],

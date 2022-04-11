@@ -36,6 +36,9 @@ export function PCPVis({ config, extensions, columns, setConfig, selected = {}, 
                 showlegend: true,
                 autosize: true,
                 grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
+                font: {
+                    family: 'Roboto',
+                },
                 shapes: [],
                 violingap: 0,
             }

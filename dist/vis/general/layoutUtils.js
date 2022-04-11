@@ -28,7 +28,7 @@ export function beautifyLayout(traces, layout) {
                 standoff: 5,
                 text: traces.plots.length > 1 ? truncateText(t.xLabel, 15) : truncateText(t.xLabel, 50),
                 font: {
-                    family: 'Courier New, monospace',
+                    family: 'Roboto',
                     size: traces.plots.length > 9 ? 10 : 14,
                     color: '#7f7f7f',
                 },
@@ -45,7 +45,7 @@ export function beautifyLayout(traces, layout) {
             title: {
                 text: traces.plots.length > 1 ? truncateText(t.yLabel, 15) : truncateText(t.yLabel, 50),
                 font: {
-                    family: 'Courier New, monospace',
+                    family: 'Roboto',
                     size: traces.plots.length > 9 ? 10 : 14,
                     color: '#7f7f7f',
                 },
