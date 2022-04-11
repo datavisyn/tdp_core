@@ -39,6 +39,8 @@ const defaultConfig: IBarConfig = {
   aggregateType: EAggregateTypes.COUNT,
 };
 
+const TICK_LABEL_LENGTH = 8;
+
 export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig): IVisConfig {
   const merged = merge({}, defaultConfig, config);
 
@@ -204,9 +206,9 @@ async function setPlotsWithGroupsAndMultiples(
         xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
         yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
         xTicks: vertFlag ? uniqueColVals : null,
-        xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
+        xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
         yTicks: !vertFlag ? uniqueColVals : null,
-        yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
+        yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       });
     });
     plotCounterEdit += 1;
@@ -276,9 +278,9 @@ async function setPlotsWithGroups(
       xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
       yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
       xTicks: vertFlag ? uniqueColVals : null,
-      xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
+      xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
-      yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
+      yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
     });
   });
 
@@ -312,9 +314,7 @@ async function setPlotsWithMultiples(
         const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v);
         const joinedObjs = allObjs.filter((c) => allMultiplesObjsIds.has(c.id));
 
-        const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
-
-        return joinedObjs.length === 0 ? [0] : aggregateValues;
+        return joinedObjs.length === 0 ? [0] : getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
       })
       .flat();
 
@@ -335,9 +335,9 @@ async function setPlotsWithMultiples(
       xLabel: vertFlag ? catColValues.info.name : aggType,
       yLabel: vertFlag ? aggType : catColValues.info.name,
       xTicks: vertFlag ? uniqueColVals : null,
-      xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
+      xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
-      yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, 8)) : null,
+      yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
     });
     plotCounterEdit += 1;
   });
@@ -382,9 +382,9 @@ async function setPlotsBasic(
     xLabel: vertFlag ? catColValues.info.name : aggType,
     yLabel: vertFlag ? aggType : catColValues.info.name,
     xTicks: vertFlag ? valArr : null,
-    xTickLabels: vertFlag ? valArr.map((v) => truncateText(v, 8)) : null,
+    xTickLabels: vertFlag ? valArr.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
     yTicks: !vertFlag ? valArr : null,
-    yTickLabels: !vertFlag ? valArr.map((v) => truncateText(v, 8)) : null,
+    yTickLabels: !vertFlag ? valArr.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
   });
   plotCounterEdit += 1;
 

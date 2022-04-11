@@ -4,7 +4,7 @@
  * @param maxLength Maximum text length (default: 50)
  */
 export function truncateText(text, maxLength = 50) {
-    return text.length > maxLength ? `${text.substring(0, maxLength)}..` : text;
+    return text.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
 }
 /**
  * Cleans up the layout of a given trace, primarily by positioning potential small multiple plots in a reasonable way
