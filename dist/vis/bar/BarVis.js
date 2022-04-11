@@ -9,28 +9,6 @@ import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';
 import { createBarTraces } from './utils';
 import { BarVisSidebar } from './BarVisSidebar';
-const defaultConfig = {
-    group: {
-        enable: true,
-        customComponent: null,
-    },
-    multiples: {
-        enable: true,
-        customComponent: null,
-    },
-    direction: {
-        enable: true,
-        customComponent: null,
-    },
-    groupType: {
-        enable: true,
-        customComponent: null,
-    },
-    display: {
-        enable: true,
-        customComponent: null,
-    },
-};
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -38,9 +16,6 @@ const defaultExtensions = {
     postSidebar: null,
 };
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }) {
-    const mergedOptionsConfig = React.useMemo(() => {
-        return merge({}, defaultConfig, optionsConfig);
-    }, [optionsConfig]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
@@ -87,7 +62,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                         d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
                         d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
-                } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { message: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
+                } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
             mergedExtensions.postPlot),
         !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
             React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${id}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
