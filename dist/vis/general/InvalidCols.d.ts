@@ -1,6 +1,5 @@
-interface InvalidColsProps {
-    message: string;
-}
-export declare function InvalidCols({ message }: InvalidColsProps): JSX.Element;
-export {};
+export declare function InvalidCols({ headerMessage, bodyMessage }: {
+    headerMessage: string;
+    bodyMessage: string;
+}): JSX.Element;
 //# sourceMappingURL=InvalidCols.d.ts.map
