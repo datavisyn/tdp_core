@@ -1,4 +1,4 @@
-import { ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem } from 'lineupjs';
+import { ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem, Column } from 'lineupjs';
 import { IDTypeLike } from '../idtype';
 import { ISearchOption, IPanelAddColumnButtonOptions } from './panel';
 
@@ -17,6 +17,11 @@ export interface IARankingViewOptions {
    * the idtype of the shown items
    */
   itemIDType: IDTypeLike | null;
+
+  /**
+   * Show column in context mode
+   */
+  showInContextMode: (col: Column) => boolean;
 
   /**
    * custom argument (or callback function) to pass to scores dialogs
