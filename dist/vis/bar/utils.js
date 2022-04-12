@@ -1,6 +1,7 @@
-import { merge, sum } from 'lodash';
+import { merge, sum, mean, min, max } from 'lodash';
+import { median } from 'd3';
 import { I18nextManager } from '../../i18n';
-import { EColumnTypes, ESupportedPlotlyVis, EBarGroupingType, EBarDisplayType, EBarDirection, } from '../interfaces';
+import { EColumnTypes, ESupportedPlotlyVis, EBarGroupingType, EBarDisplayType, EBarDirection, EAggregateTypes, } from '../interfaces';
 import { resolveSingleColumn } from '../general/layoutUtils';
 import { getCol } from '../sidebar';
 export function isBar(s) {
@@ -15,18 +16,63 @@ const defaultConfig = {
     multiples: null,
     display: EBarDisplayType.ABSOLUTE,
     direction: EBarDirection.VERTICAL,
+    aggregateColumn: null,
+    aggregateType: EAggregateTypes.COUNT,
 };
 export function barMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);
     const catCols = columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
+    const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (!merged.catColumnSelected && catCols.length > 0) {
         merged.catColumnSelected = catCols[catCols.length - 1].info;
     }
+    if (!merged.aggregateColumn && numCols.length > 0) {
+        merged.aggregateColumn = numCols[numCols.length - 1].info;
+    }
     return merged;
 }
-async function setPlotsWithGroupsAndMultiples(columns, catCol, config, plots, scales, plotCounter) {
+/**
+ * This function finds the faceted values of a given categorical column based on an aggregation type.
+ * If isTotal is true, it will sum all of the categorical values, used for normalizing the bar charts.
+ * Otherwise, it will return an array of values corresponding to the categoricalOptions argument
+ * @param aggregateType Enum for aggregate type
+ * @param catColValues Categorical Column which we are visualizing
+ * @param aggColValues Numerical Column which we are using for our aggregation type, unless count is the aggregation type.
+ * @param _categoricalOptions Optional list of categorical options to find. If not provided, will use a set from the catColValues parameter
+ * @param isTotal Boolean for deciding whether or not to summarize the results of the list. Also cleans NaN and undefined values to 0
+ * @returns A list of numbers if isTotal is false, a single number if true.
+ */
+function getAggregateValues(aggregateType, catColValues, aggColValues, _categoricalOptions, isTotal) {
+    const categoricalOptions = _categoricalOptions || [...new Set(catColValues.map((v) => v.val))];
+    const categoricalMap = {};
+    catColValues.forEach((val) => {
+        categoricalMap[val.id] = val.val;
+    });
+    function aggregate(aggFunc) {
+        const aggValues = categoricalOptions.map((curr) => aggFunc(aggColValues.filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0);
+        return isTotal ? sum(aggValues) : aggValues;
+    }
+    switch (aggregateType) {
+        case EAggregateTypes.AVG:
+            return aggregate(mean);
+        case EAggregateTypes.MIN:
+            return aggregate(min);
+        case EAggregateTypes.MAX:
+            return aggregate(max);
+        case EAggregateTypes.MED:
+            return aggregate(median);
+        case EAggregateTypes.COUNT: {
+            const countValues = categoricalOptions.map((curr) => catColValues.filter((c) => c.val === curr).length);
+            return isTotal ? sum(countValues) : countValues;
+        }
+        default:
+            throw new Error('Unknown aggregation type');
+    }
+}
+async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, aggregateColumn, config, plots, scales, plotCounter) {
     let plotCounterEdit = plotCounter;
     const catColValues = await resolveSingleColumn(catCol);
+    const aggColValues = await resolveSingleColumn(aggregateColumn);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
     const currGroupColumn = await resolveSingleColumn(getCol(columns, config.group));
@@ -36,17 +82,21 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, config, plots, sc
     const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     uniqueMultiplesVals.forEach((uniqueMultiples) => {
         uniqueGroupVals.forEach((uniqueGroup) => {
-            const groupedLength = uniqueColVals.map((v) => {
-                const allObjs = catColValues.resolvedValues.filter((c) => c.val === v).map((c) => c.id);
-                const allGroupObjs = currGroupColumn.resolvedValues.filter((c) => c.val === uniqueGroup).map((c) => c.id);
-                const allMultiplesObjs = currMultiplesColumn.resolvedValues.filter((c) => c.val === uniqueMultiples).map((c) => c.id);
-                const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c) && allMultiplesObjs.includes(c));
-                return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
-            });
+            const aggregateVals = uniqueColVals
+                .map((v) => {
+                const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
+                const allGroupObjs = currGroupColumn.resolvedValues.filter((c) => c.val === uniqueGroup);
+                const allMultiplesObjs = currMultiplesColumn.resolvedValues.filter((c) => c.val === uniqueMultiples);
+                const joinedObjs = allObjs.filter((c) => allGroupObjs.find((groupObj) => groupObj.id === c.id) && allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
+                const aggregateValues = getAggregateValues(aggregateType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+                const ungroupedAggregateValues = getAggregateValues(aggregateType, currMultiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues, uniqueMultiplesVals);
+                return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
+            })
+                .flat();
             plots.push({
                 data: {
-                    x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : groupedLength,
-                    y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : groupedLength,
+                    x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : aggregateVals,
+                    y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : aggregateVals,
                     orientation: vertFlag ? 'v' : 'h',
                     xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
                     yaxis: plotCounterEdit === 1 ? 'y' : `y${plotCounterEdit}`,
@@ -57,32 +107,37 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, config, plots, sc
                         color: scales.color(uniqueGroup),
                     },
                 },
-                xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-                yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catColValues.info.name,
+                xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggregateType,
+                yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggregateType) : catColValues.info.name,
             });
         });
         plotCounterEdit += 1;
     });
     return plotCounterEdit;
 }
-async function setPlotsWithGroups(columns, catCol, config, plots, scales, plotCounter) {
+async function setPlotsWithGroups(columns, catCol, aggregateType, aggColumn, config, plots, scales, plotCounter) {
     const catColValues = await resolveSingleColumn(catCol);
+    const aggColValues = await resolveSingleColumn(aggColumn);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
     const groupColumn = await resolveSingleColumn(getCol(columns, config.group));
     const uniqueGroupVals = [...new Set(groupColumn.resolvedValues.map((v) => v.val))];
     const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     uniqueGroupVals.forEach((uniqueVal) => {
-        const groupedLength = uniqueColVals.map((v) => {
-            const allObjs = catColValues.resolvedValues.filter((c) => c.val === v).map((c) => c.id);
-            const allGroupObjs = groupColumn.resolvedValues.filter((c) => c.val === uniqueVal).map((c) => c.id);
-            const joinedObjs = allObjs.filter((c) => allGroupObjs.includes(c));
-            return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
-        });
+        const finalAggregateValues = uniqueColVals
+            .map((v) => {
+            const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
+            const allGroupObjs = groupColumn.resolvedValues.filter((c) => c.val === uniqueVal);
+            const joinedObjs = allObjs.filter((allVal) => allGroupObjs.find((groupVal) => groupVal.id === allVal.id));
+            const aggregateValues = getAggregateValues(aggregateType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+            const ungroupedAggregateValues = getAggregateValues(aggregateType, groupColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues, uniqueGroupVals, true);
+            return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
+        })
+            .flat();
         plots.push({
             data: {
-                x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : groupedLength,
-                y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : groupedLength,
+                x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
+                y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
                 orientation: vertFlag ? 'v' : 'h',
                 xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
                 yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -93,31 +148,36 @@ async function setPlotsWithGroups(columns, catCol, config, plots, scales, plotCo
                     color: scales.color(uniqueVal),
                 },
             },
-            xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catColValues.info.name,
+            xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggregateType,
+            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggregateType) : catColValues.info.name,
         });
     });
     return plotCounter;
 }
-async function setPlotsWithMultiples(columns, catCol, config, plots, plotCounter) {
+async function setPlotsWithMultiples(columns, catCol, aggregateType, aggColumn, config, plots, plotCounter) {
     let plotCounterEdit = plotCounter;
     const catColValues = await resolveSingleColumn(catCol);
+    const aggColValues = await resolveSingleColumn(aggColumn);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
     const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
     const uniqueMultiplesVals = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))];
     const uniqueColVals = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     uniqueMultiplesVals.forEach((uniqueVal) => {
-        const multiplesLength = uniqueColVals.map((v) => {
-            const allObjs = catColValues.resolvedValues.filter((c) => c.val === v).map((c) => c.id);
-            const allMultiplesObjs = multiplesColumn.resolvedValues.filter((c) => c.val === uniqueVal).map((c) => c.id);
-            const joinedObjs = allObjs.filter((c) => allMultiplesObjs.includes(c));
-            return normalizedFlag ? (joinedObjs.length / allObjs.length) * 100 : joinedObjs.length;
-        });
+        const finalAggregateValues = uniqueColVals
+            .map((v) => {
+            const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
+            const allMultiplesObjs = multiplesColumn.resolvedValues.filter((c) => c.val === uniqueVal);
+            const joinedObjs = allObjs.filter((c) => allMultiplesObjs.find((multiplesObj) => multiplesObj.id === c.id));
+            const aggregateValues = getAggregateValues(aggregateType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+            const ungroupedAggregateValues = getAggregateValues(aggregateType, multiplesColumn.resolvedValues.filter((val) => allObjs.find((insideVal) => insideVal.id === val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues, uniqueMultiplesVals, true);
+            return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
+        })
+            .flat();
         plots.push({
             data: {
-                x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : multiplesLength,
-                y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : multiplesLength,
+                x: vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
+                y: !vertFlag ? [...new Set(catColValues.resolvedValues.map((v) => v.val))] : finalAggregateValues,
                 orientation: vertFlag ? 'v' : 'h',
                 xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
                 yaxis: plotCounterEdit === 1 ? 'y' : `y${plotCounterEdit}`,
@@ -125,25 +185,24 @@ async function setPlotsWithMultiples(columns, catCol, config, plots, plotCounter
                 type: 'bar',
                 name: uniqueVal,
             },
-            xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catColValues.info.name,
+            xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggregateType,
+            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggregateType) : catColValues.info.name,
         });
         plotCounterEdit += 1;
     });
     return plotCounterEdit;
 }
-async function setPlotsBasic(columns, catCol, config, plots, scales, plotCounter) {
+async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, config, plots, scales, plotCounter) {
     let plotCounterEdit = plotCounter;
     const catColValues = await resolveSingleColumn(catCol);
+    const aggColValues = await resolveSingleColumn(aggregateColumn);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
-    const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
-    const count = [...new Set(catColValues.resolvedValues.map((v) => v.val))].map((curr) => catColValues.resolvedValues.filter((c) => c.val === curr).length);
-    const countTotal = sum(count);
+    const aggValues = getAggregateValues(aggregateType, catColValues.resolvedValues, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
     const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     plots.push({
         data: {
-            x: vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
-            y: !vertFlag ? valArr : normalizedFlag ? count.map((c) => c / countTotal) : count,
+            x: vertFlag ? valArr : aggValues,
+            y: !vertFlag ? valArr : aggValues,
             ids: valArr,
             orientation: vertFlag ? 'v' : 'h',
             xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
@@ -151,8 +210,8 @@ async function setPlotsBasic(columns, catCol, config, plots, scales, plotCounter
             type: 'bar',
             name: catColValues.info.name,
         },
-        xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : 'Count',
-        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : 'Count') : catColValues.info.name,
+        xLabel: vertFlag ? catColValues.info.name : aggregateType,
+        yLabel: vertFlag ? aggregateType : catColValues.info.name,
     });
     plotCounterEdit += 1;
     return plotCounterEdit;
@@ -171,18 +230,21 @@ export async function createBarTraces(columns, config, scales) {
     }
     const plots = [];
     const catCol = columns.find((c) => c.info.id === config.catColumnSelected.id);
+    const aggregateColumn = config.aggregateColumn
+        ? columns.find((c) => c.info.id === config.aggregateColumn.id)
+        : null;
     if (catCol) {
         if (config.group && config.multiples) {
-            plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCol, config, plots, scales, plotCounter);
+            plotCounter = await setPlotsWithGroupsAndMultiples(columns, catCol, config.aggregateType, aggregateColumn, config, plots, scales, plotCounter);
         }
         else if (config.group) {
-            plotCounter = await setPlotsWithGroups(columns, catCol, config, plots, scales, plotCounter);
+            plotCounter = await setPlotsWithGroups(columns, catCol, config.aggregateType, aggregateColumn, config, plots, scales, plotCounter);
         }
         else if (config.multiples) {
-            plotCounter = await setPlotsWithMultiples(columns, catCol, config, plots, plotCounter);
+            plotCounter = await setPlotsWithMultiples(columns, catCol, config.aggregateType, aggregateColumn, config, plots, plotCounter);
         }
         else {
-            plotCounter = await setPlotsBasic(columns, catCol, config, plots, scales, plotCounter);
+            plotCounter = await setPlotsBasic(columns, config.aggregateType, aggregateColumn, catCol, config, plots, scales, plotCounter);
         }
     }
     const rows = Math.ceil(Math.sqrt(plotCounter - 1));

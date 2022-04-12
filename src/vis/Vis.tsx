@@ -13,6 +13,7 @@ import {
   EBarDisplayType,
   EBarGroupingType,
   EScatterSelectSettings,
+  EAggregateTypes,
 } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
@@ -21,22 +22,26 @@ import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
 
+const DEFAULT_COLORS = [
+  getCssValue('visyn-c1'),
+  getCssValue('visyn-c2'),
+  getCssValue('visyn-c3'),
+  getCssValue('visyn-c4'),
+  getCssValue('visyn-c5'),
+  getCssValue('visyn-c6'),
+  getCssValue('visyn-c7'),
+  getCssValue('visyn-c8'),
+  getCssValue('visyn-c9'),
+  getCssValue('visyn-c10'),
+];
+
+const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
+
 export function Vis({
   columns,
   selected = [],
-  colors = [
-    getCssValue('visyn-c1'),
-    getCssValue('visyn-c2'),
-    getCssValue('visyn-c3'),
-    getCssValue('visyn-c4'),
-    getCssValue('visyn-c5'),
-    getCssValue('visyn-c6'),
-    getCssValue('visyn-c7'),
-    getCssValue('visyn-c8'),
-    getCssValue('visyn-c9'),
-    getCssValue('visyn-c10'),
-  ],
-  shapes = ['circle', 'square', 'triangle-up', 'star'],
+  colors = DEFAULT_COLORS,
+  shapes = DEFAULT_SHAPES,
   selectionCallback = () => null,
   filterCallback = () => null,
   externalConfig = null,
@@ -69,54 +74,84 @@ export function Vis({
   externalConfig?: IVisConfig;
   hideSidebar?: boolean;
 }) {
-  const [visConfig, setVisConfig] = React.useState<IVisConfig>(
-    externalConfig || columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1
+  // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
+  // To ensure that we never render an incosistent config, keep a consistent and a current in the config. Always render the consistent.
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  const [{ consistent: visConfig, current: inconsistentVisConfig }, _setVisConfig] = React.useState<{
+    consistent: IVisConfig;
+    current: IVisConfig;
+  }>(
+    externalConfig
+      ? { consistent: null, current: externalConfig }
+      : columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1
       ? {
-          type: ESupportedPlotlyVis.SCATTER,
-          numColumnsSelected: [],
-          color: null,
-          numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
-          shape: null,
-          dragMode: EScatterSelectSettings.RECTANGLE,
-          alphaSliderVal: 0.5,
+          consistent: null,
+          current: {
+            type: ESupportedPlotlyVis.SCATTER,
+            numColumnsSelected: [],
+            color: null,
+            numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+            shape: null,
+            dragMode: EScatterSelectSettings.RECTANGLE,
+            alphaSliderVal: 0.5,
+          },
         }
       : {
-          type: ESupportedPlotlyVis.BAR,
-          multiples: null,
-          group: null,
-          direction: EBarDirection.VERTICAL,
-          display: EBarDisplayType.ABSOLUTE,
-          groupType: EBarGroupingType.STACK,
-          numColumnsSelected: [],
-          catColumnSelected: null,
+          consistent: null,
+          current: {
+            type: ESupportedPlotlyVis.BAR,
+            multiples: null,
+            group: null,
+            direction: EBarDirection.VERTICAL,
+            display: EBarDisplayType.ABSOLUTE,
+            groupType: EBarGroupingType.STACK,
+            numColumnsSelected: [],
+            catColumnSelected: null,
+            aggregateColumn: null,
+            aggregateType: EAggregateTypes.COUNT,
+          },
         },
   );
 
+  const setVisConfig = React.useCallback((newConfig: IVisConfig) => {
+    _setVisConfig((oldConfig) => {
+      return {
+        current: newConfig,
+        consistent: oldConfig.current.type !== newConfig.type ? oldConfig.consistent : newConfig,
+      };
+    });
+  }, []);
+
   React.useEffect(() => {
-    if (isScatter(visConfig)) {
-      setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
+    if (isScatter(inconsistentVisConfig)) {
+      const newConfig = scatterMergeDefaultConfig(columns, inconsistentVisConfig);
+      _setVisConfig({ current: newConfig, consistent: newConfig });
     }
-    if (isViolin(visConfig)) {
-      setVisConfig(violinMergeDefaultConfig(columns, visConfig));
+    if (isViolin(inconsistentVisConfig)) {
+      const newConfig = violinMergeDefaultConfig(columns, inconsistentVisConfig);
+      _setVisConfig({ current: newConfig, consistent: newConfig });
     }
-    if (isStrip(visConfig)) {
-      setVisConfig(stripMergeDefaultConfig(columns, visConfig));
+    if (isStrip(inconsistentVisConfig)) {
+      const newConfig = stripMergeDefaultConfig(columns, inconsistentVisConfig);
+      _setVisConfig({ current: newConfig, consistent: newConfig });
     }
-    if (isPCP(visConfig)) {
-      setVisConfig(pcpMergeDefaultConfig(columns, visConfig));
+    if (isPCP(inconsistentVisConfig)) {
+      const newConfig = pcpMergeDefaultConfig(columns, inconsistentVisConfig);
+      _setVisConfig({ current: newConfig, consistent: newConfig });
     }
-    if (isBar(visConfig)) {
-      setVisConfig(barMergeDefaultConfig(columns, visConfig));
+    if (isBar(inconsistentVisConfig)) {
+      const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
+      _setVisConfig({ current: newConfig, consistent: newConfig });
     }
     // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visConfig.type]);
+  }, [inconsistentVisConfig.type, columns]);
 
   useEffect(() => {
     if (externalConfig) {
       setVisConfig(externalConfig);
     }
-  }, [externalConfig]);
+  }, [externalConfig, setVisConfig]);
 
   const selectedMap = useMemo(() => {
     const currMap = {};
@@ -135,6 +170,10 @@ export function Vis({
       color: colorScale,
     };
   }, [colors]);
+
+  if (!visConfig) {
+    return <div className="tdp-busy" />;
+  }
 
   return (
     <>
