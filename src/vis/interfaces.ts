@@ -162,6 +162,10 @@ export type PlotlyData = {
   data: Partial<Plotly.PlotData>;
   xLabel: string;
   yLabel: string;
+  xTicks?: string[];
+  xTickLabels?: string[];
+  yTicks?: string[];
+  yTickLabels?: string[];
 };
 
 export type ColumnInfo = {
