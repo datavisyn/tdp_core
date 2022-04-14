@@ -130,7 +130,6 @@ export function ScatterVis({
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
             onClick={(event) => {
-              console.log(event);
               const clickedId = event.points[0].id;
               if (selectedMap[clickedId]) {
                 selectionCallback(selectedList.filter((s) => s !== clickedId));

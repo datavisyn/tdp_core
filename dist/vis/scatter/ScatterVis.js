@@ -60,7 +60,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
             traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
-                    console.log(event);
                     const clickedId = event.points[0].id;
                     if (selectedMap[clickedId]) {
                         selectionCallback(selectedList.filter((s) => s !== clickedId));
