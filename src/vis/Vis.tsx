@@ -117,7 +117,9 @@ export function Vis({
   );
 
   const setExternalConfigRef = useSyncedRef(setExternalConfig);
+
   useEffect(() => {
+    console.log('setting config in vis', visConfig);
     setExternalConfigRef.current?.(visConfig);
   }, [visConfig, setExternalConfigRef]);
 
@@ -155,11 +157,15 @@ export function Vis({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inconsistentVisConfig.type, columns]);
 
-  useEffect(() => {
-    if (externalConfig) {
-      setVisConfig(externalConfig);
-    }
-  }, [externalConfig, setVisConfig]);
+  // useEffect(() => {
+  //   if (JSON.stringify(externalConfig) === JSON.stringify(visConfig)) {
+  //     return;
+  //   }
+
+  //   if (externalConfig) {
+  //     setVisConfig(externalConfig);
+  //   }
+  // }, [externalConfig, setVisConfig, visConfig]);
 
   const selectedMap = useMemo(() => {
     const currMap = {};

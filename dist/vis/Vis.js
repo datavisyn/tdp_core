@@ -59,6 +59,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
     const setExternalConfigRef = useSyncedRef(setExternalConfig);
     useEffect(() => {
         var _a;
+        console.log('setting config in vis', visConfig);
         (_a = setExternalConfigRef.current) === null || _a === void 0 ? void 0 : _a.call(setExternalConfigRef, visConfig);
     }, [visConfig, setExternalConfigRef]);
     const setVisConfig = React.useCallback((newConfig) => {
@@ -93,11 +94,14 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inconsistentVisConfig.type, columns]);
-    useEffect(() => {
-        if (externalConfig) {
-            setVisConfig(externalConfig);
-        }
-    }, [externalConfig, setVisConfig]);
+    // useEffect(() => {
+    //   if (JSON.stringify(externalConfig) === JSON.stringify(visConfig)) {
+    //     return;
+    //   }
+    //   if (externalConfig) {
+    //     setVisConfig(externalConfig);
+    //   }
+    // }, [externalConfig, setVisConfig, visConfig]);
     const selectedMap = useMemo(() => {
         const currMap = {};
         selected.forEach((s) => {
