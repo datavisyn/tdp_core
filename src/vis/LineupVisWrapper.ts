@@ -4,12 +4,13 @@ import { CategoricalColumn, Column, IDataRow, LocalDataProvider, NumberColumn, R
 import { Vis } from './Vis';
 import { EColumnTypes, ColumnInfo, VisColumn, EFilterOptions, IVisCommonValue } from './interfaces';
 import { IRow } from '../base/rest';
+import { I18nextManager } from '../i18n/I18nextManager';
 
 export class LineupVisWrapper {
   /**
    * This string is assigned if a categorical value is missing and rendered by Plotly.
    */
-  private static PLOTLY_CATEGORICAL_MISSING_VALUE = '--';
+  private PLOTLY_CATEGORICAL_MISSING_VALUE: string;
 
   readonly node: HTMLElement;
 
@@ -20,9 +21,9 @@ export class LineupVisWrapper {
       provider: LocalDataProvider;
       /**
        * Callback when the selection in a vis changed.
-       * @param ids Selected ids.
+       * @param visynIds Selected visyn ids.
        */
-      selectionCallback(ids: string[]): void;
+      selectionCallback(visynIds: string[]): void;
       doc: Document;
     },
   ) {
@@ -30,17 +31,13 @@ export class LineupVisWrapper {
     this.node.id = 'customVisDiv';
     this.node.classList.add('custom-vis-panel');
     this.viewable = false;
+    this.PLOTLY_CATEGORICAL_MISSING_VALUE = I18nextManager.getInstance().i18n.t('tdp:core.vis.missingValue');
   }
 
-  getSelectionMap = (): { [id: string]: boolean } => {
-    const selectedMap: { [id: string]: boolean } = {};
+  getSelectedList = (): string[] => {
     const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection()) as IRow[];
 
-    selectedRows.forEach((row) => {
-      selectedMap[row.id] = true;
-    });
-
-    return selectedMap;
+    return selectedRows.map((r) => r.id.toString());
   };
 
   filterCallback = (s: string) => {
@@ -64,7 +61,7 @@ export class LineupVisWrapper {
 
     const cols: VisColumn[] = [];
 
-    const selectedMap = this.getSelectionMap();
+    const selectedList = this.getSelectedList();
 
     const getColumnInfo = (column: Column): ColumnInfo => {
       return {
@@ -76,7 +73,8 @@ export class LineupVisWrapper {
     };
 
     const mapData = <T extends ValueColumn<number | string>>(innerData: IDataRow[], column: T) => {
-      return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: (d.v as IRow).id, val: column.getRaw(d) });
+      // TODO: This should be _visyn_id?
+      return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: d.v.id, val: column.getRaw(d) });
     };
 
     const getColumnValue = async <T extends ValueColumn<number | string>>(column: T) => {
@@ -107,7 +105,7 @@ export class LineupVisWrapper {
       } else if (c instanceof CategoricalColumn) {
         cols.push({
           info: getColumnInfo(c),
-          values: () => getColumnValue(c).then((res) => res.map((v) => (v.val ? v : { ...v, val: LineupVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE }))),
+          values: () => getColumnValue(c).then((res) => res.map((v) => (v.val ? v : { ...v, val: this.PLOTLY_CATEGORICAL_MISSING_VALUE }))),
           type: EColumnTypes.CATEGORICAL,
         });
       }
@@ -116,8 +114,8 @@ export class LineupVisWrapper {
     ReactDOM.render(
       React.createElement(Vis, {
         columns: cols,
-        selected: selectedMap,
-        selectionCallback: (ids) => this.props.selectionCallback(ids),
+        selected: selectedList,
+        selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
         filterCallback: (s: string) => this.filterCallback(s),
       }),
       this.node,

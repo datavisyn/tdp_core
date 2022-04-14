@@ -3,16 +3,13 @@ import * as ReactDOM from 'react-dom';
 import { CategoricalColumn, LocalDataProvider, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
 import { Vis } from './Vis';
 import { EColumnTypes, EFilterOptions } from './interfaces';
+import { I18nextManager } from '../i18n/I18nextManager';
 export class LineupVisWrapper {
     constructor(props) {
         this.props = props;
-        this.getSelectionMap = () => {
-            const selectedMap = {};
+        this.getSelectedList = () => {
             const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection());
-            selectedRows.forEach((row) => {
-                selectedMap[row.id] = true;
-            });
-            return selectedMap;
+            return selectedRows.map((r) => r.id.toString());
         };
         this.filterCallback = (s) => {
             const selectedIds = this.props.provider.getSelection();
@@ -29,7 +26,7 @@ export class LineupVisWrapper {
             const ranking = this.props.provider.getFirstRanking();
             const data = this.props.provider.viewRawRows(ranking.getOrder());
             const cols = [];
-            const selectedMap = this.getSelectionMap();
+            const selectedList = this.getSelectedList();
             const getColumnInfo = (column) => {
                 return {
                     // This regex strips any html off of the label and summary, leaving only the center text. For example, <div><span>Hello</span></div> would be Hello.
@@ -39,6 +36,7 @@ export class LineupVisWrapper {
                 };
             };
             const mapData = (innerData, column) => {
+                // TODO: This should be _visyn_id?
                 return innerData.map((d) => ({ id: d.v.id, val: column.getRaw(d) }));
             };
             const getColumnValue = async (column) => {
@@ -67,15 +65,15 @@ export class LineupVisWrapper {
                 else if (c instanceof CategoricalColumn) {
                     cols.push({
                         info: getColumnInfo(c),
-                        values: () => getColumnValue(c).then((res) => res.map((v) => (v.val ? v : { ...v, val: LineupVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE }))),
+                        values: () => getColumnValue(c).then((res) => res.map((v) => (v.val ? v : { ...v, val: this.PLOTLY_CATEGORICAL_MISSING_VALUE }))),
                         type: EColumnTypes.CATEGORICAL,
                     });
                 }
             }
             ReactDOM.render(React.createElement(Vis, {
                 columns: cols,
-                selected: selectedMap,
-                selectionCallback: (ids) => this.props.selectionCallback(ids),
+                selected: selectedList,
+                selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
                 filterCallback: (s) => this.filterCallback(s),
             }), this.node);
         };
@@ -96,10 +94,7 @@ export class LineupVisWrapper {
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
         this.viewable = false;
+        this.PLOTLY_CATEGORICAL_MISSING_VALUE = I18nextManager.getInstance().i18n.t('tdp:core.vis.missingValue');
     }
 }
-/**
- * This string is assigned if a categorical value is missing and rendered by Plotly.
- */
-LineupVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE = '--';
 //# sourceMappingURL=LineupVisWrapper.js.map

@@ -60,13 +60,13 @@ export class ViewUtils {
      * @returns {boolean}
      */
     static isSameSelection(a, b) {
-        var _a, _b;
+        var _a, _b, _c, _d;
         const aNull = a == null || a.idtype == null;
         const bNull = b == null || b.idtype == null;
         if (aNull || bNull) {
             return aNull === bNull;
         }
-        const base = a.idtype.id === b.idtype.id && isEqual((_a = a.ids) === null || _a === void 0 ? void 0 : _a.sort(), (_b = b.ids) === null || _b === void 0 ? void 0 : _b.sort());
+        const base = a.idtype.id === b.idtype.id && isEqual((_b = (_a = a.ids) === null || _a === void 0 ? void 0 : _a.slice()) === null || _b === void 0 ? void 0 : _b.sort(), (_d = (_c = b.ids) === null || _c === void 0 ? void 0 : _c.slice()) === null || _d === void 0 ? void 0 : _d.sort());
         if (!base) {
             return false;
         }
@@ -80,11 +80,12 @@ export class ViewUtils {
         }
         // same size but not empty check entries
         return Array.from(a.all.entries()).every(([key, value]) => {
+            var _a, _b;
             const other = b.all.get(key);
             if (!other) {
                 return false;
             }
-            return isEqual(value === null || value === void 0 ? void 0 : value.sort(), other === null || other === void 0 ? void 0 : other.sort());
+            return isEqual((_a = value === null || value === void 0 ? void 0 : value.slice()) === null || _a === void 0 ? void 0 : _a.sort(), (_b = other === null || other === void 0 ? void 0 : other.slice()) === null || _b === void 0 ? void 0 : _b.sort());
         });
     }
     static createContext(graph, desc, ref) {
