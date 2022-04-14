@@ -21,6 +21,7 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
+import { useSyncedRef } from '../hooks/useSyncedRef';
 
 const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
@@ -44,6 +45,7 @@ export function Vis({
   shapes = DEFAULT_SHAPES,
   selectionCallback = () => null,
   filterCallback = () => null,
+  onConfigChange = () => null,
   externalConfig = null,
   hideSidebar = false,
 }: {
@@ -71,6 +73,7 @@ export function Vis({
    * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
    */
   filterCallback?: (s: EFilterOptions) => void;
+  onConfigChange?: (config: IVisConfig) => void;
   externalConfig?: IVisConfig;
   hideSidebar?: boolean;
 }) {
@@ -112,6 +115,11 @@ export function Vis({
           },
         },
   );
+
+  const setExternalConfigRef = useSyncedRef(onConfigChange);
+  useEffect(() => {
+    setExternalConfigRef.current?.(visConfig);
+  }, [visConfig, setExternalConfigRef]);
 
   const setVisConfig = React.useCallback((newConfig: IVisConfig) => {
     _setVisConfig((oldConfig) => {

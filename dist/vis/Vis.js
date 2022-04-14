@@ -8,6 +8,7 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
+import { useSyncedRef } from '../hooks/useSyncedRef';
 const DEFAULT_COLORS = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
@@ -21,7 +22,7 @@ const DEFAULT_COLORS = [
     getCssValue('visyn-c10'),
 ];
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
-export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, externalConfig = null, hideSidebar = false, }) {
+export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, onConfigChange = () => null, externalConfig = null, hideSidebar = false, }) {
     // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
     // To ensure that we never render an incosistent config, keep a consistent and a current in the config. Always render the consistent.
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -55,6 +56,11 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
                     aggregateType: EAggregateTypes.COUNT,
                 },
             });
+    const setExternalConfigRef = useSyncedRef(onConfigChange);
+    useEffect(() => {
+        var _a;
+        (_a = setExternalConfigRef.current) === null || _a === void 0 ? void 0 : _a.call(setExternalConfigRef, visConfig);
+    }, [visConfig, setExternalConfigRef]);
     const setVisConfig = React.useCallback((newConfig) => {
         _setVisConfig((oldConfig) => {
             return {
