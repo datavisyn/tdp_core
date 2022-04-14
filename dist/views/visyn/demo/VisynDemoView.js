@@ -70,7 +70,12 @@ export function VisynDemoView({ desc, parameters, onParametersChanged }) {
     }, [parameters === null || parameters === void 0 ? void 0 : parameters.dataLength, onParametersChanged]);
     return (React.createElement(React.Fragment, null,
         desc.helpText,
-        parameters.columns ? React.createElement(Vis, { columns: parameters.columns, externalConfig: parameters.config, hideSidebar: true }) : null));
+        parameters.columns ? (React.createElement(Vis, { columns: parameters.columns, externalConfig: parameters.config, hideSidebar: true, setExternalConfig: (config) => {
+                onParametersChanged((p) => ({
+                    ...p,
+                    config,
+                }));
+            } })) : null));
 }
 export function VisynDemoViewSidebar({ parameters, onParametersChanged }) {
     return parameters.columns ? (React.createElement(VisSidebar, { style: {

@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { IVisConfig, VisColumn, EFilterOptions } from './interfaces';
-export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, onConfigChange, externalConfig, hideSidebar, }: {
+export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, setExternalConfig, externalConfig, hideSidebar, }: {
     /**
      * Required data columns which are displayed.
      */
@@ -25,7 +25,7 @@ export declare function Vis({ columns, selected, colors, shapes, selectionCallba
      * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
      */
     filterCallback?: (s: EFilterOptions) => void;
-    onConfigChange?: (config: IVisConfig) => void;
+    setExternalConfig?: (config: IVisConfig) => void;
     externalConfig?: IVisConfig;
     hideSidebar?: boolean;
 }): JSX.Element;

@@ -45,7 +45,7 @@ export function Vis({
   shapes = DEFAULT_SHAPES,
   selectionCallback = () => null,
   filterCallback = () => null,
-  onConfigChange = () => null,
+  setExternalConfig = () => null,
   externalConfig = null,
   hideSidebar = false,
 }: {
@@ -73,7 +73,7 @@ export function Vis({
    * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
    */
   filterCallback?: (s: EFilterOptions) => void;
-  onConfigChange?: (config: IVisConfig) => void;
+  setExternalConfig?: (config: IVisConfig) => void;
   externalConfig?: IVisConfig;
   hideSidebar?: boolean;
 }) {
@@ -116,7 +116,7 @@ export function Vis({
         },
   );
 
-  const setExternalConfigRef = useSyncedRef(onConfigChange);
+  const setExternalConfigRef = useSyncedRef(setExternalConfig);
   useEffect(() => {
     setExternalConfigRef.current?.(visConfig);
   }, [visConfig, setExternalConfigRef]);
