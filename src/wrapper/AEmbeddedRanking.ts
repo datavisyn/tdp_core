@@ -179,7 +179,7 @@ export abstract class AEmbeddedRanking<T extends IRow> implements IViewProviderL
   protected addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn>;
   protected addTrackedScoreColumn(score: IScore<any> | string, scoreParams: any, position?: number): Promise<ILazyLoadedColumn | ILazyLoadedColumn[]> {
     if (typeof score !== 'string') {
-      return this.ranking.addTrackedScoreColumn(score, scoreParams); // aka scoreParams = position
+      return Promise.resolve(this.ranking.addTrackedScoreColumn(score, scoreParams)); // aka scoreParams = position
     }
 
     const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, score);

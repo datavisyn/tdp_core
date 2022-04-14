@@ -1,6 +1,7 @@
 import { EngineRenderer, LocalDataProvider, TaggleRenderer } from 'lineupjs';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection, EViewMode, IScore, IAdditionalColumnDesc } from '../base/interfaces';
+import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
 import { IInitialRankingOptions } from './desc';
 import { IRankingWrapper } from './IRankingWrapper';
 import { IRow, IServerColumn, IServerColumnDesc } from '../base/rest';
@@ -22,9 +23,9 @@ export declare abstract class ARankingView extends AView {
      * DOM element for LineUp stats in parameter UI
      */
     private readonly stats;
-    private readonly provider;
+    readonly provider: LocalDataProvider;
     private readonly taggle;
-    private readonly selectionHelper;
+    readonly selectionHelper: LineUpSelectionHelper;
     private readonly panel;
     private readonly generalVis;
     /**
@@ -107,7 +108,7 @@ export declare abstract class ARankingView extends AView {
      * @param {IScore<any>} score
      * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
      */
-    addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn>;
+    addTrackedScoreColumn(score: IScore<any>, position?: number): ILazyLoadedColumn;
     private pushTrackedScoreColumn;
     /**
      * used by commands to remove a tracked score again

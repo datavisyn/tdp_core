@@ -8,6 +8,16 @@ export interface IRow {
      * id, e.g. ESNGxxxx
      */
     readonly id: string;
+    /**
+     * unique internal number id, e.g. 42
+     */
+    readonly _visyn_id: string;
+    /**
+     * Legacy internal id.
+     * TODO: Remove after all usages are refactored.
+     * @deprecated Use _visyn_id instead.
+     */
+    readonly _id: never;
     [key: string]: any;
 }
 /**

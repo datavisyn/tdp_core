@@ -24,9 +24,9 @@ export class PanelAddColumnButton implements IPanelButton {
       this.node.classList.remove('once');
     });
 
-    const button = new PanelButton(
-      this.node,
-      Object.assign(options, {
+    const btnOptions = {
+      ...options,
+      ...{
         title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
         faIcon: 'fas fa-plus',
         onClick: () => {
@@ -34,8 +34,9 @@ export class PanelAddColumnButton implements IPanelButton {
           (<HTMLElement>this.search.node.querySelector('input'))!.focus();
           this.search.focus();
         },
-      }),
-    );
+      },
+    };
+    const button = new PanelButton(this.node, btnOptions);
 
     this.node.appendChild(button.node);
     this.node.appendChild(this.search.node);

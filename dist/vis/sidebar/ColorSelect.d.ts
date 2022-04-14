@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ColumnInfo, VisColumn, ENumericalColorScaleType } from '../interfaces';
 interface ColorSelectProps {
     callback: (c: ColumnInfo) => void;
