@@ -58,87 +58,67 @@ export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig):
   return merged;
 }
 
-function getAggregateValues(aggType: EAggregateTypes, catColValues: VisCategoricalValue[], aggColValues: VisNumericalValue[]) {
-  const categoricalOptions = [...new Set(catColValues.map((v) => v.val))];
-
-  const categoricalMap = {};
-
-  catColValues.forEach((val) => {
-    categoricalMap[val.id] = val.val;
-  });
-
-  if (aggType === EAggregateTypes.COUNT) {
-    return categoricalOptions.map((curr) => (catColValues as VisCategoricalValue[]).filter((c) => c.val === curr).length);
-  }
-  if (aggType === EAggregateTypes.AVG) {
-    return categoricalOptions.map((curr) =>
-      mean((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
-    );
-  }
-  if (aggType === EAggregateTypes.MIN) {
-    return categoricalOptions.map((curr) =>
-      min((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
-    );
-  }
-  if (aggType === EAggregateTypes.MED) {
-    return categoricalOptions.map((curr) =>
-      median((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
-    );
-  }
-
-  return categoricalOptions.map((curr) =>
-    max((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)),
-  );
-}
-
-function getTotalAggregateValues(
-  aggType: EAggregateTypes,
-  categoricalOptions: string[],
+/**
+ * This function finds the faceted values of a given categorical column based on an aggregation type.
+ * If isTotal is true, it will sum all of the categorical values, used for normalizing the bar charts.
+ * Otherwise, it will return an array of values corresponding to the categoricalOptions argument
+ * @param aggregateType Enum for aggregate type
+ * @param catColValues Categorical Column which we are visualizing
+ * @param aggColValues Numerical Column which we are using for our aggregation type, unless count is the aggregation type.
+ * @param _categoricalOptions Optional list of categorical options to find. If not provided, will use a set from the catColValues parameter
+ * @param isTotal Boolean for deciding whether or not to summarize the results of the list. Also cleans NaN and undefined values to 0
+ * @returns A list of numbers if isTotal is false, a single number if true.
+ */
+function getAggregateValues(
+  aggregateType: EAggregateTypes,
   catColValues: VisCategoricalValue[],
   aggColValues: VisNumericalValue[],
+  _categoricalOptions?: string[],
+  isTotal?: boolean,
 ) {
+  const categoricalOptions = _categoricalOptions || [...new Set(catColValues.map((v) => v.val))];
+
   const categoricalMap = {};
 
   catColValues.forEach((val) => {
     categoricalMap[val.id] = val.val;
   });
 
-  if (aggType === EAggregateTypes.COUNT) {
-    return sum(categoricalOptions.map((curr) => (catColValues as VisCategoricalValue[]).filter((c) => c.val === curr).length));
-  }
-  if (aggType === EAggregateTypes.AVG) {
-    return sum(
-      categoricalOptions.map(
-        (curr) => mean((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0,
-      ),
+  function aggregate(aggFunc) {
+    const aggValues = categoricalOptions.map(
+      (curr) => aggFunc((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0,
     );
-  }
-  if (aggType === EAggregateTypes.MIN) {
-    return sum(
-      categoricalOptions.map(
-        (curr) => min((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0,
-      ),
-    );
-  }
-  if (aggType === EAggregateTypes.MED) {
-    return sum(
-      categoricalOptions.map(
-        (curr) => median((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0,
-      ),
-    );
+
+    return isTotal ? sum(aggValues) : aggValues;
   }
 
-  return sum(
-    categoricalOptions.map(
-      (curr) => max((aggColValues as VisNumericalValue[]).filter((c) => categoricalMap[c.id] === curr && !Number.isNaN(c.val)).map((c) => c.val)) || 0,
-    ),
-  );
+  switch (aggregateType) {
+    case EAggregateTypes.AVG:
+      return aggregate(mean);
+
+    case EAggregateTypes.MIN:
+      return aggregate(min);
+
+    case EAggregateTypes.MAX:
+      return aggregate(max);
+
+    case EAggregateTypes.MED:
+      return aggregate(median);
+
+    case EAggregateTypes.COUNT: {
+      const countValues = categoricalOptions.map((curr) => (catColValues as VisCategoricalValue[]).filter((c) => c.val === curr).length);
+      return isTotal ? sum(countValues) : countValues;
+    }
+
+    default:
+      throw new Error('Unknown aggregation type');
+  }
 }
 
 async function setPlotsWithGroupsAndMultiples(
   columns: VisColumn[],
   catCol: VisCategoricalColumn,
-  aggType: EAggregateTypes,
+  aggregateType: EAggregateTypes,
   aggregateColumn: VisNumericalColumn,
   config: IBarConfig,
   plots: PlotlyData[],
@@ -174,15 +154,15 @@ async function setPlotsWithGroupsAndMultiples(
 
           const joinedObjs = allObjs.filter((c) => allGroupObjsIds.has(c.id) && allMultiplesObjsIds.has(c.id));
 
-          const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
+          const aggregateValues = getAggregateValues(aggregateType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
 
-          const ungroupedAggregateValues = getTotalAggregateValues(
-            aggType,
-            uniqueMultiplesVals,
+          const ungroupedAggregateValues = getAggregateValues(
+            aggregateType,
             currMultiplesColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)) as VisCategoricalValue[],
             aggColValues?.resolvedValues as VisNumericalValue[],
+            uniqueMultiplesVals,
           );
-          return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
+          return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / (ungroupedAggregateValues as number)) * 100 : aggregateValues;
         })
         .flat();
 
@@ -203,8 +183,8 @@ async function setPlotsWithGroupsAndMultiples(
             color: scales.color(uniqueGroup),
           },
         },
-        xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
-        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
+        xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggregateType,
+        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggregateType) : catColValues.info.name,
         xTicks: vertFlag ? uniqueColVals : null,
         xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
         yTicks: !vertFlag ? uniqueColVals : null,
@@ -220,7 +200,7 @@ async function setPlotsWithGroupsAndMultiples(
 async function setPlotsWithGroups(
   columns: VisColumn[],
   catCol: VisCategoricalColumn,
-  aggType: EAggregateTypes,
+  aggregateType: EAggregateTypes,
   aggColumn: VisNumericalColumn,
   config: IBarConfig,
   plots: PlotlyData[],
@@ -246,15 +226,16 @@ async function setPlotsWithGroups(
 
         const joinedObjs = allObjs.filter((allVal) => allGroupObjsIds.has(allVal.id));
 
-        const aggregateValues = getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
-        const ungroupedAggregateValues = getTotalAggregateValues(
-          aggType,
-          uniqueGroupVals,
+        const aggregateValues = getAggregateValues(aggregateType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
+        const ungroupedAggregateValues = getAggregateValues(
+          aggregateType,
           groupColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)) as VisCategoricalValue[],
           aggColValues?.resolvedValues as VisNumericalValue[],
+          uniqueGroupVals,
+          true,
         );
 
-        return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
+        return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / (ungroupedAggregateValues as number)) * 100 : aggregateValues;
       })
       .flat();
 
@@ -275,8 +256,8 @@ async function setPlotsWithGroups(
           color: scales.color(uniqueVal),
         },
       },
-      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggType,
-      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggType) : catColValues.info.name,
+      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggregateType,
+      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggregateType) : catColValues.info.name,
       xTicks: vertFlag ? uniqueColVals : null,
       xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
@@ -290,7 +271,7 @@ async function setPlotsWithGroups(
 async function setPlotsWithMultiples(
   columns: VisColumn[],
   catCol: VisCategoricalColumn,
-  aggType: EAggregateTypes,
+  aggregateType: EAggregateTypes,
   aggColumn: VisNumericalColumn,
   config: IBarConfig,
   plots: PlotlyData[],
@@ -314,7 +295,7 @@ async function setPlotsWithMultiples(
         const allObjs = (catColValues.resolvedValues as VisCategoricalValue[]).filter((c) => c.val === v);
         const joinedObjs = allObjs.filter((c) => allMultiplesObjsIds.has(c.id));
 
-        return joinedObjs.length === 0 ? [0] : getAggregateValues(aggType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
+        return joinedObjs.length === 0 ? [0] : getAggregateValues(aggregateType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
       })
       .flat();
 
@@ -332,8 +313,8 @@ async function setPlotsWithMultiples(
         type: 'bar',
         name: uniqueVal,
       },
-      xLabel: vertFlag ? catColValues.info.name : aggType,
-      yLabel: vertFlag ? aggType : catColValues.info.name,
+      xLabel: vertFlag ? catColValues.info.name : aggregateType,
+      yLabel: vertFlag ? aggregateType : catColValues.info.name,
       xTicks: vertFlag ? uniqueColVals : null,
       xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
@@ -347,7 +328,7 @@ async function setPlotsWithMultiples(
 
 async function setPlotsBasic(
   columns: VisColumn[],
-  aggType: EAggregateTypes,
+  aggregateType: EAggregateTypes,
   aggregateColumn: VisNumericalColumn | null,
   catCol: VisCategoricalColumn,
   config: IBarConfig,
@@ -361,7 +342,11 @@ async function setPlotsBasic(
 
   const vertFlag = config.direction === EBarDirection.VERTICAL;
 
-  const aggValues = getAggregateValues(aggType, catColValues.resolvedValues as VisCategoricalValue[], aggColValues?.resolvedValues as VisNumericalValue[]);
+  const aggValues: any[] = getAggregateValues(
+    aggregateType,
+    catColValues.resolvedValues as VisCategoricalValue[],
+    aggColValues?.resolvedValues as VisNumericalValue[],
+  ) as any[];
 
   const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))];
   plots.push({
@@ -379,8 +364,8 @@ async function setPlotsBasic(
       name: catColValues.info.name,
       showlegend: false,
     },
-    xLabel: vertFlag ? catColValues.info.name : aggType,
-    yLabel: vertFlag ? aggType : catColValues.info.name,
+    xLabel: vertFlag ? catColValues.info.name : aggregateType,
+    yLabel: vertFlag ? aggregateType : catColValues.info.name,
     xTicks: vertFlag ? valArr : null,
     xTickLabels: vertFlag ? valArr.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
     yTicks: !vertFlag ? valArr : null,

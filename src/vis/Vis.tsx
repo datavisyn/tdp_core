@@ -22,7 +22,7 @@ import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
 
-const DEFAULTCOLORS = [
+const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
   getCssValue('visyn-c2'),
   getCssValue('visyn-c3'),
@@ -35,13 +35,13 @@ const DEFAULTCOLORS = [
   getCssValue('visyn-c10'),
 ];
 
-const DEFAULTSHAPES = ['circle', 'square', 'triangle-up', 'star'];
+const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
 
 export function Vis({
   columns,
   selected = [],
-  colors = DEFAULTCOLORS,
-  shapes = DEFAULTSHAPES,
+  colors = DEFAULT_COLORS,
+  shapes = DEFAULT_SHAPES,
   selectionCallback = () => null,
   filterCallback = () => null,
   externalConfig = null,
@@ -76,7 +76,6 @@ export function Vis({
 }) {
   // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
   // To ensure that we never render an incosistent config, keep a consistent and a current in the config. Always render the consistent.
-  // TODO:: probably change the names, especially "current" and "inconsistentVisConfig" to something more useful.
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const [{ consistent: visConfig, current: inconsistentVisConfig }, _setVisConfig] = React.useState<{
     consistent: IVisConfig;
