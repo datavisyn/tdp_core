@@ -131,6 +131,7 @@ export abstract class ARankingView extends AView {
       filterGlobally: true,
       propagateAggregationState: false,
     },
+    showInContextMode: (col: Column) => (<any>col.desc).column === 'id',
     formatSearchBoxItem: (item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement): string | void => {
       // TypeScript type guard function
       function hasColumnDesc(i: ISearchOption | IGroupSearchItem<ISearchOption>): i is ISearchOption {
@@ -433,13 +434,7 @@ export abstract class ARankingView extends AView {
 
     this.dump = new Set<string>();
     ranking.children.forEach((c) => {
-      if (
-        c === labelColumn ||
-        (s && c === s.col) ||
-        c.desc.type === 'rank' ||
-        c.desc.type === 'selection' ||
-        (<any>c.desc).column === 'id' // = Ensembl column
-      ) {
+      if (c === labelColumn || (s && c === s.col) || c.desc.type === 'rank' || c.desc.type === 'selection' || this.options.showInContextMode(c)) {
         // keep these columns
       } else {
         c.setVisible(false);

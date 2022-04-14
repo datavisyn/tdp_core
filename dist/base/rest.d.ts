@@ -175,7 +175,7 @@ export declare class RestBaseUtils {
      * @param filters URL filter parameters
      */
     static mergeParamAndFilters(params: IParams, filters: IParams): {
-        [x: string]: string | number | boolean | number[] | string[] | boolean[];
+        [x: string]: string | number | boolean | string[] | boolean[] | number[];
     };
     /**
      * query the TDP rest api to read data with additional given filters

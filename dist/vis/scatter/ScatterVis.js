@@ -4,7 +4,7 @@ import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
-import { beautifyLayout } from '../layoutUtils';
+import { beautifyLayout } from '../general/layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
