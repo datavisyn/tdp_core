@@ -31,7 +31,7 @@ export function SingleHex({
   hexRadius,
   colorScale,
   selected = {},
-  isCategorySelected
+  isCategorySelected,
 }: SingleHexProps) {
   const { catMap, catMapKeys, catMapVals } = useMemo(() => {
     const currMap = {};

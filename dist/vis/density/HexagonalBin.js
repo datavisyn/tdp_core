@@ -92,6 +92,9 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
         if (ref) {
             ro.observe(ref.current);
         }
+        return () => {
+            ro.disconnect();
+        };
     }, []);
     // create x scale
     const xScale = useMemo(() => {

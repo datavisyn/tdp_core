@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { PieChart } from './PieChart';
 import { cutHex } from './utils';
 import { EHexbinOptions } from '../interfaces';
-export function SingleHex({ hexbinOption, hexData, d3Hexbin, isSizeScale, radiusScale, isOpacityScale, opacityScale, hexRadius, colorScale, selected = {}, isCategorySelected }) {
+export function SingleHex({ hexbinOption, hexData, d3Hexbin, isSizeScale, radiusScale, isOpacityScale, opacityScale, hexRadius, colorScale, selected = {}, isCategorySelected, }) {
     const { catMap, catMapKeys, catMapVals } = useMemo(() => {
         const currMap = {};
         hexData.forEach((point) => {

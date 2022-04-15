@@ -17,5 +17,5 @@ export interface SingleHexProps {
     };
     isCategorySelected: boolean;
 }
-export declare function SingleHex({ hexbinOption, hexData, d3Hexbin, isSizeScale, radiusScale, isOpacityScale, opacityScale, hexRadius, colorScale, selected, isCategorySelected }: SingleHexProps): JSX.Element;
+export declare function SingleHex({ hexbinOption, hexData, d3Hexbin, isSizeScale, radiusScale, isOpacityScale, opacityScale, hexRadius, colorScale, selected, isCategorySelected, }: SingleHexProps): JSX.Element;
 //# sourceMappingURL=SingleHex.d.ts.map

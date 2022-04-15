@@ -40,14 +40,16 @@ export function DensityVis({ config, extensions, columns, setConfig, selectionCa
   return (
     <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
       <div
-        className="position-relative d-grid flex-grow-1"
+        className="position-relative d-grid flex-grow-1 justify-content-center"
         style={{ gridTemplateColumns: 'minmax(0, 1fr) '.repeat(config.numColumnsSelected.length < 3 ? 1 : config.numColumnsSelected.length) }}
       >
         {config.numColumnsSelected.length < 2 ? (
-          <InvalidCols
-            headerMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader')}
-            bodyMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError')}
-          />
+          <div className="justify-content-center align-items-center d-flex">
+            <InvalidCols
+              headerMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader')}
+              bodyMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError')}
+            />
+          </div>
         ) : (
           <>
             {config.numColumnsSelected.length > 2 ? (
