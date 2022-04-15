@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { ColumnInfo, EHexbinOptions, ESupportedPlotlyVis, IDensityConfig, IVisConfig, VisColumn } from '../interfaces';
+import { ColumnInfo, EColumnTypes, EHexbinOptions, ESupportedPlotlyVis, IDensityConfig, IVisConfig, VisColumn } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { NumericalColumnSelect } from '../sidebar';
-import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
+import { SingleColumnSelect } from '../sidebar/SingleColumnSelect';
 import { HexSizeSlider } from '../sidebar/HexSizeSlider';
 import { HexSizeSwitch } from '../sidebar/HexSizeScaleSwitch';
 import { HexOpacitySwitch } from '../sidebar/HexOpacityScaleSwitch';
@@ -56,7 +56,13 @@ export function DensityVisSidebar({
         columns={columns}
         currentSelected={config.numColumnsSelected || []}
       />
-      <CategoricalColumnSingleSelect callback={(color: ColumnInfo) => setConfig({ ...config, color })} columns={columns} currentSelected={config.color} />
+      <SingleColumnSelect
+        callback={(color: ColumnInfo) => setConfig({ ...config, color })}
+        columns={columns}
+        currentSelected={config.color}
+        type={[EColumnTypes.CATEGORICAL]}
+        label="Categorical Column"
+      />
       {config.color ? (
         <HexbinOptionSelect callback={(hexbinOptions: EHexbinOptions) => setConfig({ ...config, hexbinOptions })} currentSelected={config.hexbinOptions} />
       ) : null}
