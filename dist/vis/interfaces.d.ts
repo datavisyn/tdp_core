@@ -27,6 +27,13 @@ export declare enum EViolinOverlay {
     STRIP = "Strip",
     BOX = "Box"
 }
+export declare enum EAggregateTypes {
+    COUNT = "Count",
+    MIN = "Minimum",
+    AVG = "Average",
+    MED = "Median",
+    MAX = "Maximum"
+}
 export declare enum EBarGroupingType {
     STACK = "Stacked",
     GROUP = "Grouped"
@@ -94,6 +101,8 @@ export interface IBarConfig {
     groupType: EBarGroupingType;
     numColumnsSelected: ColumnInfo[];
     catColumnSelected: ColumnInfo;
+    aggregateType: EAggregateTypes;
+    aggregateColumn: ColumnInfo | null;
 }
 export interface IPCPConfig {
     type: ESupportedPlotlyVis.PCP;
@@ -136,6 +145,10 @@ export declare type PlotlyData = {
     data: Partial<Plotly.PlotData>;
     xLabel: string;
     yLabel: string;
+    xTicks?: string[];
+    xTickLabels?: string[];
+    yTicks?: string[];
+    yTickLabels?: string[];
 };
 export declare type ColumnInfo = {
     name: string;

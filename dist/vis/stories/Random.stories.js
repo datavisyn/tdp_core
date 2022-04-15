@@ -1,6 +1,6 @@
 import React from 'react';
 import { Vis } from '../Vis';
-import { EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, EScatterSelectSettings, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
+import { EAggregateTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, EScatterSelectSettings, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
 function fetchData(numberOfPoints) {
     const dataGetter = async () => ({
         value: Array(numberOfPoints)
@@ -113,6 +113,8 @@ BarChart.args = {
             id: 'category',
             name: 'category',
         },
+        aggregateColumn: null,
+        aggregateType: EAggregateTypes.COUNT,
     },
 };
 export const ViolinPlot = Template.bind({});

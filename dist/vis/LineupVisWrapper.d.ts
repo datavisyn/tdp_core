@@ -12,7 +12,7 @@ export declare class LineupVisWrapper {
     /**
      * This string is assigned if a categorical value is missing and rendered by Plotly.
      */
-    private static PLOTLY_CATEGORICAL_MISSING_VALUE;
+    private PLOTLY_CATEGORICAL_MISSING_VALUE;
     readonly node: HTMLElement;
     private viewable;
     constructor(props: {

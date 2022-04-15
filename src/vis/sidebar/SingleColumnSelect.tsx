@@ -3,20 +3,22 @@ import Select from 'react-select';
 import { ColumnInfo, EColumnTypes, VisColumn } from '../interfaces';
 import { formatOptionLabel } from './utils';
 
-interface CategoricalColumnSelectProps {
+interface SingleColumnSelectProps {
   callback: (s: ColumnInfo) => void;
   columns: VisColumn[];
   currentSelected: ColumnInfo;
+  label: string;
+  type: EColumnTypes[];
 }
 
-export function CategoricalColumnSingleSelect({ callback, columns, currentSelected }: CategoricalColumnSelectProps) {
+export function SingleColumnSelect({ callback, columns, currentSelected, label, type }: SingleColumnSelectProps) {
   const selectCatOptions = React.useMemo(() => {
-    return columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
-  }, [columns]);
+    return columns.filter((c) => type.includes(c.type)).map((c) => c.info);
+  }, [columns, type]);
 
   return (
     <>
-      <label className="pt-2 pb-1">Categorical Column</label>
+      <label className="pt-2 pb-1">{label}</label>
       <Select
         isClearable
         closeMenuOnSelect

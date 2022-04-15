@@ -242,7 +242,6 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
 
   // Create a default color scale
   const colorScale = useMemo(() => {
-    console.log(colsStatus);
     if (colsStatus !== 'success' || !currentColorColumn?.allValues) {
       return null;
     }

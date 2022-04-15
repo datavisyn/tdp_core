@@ -37,6 +37,14 @@ export var EViolinOverlay;
     EViolinOverlay["STRIP"] = "Strip";
     EViolinOverlay["BOX"] = "Box";
 })(EViolinOverlay || (EViolinOverlay = {}));
+export var EAggregateTypes;
+(function (EAggregateTypes) {
+    EAggregateTypes["COUNT"] = "Count";
+    EAggregateTypes["MIN"] = "Minimum";
+    EAggregateTypes["AVG"] = "Average";
+    EAggregateTypes["MED"] = "Median";
+    EAggregateTypes["MAX"] = "Maximum";
+})(EAggregateTypes || (EAggregateTypes = {}));
 export var EBarGroupingType;
 (function (EBarGroupingType) {
     EBarGroupingType["STACK"] = "Stacked";
