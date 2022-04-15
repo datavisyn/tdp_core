@@ -1,4 +1,4 @@
-import { PlotlyInfo, VisColumn } from '../interfaces';
+import { ColumnInfo, EColumnTypes, PlotlyInfo, VisCategoricalValue, VisColumn, VisNumericalValue } from '../interfaces';
 import { Plotly } from '../Plot';
 /**
  * Truncate long texts (e.g., to use as axes title)
@@ -13,26 +13,14 @@ export declare function truncateText(text: string, maxLength?: number): string;
  * @returns the changed layout
  */
 export declare function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout): Plotly.Layout;
-export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
-    resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
-    type: import("../interfaces").EColumnTypes.NUMERICAL;
-    info: import("../interfaces").ColumnInfo;
-    values: () => (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[] | Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
-} | {
-    resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
-    type: import("../interfaces").EColumnTypes.CATEGORICAL;
-    info: import("../interfaces").ColumnInfo;
-    values: () => (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[] | Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
-})[]>;
+export declare function resolveColumnValues(columns: VisColumn[]): Promise<{
+    resolvedValues: (VisNumericalValue | VisCategoricalValue)[];
+    type: EColumnTypes.NUMERICAL | EColumnTypes.CATEGORICAL;
+    info: ColumnInfo;
+}[]>;
 export declare function resolveSingleColumn(column: VisColumn): Promise<{
-    resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
-    type: import("../interfaces").EColumnTypes.NUMERICAL;
-    info: import("../interfaces").ColumnInfo;
-    values: () => (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[] | Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
-} | {
-    resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
-    type: import("../interfaces").EColumnTypes.CATEGORICAL;
-    info: import("../interfaces").ColumnInfo;
-    values: () => (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[] | Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
+    resolvedValues: (VisNumericalValue | VisCategoricalValue)[];
+    type: EColumnTypes.NUMERICAL | EColumnTypes.CATEGORICAL;
+    info: ColumnInfo;
 }>;
 //# sourceMappingURL=layoutUtils.d.ts.map

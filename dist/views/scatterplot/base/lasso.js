@@ -1,6 +1,4 @@
-import { line as d3line, curveLinearClosed } from 'd3-shape';
-import { polygonHull, polygonContains } from 'd3-polygon';
-import { extent } from 'd3-array';
+import { line as d3line, curveLinearClosed, polygonHull, polygonContains, extent } from 'd3v7';
 import { QuadtreeUtils } from './quadtree';
 import { ObjectUtils } from './ObjectUtils';
 const MIN_POINT_DISTANCE2 = 10 * 10;

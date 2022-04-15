@@ -1,4 +1,4 @@
-import { select } from 'd3';
+import { select } from 'd3v3';
 import { IDTypeManager, SelectionUtils } from '../idtype';
 import { EventHandler, WebpackEnv } from '../base';
 import { I18nextManager } from '../i18n';

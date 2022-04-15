@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3 from 'd3v3';
 import { IEventHandler } from '../base';
 /**
  * List of all available for elements that the form builder can handle

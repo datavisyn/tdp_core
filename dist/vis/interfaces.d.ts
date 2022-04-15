@@ -5,9 +5,15 @@ export declare enum ESupportedPlotlyVis {
     PCP = "Parallel Coordinates Plot",
     VIOLIN = "Violin Plot",
     STRIP = "Strip Plot",
-    BAR = "Bar Chart"
+    BAR = "Bar Chart",
+    DENSITY = "Hexagonal Bin Chart"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
+export declare enum EHexbinOptions {
+    COLOR = "Color",
+    PIE = "Pie",
+    BINS = "Bins"
+}
 export declare enum EBarDisplayType {
     ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
@@ -76,6 +82,16 @@ export interface IScatterConfig {
     dragMode: EScatterSelectSettings;
     alphaSliderVal: number;
 }
+export interface IDensityConfig {
+    type: ESupportedPlotlyVis.DENSITY;
+    numColumnsSelected: ColumnInfo[];
+    color: ColumnInfo | null;
+    hexRadius: number;
+    isOpacityScale: boolean;
+    isSizeScale: boolean;
+    dragMode: EScatterSelectSettings;
+    hexbinOptions: EHexbinOptions;
+}
 export interface IBarConfig {
     type: ESupportedPlotlyVis.BAR;
     multiples: ColumnInfo | null;
@@ -92,7 +108,7 @@ export interface IPCPConfig {
     type: ESupportedPlotlyVis.PCP;
     allColumnsSelected: ColumnInfo[];
 }
-export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
+export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig | IDensityConfig;
 declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**

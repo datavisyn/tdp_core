@@ -1,4 +1,4 @@
-import d3 from 'd3';
+import * as d3v7 from 'd3v7';
 import { merge } from 'lodash';
 import { I18nextManager } from '../../i18n';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
@@ -6,12 +6,12 @@ import { resolveColumnValues } from '../general/layoutUtils';
 export function isPCP(s) {
     return s.type === ESupportedPlotlyVis.PCP;
 }
-const defaultConfig = {
+export const defaultPCPConfig = {
     type: ESupportedPlotlyVis.PCP,
     allColumnsSelected: [],
 };
 export function pcpMergeDefaultConfig(columns, config) {
-    const merged = merge({}, defaultConfig, config);
+    const merged = merge({}, defaultPCPConfig, config);
     if (merged.allColumnsSelected.length === 0 && columns.length > 1) {
         // FIXME It is always selecting the last two columns, no matter their type. (@see https://github.com/datavisyn/reprovisyn/issues/199)
         merged.allColumnsSelected.push(columns[columns.length - 1].info);
@@ -68,7 +68,7 @@ export async function createPCPTraces(columns, config, selectedMap) {
             dimensions: allColValues.map((c) => {
                 if (c.type === EColumnTypes.NUMERICAL) {
                     return {
-                        range: [d3.min(c.resolvedValues.map((v) => v.val)), d3.max(c.resolvedValues.map((v) => v.val))],
+                        range: [d3v7.min(c.resolvedValues.map((v) => v.val)), d3v7.max(c.resolvedValues.map((v) => v.val))],
                         label: c.info.name,
                         values: c.resolvedValues.map((v) => v.val),
                     };

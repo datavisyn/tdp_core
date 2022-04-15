@@ -26,7 +26,7 @@ export function isBar(s: IVisConfig): s is IBarConfig {
   return s.type === ESupportedPlotlyVis.BAR;
 }
 
-const defaultConfig: IBarConfig = {
+export const defaultBarConfig: IBarConfig = {
   type: ESupportedPlotlyVis.BAR,
   numColumnsSelected: [],
   catColumnSelected: null,
@@ -42,7 +42,7 @@ const defaultConfig: IBarConfig = {
 const TICK_LABEL_LENGTH = 8;
 
 export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig): IVisConfig {
-  const merged = merge({}, defaultConfig, config);
+  const merged = merge({}, defaultBarConfig, config);
 
   const catCols = columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
   const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);

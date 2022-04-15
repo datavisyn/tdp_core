@@ -5,6 +5,7 @@ export var ESupportedPlotlyVis;
     ESupportedPlotlyVis["VIOLIN"] = "Violin Plot";
     ESupportedPlotlyVis["STRIP"] = "Strip Plot";
     ESupportedPlotlyVis["BAR"] = "Bar Chart";
+    ESupportedPlotlyVis["DENSITY"] = "Hexagonal Bin Chart";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
 export const allVisTypes = [
     ESupportedPlotlyVis.SCATTER,
@@ -12,7 +13,14 @@ export const allVisTypes = [
     ESupportedPlotlyVis.VIOLIN,
     ESupportedPlotlyVis.STRIP,
     ESupportedPlotlyVis.PCP,
+    ESupportedPlotlyVis.DENSITY,
 ];
+export var EHexbinOptions;
+(function (EHexbinOptions) {
+    EHexbinOptions["COLOR"] = "Color";
+    EHexbinOptions["PIE"] = "Pie";
+    EHexbinOptions["BINS"] = "Bins";
+})(EHexbinOptions || (EHexbinOptions = {}));
 export var EBarDisplayType;
 (function (EBarDisplayType) {
     EBarDisplayType["ABSOLUTE"] = "Absolute";
