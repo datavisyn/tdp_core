@@ -25,6 +25,10 @@ export type VisSidebarProps = {
 } & ICommonVisSideBarProps;
 
 export function VisSidebar({ columns, filterCallback = () => null, externalConfig = null, setExternalConfig = null, className, style }: VisSidebarProps) {
+  if (!externalConfig) {
+    return null;
+  }
+
   return (
     <>
       {isScatter(externalConfig) ? (

@@ -10,6 +10,9 @@ import { StripVisSidebar } from './strip/StripVisSidebar';
 import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
 export function VisSidebar({ columns, filterCallback = () => null, externalConfig = null, setExternalConfig = null, className, style }) {
+    if (!externalConfig) {
+        return null;
+    }
     return (React.createElement(React.Fragment, null,
         isScatter(externalConfig) ? (React.createElement(ScatterVisSidebar, { config: externalConfig, optionsConfig: {
                 color: {
