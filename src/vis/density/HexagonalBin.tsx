@@ -269,12 +269,25 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
               opacityScale={opacityScale}
               hexRadius={config.hexRadius}
               colorScale={colorScale}
+              isCategorySelected={!!config.color}
             />
           );
         })}
       </>
     );
-  }, [colorScale, config.hexRadius, config.isOpacityScale, config.isSizeScale, d3Hexbin, hexes, opacityScale, radiusScale, selected, config.hexbinOptions]);
+  }, [
+    colorScale,
+    config.hexRadius,
+    config.isOpacityScale,
+    config.isSizeScale,
+    d3Hexbin,
+    hexes,
+    opacityScale,
+    radiusScale,
+    selected,
+    config.hexbinOptions,
+    config.color,
+  ]);
 
   // // apply zoom/panning
   useEffect(() => {

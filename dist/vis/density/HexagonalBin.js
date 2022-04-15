@@ -186,9 +186,21 @@ export function HexagonalBin({ config, columns, selectionCallback = () => null, 
     // memoize the actual hexes since they do not need to change on zoom/drag
     const hexObjects = React.useMemo(() => {
         return (React.createElement(React.Fragment, null, hexes.map((singleHex) => {
-            return (React.createElement(SingleHex, { key: `${singleHex.x}, ${singleHex.y}`, selected: selected, hexbinOption: config.hexbinOptions, hexData: singleHex, d3Hexbin: d3Hexbin, isSizeScale: config.isSizeScale, radiusScale: radiusScale, isOpacityScale: config.isOpacityScale, opacityScale: opacityScale, hexRadius: config.hexRadius, colorScale: colorScale }));
+            return (React.createElement(SingleHex, { key: `${singleHex.x}, ${singleHex.y}`, selected: selected, hexbinOption: config.hexbinOptions, hexData: singleHex, d3Hexbin: d3Hexbin, isSizeScale: config.isSizeScale, radiusScale: radiusScale, isOpacityScale: config.isOpacityScale, opacityScale: opacityScale, hexRadius: config.hexRadius, colorScale: colorScale, isCategorySelected: !!config.color }));
         })));
-    }, [colorScale, config.hexRadius, config.isOpacityScale, config.isSizeScale, d3Hexbin, hexes, opacityScale, radiusScale, selected, config.hexbinOptions]);
+    }, [
+        colorScale,
+        config.hexRadius,
+        config.isOpacityScale,
+        config.isSizeScale,
+        d3Hexbin,
+        hexes,
+        opacityScale,
+        radiusScale,
+        selected,
+        config.hexbinOptions,
+        config.color,
+    ]);
     // // apply zoom/panning
     useEffect(() => {
         const zoom = d3v7.zoom();

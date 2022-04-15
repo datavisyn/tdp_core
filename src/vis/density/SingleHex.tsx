@@ -17,6 +17,7 @@ export interface SingleHexProps {
   hexRadius: number;
   colorScale: d3v7.ScaleOrdinal<string, string, never>;
   selected?: { [key: string]: boolean };
+  isCategorySelected: boolean;
 }
 
 export function SingleHex({
@@ -30,6 +31,7 @@ export function SingleHex({
   hexRadius,
   colorScale,
   selected = {},
+  isCategorySelected
 }: SingleHexProps) {
   const { catMap, catMapKeys, catMapVals } = useMemo(() => {
     const currMap = {};
@@ -64,7 +66,7 @@ export function SingleHex({
 
   return (
     <>
-      {hexbinOption === EHexbinOptions.BINS
+      {hexbinOption === EHexbinOptions.BINS && isCategorySelected
         ? catMapKeys.sort().map((key) => {
             const currPath = cutHex(
               d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius - 0.5),
@@ -91,7 +93,7 @@ export function SingleHex({
           })
         : null}
 
-      {hexbinOption === EHexbinOptions.COLOR ? (
+      {hexbinOption === EHexbinOptions.COLOR || !isCategorySelected ? (
         <path
           d={d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius - 0.5)}
           style={{
@@ -103,7 +105,7 @@ export function SingleHex({
           }}
         />
       ) : null}
-      {hexbinOption === EHexbinOptions.PIE ? (
+      {hexbinOption === EHexbinOptions.PIE && isCategorySelected ? (
         <>
           {isOpacityScale ? (
             <path
