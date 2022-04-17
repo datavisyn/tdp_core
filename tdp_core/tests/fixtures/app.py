@@ -12,7 +12,7 @@ from ...server.visyn_server import create_visyn_server
 @pytest.fixture
 def mock_plugins(monkeypatch):
     def mock_current_user_in_manager(self):
-        return permissions.User(id="admin", name="admin")
+        return permissions.User(id="admin")
 
     monkeypatch.setattr(SecurityManager, "current_user", property(mock_current_user_in_manager))
 

@@ -5,7 +5,7 @@ from builtins import next
 
 from flask import Flask, safe_join, send_from_directory
 
-from ..settings import get_global_settings
+from .. import manager
 
 _log = logging.getLogger(__name__)
 
@@ -45,9 +45,9 @@ def _deliver(path):
     if len(elems) > 0:
         plugin_id = elems[0]
         elems[0] = "build"
-        from ..plugin.registry import get_registry
+        from .. import manager
 
-        plugin = next((p for p in get_registry().plugins if p.id == plugin_id), None)
+        plugin = next((p for p in manager.registry.plugins if p.id == plugin_id), None)
         if plugin:
             dpath = safe_join(plugin.folder, "/".join(elems))
             if os.path.exists(dpath):
@@ -74,9 +74,9 @@ def _generate_index():
     ]
 
     # filter list and get title for apps
-    from ..plugin.registry import get_registry
+    from .. import manager
 
-    apps = sorted((p for p in get_registry().plugins if p.is_app()), key=lambda p: p.title)
+    apps = sorted((p for p in manager.registry.plugins if p.is_app()), key=lambda p: p.title)
 
     for app in apps:
         text.append("<li>")
@@ -115,7 +115,7 @@ def _generate_index():
 def build_info():
     from codecs import open
 
-    from ..plugin.registry import get_registry
+    from .. import manager
 
     dependencies = []
     all_plugins = []
@@ -126,7 +126,7 @@ def build_info():
         with open(requirements, "r", encoding="utf-8") as f:
             dependencies.extend([line.strip() for line in f.readlines()])
 
-    for p in get_registry().plugins:
+    for p in manager.registry.plugins:
         if p.id == "tdp_core":
             build_info["name"] = p.name
             build_info["version"] = p.version
@@ -146,7 +146,7 @@ def health():
 def create():
     # check initialization
     app = Flask(__name__)
-    if get_global_settings().is_development_mode:
+    if manager.settings.is_development_mode:
         app.add_url_rule("/", "index", _generate_index)
         app.add_url_rule("/index.html", "index", _generate_index)
         app.add_url_rule("/<path:path>", "deliver", _deliver)

@@ -1,45 +1,91 @@
 import logging
-from datetime import datetime, timedelta
-from functools import lru_cache, wraps
-from typing import List, Union
+from base64 import b64decode
+from datetime import datetime, timedelta, timezone
+from functools import wraps
+from typing import Callable, Dict, List, Optional, Tuple
 
 import jwt
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, status
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import FastAPI, HTTPException, Request, Response, status
+from fastapi.security.utils import get_authorization_scheme_param
 
+from .. import manager
 from ..middleware.request_context_middleware import get_request
-from ..plugin import registry
-from ..settings import get_global_settings
-from .constants import ACCESS_TOKEN_EXPIRE_MINUTES, ALGORITHM, ANONYMOUS, SECRET_KEY
-from .model import ANONYMOUS_USER, LogoutReturnValue, Token, User
+from .model import ANONYMOUS_USER, LogoutReturnValue, User
 from .store.base_store import BaseStore
 
 _log = logging.getLogger(__name__)
 
 
+def user_to_access_token(user: User) -> Tuple[str, Dict]:
+    # Define access token data
+    payload = {}
+
+    # Add additional claims loader data
+    for claims_loader in manager.security._additional_jwt_claims_loader:
+        try:
+            payload.update(claims_loader(user) or {})
+        except Exception:
+            _log.exception("Error calling additional claims loader")
+
+    # Add required fields last
+    payload.update(
+        {
+            "sub": user.id,
+            "roles": user.roles,
+            "exp": (datetime.utcnow() + timedelta(seconds=manager.settings.jwt_expire_in_seconds)).timestamp(),
+        }
+    )
+
+    # Encode the token
+    return jwt.encode(payload, manager.settings.secret_key, algorithm=manager.settings.jwt_algorithm), payload
+
+
+def access_token_to_payload(token: str) -> Dict:
+    return jwt.decode(token, manager.settings.secret_key, algorithms=[manager.settings.jwt_algorithm])
+
+
+def access_token_to_user(token: str) -> User:
+    payload = access_token_to_payload(token)
+    username: str = payload.get("sub")
+    if username is None:
+        return None
+    return User(id=username, access_token=token, roles=payload.get("roles", []))
+
+
+def user_to_dict(user: User, access_token: Optional[str] = None, payload: Optional[Dict] = None) -> Dict:
+    if not payload and access_token:
+        payload = access_token_to_payload(access_token)
+
+    return {
+        "name": user.name,
+        "roles": user.roles,
+        "payload": payload,
+        "access_token": access_token,
+        "token_type": "bearer" if access_token else None,
+    }
+
+
+def add_access_token_to_response(response: Response, access_token: str) -> Response:
+    response.set_cookie(
+        key=manager.settings.jwt_access_cookie_name,
+        value=access_token,
+        httponly=True,
+        max_age=manager.settings.jwt_expire_in_seconds,
+        secure=manager.settings.jwt_cookie_secure,
+        samesite=manager.settings.jwt_cookie_samesite,
+        path=manager.settings.jwt_access_cookie_path,
+    )
+
+    return response
+
+
 class SecurityManager:
     def __init__(self, user_stores: List[BaseStore]):
         self.user_stores: List[BaseStore] = user_stores
+        self._additional_jwt_claims_loader: List[Callable[[User], Dict]] = []
 
-    def login_required(self, func):
-        @wraps(func)
-        def decorated_view(*args, **kwargs):
-            if not self.is_logged_in:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-            return func(*args, **kwargs)
-
-        return decorated_view
-
-    def login(self, username, extra_fields=None) -> Union[User, None]:
-        if extra_fields is None:
-            extra_fields = {}
-
-        for store in self.user_stores:
-            user = store.login(username, extra_fields)
-            if user:
-                return user
-        return None
+    def login(self, username, extra_fields=None) -> Optional[User]:
+        return self._delegate_stores_until_not_none("login", username, extra_fields or {})
 
     def logout(self):
         u = self.current_user
@@ -51,37 +97,48 @@ class SecurityManager:
             response_payload.update(customizations.data)
             # cookies is a list of Dicts which are passed 1:1 to response.set_cookie.
             response_cookies.extend(customizations.cookies)
-
         return response_payload, response_cookies
 
+    def _delegate_stores_until_not_none(self, store_method_name: str, *args):
+        """Run a method on ordered stores (if exists) until one doesn't return None"""
+        for store in self.user_stores:
+            method = getattr(store, store_method_name, None)
+            if callable(method):
+                try:
+                    value = method(*args)
+                except Exception:
+                    _log.exception(f"Error executing {store_method_name} in {store}")
+                else:
+                    if value:
+                        return value
+
     @property
-    def is_logged_in(self) -> bool:
+    def current_user(self) -> Optional[User]:
         try:
-            return self.current_user is not None
+            return self.load_from_request(get_request())
         except Exception:
-            _log.exception("Error loading current user")
-            return False
-
-    @property
-    def current_user(self) -> User:
-        return self.load_from_request(get_request())
-
-    def has_role(self, role):
-        return self.current_user.has_role(role)
+            _log.info("Error loading user from request")
+            return None
 
     def load_from_request(self, request: Request):
-        # Login using the request
-        for store in self.user_stores:
-            # first check if the actual "load_from_request" method is implemented and then call it
-            load_from_req = getattr(store, "load_from_request", None)
-            if callable(load_from_req):
-                try:
-                    user = load_from_req(request)
-                except Exception:
-                    _log.exception(f"Error loading from request in {store}")
-                else:
-                    if user:
-                        return user
+        # Load JWT user from Authorization header
+        scheme, token = get_authorization_scheme_param(request.headers.get("Authorization"))
+        if token and scheme.lower() == "bearer":
+            user = access_token_to_user(token)
+            if user:
+                return user
+
+        # Load JWT user from cookie
+        token_from_cookie = request.cookies.get(manager.settings.jwt_access_cookie_name)
+        if token_from_cookie:
+            user = access_token_to_user(token_from_cookie)
+            if user:
+                return user
+
+        # Otherwise, login using the request
+        user = self._load_from_key(request) or self._delegate_stores_until_not_none("load_from_request", request)
+        if user:
+            return user
 
         # Raise an exception is no user could be loaded
         raise HTTPException(
@@ -89,6 +146,18 @@ class SecurityManager:
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    def _load_from_key(self, request: Request) -> Optional[User]:
+        # try to login using the api_key url arg
+        api_key = request.headers.get("apiKey")
+        if not api_key:
+            # then, try to login using Basic Auth
+            api_key = request.headers.get("Authorization")
+            if api_key:
+                api_key.replace("Basic ", "", 1)
+                api_key = b64decode(api_key)
+        if api_key:
+            return self._delegate_stores_until_not_none("load_from_key", api_key)
 
     def init_app(self, app: FastAPI):
         # next, init every store if any requires that
@@ -98,120 +167,98 @@ class SecurityManager:
             if callable(init_store_app):
                 init_store_app(app)
 
-        jwt_router = APIRouter(tags=["Security"])
-
-        @jwt_router.get("/login", response_class=HTMLResponse)
-        def get_login():
-            return """
-            <!DOCTYPE html>
-            <html>
-                <body>
-                    <form name="login" action="/login" method="post" accept-charset="utf-8">
-                        <div><label for="username" class="form-label">User name: </label><input type="text" name="username" placeholder="name" required="required"></div>
-                        <div><label for="password" class="form-label">Password</label><input type="password" name="password" placeholder="password" required="required"></div>
-                        <div><input type="reset" value="Reset"><input type="submit" value="Login"></div>
-                    </form>
-                </body>
-            </html>
-            """
-
-        @jwt_router.post("/login", response_model=Token)
-        def post_login(form_data: OAuth2PasswordRequestForm = Depends()):
-            # TODO
-            user = self.login(form_data.username, {"password": form_data.password})
-            if not user:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Incorrect username or password",
-                    headers={"WWW-Authenticate": "Bearer"},
-                )
-
-            # Define access token data
-            access_token_data = {
-                "sub": user.id,
-                "roles": user.roles,
-                "exp": datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-            }
-            # Encode the token
-            access_token = jwt.encode(access_token_data, SECRET_KEY, algorithm=ALGORITHM)
-
-            # Send it back to the client in JSON
-            response = JSONResponse(
-                content={
-                    "name": user.name,
-                    "roles": user.roles,
-                    "access_token": access_token,
-                    "token_type": "bearer",
-                }
-            )
-
-            # And as cookie
-            # TODO: Set max-age and so on
-            response.set_cookie("dv_access_token", access_token, httponly=True, samesite="strict")
-
-            return response
-
-        @jwt_router.post("/logout")
-        def logout():
-            payload, cookies = self.logout()
-
-            # Create response and add security store payload
-            response = JSONResponse(content=dict(msg="Bye Bye", **payload))
-
-            # Handle cookie changes from the security stores
-            for cookie in cookies:
-                try:
-                    response.set_cookie(**cookie)
-                except Exception:
-                    _log.exception(f"Error setting cookie {cookie} to logout response")
-            return response
-
-        @jwt_router.get("/loggedinas")
-        @jwt_router.post("/loggedinas")
-        def loggedinas(request: Request):
-            user = self.current_user
-            if user:
-                return {"name": user.name, "roles": user.roles}
-            return '"not_yet_logged_in"'
+        from .jwt_router import jwt_router
 
         app.include_router(jwt_router)
 
+        # Using an `after_request` callback, we refresh any token that is within a few minutes of expiring.
+        @app.middleware("http")
+        async def refresh_token_middleware(request: Request, call_next):
+            response = await call_next(request)
+            try:
+                user = self.current_user
+                if user and user.access_token:
+                    exp_timestamp = access_token_to_payload(user.access_token)["exp"]
+                    target_timestamp = datetime.timestamp(
+                        datetime.now(timezone.utc) + timedelta(seconds=manager.settings.jwt_refresh_if_expiring_in_seconds)
+                    )
+                    if target_timestamp > exp_timestamp:
+                        access_token, payload = user_to_access_token(user)
+                        add_access_token_to_response(response, access_token)
+            except (RuntimeError, KeyError):
+                # Case where there is not a valid JWT. Just return the original respone
+                pass
+            finally:
+                return response
 
-@lru_cache(maxsize=1)
-def security_manager():
+    def jwt_claims_loader(self, callback: Callable[[User], Dict]):
+        """
+        Register additional jwt claims loaders. These will be called with the current user when a new token is issued.
+
+        Usage:
+        ```python
+        @manager.security.jwt_claims_loader
+        def my_jwt_cliasm_loader(user: User):
+            return {'identity': user.name}
+        ```
+        """
+        self._additional_jwt_claims_loader.append(callback)
+        return callback
+
+
+def create_security_manager():
     """
     :return: the security manager
     """
     _log.info("Creating security_manager")
 
-    user_stores = list(filter(None, [p.load().factory() for p in registry.list_plugins("user_stores")]))
-    if len(user_stores) == 0 or get_global_settings().tdp_core.alwaysAppendDummyStore:
+    user_stores = list(filter(None, [p.load().factory() for p in manager.registry.list("user_stores")]))
+    if len(user_stores) == 0 or manager.settings.tdp_core.alwaysAppendDummyStore:
         from .store import dummy_store
 
         user_stores.append(dummy_store.create())
-
-    from .store import jwt_store
-
-    user_stores.append(jwt_store.create())
 
     return SecurityManager(user_stores=user_stores)
 
 
 def is_logged_in():
-    return security_manager().current_user is not None
-
-
-def login_required(func):
-    return security_manager().login_required(func)
+    return manager.security.current_user is not None
 
 
 def current_username():
-    u = security_manager().current_user
-    return u.name if hasattr(u, "name") else ANONYMOUS
+    u = manager.security.current_user
+    return u.name if hasattr(u, "name") else ANONYMOUS_USER.name
 
 
 def current_user():
-    user = security_manager().current_user
+    user = manager.security.current_user
     if not user:
         return ANONYMOUS_USER
     return user
+
+
+def login_required(f=None, *, users=(), roles=()):
+    """Usage: @login_required or @login_required(users=("admin") or @login_required(roles=("admin"))"""
+
+    def login_required_inner(fn=None):
+        @wraps(fn)
+        def decorator(*args, **kwargs):
+            u = manager.security.current_user
+            # Allow access only if a user is available
+            if not u:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="No user in login_required request")
+            if users and u.name not in users:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not in allowed_users in login_required request")
+            if roles and set(u.roles).intersection(roles):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, detail="User role not in allowed_roles in login_required request"
+                )
+            return fn(*args, **kwargs)
+
+        return decorator
+
+    if f is None:
+        return login_required_inner
+    else:
+        assert callable(f)
+        return login_required_inner(f)

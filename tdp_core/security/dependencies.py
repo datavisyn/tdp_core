@@ -1,5 +1,6 @@
 from fastapi import Request
 
+from .. import manager
 from .model import User
 
 
@@ -12,7 +13,5 @@ def get_current_user(request: Request) -> User:
         ...
     ```
     """
-    from .manager import security_manager
-
     # Iterate through list of user providers
-    return security_manager().load_from_request(request)
+    return manager.security.load_from_request(request)

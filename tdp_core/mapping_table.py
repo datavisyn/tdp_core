@@ -1,7 +1,7 @@
 import itertools
 import logging
 
-from . import db
+from . import db, manager
 from .dbview import DBMapping
 
 _log = logging.getLogger(__name__)
@@ -34,10 +34,10 @@ class SQLMappingTable(object):
 
 
 def _discover_mappings():
-    for k, connector in db.db_manager().connectors.items():
+    for k, connector in manager.db.connectors.items():
         if not connector.mappings:
             continue
-        engine = db.db_manager().engine(k)
+        engine = manager.db.engine(k)
         for mapping in connector.mappings:
             _log.info("registering %s to %s", mapping.from_idtype, mapping.to_idtype)
             yield SQLMappingTable(mapping, engine)

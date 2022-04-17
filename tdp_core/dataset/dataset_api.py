@@ -3,7 +3,7 @@ from builtins import str
 
 from flask import Flask, Response, abort, make_response, request
 
-from ..plugin.registry import list_plugins
+from .. import manager
 from ..utils import etag, jsonify, to_json
 from .dataset import add, get, iter, list_datasets, remove
 
@@ -222,7 +222,7 @@ def _remove_dataset(dataset_id):
 
 
 # add all specific handler
-for handler in list_plugins("dataset-specific-handler"):
+for handler in manager.registry.list("dataset-specific-handler"):
     p = handler.load()
     p(app, _dataset_getter)
 

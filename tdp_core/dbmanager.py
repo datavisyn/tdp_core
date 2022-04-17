@@ -1,16 +1,14 @@
 import logging
-from functools import lru_cache
 from typing import Dict, Union
 
 from fastapi import FastAPI
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
+from . import manager
 from .dbview import DBConnector
 from .middleware.close_web_sessions_middleware import CloseWebSessionsMiddleware
 from .middleware.request_context_middleware import get_request
-from .plugin.registry import list_plugins
-from .settings import get_global_settings
 
 _log = logging.getLogger(__name__)
 
@@ -27,8 +25,8 @@ class DBManager(object):
     def init_app(self, app: FastAPI):
         app.add_middleware(CloseWebSessionsMiddleware)
 
-        for p in list_plugins("tdp-sql-database-definition"):
-            config = get_global_settings().get_nested(p.configKey)
+        for p in manager.registry.list("tdp-sql-database-definition"):
+            config = manager.settings.get_nested(p.configKey)
             connector: DBConnector = p.load().factory()
             if not connector.dburl:
                 connector.dburl = config["dburl"]
@@ -50,7 +48,7 @@ class DBManager(object):
     def _load_engine(self, item):
         if not self._initialized:
             self._initialized = True
-            for p in list_plugins("greenifier"):
+            for p in manager.registry.list("greenifier"):
                 _log.info("run greenifier: %s", p.id)
                 p.load().factory()
         if item in self._engines:
@@ -58,7 +56,7 @@ class DBManager(object):
 
         p = self._plugins[item]
         connector = self.connectors[item]
-        config = get_global_settings().get_nested(p.configKey)
+        config = manager.settings.get_nested(p.configKey)
 
         engine = connector.create_engine(config)
         maker = connector.create_sessionmaker(engine)
@@ -103,9 +101,3 @@ class DBManager(object):
         existing_session.append(session)
 
         return session
-
-
-@lru_cache(maxsize=1)
-def db_manager() -> DBManager:
-    _log.info("Creating db_manager")
-    return DBManager()

@@ -1,7 +1,7 @@
 import abc
 from builtins import object
 
-from ...plugin.registry import list_plugins
+from ... import manager
 from ..dataset_def import ADataSetEntry
 
 
@@ -111,7 +111,7 @@ class AGraph(ADataSetEntry, metaclass=abc.ABCMeta):
 
 
 def _resolve_parser(format):
-    for p in list_plugins("graph-parser"):
+    for p in manager.registry.list("graph-parser"):
         if p.format == format:
             return p.load()
 

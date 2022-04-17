@@ -1,6 +1,6 @@
 from flask import abort, jsonify, request
 
-from ...plugin.registry import list_plugins
+from ... import manager
 from ...utils import etag
 
 
@@ -22,10 +22,10 @@ def format_json(dataset, args):
 
 
 def resolve_formatter(type, format):
-    for p in list_plugins(type + "-formatter"):
+    for p in manager.registry.list(type + "-formatter"):
         if p.format == format:
             return p.load()
-    formats = ",".join(p.format for p in list_plugins(type + "-formatter"))
+    formats = ",".join(p.format for p in manager.registry.list(type + "-formatter"))
     abort(400, 'unknown format "{0}" possible formats are: {1}'.format(format, formats))
 
 

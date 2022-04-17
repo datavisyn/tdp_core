@@ -1,10 +1,9 @@
 import logging
 from builtins import object, set
-from functools import lru_cache
 from itertools import chain
 from typing import List
 
-from ..plugin.registry import list_plugins
+from .. import manager
 
 _log = logging.getLogger(__name__)
 
@@ -198,11 +197,10 @@ class MappingManager(object):
         return list(rset)
 
 
-@lru_cache(maxsize=1)
-def mapping_manager() -> MappingManager:
+def create_id_mapping_manager() -> MappingManager:
     _log.info("Creating mapping_manager")
     # Load mapping providers
     providers = []
-    for plugin in list_plugins("mapping_provider"):
+    for plugin in manager.registry.list("mapping_provider"):
         providers = providers + list(plugin.load().factory())
     return MappingManager(providers)

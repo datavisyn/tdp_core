@@ -1,7 +1,6 @@
 import logging
 import re
 from argparse import REMAINDER
-from functools import lru_cache
 from os import path
 from typing import Dict, List, Optional
 
@@ -9,9 +8,8 @@ import alembic.command
 import alembic.config
 from fastapi import FastAPI
 
-from ..db import db_manager
+from .. import manager
 from ..plugin.registry import AExtensionDesc
-from ..settings import get_global_settings
 
 __author__ = "Datavisyn"
 _log = logging.getLogger(__name__)
@@ -159,13 +157,13 @@ class DBMigrationManager(object):
     def init_app(self, app: FastAPI, plugins: List[AExtensionDesc] = []):
         _log.info("Initializing DBMigrationManager")
 
-        auto_upgrade_default = get_global_settings().tdp_core.migrations.autoUpgrade
+        auto_upgrade_default = manager.settings.tdp_core.migrations.autoUpgrade
 
         for p in plugins:
             _log.info("DBMigration found: %s", p.id)
 
             # Check if configKey is set, otherwise use the plugin configuration
-            config = get_global_settings().get_nested(p.configKey, {}) if hasattr(p, "configKey") else {}
+            config = manager.settings.get_nested(p.configKey, {}) if hasattr(p, "configKey") else {}
 
             # Priority of assignments: Configuration File -> Plugin Definition
             id = config.get("id") or (p.id if hasattr(p, "id") else None)
@@ -200,13 +198,13 @@ class DBMigrationManager(object):
                 _log.info(f"Both dbKey and dbUrl defined for DBMigration {id} - falling back to dbUrl")
             elif db_key:
                 # Check if engine exists
-                if db_key not in db_manager().connectors:
+                if db_key not in manager.db.connectors:
                     _log.error(f"No engine called {db_key} found for DBMigration {id} - is your configuration up to date?")
                     continue
 
                 # Retrieve engine and store string as db url
                 try:
-                    db_url = str(db_manager().engine(db_key).url)
+                    db_url = str(manager.db.engine(db_key).url)
                 except Exception:
                     _log.exception(f"Error retrieving URL from engine {db_key}")
                     continue
@@ -243,18 +241,10 @@ class DBMigrationManager(object):
         return list(self._migrations.values())
 
 
-@lru_cache(maxsize=1)
-def db_migration_manager() -> DBMigrationManager:
-    _log.info("Creating db_migration_manager")
-    return DBMigrationManager()
-
-
 def create_migration_command(parser):
     """
     Creates a migration command used by the 'command' extension point.
     """
-    manager = db_migration_manager()
-
     subparsers = parser.add_subparsers(dest="action", required=True)
 
     subparsers.add_parser("list", help="List all available migrations")
@@ -264,7 +254,7 @@ def create_migration_command(parser):
     # Either require individual ids or all flag
     command_parser.add_argument(
         "id",
-        choices=manager.ids + ["all"],
+        choices=manager.db_migration.ids + ["all"],
         help="ID of the migration, or all of them",
     )
 
@@ -272,10 +262,10 @@ def create_migration_command(parser):
 
     def execute(args):
         if args.action == "list":
-            if len(manager) == 0:
+            if len(manager.db_migration) == 0:
                 _log.info("No migrations found")
             else:
-                _log.info("Available migrations: {}".format(", ".join(str(migration) for migration in manager.migrations)))
+                _log.info("Available migrations: {}".format(", ".join(str(migration) for migration in manager.db_migration.migrations)))
         elif args.action == "exec":
             if args.id == "all":
                 # TODO
@@ -286,6 +276,6 @@ def create_migration_command(parser):
 
             # Using REMAINDER as nargs causes the argument to be be optional, but '+' does not work because it also parses additional --attr with the parser which should actually be ignored.
             # Therefore, args.command might be empty and we simply pass None to trigger the error message
-            manager[args.id].execute(args.command if len(args.command) > 0 else None)
+            manager.db_migration[args.id].execute(args.command if len(args.command) > 0 else None)
 
     return lambda args: lambda: execute(args)

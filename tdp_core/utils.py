@@ -5,7 +5,7 @@ from typing import Union
 
 from flask import Response, abort, make_response, request
 
-from .plugin.registry import list_plugins
+from . import manager
 
 _log = logging.getLogger(__name__)
 
@@ -28,12 +28,10 @@ def map_scores(scores, from_idtype, to_idtype):
     """
     if len(scores) == 0:
         return []
-    from .id_mapping.manager import mapping_manager
 
-    manager = mapping_manager()
-    if not manager.can_map(from_idtype, to_idtype):
+    if not manager.id_mapping.can_map(from_idtype, to_idtype):
         abort(400, "score cannot be mapped to target")
-    mapped_ids = manager(from_idtype, to_idtype, [r["id"] for r in scores])
+    mapped_ids = manager.id_mapping(from_idtype, to_idtype, [r["id"] for r in scores])
 
     mapped_scores = []
     for score, mapped in zip(scores, mapped_ids):
@@ -149,7 +147,7 @@ class JSONExtensibleEncoder(json.JSONEncoder):
     def __init__(self, *args, **kwargs):
         super(JSONExtensibleEncoder, self).__init__(*args, **kwargs)
 
-        self.encoders = [p.load().factory() for p in list_plugins("json-encoder")]
+        self.encoders = [p.load().factory() for p in manager.registry.list("json-encoder")]
 
     def default(self, o):
         for encoder in self.encoders:

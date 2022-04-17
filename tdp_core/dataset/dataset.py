@@ -1,7 +1,7 @@
 import itertools
 from builtins import str
 
-from ..plugin.registry import list_plugins
+from .. import manager
 
 _providers_r = None
 
@@ -9,7 +9,7 @@ _providers_r = None
 def _providers():
     global _providers_r
     if _providers_r is None:
-        _providers_r = [p.load().factory() for p in list_plugins("dataset-provider")]
+        _providers_r = [p.load().factory() for p in manager.registry.list("dataset-provider")]
     return _providers_r
 
 
