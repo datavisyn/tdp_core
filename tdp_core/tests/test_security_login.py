@@ -6,7 +6,17 @@ from tdp_core import manager
 from tdp_core.security.model import User
 
 
-def test_login(client: TestClient):
+def test_api_key(client: TestClient):
+    assert client.get("/loggedinas", headers={"apiKey": "invalid_user:password"}).json() == '"not_yet_logged_in"'
+    assert client.get("/loggedinas", headers={"apiKey": "admin:admin"}).json()["name"] == "admin"
+
+
+def test_basic_authorization(client: TestClient):
+    assert client.get("/loggedinas", auth=("invalid_user", "password")).json() == '"not_yet_logged_in"'
+    assert client.get("/loggedinas", auth=("admin", "admin")).json()["name"] == "admin"
+
+
+def test_jwt_login(client: TestClient):
     # Add additional claims loaders
     @manager.security.jwt_claims_loader
     def claims_loader_1(user: User):

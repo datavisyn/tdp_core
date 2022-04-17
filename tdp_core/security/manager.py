@@ -154,8 +154,10 @@ class SecurityManager:
             # then, try to login using Basic Auth
             api_key = request.headers.get("Authorization")
             if api_key:
-                api_key.replace("Basic ", "", 1)
-                api_key = b64decode(api_key)
+                try:
+                    api_key = b64decode(api_key.replace("Basic ", "", 1)).decode("utf-8")
+                except Exception:
+                    pass
         if api_key:
             return self._delegate_stores_until_not_none("load_from_key", api_key)
 
