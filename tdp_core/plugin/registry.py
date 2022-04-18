@@ -1,6 +1,5 @@
 import logging
 from builtins import object
-from functools import lru_cache
 from typing import List
 
 from fastapi import FastAPI
@@ -99,12 +98,3 @@ class Registry(object):
         if not hasattr(plugin_type, "__call__"):  # not a callable
             return [x for x in self if x.type == plugin_type]
         return [x for x in self if plugin_type(x)]
-
-
-def list_plugins(plugin_type=None):
-    return get_registry().list(plugin_type)
-
-
-@lru_cache(maxsize=1)
-def get_registry() -> Registry:
-    return Registry()

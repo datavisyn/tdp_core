@@ -6,10 +6,10 @@ from pymongo.collection import ReturnDocument
 
 import tdp_core.security as security
 
-from .settings import get_global_settings
+from . import manager
 from .utils import etag, fix_id, random_id
 
-c = get_global_settings().tdp_core.mongo
+c = manager.settings.tdp_core.mongo
 _log = logging.getLogger(__name__)
 
 app = Flask(__name__)

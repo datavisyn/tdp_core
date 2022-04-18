@@ -23,13 +23,14 @@ def create_visyn_server(
     start_cmd: Optional start command for the server, i.e. db-migration exposes commands like `db-migration exec <..> upgrade head`.
     workspace_config: Optional override for the workspace configuration. If nothing is provided `load_workspace_config()` is used instead.
     """
-    from ..settings import get_global_settings, model as settings_model
+    from .. import manager
+    from ..settings.model import GlobalSettings
     from ..settings.utils import load_workspace_config
 
     # Load the workspace config.json and initialize the global settings
     workspace_config = workspace_config if isinstance(workspace_config, dict) else load_workspace_config()
-    settings_model.__global_settings = settings_model.GlobalSettings(**workspace_config)
-    logging.config.dictConfig(get_global_settings().tdp_core.logging)
+    manager.settings = GlobalSettings(**workspace_config)
+    logging.config.dictConfig(manager.settings.tdp_core.logging)
     logging.info("Workspace settings successfully loaded")
 
     # Load the initial plugins
@@ -38,14 +39,14 @@ def create_visyn_server(
     plugins = load_all_plugins()
     # With all the plugins, load the corresponding configuration files and create a new model based on the global settings, with all plugin models as sub-models
     [plugin_config_files, plugin_settings_models] = get_config_from_plugins(plugins)
-    visyn_server_settings = create_model("VisynServerSettings", __base__=settings_model.GlobalSettings, **plugin_settings_models)
+    visyn_server_settings = create_model("VisynServerSettings", __base__=GlobalSettings, **plugin_settings_models)
     # Patch the global settings by instantiating the new settings model with the global config, all config.json(s), and pydantic models
-    settings_model.__global_settings = visyn_server_settings(**deep_update(*plugin_config_files, workspace_config))
+    manager.settings = visyn_server_settings(**deep_update(*plugin_config_files, workspace_config))
     logging.info("All settings successfully loaded")
 
     app = FastAPI(
         # TODO: Remove debug
-        debug=get_global_settings().is_development_mode,
+        debug=manager.settings.is_development_mode,
         title="Visyn Server",
         # TODO: Extract version from package.json
         version="1.0.0",
@@ -55,22 +56,35 @@ def create_visyn_server(
         **fast_api_args,
     )
 
-    # Initialize global managers. TODO: Should we do that by loading all singletons in the registry?
-    from ..plugin.registry import get_registry, list_plugins
+    # Store all globals also in app.state.<manager> to allow access in FastAPI routes via request.app.state.<manager>.
+    app.state.settings = manager.settings
 
-    get_registry().init_app(app, plugins)
+    # Initialize global managers.
+    from ..plugin.registry import Registry
+
+    app.state.registry = manager.registry = Registry()
+    manager.registry.init_app(app, plugins)
+
     logging.info("Plugin registry successfully initialized")
 
-    from ..dbmanager import db_manager
+    from ..dbmanager import DBManager
 
-    db_manager().init_app(app)
-    from ..dbmigration.manager import db_migration_manager
+    app.state.db_manager = manager.db = DBManager()
+    manager.db.init_app(app)
 
-    db_migration_manager().init_app(app, list_plugins("tdp-sql-database-migration"))
-    from ..plugin.registry import list_plugins
-    from ..security.manager import security_manager
+    from ..dbmigration.manager import DBMigrationManager
 
-    security_manager().init_app(app)
+    app.state.db_migration_manager = manager.db_migration = DBMigrationManager()
+    manager.db_migration.init_app(app, manager.registry.list("tdp-sql-database-migration"))
+
+    from ..security.manager import create_security_manager
+
+    app.state.security_manager = manager.security = create_security_manager()
+    manager.security.init_app(app)
+
+    from ..id_mapping.manager import create_id_mapping_manager
+
+    app.state.id_mapping_manager = manager.id_mapping = create_id_mapping_manager()
 
     # TODO: Allow custom command routine (i.e. for db-migrations)
     from .cmd import parse_command_string
@@ -86,14 +100,14 @@ def create_visyn_server(
     # Load all namespace plugins as WSGIMiddleware plugins
     from .utils import init_legacy_app, load_after_server_started_hooks
 
-    namespace_plugins = list_plugins("namespace")
+    namespace_plugins = manager.registry.list("namespace")
     logging.info(f"Registering {len(namespace_plugins)} legacy namespaces via WSGIMiddleware")
     for p in namespace_plugins:
         logging.info(f"Registering legacy namespace: {p.namespace}")
         app.mount(p.namespace, WSGIMiddleware(init_legacy_app(p.load().factory())))
 
     # Load all FastAPI apis
-    router_plugins = list_plugins("fastapi_router")
+    router_plugins = manager.registry.list("fastapi_router")
     logging.info(f"Registering {len(router_plugins)} API-routers")
     # Load all namespace plugins as WSGIMiddleware plugins
     for p in router_plugins:

@@ -3,7 +3,7 @@ import logging
 from flask import abort
 from werkzeug.datastructures import MultiDict
 
-from .dbmanager import db_manager
+from . import manager
 from .sql_filter import filter_logic
 from .utils import clean_query, secure_replacements
 
@@ -24,9 +24,9 @@ def resolve(database):
     :param database: database key to lookup
     :return: (connector, engine)
     """
-    if database not in db_manager().connectors:
+    if database not in manager.db.connectors:
         abort(404, 'Database with id "{}" cannot be found'.format(database))
-    r = db_manager().connector_and_engine(database)
+    r = manager.db.connector_and_engine(database)
     # derive needed columns
     connector, engine = r
     for view in connector.views.values():
@@ -41,9 +41,9 @@ def resolve_engine(database):
     :param database: database key to lookup
     :return: engine
     """
-    if database not in db_manager().connectors:
+    if database not in manager.db.connectors:
         abort(404, 'Database with id "{}" cannot be found'.format(database))
-    return db_manager().engine(database)
+    return manager.db.engine(database)
 
 
 def resolve_view(database, view_name, check_default_security=False):
@@ -105,7 +105,7 @@ class WrappedSession(object):
         :param engine:
         """
         _log.info("creating session")
-        self._session = db_manager().create_session(engine)
+        self._session = manager.db.create_session(engine)
         self._supports_array_parameter = _supports_sql_parameters(engine.name)
 
     def execute(self, sql, **kwargs):

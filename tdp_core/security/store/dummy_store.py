@@ -1,9 +1,7 @@
 import hashlib
 import logging
 
-from fastapi import Request
-
-from ...settings import get_global_settings
+from ... import manager
 from ..model import User
 from .base_store import BaseStore
 
@@ -33,26 +31,17 @@ class DummyStore(BaseStore):
                 password=v["password"],
                 salt=v["salt"],
             )
-            for v in get_global_settings().tdp_core.users
+            for v in manager.settings.tdp_core.users
         ]
 
-    def load_from_request(self, request: Request):
-        api_key = request.headers.get("Authorization")
-        if api_key:
-            api_key = api_key.replace("Basic ", "", 1)
-            try:
-                import base64
-
-                api_key = base64.b64decode(api_key)
-            except Exception:
-                pass
-            parts = api_key.split(":")
-            if len(parts) != 2:
-                return None
-            return next(
-                (u for u in self._users if u.id == parts[0] and u.is_password(parts[1])),
-                None,
-            )
+    def load_from_key(self, api_key: str):
+        parts = api_key.split(":")
+        if len(parts) != 2:
+            return None
+        return next(
+            (u for u in self._users if u.id == parts[0] and u.is_password(parts[1])),
+            None,
+        )
 
     def login(self, username, extra_fields={}):
         return next(

@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple, Type
 
 from pydantic import BaseSettings
 
-from ..settings import get_global_settings
+from .. import manager
 from .model import AVisynPlugin, RegHelper
 
 _log = logging.getLogger(__name__)
@@ -15,14 +15,14 @@ _log = logging.getLogger(__name__)
 def is_disabled_plugin(p):
     import re
 
-    if get_global_settings().tdp_core.enabled_plugins:
-        return p.id not in get_global_settings().tdp_core.enabled_plugins
+    if manager.settings.tdp_core.enabled_plugins:
+        return p.id not in manager.settings.tdp_core.enabled_plugins
 
     # TODO: Check if case insensitive
     def check(disable):
         return isinstance(disable, str) and re.match(disable, p.id)
 
-    return any(map(check, get_global_settings().tdp_core.disable.plugins))
+    return any(map(check, manager.settings.tdp_core.disable.plugins))
 
 
 def is_disabled_extension(extension, extension_type, p):
@@ -40,7 +40,7 @@ def is_disabled_extension(extension, extension_type, p):
             return re.match(disable, extension["id"])
         return all(check_elem(k, v) for k, v in disable.items())
 
-    return any(map(check, get_global_settings().tdp_core.disable.extensions))
+    return any(map(check, manager.settings.tdp_core.disable.extensions))
 
 
 class EntryPointPlugin(object):

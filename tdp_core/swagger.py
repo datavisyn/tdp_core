@@ -5,8 +5,7 @@ from collections import OrderedDict
 from flask import Flask, Response, render_template
 from jinja2 import Template
 
-from . import db
-from .plugin.registry import list_plugins
+from . import db, manager
 from .utils import secure_replacements
 
 _log = logging.getLogger(__name__)
@@ -40,7 +39,7 @@ def _gen():
             return "number"
 
     # integrate all views using the template
-    for database, connector in db.db_manager().connectors.items():
+    for database, connector in manager.db.connectors.items():
 
         db.resolve(database)  # trigger filling up columns
 
@@ -153,7 +152,7 @@ def _gen():
             base = data_merge(base, part)
 
     # post process using extensions
-    for p in list_plugins("tdp-swagger-postprocessor"):
+    for p in manager.registry.list("tdp-swagger-postprocessor"):
         base = p.load().factory(base)
 
     return base

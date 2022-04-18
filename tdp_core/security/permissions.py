@@ -1,6 +1,5 @@
-from .constants import ANONYMOUS
 from .manager import current_user
-from .model import User
+from .model import ANONYMOUS_USER, User
 
 PERMISSION_READ = 4
 PERMISSION_WRITE = 2
@@ -74,16 +73,16 @@ def can(item, permission: int, user: User = None):
     if not isinstance(item, dict):
         # assume we have an object
         item = {
-            "creator": getattr(item, "creator", ANONYMOUS),
+            "creator": getattr(item, "creator", ANONYMOUS_USER.name),
             "buddies": getattr(item, "buddies", []),
-            "group": getattr(item, "group", ANONYMOUS),
+            "group": getattr(item, "group", ANONYMOUS_USER.name),
             "permissions": getattr(item, "permissions", DEFAULT_PERMISSION),
         }
 
     owner, group, others, buddies = _decode(item.get("permissions", DEFAULT_PERMISSION))
 
     # I'm the creator
-    if _is_equal(user.name, item.get("creator", ANONYMOUS)) and permission in owner:
+    if _is_equal(user.name, item.get("creator", ANONYMOUS_USER.name)) and permission in owner:
         return True
 
     # check if I'm in the buddies list

@@ -2,7 +2,7 @@ import logging
 
 from werkzeug.datastructures import MultiDict
 
-from .id_mapping.manager import mapping_manager
+from . import manager
 
 _log = logging.getLogger(__name__)
 
@@ -34,8 +34,6 @@ def _replace_named_sets_in_ids(v):
 
 
 def _replace_range_in_ids(v, id_type, target_id_type):
-    mappingmanager = mapping_manager()
-
     union = set()
 
     def add_range(r):
@@ -43,7 +41,7 @@ def _replace_range_in_ids(v, id_type, target_id_type):
         ids = r
         if id_type != target_id_type:
             # need to map the ids
-            mapped_ids = mappingmanager(id_type, target_id_type, ids)
+            mapped_ids = manager.id_mapping(id_type, target_id_type, ids)
             for id in mapped_ids:
                 if id is not None and len(id) > 0:
                     union.add(id[0])  # just the first one for now

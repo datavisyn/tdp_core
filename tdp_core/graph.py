@@ -1,6 +1,6 @@
+from . import manager
 from .dataset.dataset_def import ADataSetProvider
 from .dataset.graph import graph
-from .settings import get_global_settings
 from .utils import fix_id, random_id
 
 
@@ -277,7 +277,7 @@ class GraphProvider(ADataSetProvider):
     def __init__(self):
         from pymongo import MongoClient
 
-        c = get_global_settings().tdp_core.mongo
+        c = manager.settings.tdp_core.mongo
 
         self.client = MongoClient(c.host, c.port)
         self.db = self.client[c.db_graph]

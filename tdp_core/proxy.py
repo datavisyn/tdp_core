@@ -3,7 +3,7 @@ import logging
 import requests
 from flask import Flask, Response, abort, request
 
-from .plugin.registry import list_plugins
+from . import manager
 
 _log = logging.getLogger(__name__)
 
@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 
 def _to_site_url(site):
-    proxy_defs = list_plugins("tdp_proxy")
+    proxy_defs = manager.registry.list("tdp_proxy")
     for p in proxy_defs:
         if p.id == site:
             headers = getattr(p, "headers") if hasattr(p, "headers") else dict()
@@ -23,7 +23,7 @@ def _to_site_url(site):
 def _request_url(url, headers):
     import re
 
-    handlers = list_plugins("tdp_proxy_handler")
+    handlers = manager.registry.list("tdp_proxy_handler")
     for handler in handlers:
         handles = getattr(handler, "handles", ".*")
         if re.match(handles, url, re.I):

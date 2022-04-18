@@ -3,7 +3,7 @@ from functools import wraps
 
 from flask import Flask, abort, jsonify, request
 
-from . import db
+from . import db, manager
 from .formatter import formatter
 from .security import login_required_for_dbviews
 from .utils import map_scores, no_cache
@@ -32,7 +32,7 @@ def _view_no_cache(func):
 @app.route("/")
 @login_required_for_dbviews
 def list_database():
-    return jsonify([v.dump(k) for k, v in db.db_manager().connectors.items()])
+    return jsonify([v.dump(k) for k, v in manager.db.connectors.items()])
 
 
 @app.route("/<database>/")

@@ -2,7 +2,7 @@ import logging
 import shlex
 from typing import Callable, Optional, Union
 
-from ..plugin.registry import list_plugins
+from .. import manager
 
 _log = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def parse_command_string(cmd: Optional[str]) -> Union[Callable, None]:
     # create a subparser, with the first argument being the command id
     subparsers = parser.add_subparsers(dest="cmd")
 
-    for command in list_plugins("command"):
+    for command in manager.registry.list("command"):
         _log.info(f"Received an alternative starting command: {command.id}")
 
         # create a argument parser for this specific command

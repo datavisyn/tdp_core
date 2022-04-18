@@ -98,6 +98,13 @@ class VisynServerSettings(BaseModel):
 class GlobalSettings(BaseSettings):
     env: Literal["development", "production"] = "development"
     secret_key: str = "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w"
+    jwt_expire_in_seconds: int = 24 * 60 * 60
+    jwt_refresh_if_expiring_in_seconds: int = 30 * 60
+    jwt_algorithm: str = "HS256"
+    jwt_access_cookie_name: str = "dv_access_token"
+    jwt_cookie_secure: bool = False
+    jwt_cookie_samesite: str = "Strict"
+    jwt_access_cookie_path: str = "/"
     tdp_core: VisynServerSettings = VisynServerSettings()
 
     @property
@@ -106,7 +113,6 @@ class GlobalSettings(BaseSettings):
 
     def get_nested(self, key: str, default: Any = None) -> Union[Any, None]:
         # TODO: Set deprecated
-        # TODO: Make sure that env is loaded here
         keys = key.split(".")
         plugin_id = keys[0]
         dic = self.dict(include={plugin_id})
@@ -117,13 +123,3 @@ class GlobalSettings(BaseSettings):
     class Config:
         extra = Extra.allow
         env_nested_delimiter = "__"
-
-
-__global_settings: GlobalSettings = None
-
-
-def get_global_settings() -> GlobalSettings:
-    global __global_settings
-    if __global_settings is None:
-        raise Exception("Global setting is not yet initialized!")
-    return __global_settings

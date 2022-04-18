@@ -3,11 +3,11 @@ from typing import Optional
 
 import jwt
 
-from ...settings import get_global_settings
+from ... import manager
 from ..model import User
 
 _log = logging.getLogger(__name__)
-_conf = get_global_settings().get_nested("tdp_core.security.store.alb_security_store")
+_conf = manager.settings.get_nested("tdp_core.security.store.alb_security_store")
 
 
 class ALBSecurityStore(object):
@@ -24,7 +24,7 @@ class ALBSecurityStore(object):
                 user = jwt.decode(encoded, options={"verify_signature": False})
                 # Create new user from given attributes
                 email = user["email"]
-                return User(id=email, name=email, roles=[])
+                return User(id=email, roles=[])
             except Exception:
                 _log.exception("Error in load_from_request")
                 return None

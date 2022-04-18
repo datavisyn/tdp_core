@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from ..plugin.registry import get_registry
+from .. import manager
 from ..security.dependencies import get_current_user
 
 router = APIRouter(tags=["Plugins"], prefix="/api/tdp", dependencies=[Depends(get_current_user)])
@@ -18,7 +18,7 @@ def get_plugins():
                 "description": p.description,
                 "version": p.version,
             }
-            for p in get_registry().plugins
+            for p in manager.registry.plugins
         ],
         "extensions": [
             {
@@ -28,7 +28,7 @@ def get_plugins():
                 "description": e.description,
                 "version": e.version,
             }
-            for e in get_registry().list()
+            for e in manager.registry.list()
         ],
     }
 
