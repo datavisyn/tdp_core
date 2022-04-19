@@ -152,12 +152,10 @@ export async function createScatterTraces(
           },
           symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
           color: colorCol
-            ? colorCol.resolvedValues.map((v) =>
-                selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
-              )
+            ? validCols[0].resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
             : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
           opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
-          size: 8,
+          size: colorCol ? validCols[0].resolvedValues.map((v) => (selected[v.id] ? 12 : 8)) : 8,
         },
       },
       xLabel: validCols[0].info.name,
@@ -208,12 +206,10 @@ export async function createScatterTraces(
                 },
                 symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
                 color: colorCol
-                  ? colorCol.resolvedValues.map((v) =>
-                      selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
-                    )
+                  ? xCurr.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
                   : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
                 opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
-                size: 8,
+                size: colorCol ? xCurr.resolvedValues.map((v) => (selected[v.id] ? 12 : 8)) : 8,
               },
             },
             xLabel: xCurr.info.name,
