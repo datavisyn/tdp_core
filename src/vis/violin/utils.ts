@@ -19,7 +19,7 @@ export function isViolin(s: IVisConfig): s is IViolinConfig {
   return s.type === ESupportedPlotlyVis.VIOLIN;
 }
 
-export const defaultViolinConfig: IViolinConfig = {
+const defaultConfig: IViolinConfig = {
   type: ESupportedPlotlyVis.VIOLIN,
   numColumnsSelected: [],
   catColumnsSelected: [],
@@ -27,7 +27,7 @@ export const defaultViolinConfig: IViolinConfig = {
 };
 
 export function violinMergeDefaultConfig(columns: VisColumn[], config: IViolinConfig): IVisConfig {
-  const merged = merge({}, defaultViolinConfig, config);
+  const merged = merge({}, defaultConfig, config);
 
   const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
 

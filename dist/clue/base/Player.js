@@ -1,4 +1,4 @@
-import * as d3 from 'd3v3';
+import * as d3 from 'd3';
 import { merge } from 'lodash';
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export var StoryTransition;

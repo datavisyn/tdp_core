@@ -1,4 +1,7 @@
-import { axisLeft, axisBottom, axisRight, scaleLinear, select, quadtree } from 'd3v7';
+import { axisLeft, axisBottom, axisRight } from 'd3-axis';
+import { scaleLinear } from 'd3-scale';
+import { select } from 'd3-selection';
+import { quadtree } from 'd3-quadtree';
 import { ERenderMode, SymbolUtils } from './symbol';
 import { QuadtreeUtils } from './quadtree';
 import { TDP_SCATTERPLOT_CSS_PREFIX, TDP_SCATTERPLOT_DEBUG, TDP_SCATTERPLOT_DEBUGLOG } from './constants';

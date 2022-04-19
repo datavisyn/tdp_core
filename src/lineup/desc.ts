@@ -9,7 +9,7 @@ import {
   Column,
   createRankDesc,
 } from 'lineupjs';
-import { extent } from 'd3v3';
+import { extent } from 'd3';
 import { IServerColumn } from '../base/rest';
 import { IAdditionalColumnDesc } from '../base/interfaces';
 import { ValueTypeUtils } from '../data';

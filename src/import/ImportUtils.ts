@@ -1,5 +1,5 @@
 import { merge, identity } from 'lodash';
-import * as d3 from 'd3v3';
+import * as d3 from 'd3';
 import { ITypeDefinition, ValueTypeEditor, PHOVEA_IMPORTER_ValueTypeUtils } from './valuetype/valuetypes';
 import { I18nextManager } from '../i18n';
 import { BaseUtils } from '../base';

@@ -1,4 +1,4 @@
-import * as d3 from 'd3v3';
+import * as d3 from 'd3';
 import marked from 'marked';
 import { merge } from 'lodash';
 import { ModeWrapper } from './mode';

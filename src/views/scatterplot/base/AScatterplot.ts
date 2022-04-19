@@ -1,24 +1,11 @@
-import {
-  AxisScale,
-  Axis,
-  extent,
-  format,
-  select,
-  mouse,
-  event as d3event,
-  zoom as d3zoom,
-  ZoomScale,
-  ZoomTransform,
-  D3ZoomEvent,
-  zoomIdentity,
-  ZoomBehavior,
-  drag as d3drag,
-  scaleLinear,
-  quadtree,
-  Quadtree,
-  QuadtreeInternalNode,
-  QuadtreeLeaf,
-} from 'd3v7';
+import { AxisScale, Axis } from 'd3-axis';
+import { extent } from 'd3-array';
+import { format } from 'd3-format';
+import { select, mouse, event as d3event } from 'd3-selection';
+import { zoom as d3zoom, ZoomScale, ZoomTransform, D3ZoomEvent, zoomIdentity, ZoomBehavior } from 'd3-zoom';
+import { drag as d3drag } from 'd3-drag';
+import { scaleLinear } from 'd3-scale';
+import { quadtree, Quadtree, QuadtreeInternalNode, QuadtreeLeaf } from 'd3-quadtree';
 import { EventEmitter } from 'eventemitter3';
 import { ISymbol, ISymbolRenderer } from './symbol';
 import { ObjectUtils } from './ObjectUtils';
