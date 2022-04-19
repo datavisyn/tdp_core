@@ -1,21 +1,21 @@
-from setuptools import setup, find_packages
-from codecs import open
-from os import path
-import json
+from datetime import datetime
+from json import load
+from pathlib import Path
 
-here = path.abspath(path.dirname(__file__))
+from setuptools import setup, find_packages
+
+here = Path(__file__).parent
+pkg = here / "package.json"
+pkg = load(pkg.open())
 
 
 def read_it(name):
-    with open(path.join(here, name), encoding='utf-8') as f:
-        return f.read()
+    fn = here / name
+    return fn.read_text() if os.path.exists(fn) else ""
 
 
 def requirements(file):
     return [r.strip() for r in read_it(file).strip().split('\n')]
-
-
-pkg = json.loads(read_it('package.json'))
 
 
 setup(
