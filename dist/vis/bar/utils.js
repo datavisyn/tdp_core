@@ -32,6 +32,9 @@ export function barMergeDefaultConfig(columns, config) {
     }
     return merged;
 }
+function createAxisLabel(aggregateType, aggregateColumn) {
+    return aggregateType === EAggregateTypes.COUNT ? aggregateType : `${aggregateType} of ${aggregateColumn.info.name}`;
+}
 /**
  * This function finds the faceted values of a given categorical column based on an aggregation type.
  * If isTotal is true, it will sum all of the categorical values, used for normalizing the bar charts.
@@ -95,6 +98,7 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, ag
                 return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
             })
                 .flat();
+            const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
             plots.push({
                 data: {
                     x: vertFlag ? uniqueColVals : aggregateVals,
@@ -112,8 +116,8 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, ag
                         color: scales.color(uniqueGroup),
                     },
                 },
-                xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggregateType,
-                yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggregateType) : catColValues.info.name,
+                xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+                yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
                 xTicks: vertFlag ? uniqueColVals : null,
                 xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
                 yTicks: !vertFlag ? uniqueColVals : null,
@@ -124,9 +128,9 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, ag
     });
     return plotCounterEdit;
 }
-async function setPlotsWithGroups(columns, catCol, aggregateType, aggColumn, config, plots, scales, plotCounter) {
+async function setPlotsWithGroups(columns, catCol, aggregateType, aggregateColumn, config, plots, scales, plotCounter) {
     const catColValues = await resolveSingleColumn(catCol);
-    const aggColValues = await resolveSingleColumn(aggColumn);
+    const aggColValues = await resolveSingleColumn(aggregateColumn);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
     const groupColumn = await resolveSingleColumn(getCol(columns, config.group));
@@ -144,6 +148,7 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggColumn, con
             return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
         })
             .flat();
+        const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
         plots.push({
             data: {
                 x: vertFlag ? uniqueColVals : finalAggregateValues,
@@ -161,8 +166,8 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggColumn, con
                     color: scales.color(uniqueVal),
                 },
             },
-            xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggregateType,
-            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggregateType) : catColValues.info.name,
+            xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
             xTicks: vertFlag ? uniqueColVals : null,
             xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
             yTicks: !vertFlag ? uniqueColVals : null,
@@ -171,10 +176,10 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggColumn, con
     });
     return plotCounter;
 }
-async function setPlotsWithMultiples(columns, catCol, aggregateType, aggColumn, config, plots, plotCounter) {
+async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateColumn, config, plots, plotCounter) {
     let plotCounterEdit = plotCounter;
     const catColValues = await resolveSingleColumn(catCol);
-    const aggColValues = await resolveSingleColumn(aggColumn);
+    const aggColValues = await resolveSingleColumn(aggregateColumn);
     const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const uniqueMultiplesVals = [...new Set((await multiplesColumn).resolvedValues.map((v) => v.val))];
@@ -188,6 +193,7 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggColumn, 
             return joinedObjs.length === 0 ? [0] : getAggregateValues(aggregateType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
         })
             .flat();
+        const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
         plots.push({
             data: {
                 x: vertFlag ? uniqueColVals : finalAggregateValues,
@@ -202,8 +208,8 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggColumn, 
                 type: 'bar',
                 name: uniqueVal,
             },
-            xLabel: vertFlag ? catColValues.info.name : aggregateType,
-            yLabel: vertFlag ? aggregateType : catColValues.info.name,
+            xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
+            yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
             xTicks: vertFlag ? uniqueColVals : null,
             xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
             yTicks: !vertFlag ? uniqueColVals : null,
@@ -220,6 +226,7 @@ async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, co
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const aggValues = getAggregateValues(aggregateType, catColValues.resolvedValues, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
     const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
+    const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
     plots.push({
         data: {
             x: vertFlag ? valArr : aggValues,
@@ -235,8 +242,8 @@ async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, co
             name: catColValues.info.name,
             showlegend: false,
         },
-        xLabel: vertFlag ? catColValues.info.name : aggregateType,
-        yLabel: vertFlag ? aggregateType : catColValues.info.name,
+        xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
+        yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
         xTicks: vertFlag ? valArr : null,
         xTickLabels: vertFlag ? valArr.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
         yTicks: !vertFlag ? valArr : null,
