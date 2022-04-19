@@ -93,7 +93,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         }
         // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inconsistentVisConfig.type, columns]);
+    }, [inconsistentVisConfig.type]);
     useEffect(() => {
         if (externalConfig) {
             setVisConfig(externalConfig);
