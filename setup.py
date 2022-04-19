@@ -11,7 +11,7 @@ pkg = load(pkg.open())
 
 def read_it(name):
     fn = here / name
-    return fn.read_text() if os.path.exists(fn) else ""
+    return fn.read_text() if fn.exists() else ""
 
 
 def requirements(file):
