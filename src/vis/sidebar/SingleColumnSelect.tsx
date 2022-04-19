@@ -20,7 +20,6 @@ export function SingleColumnSelect({ callback, columns, currentSelected, label, 
     <>
       <label className="pt-2 pb-1">{label}</label>
       <Select
-        isClearable
         closeMenuOnSelect
         formatOptionLabel={formatOptionLabel}
         getOptionLabel={(option) => option.name}

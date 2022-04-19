@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as d3v7 from 'd3v7';
+import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
@@ -102,9 +102,9 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             // plotly redraws everything on updates, so you need to reappend title and
             onUpdate={() => {
               for (const p of traces.plots) {
-                d3v7.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+                d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
 
-                d3v7.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+                d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
               }
             }}
           />

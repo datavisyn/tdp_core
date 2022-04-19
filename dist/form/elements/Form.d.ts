@@ -1,4 +1,4 @@
-import * as d3 from 'd3v3';
+import * as d3 from 'd3';
 import { IFormElement, IForm, IFormElementDesc } from '../interfaces';
 /**
  * Builds a form from a given collection of form elements

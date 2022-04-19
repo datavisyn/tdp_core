@@ -1,5 +1,5 @@
 import { toCategories } from 'lineupjs';
-import { extent, min, max } from 'd3v3';
+import { extent, min, max } from 'd3';
 import { LineupUtils } from '../utils';
 import { EP_TDP_CORE_SCORE_COLUMN_PATCHER } from '../../base/extensions';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';

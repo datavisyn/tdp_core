@@ -1,7 +1,9 @@
 /**
  * Created by sam on 19.12.2016.
  */
-import { select, event as d3event, scaleLinear, brushX, brushY, brush } from 'd3v7';
+import { select, event as d3event } from 'd3-selection';
+import { scaleLinear } from 'd3-scale';
+import { brushX, brushY, brush } from 'd3-brush';
 import { Scatterplot } from './Scatterplot';
 import { TDP_SCATTERPLOT_CSS_PREFIX } from './constants';
 import { EScaleAxes } from './AScatterplot';

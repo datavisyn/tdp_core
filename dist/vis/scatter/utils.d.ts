@@ -1,6 +1,5 @@
 import { PlotlyInfo, IVisConfig, Scales, VisColumn, IScatterConfig, VisCategoricalValue, VisNumericalValue } from '../interfaces';
 export declare function isScatter(s: IVisConfig): s is IScatterConfig;
-export declare const defaultScatterConfig: IScatterConfig;
 export declare function scatterMergeDefaultConfig(columns: VisColumn[], config: IScatterConfig): IVisConfig;
 export declare function moveSelectedToFront(col: (VisCategoricalValue | VisNumericalValue)[], selectedMap: {
     [key: string]: boolean;

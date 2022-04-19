@@ -5,13 +5,13 @@ import { resolveColumnValues } from '../general/layoutUtils';
 export function isStrip(s) {
     return s.type === ESupportedPlotlyVis.STRIP;
 }
-export const defaultStripConfig = {
+const defaultConfig = {
     type: ESupportedPlotlyVis.STRIP,
     numColumnsSelected: [],
     catColumnsSelected: [],
 };
 export function stripMergeDefaultConfig(columns, config) {
-    const merged = merge({}, defaultStripConfig, config);
+    const merged = merge({}, defaultConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 0) {
         merged.numColumnsSelected.push(numCols[numCols.length - 1].info);

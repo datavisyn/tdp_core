@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import * as d3v7 from 'd3v7';
+import d3 from 'd3';
 import {
   PlotlyInfo,
   PlotlyData,
@@ -24,7 +24,7 @@ export function isScatter(s: IVisConfig): s is IScatterConfig {
   return s.type === ESupportedPlotlyVis.SCATTER;
 }
 
-export const defaultScatterConfig: IScatterConfig = {
+const defaultConfig: IScatterConfig = {
   type: ESupportedPlotlyVis.SCATTER,
   numColumnsSelected: [],
   color: null,
@@ -35,7 +35,7 @@ export const defaultScatterConfig: IScatterConfig = {
 };
 
 export function scatterMergeDefaultConfig(columns: VisColumn[], config: IScatterConfig): IVisConfig {
-  const merged = merge({}, defaultScatterConfig, config);
+  const merged = merge({}, defaultConfig, config);
 
   const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
 
@@ -101,8 +101,8 @@ export async function createScatterTraces(
   });
 
   const shapeScale = config.shape
-    ? d3v7
-        .scaleOrdinal<string>()
+    ? d3.scale
+        .ordinal<string>()
         .domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))] as string[])
         .range(shapes)
     : null;
@@ -111,13 +111,13 @@ export async function createScatterTraces(
   let max = 0;
 
   if (config.color) {
-    min = d3v7.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
-    max = d3v7.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+    min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+    max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
   }
 
   const numericalColorScale = config.color
-    ? d3v7
-        .scaleLinear<string, number>()
+    ? d3.scale
+        .linear<string, number>()
         .domain([max, (max + min) / 2, min])
         .range(
           config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL

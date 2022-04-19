@@ -1,4 +1,4 @@
-import { CurveFactory, SymbolType } from 'd3v7';
+import { CurveFactory, SymbolType } from 'd3-shape';
 /**
  * a symbol renderer renderes a bunch of data points using `render` at the end `done` will be called
  */

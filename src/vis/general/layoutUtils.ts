@@ -1,4 +1,4 @@
-import { ColumnInfo, EColumnTypes, PlotlyInfo, VisCategoricalValue, VisColumn, VisNumericalValue } from '../interfaces';
+import { PlotlyInfo, VisColumn } from '../interfaces';
 import { Plotly } from '../Plot';
 
 /**
@@ -146,21 +146,11 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
   return layoutEdit;
 }
 
-export function resolveColumnValues(columns: VisColumn[]): Promise<
-  {
-    resolvedValues: (VisNumericalValue | VisCategoricalValue)[];
-    type: EColumnTypes.NUMERICAL | EColumnTypes.CATEGORICAL;
-    info: ColumnInfo;
-  }[]
-> {
+export function resolveColumnValues(columns: VisColumn[]) {
   return Promise.all(columns.map(async (col) => ({ ...col, resolvedValues: await col.values() })));
 }
 
-export async function resolveSingleColumn(column: VisColumn): Promise<{
-  resolvedValues: (VisNumericalValue | VisCategoricalValue)[];
-  type: EColumnTypes.NUMERICAL | EColumnTypes.CATEGORICAL;
-  info: ColumnInfo;
-}> {
+export async function resolveSingleColumn(column: VisColumn) {
   if (!column) {
     return null;
   }

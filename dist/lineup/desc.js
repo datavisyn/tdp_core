@@ -1,5 +1,5 @@
 import { createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, createRankDesc, } from 'lineupjs';
-import { extent } from 'd3v3';
+import { extent } from 'd3';
 export class ColumnDescUtils {
     static baseColumn(column, options = {}) {
         return {

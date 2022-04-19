@@ -1,4 +1,4 @@
-import * as d3 from 'd3v3';
+import * as d3 from 'd3';
 import { merge } from 'lodash';
 import { ProvenanceGraph, SlideNode } from '../provenance';
 
