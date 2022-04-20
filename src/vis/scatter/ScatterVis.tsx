@@ -12,7 +12,7 @@ import { ScatterVisSidebar } from './ScatterVisSidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
-import {CloseButton} from '../sidebar/CloseButton';
+import { CloseButton } from '../sidebar/CloseButton';
 
 const defaultExtensions = {
   prePlot: null,
@@ -34,7 +34,7 @@ export function ScatterVis({
   setConfig,
   hideSidebar = false,
   showCloseButton = false,
-  closeButtonCallback = () => null
+  closeButtonCallback = () => null,
   scales,
 }: {
   config: IScatterConfig;
@@ -136,7 +136,7 @@ export function ScatterVis({
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
             onClick={(event) => {
-              const clickedId = event.points[0].id;
+              const clickedId = (event.points[0] as any).id;
               if (selectedMap[clickedId]) {
                 selectionCallback(selectedList.filter((s) => s !== clickedId));
               } else {
@@ -171,9 +171,7 @@ export function ScatterVis({
           <OpacitySlider callback={(e) => setConfig({ ...config, alphaSliderVal: e })} currentValue={config.alphaSliderVal} />
         </div>
         {mergedExtensions.postPlot}
-        {showCloseButton ? (
-          <CloseButton closeCallback={closeButtonCallback} />
-        ) : null}
+        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>

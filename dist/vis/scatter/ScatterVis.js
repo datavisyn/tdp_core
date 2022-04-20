@@ -89,7 +89,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 React.createElement(BrushOptionButtons, { callback: (dragMode) => setConfig({ ...config, dragMode }), dragMode: config.dragMode }),
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
             mergedExtensions.postPlot,
-            showCloseButton ? (React.createElement(CloseButton, { closeCallback: closeButtonCallback })) : null),
+            showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
             React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));
 }

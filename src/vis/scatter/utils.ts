@@ -137,7 +137,6 @@ export async function createScatterTraces(
     return emptyVal;
   }
 
-  console.log(validCols, colorCol, scales.color.range(), scales.color.domain());
   // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
   if (validCols.length === 2) {
     plots.push({
