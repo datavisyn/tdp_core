@@ -12,6 +12,7 @@ import { ScatterVisSidebar } from './ScatterVisSidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import {CloseButton} from '../sidebar/CloseButton';
 
 const defaultExtensions = {
   prePlot: null,
@@ -32,6 +33,8 @@ export function ScatterVis({
   selectedList = [],
   setConfig,
   hideSidebar = false,
+  showCloseButton = false,
+  closeButtonCallback = () => null
   scales,
 }: {
   config: IScatterConfig;
@@ -59,11 +62,13 @@ export function ScatterVis({
   columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
   selectionCallback?: (ids: string[]) => void;
+  closeButtonCallback?: () => void;
   selectedMap?: { [key: string]: boolean };
   selectedList: string[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   hideSidebar?: boolean;
+  showCloseButton?: boolean;
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
 
@@ -166,6 +171,9 @@ export function ScatterVis({
           <OpacitySlider callback={(e) => setConfig({ ...config, alphaSliderVal: e })} currentValue={config.alphaSliderVal} />
         </div>
         {mergedExtensions.postPlot}
+        {showCloseButton ? (
+          <CloseButton closeCallback={closeButtonCallback} />
+        ) : null}
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>

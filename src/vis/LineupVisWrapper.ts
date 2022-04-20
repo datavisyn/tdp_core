@@ -115,6 +115,8 @@ export class LineupVisWrapper {
         selected: selectedList,
         selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
         filterCallback: (s: string) => this.filterCallback(s),
+        showCloseButton: true,
+        closeCallback: () => this.hide(),
       }),
       this.node,
     );
@@ -132,7 +134,6 @@ export class LineupVisWrapper {
   };
 
   hide = () => {
-    ReactDOM.unmountComponentAtNode(this.node);
     this.viewable = false;
     this.node.style.display = 'none';
   };

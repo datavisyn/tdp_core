@@ -9,13 +9,14 @@ import { createViolinTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { ViolinVisSidebar } from './ViolinVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import { CloseButton } from '../sidebar/CloseButton';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
     postSidebar: null,
 };
-export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }) {
+export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, }) {
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
@@ -65,7 +66,8 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
                         d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
-            mergedExtensions.postPlot),
+            mergedExtensions.postPlot,
+            showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
             React.createElement(ViolinVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
 }

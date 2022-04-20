@@ -9,13 +9,14 @@ import { createStripTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { StripVisSidebar } from './StripVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import { CloseButton } from '../sidebar/CloseButton';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
     postSidebar: null,
 };
-export function StripVis({ config, extensions, columns, setConfig, selectionCallback = () => null, selected = {}, scales, hideSidebar = false, }) {
+export function StripVis({ config, extensions, columns, setConfig, selectionCallback = () => null, selected = {}, scales, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, }) {
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
@@ -68,7 +69,8 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
                         d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
-            mergedExtensions.postPlot),
+            mergedExtensions.postPlot,
+            showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
             React.createElement(StripVisSidebar, { config: config, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
 }

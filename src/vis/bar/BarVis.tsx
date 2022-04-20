@@ -10,6 +10,7 @@ import { useAsync } from '../../hooks';
 import { createBarTraces } from './utils';
 import { BarVisSidebar } from './BarVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import { CloseButton } from '../sidebar/CloseButton';
 
 interface BarVisProps {
   config: IBarConfig;
@@ -42,6 +43,9 @@ interface BarVisProps {
     postSidebar?: React.ReactNode;
   };
   columns: VisColumn[];
+  closeButtonCallback?: () => void;
+  showCloseButton?: boolean;
+
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   hideSidebar?: boolean;
@@ -54,7 +58,17 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }: BarVisProps) {
+export function BarVis({
+  config,
+  optionsConfig,
+  extensions,
+  columns,
+  setConfig,
+  scales,
+  hideSidebar = false,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
+}: BarVisProps) {
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -132,6 +146,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
+        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>

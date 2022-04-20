@@ -10,6 +10,7 @@ import { createStripTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { StripVisSidebar } from './StripVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import { CloseButton } from '../sidebar/CloseButton';
 
 interface StripVisProps {
   config: IStripConfig;
@@ -23,8 +24,10 @@ interface StripVisProps {
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   selectionCallback?: (s: string[]) => void;
+  closeButtonCallback?: () => void;
   selected?: { [key: string]: boolean };
   hideSidebar?: boolean;
+  showCloseButton?: boolean;
 }
 
 const defaultExtensions = {
@@ -43,6 +46,8 @@ export function StripVis({
   selected = {},
   scales,
   hideSidebar = false,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
 }: StripVisProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
@@ -125,6 +130,7 @@ export function StripVis({
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
+        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>

@@ -10,6 +10,7 @@ import { createViolinTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { ViolinVisSidebar } from './ViolinVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import { CloseButton } from '../sidebar/CloseButton';
 
 interface ViolinVisProps {
   config: IViolinConfig;
@@ -27,8 +28,11 @@ interface ViolinVisProps {
   };
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
+  closeButtonCallback?: () => void;
+
   scales: Scales;
   hideSidebar?: boolean;
+  showCloseButton?: boolean;
 }
 
 const defaultExtensions = {
@@ -38,7 +42,17 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }: ViolinVisProps) {
+export function ViolinVis({
+  config,
+  optionsConfig,
+  extensions,
+  columns,
+  setConfig,
+  scales,
+  hideSidebar = false,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
+}: ViolinVisProps) {
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -116,6 +130,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
+        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>

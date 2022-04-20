@@ -39,6 +39,8 @@ export function Vis({
   shapes = ['circle', 'square', 'triangle-up', 'star'],
   selectionCallback = () => null,
   filterCallback = () => null,
+  closeCallback = () => null,
+  showCloseButton = false,
   externalConfig = null,
   hideSidebar = false,
 }: {
@@ -66,6 +68,8 @@ export function Vis({
    * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
    */
   filterCallback?: (s: EFilterOptions) => void;
+  closeCallback?: () => void;
+  showCloseButton?: boolean;
   externalConfig?: IVisConfig;
   hideSidebar?: boolean;
 }) {
@@ -155,6 +159,8 @@ export function Vis({
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}
+          showCloseButton={showCloseButton}
+          closeButtonCallback={closeCallback}
         />
       ) : null}
 
@@ -170,6 +176,8 @@ export function Vis({
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}
+          showCloseButton={showCloseButton}
+          closeButtonCallback={closeCallback}
         />
       ) : null}
 
@@ -182,12 +190,34 @@ export function Vis({
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}
+          showCloseButton={showCloseButton}
+          closeButtonCallback={closeCallback}
         />
       ) : null}
 
-      {isPCP(visConfig) ? <PCPVis config={visConfig} selected={selectedMap} setConfig={setVisConfig} columns={columns} hideSidebar={hideSidebar} /> : null}
+      {isPCP(visConfig) ? (
+        <PCPVis
+          config={visConfig}
+          selected={selectedMap}
+          setConfig={setVisConfig}
+          columns={columns}
+          hideSidebar={hideSidebar}
+          showCloseButton={showCloseButton}
+          closeButtonCallback={closeCallback}
+        />
+      ) : null}
 
-      {isBar(visConfig) ? <BarVis config={visConfig} setConfig={setVisConfig} columns={columns} scales={scales} hideSidebar={hideSidebar} /> : null}
+      {isBar(visConfig) ? (
+        <BarVis
+          config={visConfig}
+          setConfig={setVisConfig}
+          columns={columns}
+          scales={scales}
+          hideSidebar={hideSidebar}
+          showCloseButton={showCloseButton}
+          closeButtonCallback={closeCallback}
+        />
+      ) : null}
     </>
   );
 }

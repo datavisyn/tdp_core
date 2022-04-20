@@ -8,6 +8,7 @@ import { createPCPTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { PCPVisSidebar } from './PCPVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import { CloseButton } from '../sidebar/CloseButton';
 
 interface PCPVisProps {
   config: IPCPConfig;
@@ -21,6 +22,8 @@ interface PCPVisProps {
   setConfig: (config: IVisConfig) => void;
   selected?: { [key: string]: boolean };
   hideSidebar?: boolean;
+  closeButtonCallback?: () => void;
+  showCloseButton?: boolean;
 }
 
 const defaultExtensions = {
@@ -30,7 +33,16 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function PCPVis({ config, extensions, columns, setConfig, selected = {}, hideSidebar = false }: PCPVisProps) {
+export function PCPVis({
+  config,
+  extensions,
+  columns,
+  setConfig,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
+  selected = {},
+  hideSidebar = false,
+}: PCPVisProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -92,6 +104,7 @@ export function PCPVis({ config, extensions, columns, setConfig, selected = {}, 
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
+        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>
