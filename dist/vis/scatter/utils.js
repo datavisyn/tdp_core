@@ -62,6 +62,9 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     validCols.forEach((c) => {
         c.resolvedValues = moveSelectedToFront(c.resolvedValues, selected);
     });
+    if (colorCol) {
+        colorCol.resolvedValues = moveSelectedToFront(colorCol.resolvedValues, selected);
+    }
     const shapeScale = config.shape
         ? d3.scale
             .ordinal()
@@ -87,6 +90,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
     if (validCols.length === 1) {
         return emptyVal;
     }
+    console.log(validCols, colorCol, scales.color.range(), scales.color.domain());
     // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
     if (validCols.length === 2) {
         plots.push({
@@ -106,7 +110,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     },
                     symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
                     color: colorCol
-                        ? validCols[0].resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)))
+                        ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)))
                         : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
                     opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
                     size: colorCol ? validCols[0].resolvedValues.map((v) => (selected[v.id] ? 12 : 8)) : 8,
@@ -162,7 +166,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                                 },
                                 symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
                                 color: colorCol
-                                    ? xCurr.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)))
+                                    ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)))
                                     : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
                                 opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
                                 size: colorCol ? xCurr.resolvedValues.map((v) => (selected[v.id] ? 12 : 8)) : 8,
