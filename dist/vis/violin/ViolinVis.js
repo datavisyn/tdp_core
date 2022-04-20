@@ -8,6 +8,7 @@ import { beautifyLayout } from '../general/layoutUtils';
 import { createViolinTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { ViolinVisSidebar } from './ViolinVisSidebar';
+import { VisSidebarWrapper } from '../VisSidebarWrapper';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -65,10 +66,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
             mergedExtensions.postPlot),
-        !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
-            React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${id}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
-                React.createElement("i", { className: "fas fa-bars" })),
-            React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${id}` },
-                React.createElement(ViolinVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, setConfig: setConfig })))) : null));
+        !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
+            React.createElement(ViolinVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
 }
 //# sourceMappingURL=ViolinVis.js.map

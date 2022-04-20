@@ -9,6 +9,7 @@ import { beautifyLayout } from '../general/layoutUtils';
 import { createViolinTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { ViolinVisSidebar } from './ViolinVisSidebar';
+import { VisSidebarWrapper } from '../VisSidebarWrapper';
 
 interface ViolinVisProps {
   config: IViolinConfig;
@@ -117,21 +118,9 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         {mergedExtensions.postPlot}
       </div>
       {!hideSidebar ? (
-        <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
-          <button
-            className="btn btn-primary-outline"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target={`#generalVisBurgerMenu${id}`}
-            aria-expanded="true"
-            aria-controls="generalVisBurgerMenu"
-          >
-            <i className="fas fa-bars" />
-          </button>
-          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
-            <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
-          </div>
-        </div>
+        <VisSidebarWrapper id={id}>
+          <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
+        </VisSidebarWrapper>
       ) : null}
     </div>
   );

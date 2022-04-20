@@ -11,6 +11,7 @@ import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
+import { VisSidebarWrapper } from '../VisSidebarWrapper';
 
 const defaultExtensions = {
   prePlot: null,
@@ -167,28 +168,16 @@ export function ScatterVis({
         {mergedExtensions.postPlot}
       </div>
       {!hideSidebar ? (
-        <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
-          <button
-            className="btn btn-primary-outline"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target={`#generalVisBurgerMenu${id}`}
-            aria-expanded="true"
-            aria-controls="generalVisBurgerMenu"
-          >
-            <i className="fas fa-bars" />
-          </button>
-          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
-            <ScatterVisSidebar
-              config={config}
-              optionsConfig={optionsConfig}
-              extensions={extensions}
-              columns={columns}
-              filterCallback={filterCallback}
-              setConfig={setConfig}
-            />
-          </div>
-        </div>
+        <VisSidebarWrapper id={id}>
+          <ScatterVisSidebar
+            config={config}
+            optionsConfig={optionsConfig}
+            extensions={extensions}
+            columns={columns}
+            filterCallback={filterCallback}
+            setConfig={setConfig}
+          />
+        </VisSidebarWrapper>
       ) : null}
     </div>
   );

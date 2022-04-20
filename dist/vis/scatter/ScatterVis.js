@@ -10,6 +10,7 @@ import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
+import { VisSidebarWrapper } from '../VisSidebarWrapper';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -87,10 +88,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 React.createElement(BrushOptionButtons, { callback: (dragMode) => setConfig({ ...config, dragMode }), dragMode: config.dragMode }),
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
             mergedExtensions.postPlot),
-        !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
-            React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${id}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
-                React.createElement("i", { className: "fas fa-bars" })),
-            React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${id}` },
-                React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig })))) : null));
+        !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
+            React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));
 }
 //# sourceMappingURL=ScatterVis.js.map
