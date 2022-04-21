@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Type
 
 from fastapi import FastAPI
-from pydantic import BaseSettings
+from pydantic import BaseModel
 
 
 class RegHelper(object):
@@ -35,5 +35,5 @@ class AVisynPlugin(ABC):
         pass
 
     @property
-    def setting_class(self) -> Type[BaseSettings]:
+    def setting_class(self) -> Type[BaseModel]:
         return None

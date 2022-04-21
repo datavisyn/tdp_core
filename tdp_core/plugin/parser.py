@@ -4,7 +4,7 @@ from functools import cached_property, lru_cache
 from importlib.metadata import EntryPoint, entry_points
 from typing import Dict, List, Tuple, Type
 
-from pydantic import BaseSettings
+from pydantic import BaseModel
 
 from .. import manager
 from .model import AVisynPlugin, RegHelper
@@ -102,12 +102,12 @@ def get_extensions_from_plugins(plugins: List[EntryPointPlugin]) -> List:
     return server_extensions
 
 
-def get_config_from_plugins(plugins: List[EntryPointPlugin]) -> Tuple[List[Dict[str, Dict]], Dict[str, Type[BaseSettings]]]:
+def get_config_from_plugins(plugins: List[EntryPointPlugin]) -> Tuple[List[Dict[str, Dict]], Dict[str, Type[BaseModel]]]:
     # from ..settings.utils import load_config_file
 
     # With all the plugins, load the corresponding configuration files and add them to the global config
     files: List[Dict[str, Dict]] = []
-    models: Dict[str, Type[BaseSettings]] = {}
+    models: Dict[str, Type[BaseModel]] = {}
     for plugin in plugins:
         plugin_settings_model = plugin.plugin.setting_class
         if plugin_settings_model:
