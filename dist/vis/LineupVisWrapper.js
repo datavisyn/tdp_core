@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { CategoricalColumn, LocalDataProvider, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
 import { Vis } from './Vis';
 import { EColumnTypes, EFilterOptions } from './interfaces';
+import { I18nextManager } from '../i18n/I18nextManager';
 export class LineupVisWrapper {
     constructor(props) {
         this.props = props;
@@ -64,7 +65,7 @@ export class LineupVisWrapper {
                 else if (c instanceof CategoricalColumn) {
                     cols.push({
                         info: getColumnInfo(c),
-                        values: () => getColumnValue(c).then((res) => res.map((v) => (v.val ? v : { ...v, val: LineupVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE }))),
+                        values: () => getColumnValue(c).then((res) => res.map((v) => (v.val ? v : { ...v, val: this.PLOTLY_CATEGORICAL_MISSING_VALUE }))),
                         type: EColumnTypes.CATEGORICAL,
                     });
                 }
@@ -93,10 +94,7 @@ export class LineupVisWrapper {
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
         this.viewable = false;
+        this.PLOTLY_CATEGORICAL_MISSING_VALUE = I18nextManager.getInstance().i18n.t('tdp:core.vis.missingValue');
     }
 }
-/**
- * This string is assigned if a categorical value is missing and rendered by Plotly.
- */
-LineupVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE = '--';
 //# sourceMappingURL=LineupVisWrapper.js.map

@@ -29,26 +29,31 @@ export const useAsync = (asyncFunction, immediate = null) => {
     const [value, setValue] = React.useState(null);
     const [error, setError] = React.useState(null);
     const latestPromiseRef = React.useRef();
+    const mountedRef = React.useRef(false);
+    React.useEffect(() => {
+        mountedRef.current = true;
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
     // The execute function wraps asyncFunction and
     // handles setting state for pending, value, and error.
     // useCallback ensures the below useEffect is not called
     // on every render, but only if asyncFunction changes.
     const execute = React.useCallback((...args) => {
         setStatus('pending');
-        // Do not unset the value, as we mostly want to retain the last value to avoid flickering, i.e. for "silent" updates.
-        // setValue(null);
+        setValue(null);
         setError(null);
         const currentPromise = Promise.resolve(asyncFunction(...args))
             .then((response) => {
-            if (currentPromise === latestPromiseRef.current) {
+            if (mountedRef.current && currentPromise === latestPromiseRef.current) {
                 setValue(response);
                 setStatus('success');
             }
             return response;
         })
             .catch((e) => {
-            if (currentPromise === latestPromiseRef.current) {
-                setValue(null);
+            if (mountedRef.current && currentPromise === latestPromiseRef.current) {
                 setError(e);
                 setStatus('error');
             }

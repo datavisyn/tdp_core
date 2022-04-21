@@ -6,7 +6,7 @@ import { AppMetaDataUtils } from './metaData';
  * header html template declared inline so we can use i18next
  */
 const getTemplate = () => {
-    return `<nav class="navbar phovea-navbar navbar-expand-lg navbar-light bg-light">
+    return `<nav style="height: inherit" class="navbar phovea-navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
     <a class="navbar-brand" href="#" data-header="appLink"></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headerNavBar" aria-controls="headerNavBar" aria-expanded="false" aria-label="Toggle navigation">

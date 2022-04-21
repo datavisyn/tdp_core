@@ -8,7 +8,7 @@ export interface IMultiSelectionAdapter {
    * returns the list of currently selected sub types
    * @returns {string[]}
    */
-  getSelectedSubTypes(): string[];
+  getSelectedSubTypes(): { entityId: string; columnSelection: string }[];
 
   /**
    * create the column descriptions for the given selection and sub types
@@ -16,7 +16,7 @@ export interface IMultiSelectionAdapter {
    * @param {string[]} subTypes the currently selected sub types
    * @returns {Promise<IAdditionalColumnDesc[]>} the created descriptions
    */
-  createDescs(id: string, subTypes: string[]): Promise<IAdditionalColumnDesc[]> | IAdditionalColumnDesc[];
+  createDescs(id: string, subTypes: { entityId: string; columnSelection: string }[]): Promise<IAdditionalColumnDesc[]> | IAdditionalColumnDesc[];
 
   /**
    * load the data for the given selection and the selected descriptions
@@ -44,6 +44,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
       if (descs.length <= 0) {
         return [];
       }
+
       descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, id));
 
       const usedCols = context.columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
@@ -57,6 +58,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
       if (addedParameters.length <= 0) {
         return [];
       }
+
       // Filter the descriptions to only leave the new columns and load them
       const columnsToBeAdded = descs.filter((desc) => addedParameters.includes(`${id}_${desc.selectedSubtype}`));
       const data = this.adapter.loadData(id, columnsToBeAdded);
@@ -80,7 +82,10 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     const dynamicColumnSubtypes = usedCols.map((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype);
 
     // check which parameters have been removed
-    const removedParameters = difference(dynamicColumnSubtypes, selectedSubTypes);
+    const removedParameters = difference(
+      dynamicColumnSubtypes,
+      selectedSubTypes.map((s) => s.columnSelection),
+    );
 
     context.remove(
       [].concat(
