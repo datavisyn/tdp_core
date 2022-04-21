@@ -1,9 +1,9 @@
 .DEFAULT_GOAL := help
 pkg_src = tdp_core
 
-flake8 = flake8 $(pkg_src)
-isort = isort $(pkg_src)
-black = black --line-length 140 $(pkg_src)
+flake8 = flake8 $(pkg_src) setup.py
+isort = isort $(pkg_src) setup.py
+black = black --line-length 140 $(pkg_src) setup.py
 
 .PHONY: all  ## Perform the most common development-time rules
 all: format lint test
