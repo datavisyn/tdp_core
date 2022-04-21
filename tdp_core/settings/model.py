@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Literal, Union
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, BaseSettings, Extra, Field
 
@@ -111,14 +111,14 @@ class GlobalSettings(BaseSettings):
     def is_development_mode(self) -> bool:
         return self.env.startswith("dev")
 
-    def get_nested(self, key: str, default: Any = None) -> Union[Any, None]:
+    def get_nested(self, key: str, default: Optional[Dict] = None) -> Dict:
         # TODO: Set deprecated
         keys = key.split(".")
         plugin_id = keys[0]
         dic = self.dict(include={plugin_id})
         for key in keys:
             dic = dic.get(key, None) if dic else None
-        return dic if dic is not None else default
+        return dic or default or {}
 
     class Config:
         extra = Extra.allow
