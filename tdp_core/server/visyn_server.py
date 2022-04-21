@@ -69,22 +69,22 @@ def create_visyn_server(
 
     from ..dbmanager import DBManager
 
-    app.state.db_manager = manager.db = DBManager()
+    app.state.db = manager.db = DBManager()
     manager.db.init_app(app)
 
     from ..dbmigration.manager import DBMigrationManager
 
-    app.state.db_migration_manager = manager.db_migration = DBMigrationManager()
+    app.state.db_migration = manager.db_migration = DBMigrationManager()
     manager.db_migration.init_app(app, manager.registry.list("tdp-sql-database-migration"))
 
     from ..security.manager import create_security_manager
 
-    app.state.security_manager = manager.security = create_security_manager()
+    app.state.security = manager.security = create_security_manager()
     manager.security.init_app(app)
 
     from ..id_mapping.manager import create_id_mapping_manager
 
-    app.state.id_mapping_manager = manager.id_mapping = create_id_mapping_manager()
+    app.state.id_mapping = manager.id_mapping = create_id_mapping_manager()
 
     # TODO: Allow custom command routine (i.e. for db-migrations)
     from .cmd import parse_command_string
