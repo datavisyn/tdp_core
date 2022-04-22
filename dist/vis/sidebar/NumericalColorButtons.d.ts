@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ENumericalColorScaleType } from '../interfaces';
 interface NumericalColorButtonsProps {
     callback: (s: ENumericalColorScaleType) => void;

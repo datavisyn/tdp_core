@@ -19,6 +19,7 @@ import { debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { LineupVisWrapper } from '../vis';
+import { WebpackEnv } from '../base/WebpackEnv';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -222,6 +223,7 @@ export class ARankingView extends AView {
         }
         this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
             this.setItemSelection(sel);
+            this.generalVis.updateCustomVis();
         });
         this.selectionAdapter = this.createSelectionAdapter();
     }
@@ -231,14 +233,16 @@ export class ARankingView extends AView {
      */
     init(params, onParameterChange) {
         return super.init(params, onParameterChange).then(() => {
-            // inject stats
-            const base = params.querySelector('form') || params;
-            base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
-            const container = base.lastElementChild;
-            container.appendChild(this.stats);
-            if (this.options.enableSidePanel === 'top') {
-                container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
-                container.insertAdjacentElement('afterbegin', this.panel.node);
+            if (!WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+                // inject stats
+                const base = params.querySelector('form') || params;
+                base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
+                const container = base.lastElementChild;
+                container.appendChild(this.stats);
+                if (this.options.enableSidePanel === 'top') {
+                    container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
+                    container.insertAdjacentElement('afterbegin', this.panel.node);
+                }
             }
         });
     }
@@ -484,7 +488,10 @@ export class ARankingView extends AView {
      * @param {IScore<any>} score
      * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
      */
-    addTrackedScoreColumn(score, position) {
+    async addTrackedScoreColumn(score, position) {
+        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+            return this.addScoreColumn(score, position);
+        }
         return this.withoutTracking(() => this.addScoreColumn(score, position));
     }
     pushTrackedScoreColumn(scoreName, scoreId, params) {
@@ -495,7 +502,11 @@ export class ARankingView extends AView {
      * @param {string} columnId
      * @returns {Promise<boolean>}
      */
-    removeTrackedScoreColumn(columnId) {
+    async removeTrackedScoreColumn(columnId) {
+        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+            const column = this.provider.find(columnId);
+            return column.removeMe();
+        }
         return this.withoutTracking(() => {
             const column = this.provider.find(columnId);
             return column.removeMe();

@@ -10,7 +10,6 @@ export interface IRow {
   /**
    * id, e.g. ESNGxxxx
    */
-  // TODO: Maybe use _visyn_id to avoid conflicts.
   readonly id: string;
 
   [key: string]: any;
