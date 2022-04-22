@@ -1,5 +1,6 @@
 import { SingleSelectionAdapter } from './internal/SingleSelectionAdapter';
 import { MultiSelectionAdapter } from './internal/MultiSelectionAdapter';
+import { ReprovisynMultiSelectionAdapter } from './internal/ReprovisynMultiSelectionAdapter';
 export class AdapterUtils {
     /**
      * create a single selection adapter, i.e. that one selected item results in one additional column in LineUp
@@ -16,6 +17,9 @@ export class AdapterUtils {
      */
     static multi(adapter) {
         return new MultiSelectionAdapter(adapter);
+    }
+    static reprovisynMulti(adapter) {
+        return new ReprovisynMultiSelectionAdapter(adapter);
     }
     /**
      * no columns for selected items
