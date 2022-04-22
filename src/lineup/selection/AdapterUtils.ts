@@ -1,6 +1,7 @@
 import { ISelectionAdapter } from './ISelectionAdapter';
 import { SingleSelectionAdapter, ISingleSelectionAdapter } from './internal/SingleSelectionAdapter';
 import { MultiSelectionAdapter, IMultiSelectionAdapter } from './internal/MultiSelectionAdapter';
+import { IReprovisynMultiSelectionAdapter, ReprovisynMultiSelectionAdapter } from './internal/ReprovisynMultiSelectionAdapter';
 
 export class AdapterUtils {
   /**
@@ -19,6 +20,10 @@ export class AdapterUtils {
    */
   static multi(adapter: IMultiSelectionAdapter): ISelectionAdapter {
     return new MultiSelectionAdapter(adapter);
+  }
+
+  static reprovisynMulti(adapter: IReprovisynMultiSelectionAdapter): ISelectionAdapter {
+    return new ReprovisynMultiSelectionAdapter(adapter);
   }
 
   /**
