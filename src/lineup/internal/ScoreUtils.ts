@@ -78,9 +78,29 @@ export class ScoreUtils {
   }
 
   static async pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any) {
+    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+      const storedParams = await AttachemntUtils.externalize(params);
+      const toStoreParams = { id: scoreId, params: storedParams };
+      return ScoreUtils.addScoreImpl([provider], toStoreParams);
+    }
     const storedParams = await AttachemntUtils.externalize(params);
+    const currentParams = { id: scoreId, params, storedParams };
+    const result = await ScoreUtils.addScoreAsync([provider], currentParams);
     const toStoreParams = { id: scoreId, params: storedParams };
-    return ScoreUtils.addScoreImpl([provider], toStoreParams);
+    return graph.pushWithResult(
+      ActionUtils.action(
+        ActionMetaData.actionMeta(
+          I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', { scoreName }),
+          ObjectRefUtils.category.data,
+          ObjectRefUtils.operation.create,
+        ),
+        ScoreUtils.CMD_ADD_SCORE,
+        ScoreUtils.addScoreImpl,
+        [provider],
+        toStoreParams,
+      ),
+      result,
+    );
   }
 
   static removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]) {
