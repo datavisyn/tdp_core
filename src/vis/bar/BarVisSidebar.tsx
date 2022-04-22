@@ -11,6 +11,8 @@ import {
   IVisConfig,
   VisColumn,
   ICommonVisSideBarProps,
+  EAggregateTypes,
+  EColumnTypes,
 } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
@@ -19,7 +21,8 @@ import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
 import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
 import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
-import { CategoricalColumnSingleSelect } from '../sidebar/CategoricalColumnSingleSelect';
+import { SingleColumnSelect } from '../sidebar/SingleColumnSelect';
+import { AggregateTypeSelect } from '../sidebar/AggregateTypeSelect';
 
 const defaultConfig = {
   group: {
@@ -105,7 +108,7 @@ export function BarVisSidebar({
       <WarningMessage />
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
       <hr />
-      <CategoricalColumnSingleSelect
+      <SingleColumnSelect
         callback={(catColumnSelected: ColumnInfo) =>
           setConfig({
             ...config,
@@ -116,6 +119,21 @@ export function BarVisSidebar({
         }
         columns={columns}
         currentSelected={config.catColumnSelected}
+        type={[EColumnTypes.CATEGORICAL]}
+        label="Categorical Column"
+      />
+      <AggregateTypeSelect
+        aggregateTypeSelectCallback={(aggregateType: EAggregateTypes) => {
+          if (config.aggregateColumn === null) {
+            setConfig({ ...config, aggregateType, aggregateColumn: columns.find((col) => col.type === EColumnTypes.NUMERICAL).info });
+          } else {
+            setConfig({ ...config, aggregateType });
+          }
+        }}
+        aggregateColumnSelectCallback={(aggregateColumn: ColumnInfo) => setConfig({ ...config, aggregateColumn })}
+        columns={columns}
+        currentSelected={config.aggregateType}
+        aggregateColumn={config.aggregateColumn}
       />
       <hr />
       {mergedExtensions.preSidebar}
@@ -123,7 +141,11 @@ export function BarVisSidebar({
       {mergedOptionsConfig.group.enable
         ? mergedOptionsConfig.group.customComponent || (
             <GroupSelect
-              callback={(group: ColumnInfo) => setConfig({ ...config, group })}
+              groupColumnSelectCallback={(group: ColumnInfo) => setConfig({ ...config, group })}
+              groupTypeSelectCallback={(groupType: EBarGroupingType) => setConfig({ ...config, groupType })}
+              groupDisplaySelectCallback={(display: EBarDisplayType) => setConfig({ ...config, display })}
+              displayType={config.display}
+              groupType={config.groupType}
               columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
               currentSelected={config.group}
             />
@@ -142,18 +164,6 @@ export function BarVisSidebar({
       {mergedOptionsConfig.direction.enable
         ? mergedOptionsConfig.direction.customComponent || (
             <BarDirectionButtons callback={(direction: EBarDirection) => setConfig({ ...config, direction })} currentSelected={config.direction} />
-          )
-        : null}
-
-      {mergedOptionsConfig.groupType.enable
-        ? mergedOptionsConfig.groupType.customComponent || (
-            <BarGroupTypeButtons callback={(groupType: EBarGroupingType) => setConfig({ ...config, groupType })} currentSelected={config.groupType} />
-          )
-        : null}
-
-      {mergedOptionsConfig.display.enable
-        ? mergedOptionsConfig.display.customComponent || (
-            <BarDisplayButtons callback={(display: EBarDisplayType) => setConfig({ ...config, display })} currentSelected={config.display} />
           )
         : null}
 

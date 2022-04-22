@@ -10,4 +10,9 @@ export class WebpackEnv {
   public static __APP_CONTEXT__ = process.env.__APP_CONTEXT__;
 
   public static __DEBUG__ = process.env.__DEBUG__;
+
+  /**
+   * enables features that used in reprovisyn
+   */
+  public static ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES = process.env.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES === 'true';
 }

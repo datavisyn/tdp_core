@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
-import { beautifyLayout } from '../layoutUtils';
+import { beautifyLayout } from '../general/layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
@@ -63,8 +63,20 @@ export function ScatterVis({
   hideSidebar?: boolean;
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
+  const plotlyDivRef = React.useRef(null);
 
   useEffect(() => {
+    const ro = new ResizeObserver(() => {
+      const plotDiv = document.getElementById(`plotlyDiv${id}`);
+      if (plotDiv) {
+        Plotly.Plots.resize(plotDiv);
+      }
+    });
+
+    if (plotlyDivRef) {
+      ro.observe(plotlyDivRef.current);
+    }
+
     if (hideSidebar) {
       return;
     }
@@ -78,7 +90,7 @@ export function ScatterVis({
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [id, hideSidebar]);
+  }, [id, hideSidebar, plotlyDivRef]);
 
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
@@ -109,7 +121,7 @@ export function ScatterVis({
   }, [traces, config.dragMode]);
 
   return (
-    <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
+    <div ref={plotlyDivRef} className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
       <div
         className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
           traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
