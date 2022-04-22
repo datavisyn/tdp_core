@@ -19,6 +19,7 @@ import { debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { LineupVisWrapper } from '../vis';
+import { WebpackEnv } from '../base/WebpackEnv';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -232,15 +233,17 @@ export class ARankingView extends AView {
      */
     init(params, onParameterChange) {
         return super.init(params, onParameterChange).then(() => {
-            // inject stats
-            // const base = <HTMLElement>params.querySelector('form') || params;
-            // base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
-            // const container = <HTMLElement>base.lastElementChild!;
-            // container.appendChild(this.stats);
-            // if (this.options.enableSidePanel === 'top') {
-            //   container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
-            //   container.insertAdjacentElement('afterbegin', this.panel.node);
-            // }
+            if (!WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+                // inject stats
+                const base = params.querySelector('form') || params;
+                base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
+                const container = base.lastElementChild;
+                container.appendChild(this.stats);
+                if (this.options.enableSidePanel === 'top') {
+                    container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
+                    container.insertAdjacentElement('afterbegin', this.panel.node);
+                }
+            }
         });
     }
     update() {
@@ -485,8 +488,11 @@ export class ARankingView extends AView {
      * @param {IScore<any>} score
      * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
      */
-    addTrackedScoreColumn(score, position) {
-        return this.addScoreColumn(score, position);
+    async addTrackedScoreColumn(score, position) {
+        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+            return this.addScoreColumn(score, position);
+        }
+        return this.withoutTracking(() => this.addScoreColumn(score, position));
     }
     pushTrackedScoreColumn(scoreName, scoreId, params) {
         return ScoreUtils.pushScoreAsync(this.context.graph, this.context.ref, scoreName, scoreId, params);
@@ -497,10 +503,14 @@ export class ARankingView extends AView {
      * @returns {Promise<boolean>}
      */
     async removeTrackedScoreColumn(columnId) {
-        // return this.withoutTracking(() => {
-        const column = this.provider.find(columnId);
-        return column.removeMe();
-        // });
+        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+            const column = this.provider.find(columnId);
+            return column.removeMe();
+        }
+        return this.withoutTracking(() => {
+            const column = this.provider.find(columnId);
+            return column.removeMe();
+        });
     }
     /**
      * generates the column descriptions based on the given server columns by default they are mapped

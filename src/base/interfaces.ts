@@ -9,7 +9,6 @@ import { IEventHandler } from './event';
 import { ProvenanceGraph } from '../clue/provenance/ProvenanceGraph';
 import { IObjectRef } from '../clue/provenance/ObjectNode';
 import { AppHeader } from '../components/header';
-import type { IServerColumn } from './rest';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**
@@ -17,6 +16,9 @@ export interface IAdditionalColumnDesc extends IColumnDesc {
    * @default undefined
    */
   selectedId: string;
+  /**
+   * id for mapping relation data
+   */
   mappingEntityId?: string;
   /**
    * used internally to match selections to multiple columns

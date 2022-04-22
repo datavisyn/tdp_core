@@ -4,6 +4,7 @@ import { AttachemntUtils } from '../../storage/internal/attachment';
 import { IViewProvider } from '../IViewProvider';
 import { PluginRegistry } from '../../app';
 import { I18nextManager } from '../../i18n';
+import { WebpackEnv } from '../../base/WebpackEnv';
 import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../../clue/provenance';
 
 export class ScoreUtils {
@@ -13,17 +14,19 @@ export class ScoreUtils {
 
   private static async addScoreLogic(waitForScore: boolean, inputs: IObjectRef<IViewProvider>[], parameter: any) {
     const scoreId: string = parameter.id;
-    console.log(inputs);
     const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
     const plugin = await pluginDesc.load();
-    const view = await inputs[0].v;
+    let view;
+    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+      view = await inputs[0].v;
+    } else {
+      view = await inputs[0].v.then((vi) => vi.getInstance());
+    }
     const params = await AttachemntUtils.resolveExternalized(parameter.params);
     const score: IScore<any> | IScore<any>[] = plugin.factory(params, pluginDesc);
     const scores = Array.isArray(score) ? score : [score];
 
-    const results = await Promise.all(scores.map((s) => (<any>view).addTrackedScoreColumn(s)));
-
-    console.log(results);
+    const results = await Promise.all(scores.map((s) => view.addTrackedScoreColumn(s)));
     const col = waitForScore ? await Promise.all(results.map((r) => r.loaded)) : results.map((r) => r.col);
 
     return {
@@ -75,9 +78,29 @@ export class ScoreUtils {
   }
 
   static async pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any) {
+    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+      const storedParams = await AttachemntUtils.externalize(params);
+      const toStoreParams = { id: scoreId, params: storedParams };
+      return ScoreUtils.addScoreImpl([provider], toStoreParams);
+    }
     const storedParams = await AttachemntUtils.externalize(params);
+    const currentParams = { id: scoreId, params, storedParams };
+    const result = await ScoreUtils.addScoreAsync([provider], currentParams);
     const toStoreParams = { id: scoreId, params: storedParams };
-    return ScoreUtils.addScoreImpl([provider], toStoreParams);
+    return graph.pushWithResult(
+      ActionUtils.action(
+        ActionMetaData.actionMeta(
+          I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.add', { scoreName }),
+          ObjectRefUtils.category.data,
+          ObjectRefUtils.operation.create,
+        ),
+        ScoreUtils.CMD_ADD_SCORE,
+        ScoreUtils.addScoreImpl,
+        [provider],
+        toStoreParams,
+      ),
+      result,
+    );
   }
 
   static removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]) {

@@ -60,8 +60,8 @@ def phovea(registry):
 
   # phovea_security_flask
   # TODO: Add ENV variables to allow disabling
-  registry.append('manager', 'security_manager', 'tdp_core.security.manager.jwt_security_manager', dict(singleton=True))
-  registry.append('user_stores', 'alb_security_store', 'tdp_core.security.store.alb_security_store', {})
+  registry.append('manager', 'security_manager', 'tdp_core.flask_login_impl', dict(singleton=True))
+  registry.append('user_stores', 'alb_security_store', 'tdp_core.security.store.ALBSecurityStore', {})
 
   # tdp_matomo
   registry.append('tdp-config-safe-keys', 'matomo', '', {

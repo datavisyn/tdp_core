@@ -26,7 +26,6 @@ function useBSClass(clazz, ...options) {
     }, []);
     React.useEffect(() => {
         // Whenever we are unmounting (an instance), destroy it.
-        // console.trace("TEST");
         return () => {
             try {
                 instance === null || instance === void 0 ? void 0 : instance.dispose();

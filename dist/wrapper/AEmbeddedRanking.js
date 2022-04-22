@@ -135,7 +135,7 @@ export class AEmbeddedRanking {
     }
     addTrackedScoreColumn(score, scoreParams, position) {
         if (typeof score !== 'string') {
-            return Promise.resolve(this.ranking.addTrackedScoreColumn(score, scoreParams)); // aka scoreParams = position
+            return this.ranking.addTrackedScoreColumn(score, scoreParams); // aka scoreParams = position
         }
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, score);
         return pluginDesc.load().then((plugin) => {

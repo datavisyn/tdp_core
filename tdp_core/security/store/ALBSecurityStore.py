@@ -9,6 +9,21 @@ _log = logging.getLogger(__name__)
 _conf = viewconfig('tdp_core.security.store.alb_security_store')
 
 
+class ALBSecurityUser(security.User):
+    def __init__(self, id, roles=[]):
+        super().__init__(id)
+        self.name = id
+        self.roles = roles
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_active(self):
+        return True
+
+
 class ALBSecurityStore(object):
 
     def __init__(self, cookie_name: Optional[str], signout_url: Optional[str]):
@@ -26,7 +41,8 @@ class ALBSecurityStore(object):
                 # Try to decode the oidc data jwt
                 user = jwt.decode(encoded, options={"verify_signature": False})
                 # Create new user from given attributes
-                return security.User(id=user['email'])
+                email = user['email']
+                return ALBSecurityUser(email)
             except Exception:
                 _log.exception('Error in load_from_request')
                 return None
