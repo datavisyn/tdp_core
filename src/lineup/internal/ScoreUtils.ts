@@ -4,6 +4,7 @@ import { AttachemntUtils } from '../../storage/internal/attachment';
 import { IViewProvider } from '../IViewProvider';
 import { PluginRegistry } from '../../app';
 import { I18nextManager } from '../../i18n';
+import { WebpackEnv } from '../../base/WebpackEnv';
 import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../../clue/provenance';
 
 export class ScoreUtils {
@@ -13,17 +14,19 @@ export class ScoreUtils {
 
   private static async addScoreLogic(waitForScore: boolean, inputs: IObjectRef<IViewProvider>[], parameter: any) {
     const scoreId: string = parameter.id;
-    console.log(inputs);
     const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
     const plugin = await pluginDesc.load();
-    const view = await inputs[0].v;
+    let view;
+    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+      view = await inputs[0].v;
+    } else {
+      view = await inputs[0].v.then((vi) => vi.getInstance());
+    }
     const params = await AttachemntUtils.resolveExternalized(parameter.params);
     const score: IScore<any> | IScore<any>[] = plugin.factory(params, pluginDesc);
     const scores = Array.isArray(score) ? score : [score];
 
-    const results = await Promise.all(scores.map((s) => (<any>view).addTrackedScoreColumn(s)));
-
-    console.log(results);
+    const results = await Promise.all(scores.map((s) => view.addTrackedScoreColumn(s)));
     const col = waitForScore ? await Promise.all(results.map((r) => r.loaded)) : results.map((r) => r.col);
 
     return {

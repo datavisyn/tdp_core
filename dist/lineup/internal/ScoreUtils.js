@@ -2,19 +2,24 @@ import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
 import { AttachemntUtils } from '../../storage/internal/attachment';
 import { PluginRegistry } from '../../app';
 import { I18nextManager } from '../../i18n';
+import { WebpackEnv } from '../../base/WebpackEnv';
 import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../clue/provenance';
 export class ScoreUtils {
     static async addScoreLogic(waitForScore, inputs, parameter) {
         const scoreId = parameter.id;
-        console.log(inputs);
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
         const plugin = await pluginDesc.load();
-        const view = await inputs[0].v;
+        let view;
+        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+            view = await inputs[0].v;
+        }
+        else {
+            view = await inputs[0].v.then((vi) => vi.getInstance());
+        }
         const params = await AttachemntUtils.resolveExternalized(parameter.params);
         const score = plugin.factory(params, pluginDesc);
         const scores = Array.isArray(score) ? score : [score];
         const results = await Promise.all(scores.map((s) => view.addTrackedScoreColumn(s)));
-        console.log(results);
         const col = waitForScore ? await Promise.all(results.map((r) => r.loaded)) : results.map((r) => r.col);
         return {
             inverse: ScoreUtils.removeScore(inputs[0], I18nextManager.getInstance().i18n.t('tdp:core.lineup.scorecmds.score'), scoreId, parameter.storedParams ? parameter.storedParams : parameter.params, col.map((c) => c.id)),

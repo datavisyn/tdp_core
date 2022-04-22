@@ -6,20 +6,14 @@ export interface IMultiSelectionAdapter {
      * returns the list of currently selected sub types
      * @returns {string[]}
      */
-    getSelectedSubTypes(): {
-        entityId: string;
-        columnSelection: string;
-    }[];
+    getSelectedSubTypes(): string[];
     /**
      * create the column descriptions for the given selection and sub types
      * @param {string} id the id
      * @param {string[]} subTypes the currently selected sub types
      * @returns {Promise<IAdditionalColumnDesc[]>} the created descriptions
      */
-    createDescs(id: string, subTypes: {
-        entityId: string;
-        columnSelection: string;
-    }[]): Promise<IAdditionalColumnDesc[]> | IAdditionalColumnDesc[];
+    createDescs(id: string, subTypes: string[]): Promise<IAdditionalColumnDesc[]> | IAdditionalColumnDesc[];
     /**
      * load the data for the given selection and the selected descriptions
      * @param {string} id the id

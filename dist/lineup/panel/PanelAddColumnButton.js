@@ -17,7 +17,7 @@ export class PanelAddColumnButton {
         this.node.addEventListener('mouseleave', () => {
             this.node.classList.remove('once');
         });
-        const btnOptions = {
+        const button = new PanelButton(this.node, {
             ...options,
             ...{
                 title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
@@ -28,8 +28,7 @@ export class PanelAddColumnButton {
                     this.search.focus();
                 },
             },
-        };
-        const button = new PanelButton(this.node, btnOptions);
+        });
         this.node.appendChild(button.node);
         this.node.appendChild(this.search.node);
     }
