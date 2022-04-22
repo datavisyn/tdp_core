@@ -7,7 +7,6 @@ from ... import manager
 from ..model import User
 
 _log = logging.getLogger(__name__)
-_conf = manager.settings.get_nested("tdp_core.security.store.alb_security_store")
 
 
 class ALBSecurityStore(object):
@@ -52,14 +51,11 @@ def create():
     # Why do we do this here and not in the __init__.py?
     # Because the configuration is merged after the registry is loaded,
     # such that no keys are available (except tdp_core keys).
-    if _conf.get("enable", False):
+    if manager.settings.tdp_core.security.store.alb_security_store.enable:
         _log.info("Adding ALBSecurityStore")
-
-        # Check if the url is set first
-        cookie_name = _conf.get("cookie_name")
-        signout_url = _conf.get("signout_url")
-        # TODO: Validation of (optional) configuration?
-
-        return ALBSecurityStore(cookie_name, signout_url)
+        return ALBSecurityStore(
+            manager.settings.tdp_core.security.store.alb_security_store.cookie_name,
+            manager.settings.tdp_core.security.store.alb_security_store.signout_url,
+        )
 
     return None
