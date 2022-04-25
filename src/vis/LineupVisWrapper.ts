@@ -4,12 +4,13 @@ import { CategoricalColumn, Column, IDataRow, LocalDataProvider, NumberColumn, R
 import { Vis } from './Vis';
 import { EColumnTypes, ColumnInfo, VisColumn, EFilterOptions, IVisCommonValue } from './interfaces';
 import { IRow } from '../base/rest';
+import { I18nextManager } from '../i18n/I18nextManager';
 
 export class LineupVisWrapper {
   /**
    * This string is assigned if a categorical value is missing and rendered by Plotly.
    */
-  private static PLOTLY_CATEGORICAL_MISSING_VALUE = '--';
+  private PLOTLY_CATEGORICAL_MISSING_VALUE: string;
 
   readonly node: HTMLElement;
 
@@ -30,6 +31,7 @@ export class LineupVisWrapper {
     this.node.id = 'customVisDiv';
     this.node.classList.add('custom-vis-panel');
     this.viewable = false;
+    this.PLOTLY_CATEGORICAL_MISSING_VALUE = I18nextManager.getInstance().i18n.t('tdp:core.vis.missingValue');
   }
 
   getSelectedList = (): string[] => {
@@ -71,7 +73,6 @@ export class LineupVisWrapper {
     };
 
     const mapData = <T extends ValueColumn<number | string>>(innerData: IDataRow[], column: T) => {
-      // TODO: This should be _visyn_id?
       return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: d.v.id, val: column.getRaw(d) });
     };
 
@@ -103,7 +104,7 @@ export class LineupVisWrapper {
       } else if (c instanceof CategoricalColumn) {
         cols.push({
           info: getColumnInfo(c),
-          values: () => getColumnValue(c).then((res) => res.map((v) => (v.val ? v : { ...v, val: LineupVisWrapper.PLOTLY_CATEGORICAL_MISSING_VALUE }))),
+          values: () => getColumnValue(c).then((res) => res.map((v) => (v.val ? v : { ...v, val: this.PLOTLY_CATEGORICAL_MISSING_VALUE }))),
           type: EColumnTypes.CATEGORICAL,
         });
       }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Vis } from '../Vis';
-import { EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, EScatterSelectSettings, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
+import { EAggregateTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, EScatterSelectSettings, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
 function fetchIrisData() {
     const dataPromise = import('./irisData').then((m) => m.iris);
     return [
@@ -106,6 +106,8 @@ BarChart.args = {
             id: 'species',
             name: 'Species',
         },
+        aggregateColumn: null,
+        aggregateType: EAggregateTypes.COUNT,
     },
 };
 export const ViolinPlot = Template.bind({});
