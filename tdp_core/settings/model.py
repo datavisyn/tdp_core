@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Literal, Union
+from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, BaseSettings, Extra, Field
 
@@ -28,7 +28,21 @@ class DisableSettings(BaseModel):
     extensions: List[str] = []
 
 
-class VisynServerSettings(BaseModel):
+class SecurityStoreSettings(BaseModel):
+    enable: bool = False
+    cookie_name: Optional[str] = None
+    signout_url: Optional[str] = None
+
+
+class SecurityStoreSettings(BaseModel):
+    alb_security_store: SecurityStoreSettings = SecurityStoreSettings()
+
+
+class SecuritySettings(BaseModel):
+    store: SecurityStoreSettings = SecurityStoreSettings()
+
+
+class VisynServerSettings(BaseSettings):
     disable: DisableSettings = DisableSettings()
     enabled_plugins: List[str] = []
 
@@ -75,18 +89,8 @@ class VisynServerSettings(BaseModel):
             },
         ]
     )
-    alwaysAppendDummyStore: bool = Field(False)  # NOQA
-    security: Dict[str, Any] = Field(
-        {
-            "store": {
-                "alb_security_store": {
-                    "enable": False,
-                    "cookie_name": None,
-                    "signout_url": None,
-                }
-            }
-        }
-    )
+    alwaysAppendDummyStore: bool = False  # NOQA
+    security: SecuritySettings = SecuritySettings()
 
     # tdp_matomo
     matomo: MatomoSettings = MatomoSettings()
@@ -111,8 +115,11 @@ class GlobalSettings(BaseSettings):
     def is_development_mode(self) -> bool:
         return self.env.startswith("dev")
 
-    def get_nested(self, key: str, default: Any = None) -> Union[Any, None]:
-        # TODO: Set deprecated
+    def get_nested(self, key: str, default: Any = None) -> Optional[Any]:
+        """
+        Retrieves the value at the position of the key from the dict-ified settings, or `default` if `None` is found.
+        This method is for legacy purposes only, you should in most cases just use the settings directly.
+        """
         keys = key.split(".")
         plugin_id = keys[0]
         dic = self.dict(include={plugin_id})

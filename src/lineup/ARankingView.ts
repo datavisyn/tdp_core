@@ -42,6 +42,7 @@ import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { ISecureItem } from '../security';
 import { LineupVisWrapper } from '../vis';
+import { WebpackEnv } from '../base/WebpackEnv';
 
 /**
  * base class for views based on LineUp
@@ -61,11 +62,11 @@ export abstract class ARankingView extends AView {
    */
   private readonly stats: HTMLElement;
 
-  private readonly provider: LocalDataProvider;
+  public readonly provider: LocalDataProvider;
 
   private readonly taggle: EngineRenderer | TaggleRenderer;
 
-  private readonly selectionHelper: LineUpSelectionHelper;
+  public readonly selectionHelper: LineUpSelectionHelper;
 
   private readonly panel: LineUpPanelActions;
 
@@ -131,6 +132,7 @@ export abstract class ARankingView extends AView {
       filterGlobally: true,
       propagateAggregationState: false,
     },
+    showInContextMode: (col: Column) => (<any>col.desc).column === 'id',
     formatSearchBoxItem: (item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement): string | void => {
       // TypeScript type guard function
       function hasColumnDesc(i: ISearchOption | IGroupSearchItem<ISearchOption>): i is ISearchOption {
@@ -293,6 +295,7 @@ export abstract class ARankingView extends AView {
 
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel: ISelection) => {
       this.setItemSelection(sel);
+      this.generalVis.updateCustomVis();
     });
     this.selectionAdapter = this.createSelectionAdapter();
   }
@@ -303,15 +306,16 @@ export abstract class ARankingView extends AView {
    */
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return super.init(params, onParameterChange).then(() => {
-      // inject stats
-      const base = <HTMLElement>params.querySelector('form') || params;
-      base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
-      const container = <HTMLElement>base.lastElementChild!;
-      container.appendChild(this.stats);
-
-      if (this.options.enableSidePanel === 'top') {
-        container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
-        container.insertAdjacentElement('afterbegin', this.panel.node);
+      if (!WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+        // inject stats
+        const base = <HTMLElement>params.querySelector('form') || params;
+        base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
+        const container = <HTMLElement>base.lastElementChild!;
+        container.appendChild(this.stats);
+        if (this.options.enableSidePanel === 'top') {
+          container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
+          container.insertAdjacentElement('afterbegin', this.panel.node);
+        }
       }
     });
   }
@@ -432,13 +436,7 @@ export abstract class ARankingView extends AView {
 
     this.dump = new Set<string>();
     ranking.children.forEach((c) => {
-      if (
-        c === labelColumn ||
-        (s && c === s.col) ||
-        c.desc.type === 'rank' ||
-        c.desc.type === 'selection' ||
-        (<any>c.desc).column === 'id' // = Ensembl column
-      ) {
+      if (c === labelColumn || (s && c === s.col) || c.desc.type === 'rank' || c.desc.type === 'selection' || this.options.showInContextMode(c)) {
         // keep these columns
       } else {
         c.setVisible(false);
@@ -594,7 +592,10 @@ export abstract class ARankingView extends AView {
    * @param {IScore<any>} score
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
-  addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn> {
+  async addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn> {
+    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+      return this.addScoreColumn(score, position);
+    }
     return this.withoutTracking(() => this.addScoreColumn(score, position));
   }
 
@@ -607,7 +608,11 @@ export abstract class ARankingView extends AView {
    * @param {string} columnId
    * @returns {Promise<boolean>}
    */
-  removeTrackedScoreColumn(columnId: string): Promise<boolean> {
+  async removeTrackedScoreColumn(columnId: string): Promise<boolean> {
+    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+      const column = this.provider.find(columnId);
+      return column.removeMe();
+    }
     return this.withoutTracking(() => {
       const column = this.provider.find(columnId);
       return column.removeMe();

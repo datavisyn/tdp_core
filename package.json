@@ -24,12 +24,8 @@
     "phovea_registry.js",
     "dist",
     "tdp_core",
-    "__init__.py",
-    "__main__.py",
     "requirements.txt",
-    "requirements_dev.txt",
-    "docker_packages.txt",
-    "redhat_packages.txt"
+    "requirements_dev.txt"
   ],
   "engines": {
     "npm": ">= 6.12",

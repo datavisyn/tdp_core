@@ -29,6 +29,13 @@ export const useAsync = (asyncFunction, immediate = null) => {
     const [value, setValue] = React.useState(null);
     const [error, setError] = React.useState(null);
     const latestPromiseRef = React.useRef();
+    const mountedRef = React.useRef(false);
+    React.useEffect(() => {
+        mountedRef.current = true;
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
     // The execute function wraps asyncFunction and
     // handles setting state for pending, value, and error.
     // useCallback ensures the below useEffect is not called
@@ -40,14 +47,14 @@ export const useAsync = (asyncFunction, immediate = null) => {
         setError(null);
         const currentPromise = Promise.resolve(asyncFunction(...args))
             .then((response) => {
-            if (currentPromise === latestPromiseRef.current) {
+            if (mountedRef.current && currentPromise === latestPromiseRef.current) {
                 setValue(response);
                 setStatus('success');
             }
             return response;
         })
             .catch((e) => {
-            if (currentPromise === latestPromiseRef.current) {
+            if (mountedRef.current && currentPromise === latestPromiseRef.current) {
                 setValue(null);
                 setError(e);
                 setStatus('error');
