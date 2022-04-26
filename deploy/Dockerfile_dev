@@ -1,7 +1,7 @@
 FROM python:3.10-buster
 
 LABEL maintainer="contact@datavisyn.io"
-WORKDIR /visyn
+WORKDIR /phovea
 
 COPY requirements*.txt ./
 RUN (apt-get update) && \
@@ -9,7 +9,7 @@ RUN (apt-get update) && \
     (pip install --no-cache-dir -r requirements_dev.txt)
 
 # Create entrypoint installing the volume-mounted workspace repos
-RUN echo '#!/bin/sh\npip install --no-cache-dir --no-deps -r /visyn/requirements_workspace.txt\n$@' > /tmp/entrypoint.sh
+RUN echo '#!/bin/sh\npip install --no-cache-dir --no-deps -r /phovea/requirements_workspace.txt\n$@' > /tmp/entrypoint.sh
 RUN chmod +x /tmp/entrypoint.sh
 ENTRYPOINT [ "/tmp/entrypoint.sh" ]
 
