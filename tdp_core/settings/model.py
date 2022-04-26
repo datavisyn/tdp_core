@@ -42,7 +42,7 @@ class SecuritySettings(BaseModel):
     store: SecurityStoreSettings = SecurityStoreSettings()
 
 
-class VisynServerSettings(BaseSettings):
+class TDPCoreSettings(BaseModel):
     disable: DisableSettings = DisableSettings()
     enabled_plugins: List[str] = []
 
@@ -109,7 +109,7 @@ class GlobalSettings(BaseSettings):
     jwt_cookie_secure: bool = False
     jwt_cookie_samesite: str = "Strict"
     jwt_access_cookie_path: str = "/"
-    tdp_core: VisynServerSettings = VisynServerSettings()
+    tdp_core: TDPCoreSettings = TDPCoreSettings()
 
     @property
     def is_development_mode(self) -> bool:
