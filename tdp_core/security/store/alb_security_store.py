@@ -4,8 +4,8 @@ from typing import Optional
 import jwt
 
 from ... import manager
-from .base_store import BaseStore
 from ..model import User
+from .base_store import BaseStore
 
 _log = logging.getLogger(__name__)
 
