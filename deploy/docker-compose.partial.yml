@@ -21,7 +21,7 @@ services:
       # Required port for the python debugger
       - '5678:5678'
     volumes:
-    - .:/phovea
+    - .:/visyn
     environment:
       - ENV=development
       - PYTHONUNBUFFERED=1

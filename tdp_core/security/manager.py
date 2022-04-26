@@ -117,7 +117,7 @@ class SecurityManager:
         try:
             return self.load_from_request(get_request())
         except Exception:
-            _log.info("Error loading user from request")
+            _log.exception("Error loading user from request")
             return None
 
     def load_from_request(self, request: Request):

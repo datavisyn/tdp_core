@@ -4,12 +4,13 @@ from typing import Optional
 import jwt
 
 from ... import manager
+from .base_store import BaseStore
 from ..model import User
 
 _log = logging.getLogger(__name__)
 
 
-class ALBSecurityStore(object):
+class ALBSecurityStore(BaseStore):
     def __init__(self, cookie_name: Optional[str], signout_url: Optional[str]):
         self.cookie_name = cookie_name
         self.signout_url: Optional[str] = signout_url
@@ -27,9 +28,6 @@ class ALBSecurityStore(object):
             except Exception:
                 _log.exception("Error in load_from_request")
                 return None
-        return None
-
-    def login(self, username, extra_fields={}):
         return None
 
     def logout(self, user):
