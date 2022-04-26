@@ -2,11 +2,11 @@ version: 2.1
 
 executors:
   python-executor:
-    working_directory: ~/visyn-python
+    working_directory: ~/phovea-python
     docker:
       - image: circleci/python:3.10-buster
   node-executor:
-    working_directory: ~/visyn-web
+    working_directory: ~/phovea-web
     docker:
       - image: circleci/node:14.17-buster
 
@@ -57,7 +57,7 @@ jobs:
           destination: dist-python
       - persist_to_workspace:
           root: ~/.
-          paths: visyn-python
+          paths: phovea-python
   python-publish:
     executor: python-executor
     steps:
@@ -117,7 +117,7 @@ jobs:
           destination: dist-web
       - persist_to_workspace:
           root: ~/.
-          paths: visyn-web
+          paths: phovea-web
   web-publish:
     executor: node-executor
     steps:
