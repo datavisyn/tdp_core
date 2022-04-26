@@ -1,2 +1,0 @@
-# TODO: Databases introduction
-

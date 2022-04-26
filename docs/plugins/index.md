@@ -1,2 +1,0 @@
-# TODO: Plugins and Extensions
-
