@@ -6,6 +6,9 @@ export class AjaxError extends Error {
         this.response = response;
     }
 }
+export function isAjaxError(error) {
+    return (error === null || error === void 0 ? void 0 : error.response) instanceof Response;
+}
 export class Ajax {
     /**
      * Tries to get a proper message from a response by checking the `json()` content for `detail`, the `text()`, or the `statusText`.
@@ -16,13 +19,15 @@ export class Ajax {
         // try to get a message from the response, either via json detail, the text, or the status text.
         let message = '';
         try {
-            message = message || (await response.json()).detail;
-        }
-        catch (e) {
-            // ignore
-        }
-        try {
-            message = message || (await response.text());
+            // Read the stream and try to parse it
+            const text = await response.text();
+            try {
+                message = message || JSON.parse(text).detail;
+            }
+            catch (e) {
+                // ignore
+            }
+            message = message || text;
         }
         catch (e) {
             // ignore

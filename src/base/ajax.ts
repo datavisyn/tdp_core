@@ -7,6 +7,10 @@ export class AjaxError extends Error {
   }
 }
 
+export function isAjaxError(error: any): error is AjaxError {
+  return error?.response instanceof Response;
+}
+
 export class Ajax {
   public static GLOBAL_EVENT_AJAX_PRE_SEND = 'ajaxPreSend';
 
@@ -26,12 +30,14 @@ export class Ajax {
     // try to get a message from the response, either via json detail, the text, or the status text.
     let message = '';
     try {
-      message = message || (await response.json()).detail;
-    } catch (e) {
-      // ignore
-    }
-    try {
-      message = message || (await response.text());
+      // Read the stream and try to parse it
+      const text = await response.text();
+      try {
+        message = message || JSON.parse(text).detail;
+      } catch (e) {
+        // ignore
+      }
+      message = message || text;
     } catch (e) {
       // ignore
     }
