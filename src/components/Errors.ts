@@ -1,3 +1,4 @@
+import { Ajax } from '../base/ajax';
 import { I18nextManager } from '../i18n';
 import { Dialog } from './dialogs';
 
@@ -55,7 +56,7 @@ export class Errors {
 
     if (error instanceof Response || error.response instanceof Response) {
       const xhr: Response = error instanceof Response ? error : error.response;
-      return xhr.text().then((body: string) => {
+      return Ajax.getErrorMessageFromResponse(xhr).then((body: string) => {
         const title = I18nextManager.getInstance().i18n.t('phovea:ui.errorHeader', { status: xhr.status, statusText: xhr.statusText });
         if (xhr.status !== 400) {
           body = `${body}<hr>

@@ -1,13 +1,16 @@
-import json
 import logging
 import time
+
+from fastapi import HTTPException
+from flask import Flask
+import werkzeug
 
 from .. import manager
 
 _log = logging.getLogger(__name__)
 
 
-def init_legacy_app(app):
+def init_legacy_app(app: Flask):
     """
     initializes an application by setting common properties and options
     :param app:
@@ -23,21 +26,14 @@ def init_legacy_app(app):
     if manager.settings.tdp_core:
         app.config["SECRET_KEY"] = manager.settings.secret_key
 
-    @app.errorhandler(500)
+    @app.errorhandler(werkzeug.exceptions.HTTPException)
+    @app.errorhandler(Exception)
     def handle_exception(e):
-        """Return JSON instead of HTML for HTTP errors."""
-        # start with the correct headers and status code from the error
-        response = e.get_response()
-        # replace the body with JSON
-        response.data = json.dumps(
-            {
-                "status_code": e.code,
-                "name": e.name,
-                "detail": e.description,
-            }
-        )
-        response.content_type = "application/json"
-        return response
+        """Raises a proper fastapi#HTTPException instead of HTML for HTTP errors and exceptions."""
+        _log.exception('An exception in a Flask app', exc_info=e)
+        if isinstance(e, werkzeug.exceptions.HTTPException):
+            raise HTTPException(status_code=e.code, detail=e.description)
+        raise HTTPException(status_code=500, detail=str(e))
 
     return app
 
