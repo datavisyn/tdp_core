@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { EScatterSelectSettings } from '../interfaces';
 interface BrushOptionProps {
     callback: (dragMode: EScatterSelectSettings) => void;

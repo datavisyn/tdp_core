@@ -45,7 +45,13 @@ function useBSClass<T extends SupportedBootstrapClasses>(
 
   React.useEffect(() => {
     // Whenever we are unmounting (an instance), destroy it.
-    return () => instance?.dispose();
+    return () => {
+      try {
+        instance?.dispose();
+      } catch {
+        // ignore if the instance was already disposed.
+      }
+    };
   }, [instance]);
 
   return [setRef, instance];
