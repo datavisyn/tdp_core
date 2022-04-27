@@ -1,9 +1,9 @@
 import logging
 import time
 
+import werkzeug
 from fastapi import HTTPException
 from flask import Flask
-import werkzeug
 
 from .. import manager
 
@@ -30,7 +30,7 @@ def init_legacy_app(app: Flask):
     @app.errorhandler(Exception)
     def handle_exception(e):
         """Raises a proper fastapi#HTTPException instead of HTML for HTTP errors and exceptions."""
-        _log.exception('An exception in a Flask app', exc_info=e)
+        _log.exception("An exception in a Flask app", exc_info=e)
         if isinstance(e, werkzeug.exceptions.HTTPException):
             raise HTTPException(status_code=e.code, detail=e.description)
         raise HTTPException(status_code=500, detail=str(e))
