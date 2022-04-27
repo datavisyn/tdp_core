@@ -15,4 +15,4 @@ flask-login==0.5.0
 cachelib==0.1.1
 docutils==0.17.1
 markupsafe==2.0.1
--e git+https://github.com/phovea/phovea_server.git@develop#egg=phovea_server
+phovea_server>=9.0.0,<10.0.0
