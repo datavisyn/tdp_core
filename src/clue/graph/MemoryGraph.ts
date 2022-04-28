@@ -1,10 +1,13 @@
 import { IPersistable } from '../../base/IPersistable';
-import { GraphBase, GraphFactoryUtils } from './GraphBase';
+import { GraphBase, GraphFactoryUtils, IGraphFactory } from './GraphBase';
 import { GraphEdge, GraphNode, IGraphDataDescription } from './graph';
 
 export class MemoryGraph extends GraphBase implements IPersistable {
-  constructor(desc: IGraphDataDescription, nodes: GraphNode[] = [], edges: GraphEdge[] = [], private factory = GraphFactoryUtils.defaultGraphFactory) {
+  private factory: IGraphFactory;
+
+  constructor(desc: IGraphDataDescription, nodes: GraphNode[] = [], edges: GraphEdge[] = [], factory = GraphFactoryUtils.defaultGraphFactory) {
     super(desc, nodes, edges);
+    this.factory = factory;
   }
 
   restore(persisted: any) {

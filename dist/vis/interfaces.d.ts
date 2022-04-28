@@ -1,15 +1,15 @@
 /// <reference types="react" />
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
-    SCATTER = "Scatter",
-    PCP = "Parallel Coordinates",
-    VIOLIN = "Violin",
-    STRIP = "Strip",
-    BAR = "Bar"
+    SCATTER = "Scatter Plot",
+    PCP = "Parallel Coordinates Plot",
+    VIOLIN = "Violin Plot",
+    STRIP = "Strip Plot",
+    BAR = "Bar Chart"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EBarDisplayType {
-    DEFAULT = "Default",
+    ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
 }
 export declare enum EBarDirection {
@@ -20,6 +20,13 @@ export declare enum EViolinOverlay {
     NONE = "None",
     STRIP = "Strip",
     BOX = "Box"
+}
+export declare enum EAggregateTypes {
+    COUNT = "Count",
+    MIN = "Minimum",
+    AVG = "Average",
+    MED = "Median",
+    MAX = "Maximum"
 }
 export declare enum EBarGroupingType {
     STACK = "Stacked",
@@ -37,11 +44,17 @@ export declare enum EGeneralFormType {
 export declare enum EFilterOptions {
     IN = "Filter In",
     OUT = "Filter Out",
-    CLEAR = "Clear Filter"
+    CLEAR = "Clear"
 }
 export declare enum ENumericalColorScaleType {
     SEQUENTIAL = "Sequential",
     DIVERGENT = "Divergent"
+}
+export declare enum EScatterSelectSettings {
+    RECTANGLE = "select",
+    LASSO = "lasso",
+    ZOOM = "zoom",
+    PAN = "pan"
 }
 export interface IViolinConfig {
     type: ESupportedPlotlyVis.VIOLIN;
@@ -60,7 +73,7 @@ export interface IScatterConfig {
     color: ColumnInfo | null;
     numColorScaleType: ENumericalColorScaleType;
     shape: ColumnInfo | null;
-    isRectBrush: boolean;
+    dragMode: EScatterSelectSettings;
     alphaSliderVal: number;
 }
 export interface IBarConfig {
@@ -71,7 +84,9 @@ export interface IBarConfig {
     display: EBarDisplayType;
     groupType: EBarGroupingType;
     numColumnsSelected: ColumnInfo[];
-    catColumnsSelected: ColumnInfo[];
+    catColumnSelected: ColumnInfo;
+    aggregateType: EAggregateTypes;
+    aggregateColumn: ColumnInfo | null;
 }
 export interface IPCPConfig {
     type: ESupportedPlotlyVis.PCP;
@@ -108,11 +123,16 @@ export declare type PlotlyInfo = {
     rows: number;
     cols: number;
     errorMessage: string;
+    errorMessageHeader: string;
 };
 export declare type PlotlyData = {
     data: Partial<Plotly.PlotData>;
     xLabel: string;
     yLabel: string;
+    xTicks?: string[];
+    xTickLabels?: string[];
+    yTicks?: string[];
+    yTickLabels?: string[];
 };
 export declare type ColumnInfo = {
     name: string;

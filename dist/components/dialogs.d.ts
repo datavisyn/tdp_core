@@ -1,6 +1,7 @@
 /// <reference types="jquery" />
 /// <reference types="select2" />
-/// <reference types="ion.rangeslider" />
+/// <reference types="cypress" />
+/// <reference types="jquery.scrollto" />
 /// <reference types="bootstrap" />
 import '../webpack/_bootstrap';
 export interface IDialogOptions {
@@ -57,7 +58,6 @@ export declare class Dialog {
     static prompt(text: string, options?: IPromptOptions | string): Promise<string>;
 }
 export declare class PHOVEA_UI_FormDialog extends Dialog {
-    private readonly formId;
     constructor(title: string, primaryBtnText?: string, formId?: string, additionalCSSClasses?: string);
     get form(): HTMLFormElement;
     getFormData(): FormData;

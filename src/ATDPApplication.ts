@@ -87,24 +87,23 @@ export interface ITDPOptions {
    * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
    * Passing falsy values disables the client configuration load.
    */
-  clientConfig?:
-    | {
-        /**
-         * Configuration for the TDPTokenManager.
-         */
-        tokenManager?: {
-          /**
-           * Initial authorization configurations.
-           * Note that this is an object, because then the deep-merge with the local and remote config is easier.
-           */
-          authorizationConfigurations?: {
-            [id: string]: Omit<IAuthorizationConfiguration, 'id'>;
-          };
-        };
-        [key: string]: any;
-      }
-    | null
-    | undefined;
+  clientConfig?: ITDPClientConfig | null | undefined;
+}
+
+export interface ITDPClientConfig {
+  /**
+   * Configuration for the TDPTokenManager.
+   */
+  tokenManager?: {
+    /**
+     * Initial authorization configurations.
+     * Note that this is an object, because then the deep-merge with the local and remote config is easier.
+     */
+    authorizationConfigurations?: {
+      [id: string]: Omit<IAuthorizationConfiguration, 'id'>;
+    };
+  };
+  [key: string]: any;
 }
 
 /**

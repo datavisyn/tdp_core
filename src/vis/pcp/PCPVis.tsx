@@ -18,6 +18,7 @@ interface PCPVisProps {
   };
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
+  selected?: { [key: string]: boolean };
   hideSidebar?: boolean;
 }
 
@@ -28,19 +29,30 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function PCPVis({ config, extensions, columns, setConfig, hideSidebar = false }: PCPVisProps) {
+export function PCPVis({ config, extensions, columns, setConfig, selected = {}, hideSidebar = false }: PCPVisProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
-  const { value: traces, status: traceStatus, error: traceError } = useAsync(createPCPTraces, [columns, config]);
+  const { value: traces, status: traceStatus, error: traceError } = useAsync(createPCPTraces, [columns, config, selected]);
 
   const id = React.useMemo(() => uniqueId('PCPVis'), []);
 
+  const plotlyDivRef = React.useRef(null);
+
   useEffect(() => {
+    const ro = new ResizeObserver(() => {
+      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+    });
+
+    if (plotlyDivRef) {
+      ro.observe(plotlyDivRef.current);
+    }
+
     if (hideSidebar) {
       return;
     }
+
     const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
@@ -50,7 +62,7 @@ export function PCPVis({ config, extensions, columns, setConfig, hideSidebar = f
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [hideSidebar, id]);
+  }, [id, hideSidebar, plotlyDivRef]);
 
   const layout = React.useMemo<Partial<Plotly.Layout> | null>(() => {
     return traces
@@ -65,7 +77,7 @@ export function PCPVis({ config, extensions, columns, setConfig, hideSidebar = f
   }, [traces]);
 
   return (
-    <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
+    <div ref={plotlyDivRef} className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
       <div
         className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
           traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
@@ -84,7 +96,7 @@ export function PCPVis({ config, extensions, columns, setConfig, hideSidebar = f
             // change opacity on update, instead of just in a use effect
           />
         ) : traceStatus !== 'pending' ? (
-          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
       </div>

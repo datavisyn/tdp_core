@@ -3,7 +3,6 @@ import { GraphEdge, GraphNode } from './graph';
 export class LocalStorageGraph extends GraphBase {
     constructor(desc, nodes = [], edges = [], storage = sessionStorage) {
         super(desc, nodes, edges);
-        this.storage = storage;
         this.updateHandler = (event) => {
             const s = event.target;
             if (s instanceof GraphNode) {
@@ -13,6 +12,7 @@ export class LocalStorageGraph extends GraphBase {
                 this.updateEdge(s);
             }
         };
+        this.storage = storage;
         const { uid } = this;
         if (nodes.length > 0 || edges.length > 0) {
             this.storage.setItem(`${uid}.nodes`, JSON.stringify(nodes.map((d) => d.id)));

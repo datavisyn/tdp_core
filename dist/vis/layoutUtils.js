@@ -21,7 +21,6 @@ export function beautifyLayout(traces, layout) {
             spikecolor: 'black',
             spikethickness: 2,
             spikedash: 'dash',
-            fixedrange: true,
             ticks: 'outside',
             title: {
                 standoff: 5,
@@ -40,7 +39,6 @@ export function beautifyLayout(traces, layout) {
             spikethickness: 2,
             spikedash: 'dash',
             ticks: 'outside',
-            fixedrange: true,
             title: {
                 text: traces.plots.length > 1 ? truncateText(t.yLabel, 15) : truncateText(t.yLabel, 50),
                 font: {

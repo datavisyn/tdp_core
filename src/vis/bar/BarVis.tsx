@@ -46,29 +46,6 @@ interface BarVisProps {
   hideSidebar?: boolean;
 }
 
-const defaultConfig = {
-  group: {
-    enable: true,
-    customComponent: null,
-  },
-  multiples: {
-    enable: true,
-    customComponent: null,
-  },
-  direction: {
-    enable: true,
-    customComponent: null,
-  },
-  groupType: {
-    enable: true,
-    customComponent: null,
-  },
-  display: {
-    enable: true,
-    customComponent: null,
-  },
-};
-
 const defaultExtensions = {
   prePlot: null,
   postPlot: null,
@@ -77,10 +54,6 @@ const defaultExtensions = {
 };
 
 export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false }: BarVisProps) {
-  const mergedOptionsConfig = React.useMemo(() => {
-    return merge({}, defaultConfig, optionsConfig);
-  }, [optionsConfig]);
-
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -89,10 +62,21 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
 
   const id = React.useMemo(() => uniqueId('BarVis'), []);
 
+  const plotlyDivRef = React.useRef(null);
+
   useEffect(() => {
+    const ro = new ResizeObserver(() => {
+      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+    });
+
+    if (plotlyDivRef) {
+      ro.observe(plotlyDivRef.current);
+    }
+
     if (hideSidebar) {
       return;
     }
+
     const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
@@ -102,7 +86,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [id, hideSidebar]);
+  }, [id, hideSidebar, plotlyDivRef]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -127,7 +111,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
   }, [traces, config.groupType]);
 
   return (
-    <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
+    <div ref={plotlyDivRef} className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
       <div
         className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
           traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
@@ -152,7 +136,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             }}
           />
         ) : traceStatus !== 'pending' ? (
-          <InvalidCols message={traceError?.message || traces?.errorMessage} />
+          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
       </div>

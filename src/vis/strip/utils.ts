@@ -1,4 +1,5 @@
 import { merge } from 'lodash';
+import { selection } from 'd3';
 import { I18nextManager } from '../../i18n';
 import {
   PlotlyInfo,
@@ -36,7 +37,7 @@ export function stripMergeDefaultConfig(columns: VisColumn[], config: IStripConf
   return merged;
 }
 
-export async function createStripTraces(columns: VisColumn[], config: IStripConfig, scales: Scales): Promise<PlotlyInfo> {
+export async function createStripTraces(columns: VisColumn[], config: IStripConfig, selected: { [key: string]: boolean }, scales: Scales): Promise<PlotlyInfo> {
   let plotCounter = 1;
 
   if (!config.numColumnsSelected || !config.catColumnsSelected) {
@@ -46,6 +47,7 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
       rows: 0,
       cols: 0,
       errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
+      errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
     };
   }
 
@@ -64,21 +66,38 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
           y: numCurr.resolvedValues.map((v) => v.val),
           xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
           yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+          ids: numCurr.resolvedValues.map((v) => v.id.toString()),
           showlegend: false,
           type: 'box',
           boxpoints: 'all',
           name: 'All points',
           mode: 'none',
           pointpos: 0,
+          selectedpoints: numCurr.resolvedValues
+            .map((v, i) => {
+              return { index: i, selected: selected[v.id] };
+            })
+            .filter((v) => v.selected)
+            .map((v) => v.index),
+          // @ts-ignore
+          selected: {
+            marker: {
+              color: '#E29609',
+              opacity: 1,
+            },
+          },
+          unselected: {
+            marker: {
+              color: '#2e2e2e',
+              opacity: 0.5,
+            },
+          },
           // @ts-ignore
           box: {
             visible: true,
           },
           line: {
-            color: 'rgba(255,255,255,0)',
-          },
-          marker: {
-            color: '#337ab7',
+            color: 'rgba(255, 255, 255, 0)',
           },
         },
         xLabel: numCurr.info.name,
@@ -94,6 +113,7 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
         data: {
           x: catCurr.resolvedValues.map((v) => v.val),
           y: numCurr.resolvedValues.map((v) => v.val),
+          ids: numCurr.resolvedValues.map((v) => v.id.toString()),
           xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
           yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
           showlegend: false,
@@ -102,12 +122,30 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
           name: 'All points',
           mode: 'none',
           pointpos: 0,
+          selectedpoints: catCurr.resolvedValues
+            .map((v, i) => {
+              return { index: i, selected: selected[v.id] };
+            })
+            .filter((v) => v.selected)
+            .map((v) => v.index),
           // @ts-ignore
+          selected: {
+            marker: {
+              color: '#E29609',
+              opacity: 1,
+            },
+          },
+          unselected: {
+            marker: {
+              color: '#2e2e2e',
+              opacity: 0.5,
+            },
+          },
           box: {
             visible: true,
           },
           line: {
-            color: 'rgba(255,255,255,0)',
+            color: '#FFFFFF',
           },
           meanline: {
             visible: true,
@@ -116,9 +154,6 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
             {
               type: 'groupby',
               groups: catCurr.resolvedValues.map((v) => v.val) as string[],
-              styles: [...new Set<string>(catCurr.resolvedValues.map((v) => v.val) as string[])].map((c) => {
-                return { target: c, value: { marker: { color: scales.color(c) } } };
-              }),
             },
           ],
         },
@@ -135,5 +170,6 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
     rows: numColValues.length,
     cols: catColValues.length > 0 ? catColValues.length : 1,
     errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
   };
 }

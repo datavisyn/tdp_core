@@ -1,11 +1,11 @@
 import { Plotly } from './Plot';
 
 export enum ESupportedPlotlyVis {
-  SCATTER = 'Scatter',
-  PCP = 'Parallel Coordinates',
-  VIOLIN = 'Violin',
-  STRIP = 'Strip',
-  BAR = 'Bar',
+  SCATTER = 'Scatter Plot',
+  PCP = 'Parallel Coordinates Plot',
+  VIOLIN = 'Violin Plot',
+  STRIP = 'Strip Plot',
+  BAR = 'Bar Chart',
 }
 
 export const allVisTypes: ESupportedPlotlyVis[] = [
@@ -17,7 +17,7 @@ export const allVisTypes: ESupportedPlotlyVis[] = [
 ];
 
 export enum EBarDisplayType {
-  DEFAULT = 'Default',
+  ABSOLUTE = 'Absolute',
   NORMALIZED = 'Normalized',
 }
 
@@ -30,6 +30,14 @@ export enum EViolinOverlay {
   NONE = 'None',
   STRIP = 'Strip',
   BOX = 'Box',
+}
+
+export enum EAggregateTypes {
+  COUNT = 'Count',
+  MIN = 'Minimum',
+  AVG = 'Average',
+  MED = 'Median',
+  MAX = 'Maximum',
 }
 
 export enum EBarGroupingType {
@@ -51,12 +59,19 @@ export enum EGeneralFormType {
 export enum EFilterOptions {
   IN = 'Filter In',
   OUT = 'Filter Out',
-  CLEAR = 'Clear Filter',
+  CLEAR = 'Clear',
 }
 
 export enum ENumericalColorScaleType {
   SEQUENTIAL = 'Sequential',
   DIVERGENT = 'Divergent',
+}
+
+export enum EScatterSelectSettings {
+  RECTANGLE = 'select',
+  LASSO = 'lasso',
+  ZOOM = 'zoom',
+  PAN = 'pan',
 }
 
 export interface IViolinConfig {
@@ -78,7 +93,7 @@ export interface IScatterConfig {
   color: ColumnInfo | null;
   numColorScaleType: ENumericalColorScaleType;
   shape: ColumnInfo | null;
-  isRectBrush: boolean;
+  dragMode: EScatterSelectSettings;
   alphaSliderVal: number;
 }
 
@@ -90,7 +105,9 @@ export interface IBarConfig {
   display: EBarDisplayType;
   groupType: EBarGroupingType;
   numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
+  catColumnSelected: ColumnInfo;
+  aggregateType: EAggregateTypes;
+  aggregateColumn: ColumnInfo | null;
 }
 
 export interface IPCPConfig {
@@ -138,12 +155,17 @@ export type PlotlyInfo = {
   rows: number;
   cols: number;
   errorMessage: string;
+  errorMessageHeader: string;
 };
 
 export type PlotlyData = {
   data: Partial<Plotly.PlotData>;
   xLabel: string;
   yLabel: string;
+  xTicks?: string[];
+  xTickLabels?: string[];
+  yTicks?: string[];
+  yTickLabels?: string[];
 };
 
 export type ColumnInfo = {
