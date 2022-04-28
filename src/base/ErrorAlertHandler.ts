@@ -1,5 +1,5 @@
 import { I18nextManager } from '../i18n';
-import {Ajax, AjaxError, isAjaxError} from './ajax';
+import { Ajax, AjaxError, isAjaxError } from './ajax';
 import { NotificationHandler } from './NotificationHandler';
 
 export class ErrorAlertHandler {
@@ -39,7 +39,9 @@ export class ErrorAlertHandler {
   public errorMessage(error: any) {
     if (error instanceof Response || isAjaxError(error)) {
       const xhr: Response = error instanceof Response ? error : error.response;
-      return `<strong>${(isAjaxError(error) ? error.message : error.statusText).replace('\n', '<br>')}</strong><br><small>${xhr.status} (${xhr.statusText})</small>`;
+      return `<strong>${(isAjaxError(error) ? error.message : error.statusText).replace('\n', '<br>')}</strong><br><small>${xhr.status} (${
+        xhr.statusText
+      })</small>`;
     }
     if (error instanceof Error) {
       return `<strong>${error.name}</strong>: ${error.message.replace('\n', '<br>')}`;

@@ -33,7 +33,7 @@ def init_legacy_app(app: Flask):
         _log.exception("An exception in a Flask app", exc_info=e)
         if isinstance(e, werkzeug.exceptions.HTTPException):
             raise HTTPException(status_code=e.code, detail=e.description)
-        raise HTTPException(status_code=500, detail=str(e) if manager.settings.is_development_mode else 'Internal server error')
+        raise HTTPException(status_code=500, detail=str(e) if manager.settings.is_development_mode else "Internal server error")
 
     return app
 
