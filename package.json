@@ -86,7 +86,6 @@
     "@fortawesome/fontawesome-free": "^5.15.1",
     "@popperjs/core": "^2.9.3",
     "@types/d3-hexbin": "^0.2.3",
-    "@types/d3-selection": "^3.0.2",
     "bootstrap": "~5.1.0",
     "crypto-js": "^4.0.0",
     "d3-hexbin": "^0.2.2",
