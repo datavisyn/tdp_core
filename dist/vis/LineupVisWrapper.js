@@ -36,7 +36,6 @@ export class LineupVisWrapper {
                 };
             };
             const mapData = (innerData, column) => {
-                // TODO: This should be _visyn_id?
                 return innerData.map((d) => ({ id: d.v.id, val: column.getRaw(d) }));
             };
             const getColumnValue = async (column) => {

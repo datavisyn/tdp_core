@@ -2,13 +2,20 @@ import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
 import { AttachemntUtils } from '../../storage/internal/attachment';
 import { PluginRegistry } from '../../app';
 import { I18nextManager } from '../../i18n';
+import { WebpackEnv } from '../../base/WebpackEnv';
 import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../clue/provenance';
 export class ScoreUtils {
     static async addScoreLogic(waitForScore, inputs, parameter) {
         const scoreId = parameter.id;
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
         const plugin = await pluginDesc.load();
-        const view = await inputs[0].v.then((vi) => vi.getInstance());
+        let view;
+        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+            view = await inputs[0].v;
+        }
+        else {
+            view = await inputs[0].v.then((vi) => vi.getInstance());
+        }
         const params = await AttachemntUtils.resolveExternalized(parameter.params);
         const score = plugin.factory(params, pluginDesc);
         const scores = Array.isArray(score) ? score : [score];
@@ -40,6 +47,11 @@ export class ScoreUtils {
         });
     }
     static async pushScoreAsync(graph, provider, scoreName, scoreId, params) {
+        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+            const storedParams = await AttachemntUtils.externalize(params);
+            const toStoreParams = { id: scoreId, params: storedParams };
+            return ScoreUtils.addScoreImpl([provider], toStoreParams);
+        }
         const storedParams = await AttachemntUtils.externalize(params);
         const currentParams = { id: scoreId, params, storedParams };
         const result = await ScoreUtils.addScoreAsync([provider], currentParams);
