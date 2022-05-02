@@ -24,4 +24,4 @@ const Template: ComponentStory<typeof AllButtons> = (args) => {
 export const AllButtonsStory = Template.bind({}) as typeof Template;
 AllButtonsStory.parameters = {
   backgrounds: { default: 'light' },
-}
+};
