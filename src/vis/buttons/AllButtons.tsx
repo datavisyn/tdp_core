@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function AllButtons({ backgroundColor }: { backgroundColor: string }) {
+export function AllButtons() {
   const themeColors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark', 'gray'];
   return (
     <div className="container m-4">
@@ -21,7 +21,7 @@ export function AllButtons({ backgroundColor }: { backgroundColor: string }) {
       <div>
         {themeColors.map((color) => {
           return (
-            <div key={color} className={`row pt-2 pb-2 ${backgroundColor}`}>
+            <div key={color} className="row pt-2 pb-2">
               <div className="col-3">
                 <button type="button" className={`btn btn-${color}`}>
                   <i className="fas fa-plus me-1" /> Add column
