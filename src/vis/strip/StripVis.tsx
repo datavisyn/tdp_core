@@ -57,10 +57,21 @@ export function StripVis({
 
   const id = React.useMemo(() => uniqueId('StripVis'), []);
 
+  const plotlyDivRef = React.useRef(null);
+
   useEffect(() => {
+    const ro = new ResizeObserver(() => {
+      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+    });
+
+    if (plotlyDivRef) {
+      ro.observe(plotlyDivRef.current);
+    }
+
     if (hideSidebar) {
       return;
     }
+
     const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
@@ -70,7 +81,7 @@ export function StripVis({
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [id, hideSidebar]);
+  }, [id, hideSidebar, plotlyDivRef]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -98,7 +109,7 @@ export function StripVis({
   }, [traces]);
 
   return (
-    <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
+    <div ref={plotlyDivRef} className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
       <div
         className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
           traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''

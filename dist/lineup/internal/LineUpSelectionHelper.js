@@ -80,6 +80,7 @@ export class LineUpSelectionHelper extends EventHandler {
         if (old.length === indices.length && indices.every((v, j) => old[j] === v)) {
             return; // no change
         }
+        // What are these remove and add event listeners doing ? They mess with my event listeners as well
         this.removeEventListener();
         this.provider.setSelection(indices);
         this.addEventListener();

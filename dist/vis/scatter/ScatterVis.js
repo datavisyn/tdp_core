@@ -20,7 +20,17 @@ const defaultExtensions = {
 };
 export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, scales, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
+    const plotlyDivRef = React.useRef(null);
     useEffect(() => {
+        const ro = new ResizeObserver(() => {
+            const plotDiv = document.getElementById(`plotlyDiv${id}`);
+            if (plotDiv) {
+                Plotly.Plots.resize(plotDiv);
+            }
+        });
+        if (plotlyDivRef) {
+            ro.observe(plotlyDivRef.current);
+        }
         if (hideSidebar) {
             return;
         }
@@ -31,7 +41,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, [id, hideSidebar]);
+    }, [id, hideSidebar, plotlyDivRef]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
@@ -62,7 +72,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces, config.dragMode]);
-    return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
+    return (React.createElement("div", { ref: plotlyDivRef, className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
             traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {

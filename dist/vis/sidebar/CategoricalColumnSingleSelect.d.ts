@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ColumnInfo, VisColumn } from '../interfaces';
 interface CategoricalColumnSelectProps {
     callback: (s: ColumnInfo) => void;
