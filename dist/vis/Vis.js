@@ -61,7 +61,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         var _a;
         (_a = setExternalConfigRef.current) === null || _a === void 0 ? void 0 : _a.call(setExternalConfigRef, visConfig);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [JSON.stringify(visConfig), setExternalConfigRef]);
+    }, [visConfig, setExternalConfigRef]);
     const setVisConfig = React.useCallback((newConfig) => {
         _setVisConfig((oldConfig) => {
             return {

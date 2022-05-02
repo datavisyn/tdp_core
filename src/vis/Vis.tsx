@@ -120,7 +120,7 @@ export function Vis({
   useEffect(() => {
     setExternalConfigRef.current?.(visConfig);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(visConfig), setExternalConfigRef]);
+  }, [visConfig, setExternalConfigRef]);
 
   const setVisConfig = React.useCallback((newConfig: IVisConfig) => {
     _setVisConfig((oldConfig) => {
