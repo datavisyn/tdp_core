@@ -89,6 +89,8 @@ export async function createScatterTraces(
     return emptyVal;
   }
 
+  const hasSelected = Object.values(selected).includes(true);
+
   const numCols: VisNumericalColumn[] = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
   const plots: PlotlyData[] = [];
 
@@ -149,6 +151,13 @@ export async function createScatterTraces(
         type: 'scattergl',
         mode: 'markers',
         showlegend: false,
+        hovertext: validCols[0].resolvedValues.map(
+          (v, i) =>
+            `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${
+              colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
+            }`,
+        ),
+        hoverinfo: 'text',
         text: validCols[0].resolvedValues.map((v) => v.id.toString()),
         marker: {
           line: {
@@ -156,10 +165,14 @@ export async function createScatterTraces(
           },
           symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
           color: colorCol
-            ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
+            ? hasSelected
+              ? colorCol.resolvedValues.map((v) =>
+                  selected[v.id] ? (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)) : '#2e2e2e',
+                )
+              : colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
             : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
-          opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
-          size: colorCol ? validCols[0].resolvedValues.map((v) => (selected[v.id] ? 12 : 8)) : 8,
+          opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
+          size: 8,
         },
       },
       xLabel: validCols[0].info.name,
@@ -213,7 +226,7 @@ export async function createScatterTraces(
                   ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
                   : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
                 opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
-                size: colorCol ? xCurr.resolvedValues.map((v) => (selected[v.id] ? 12 : 8)) : 8,
+                size: 8,
               },
             },
             xLabel: xCurr.info.name,
@@ -241,7 +254,7 @@ export async function createScatterTraces(
         legendgroup: 'color',
         // @ts-ignore
         legendgrouptitle: {
-          text: 'Color',
+          text: colorCol.info.name,
         },
         marker: {
           line: {
@@ -285,7 +298,7 @@ export async function createScatterTraces(
         legendgroup: 'shape',
         // @ts-ignore
         legendgrouptitle: {
-          text: 'Shape',
+          text: shapeCol.info.name,
         },
         marker: {
           line: {

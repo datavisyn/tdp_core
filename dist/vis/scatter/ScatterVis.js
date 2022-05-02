@@ -46,6 +46,10 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 // @ts-ignore
                 itemclick: false,
                 itemdoubleclick: false,
+                font: {
+                    // same as default label font size in the sidebar
+                    size: 13.4,
+                },
             },
             font: {
                 family: 'Roboto',
@@ -76,10 +80,10 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 // change opacity on update, instead of just in a use effect
                 onInitialized: () => {
                     d3.selectAll('g .traces').style('opacity', 1);
-                    d3.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
+                    d3.selectAll('.scatterpts').style('opacity', selectedList.length > 0 ? 1 : config.alphaSliderVal);
                 }, onUpdate: () => {
                     d3.selectAll('g .traces').style('opacity', 1);
-                    d3.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
+                    d3.selectAll('.scatterpts').style('opacity', selectedList.length > 0 ? 1 : config.alphaSliderVal);
                     for (const p of traces.plots) {
                         d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
                         d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
