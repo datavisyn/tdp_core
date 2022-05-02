@@ -8,7 +8,7 @@ export function Button({
   addIcon,
 }: {
   themeColor: ThemeColorTypes;
-  type: 'icon' | 'text' | 'outline' | 'normal';
+  type?: 'icon' | 'text' | 'outline' | 'normal';
   text: string | null;
   addIcon: boolean;
 }) {
