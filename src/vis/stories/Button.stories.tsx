@@ -9,22 +9,24 @@ function Button({
   text,
   size,
   addIcon,
+  isDisabled,
 }: {
   themeColor: ThemeColorTypes;
-  type?: 'icon' | 'text' | 'outline' | null;
-  size?: 'btn-sm' | 'btn-lg' | null;
+  type?: 'icon' | 'text' | 'outline' | 'default';
+  size?: 'btn-sm' | 'btn-lg' | 'default';
   text: string | null;
   addIcon: boolean;
+  isDisabled: boolean;
 }) {
   return (
-    <button type="button" className={`btn btn${type ? `-${type}` : ''}-${themeColor} ${size || ''}`}>
-      {addIcon && <i className="fas fa-plus me-1" />}
+    <button type="button" className={`btn btn${type !== 'default' ? `-${type}` : ''}-${themeColor} ${size !== 'default' && size} ${isDisabled && 'disabled'}`}>
+      {addIcon && <i className={`fas fa-plus ${text ? 'me-2' : ''}`} />}
       {text}
     </button>
   );
 }
 
-// More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
+// create default export to show story
 export default {
   title: 'Example/Styles/Buttons',
   component: Button,
@@ -35,29 +37,60 @@ export default {
       control: { type: 'select' },
     },
     type: {
-      options: ['icon', 'text', 'outline', null],
+      options: ['icon', 'text', 'outline', 'default'],
       control: { type: 'radio' },
     },
     size: {
-      options: ['btn-sm', 'btn-lg', null],
+      options: ['btn-sm', 'btn-lg', 'default'],
       control: { type: 'radio' },
     },
   },
 };
 
-// More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
+// create template to create stories for multiple buttons if nedded
 // eslint-disable-next-line react/function-component-definition
 const Template: ComponentStory<typeof Button> = (args) => {
   return <Button {...args} />;
 };
 
+// create story for single button
 export const ButtonStory = Template.bind({}) as typeof Template;
-ButtonStory.parameters = {
-  backgrounds: { default: 'light' },
-};
 
 ButtonStory.args = {
   text: 'Test Button',
   themeColor: 'primary',
   addIcon: false,
+  isDisabled: false,
+  type: 'default',
+  size: 'default',
+};
+
+interface Iprops {
+  text?: string;
+  themeColor?: string;
+  type?: string;
+}
+
+ButtonStory.parameters = {
+  backgrounds: { default: 'light' },
+  docs: {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    transformSource: (src: string, _: unknown) => {
+      const varRegex = /\w+(?=(\s)*(=))/g;
+      const valueRegex = /(?<=(=)[\s'"]*)\w+/g;
+
+      const varArr = src.match(varRegex);
+      const valueArr = src.match(valueRegex);
+
+      const props: Iprops = {};
+      // eslint-disable-next-line guard-for-in
+      for (const i in varArr) {
+        props[varArr[i]] = valueArr[i];
+      }
+
+      return `<button type="button" className="btn${props.type ? `-${props.type}` : ''}${props.themeColor ? `-${props.themeColor}` : ''}">
+      ${props.text}
+      </button>`;
+    },
+  },
 };
