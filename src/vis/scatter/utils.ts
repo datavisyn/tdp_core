@@ -151,6 +151,9 @@ export async function createScatterTraces(
         type: 'scattergl',
         mode: 'markers',
         showlegend: false,
+        hoverlabel: {
+          bgcolor: 'black',
+        },
         hovertext: validCols[0].resolvedValues.map(
           (v, i) =>
             `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${
@@ -220,7 +223,7 @@ export async function createScatterTraces(
               ),
               hoverinfo: 'text',
               hoverlabel: {
-                namelength: 5,
+                bgcolor: 'black',
               },
               showlegend: false,
               text: validCols[0].resolvedValues.map((v) => v.id.toString()),

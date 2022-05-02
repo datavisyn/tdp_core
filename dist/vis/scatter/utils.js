@@ -103,6 +103,9 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                 type: 'scattergl',
                 mode: 'markers',
                 showlegend: false,
+                hoverlabel: {
+                    bgcolor: 'black',
+                },
                 hovertext: validCols[0].resolvedValues.map((v, i) => `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''}`),
                 hoverinfo: 'text',
                 text: validCols[0].resolvedValues.map((v) => v.id.toString()),
@@ -162,7 +165,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                             hovertext: xCurr.resolvedValues.map((v, i) => `${v.id}<br>x: ${v.val}<br>y: ${yCurr.resolvedValues[i].val}<br>${colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''}`),
                             hoverinfo: 'text',
                             hoverlabel: {
-                                namelength: 5,
+                                bgcolor: 'black',
                             },
                             showlegend: false,
                             text: validCols[0].resolvedValues.map((v) => v.id.toString()),
