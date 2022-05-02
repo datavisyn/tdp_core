@@ -212,6 +212,13 @@ export async function createScatterTraces(
               yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
               type: 'scattergl',
               mode: 'markers',
+              hovertext: xCurr.resolvedValues.map(
+                (v, i) =>
+                  `${v.id}<br>x: ${v.val}<br>y: ${yCurr.resolvedValues[i].val}<br>${
+                    colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
+                  }`,
+              ),
+              hoverinfo: 'text',
               hoverlabel: {
                 namelength: 5,
               },
