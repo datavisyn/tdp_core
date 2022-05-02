@@ -1,6 +1,6 @@
 import React from 'react';
 
-export function Buttons({ backgroundColor }: { backgroundColor: string }) {
+export function AllButtons({ backgroundColor }: { backgroundColor: string }) {
   const themeColors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'light', 'dark', 'gray'];
   return (
     <div className="container m-4">
