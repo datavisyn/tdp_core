@@ -24,4 +24,29 @@ ButtonStory.args = {
   text: 'Test Button',
   themeColor: 'primary',
   type: 'normal',
+  addIcon: false,
+};
+
+export const ButtonStoryOutline = Template.bind({}) as typeof Template;
+ButtonStoryOutline.parameters = {
+  backgrounds: { default: 'light' },
+};
+
+ButtonStoryOutline.args = {
+  text: 'Test Button',
+  themeColor: 'primary',
+  type: 'outline',
+  addIcon: false,
+};
+
+export const ButtonStoryIcon = Template.bind({}) as typeof Template;
+ButtonStoryIcon.parameters = {
+  backgrounds: { default: 'light' },
+};
+
+ButtonStoryIcon.args = {
+  text: 'Test Button',
+  themeColor: 'primary',
+  type: 'icon',
+  addIcon: true,
 };
