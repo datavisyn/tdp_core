@@ -1,4 +1,4 @@
-import { shuffle } from 'd3-array';
+import { shuffle } from 'd3v7';
 export class QuadtreeUtils {
     static ellipseTester(cx, cy, radiusX, radiusY) {
         const radiusX2 = radiusX * radiusX;

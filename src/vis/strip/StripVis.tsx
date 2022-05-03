@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3';
+import * as d3v7 from 'd3v7';
 import { merge, uniqueId } from 'lodash';
 import { useMemo, useEffect } from 'react';
 import { IVisConfig, VisColumn, IStripConfig, Scales } from '../interfaces';
@@ -122,9 +122,9 @@ export function StripVis({
             // plotly redraws everything on updates, so you need to reappend title and
             onUpdate={() => {
               for (const p of traces.plots) {
-                d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+                d3v7.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
 
-                d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+                d3v7.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
               }
             }}
           />

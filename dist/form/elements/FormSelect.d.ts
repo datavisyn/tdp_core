@@ -1,4 +1,5 @@
-import * as d3 from 'd3';
+/// <reference types="d3" />
+import * as d3 from 'd3v3';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
 import { IPluginDesc } from '../../base';

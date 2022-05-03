@@ -1,5 +1,5 @@
 import { behavior, mouse as d3mouse, select, selectAll } from 'd3';
-import * as d3 from 'd3';
+import * as d3 from 'd3v3';
 import marked from 'marked';
 import * as $ from 'jquery';
 import { merge } from 'lodash';
