@@ -2,6 +2,7 @@ export declare class AjaxError extends Error {
     readonly response: Response;
     constructor(response: Response, message?: string);
 }
+export declare function isAjaxError(error: any): error is AjaxError;
 export declare class Ajax {
     static GLOBAL_EVENT_AJAX_PRE_SEND: string;
     static GLOBAL_EVENT_AJAX_POST_SEND: string;
@@ -9,7 +10,13 @@ export declare class Ajax {
      * Maximum number of characters of a valid URL
      */
     static MAX_URL_LENGTH: number;
-    static checkStatus(response: Response): Response;
+    /**
+     * Tries to get a proper message from a response by checking the `json()` content for `detail`, the `text()`, or the `statusText`.
+     * @param response Response where the error message is contained.
+     * @returns The extracted error message.
+     */
+    static getErrorMessageFromResponse(response: Response): Promise<string>;
+    static checkStatus(response: Response): Promise<Response>;
     static parseType(expectedDataType: string, response: Response): Promise<any>;
     /**
      * sends an XML http request to the server

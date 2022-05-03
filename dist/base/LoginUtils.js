@@ -9,9 +9,9 @@ export class LoginUtils {
      * @param {boolean} remember whether to set a long term cookie
      * @return {Promise<never | any>} the result in case of a reject it was an invalid request
      */
-    static login(username, password, remember = false) {
+    static login(username, password) {
         UserSession.getInstance().reset();
-        const r = Ajax.send('/login', { username, password, remember }, 'post').then((user) => {
+        const r = Ajax.send('/login', { username, password }, 'post').then((user) => {
             UserSession.getInstance().login(user);
             return user;
         });
@@ -53,7 +53,7 @@ export class LoginUtils {
         });
     }
     /**
-     * helper to bind to a login form, assuming that fields `login_username`, `login_password` and `login_remember` exists
+     * helper to bind to a login form, assuming that fields `login_username`, `login_password` exists
      * @param {HTMLFormElement} form
      * @param {(error: any, user: IUser) => any} callback
      */
@@ -75,8 +75,7 @@ export class LoginUtils {
             }
             const username = form.login_username.value;
             const password = form.login_password.value;
-            const rememberMe = form.login_remember.checked;
-            LoginUtils.login(username, password, rememberMe)
+            LoginUtils.login(username, password)
                 .then((user) => callback(null, user))
                 .catch((error) => {
                 if (error.response && error.response.status !== 401) {
@@ -101,12 +100,6 @@ LoginUtils.defaultLoginForm = () => `<form class="form-signin" action="/login" m
     <div class="mb-3">
       <label class="form-label" for="login_password"> ${I18nextManager.getInstance().i18n.t('phovea:security_flask.password')}</label>
       <input type="password" class="form-control" id="login_password" placeholder="${I18nextManager.getInstance().i18n.t('phovea:security_flask.password')}" required="required" autocomplete="current-password">
-    </div>
-    <div class="mb-3">
-      <div class="checkbox form-check">
-        <input type="checkbox" class="form-check-input" id="login_remember">
-        <label class="form-label form-check-label" for="login_remember">${I18nextManager.getInstance().i18n.t('phovea:security_flask.rememberMe')}</label>
-      </div>
     </div>
     <button type="submit" class="btn btn-primary"> ${I18nextManager.getInstance().i18n.t('phovea:security_flask.submit')}</button>
     </form>
