@@ -1,15 +1,13 @@
 import * as React from 'react';
-import * as d3v7 from 'd3v7';
+import d3 from 'd3';
 import { useMemo, useEffect } from 'react';
-import { ESupportedPlotlyVis, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, EAggregateTypes, ENumericalColorScaleType, } from './interfaces';
+import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, EAggregateTypes, } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
-import { densityMergeDefaultConfig, isDensity } from './density/utils';
-import { DensityVis } from './density/DensityVis';
 const DEFAULT_COLORS = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
@@ -86,10 +84,6 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
             const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
             _setVisConfig({ current: newConfig, consistent: newConfig });
         }
-        if (isDensity(inconsistentVisConfig)) {
-            const newConfig = densityMergeDefaultConfig(columns, inconsistentVisConfig);
-            _setVisConfig({ current: newConfig, consistent: newConfig });
-        }
         // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inconsistentVisConfig.type, columns]);
@@ -106,7 +100,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         return currMap;
     }, [selected]);
     const scales = useMemo(() => {
-        const colorScale = d3v7.scaleOrdinal().range(colors);
+        const colorScale = d3.scale.ordinal().range(colors);
         return {
             color: colorScale,
         };
@@ -120,7 +114,6 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
                     enable: true,
                 },
             }, shapes: shapes, setConfig: setVisConfig, filterCallback: filterCallback, selectionCallback: selectionCallback, selected: selectedMap, columns: columns, scales: scales, hideSidebar: hideSidebar })) : null,
-        isDensity(visConfig) ? (React.createElement(DensityVis, { config: visConfig, selectionCallback: selectionCallback, selected: selectedMap, setConfig: setVisConfig, columns: columns, hideSidebar: hideSidebar })) : null,
         isViolin(visConfig) ? (React.createElement(ViolinVis, { config: visConfig, optionsConfig: {
                 overlay: {
                     enable: true,

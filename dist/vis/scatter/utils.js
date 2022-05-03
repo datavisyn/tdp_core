@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import * as d3v7 from 'd3v7';
+import d3 from 'd3';
 import { EColumnTypes, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
@@ -8,7 +8,7 @@ import { I18nextManager } from '../../i18n';
 export function isScatter(s) {
     return s.type === ESupportedPlotlyVis.SCATTER;
 }
-export const defaultScatterConfig = {
+const defaultConfig = {
     type: ESupportedPlotlyVis.SCATTER,
     numColumnsSelected: [],
     color: null,
@@ -18,7 +18,7 @@ export const defaultScatterConfig = {
     alphaSliderVal: 0.5,
 };
 export function scatterMergeDefaultConfig(columns, config) {
-    const merged = merge({}, defaultScatterConfig, config);
+    const merged = merge({}, defaultConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 1) {
         merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
@@ -63,20 +63,20 @@ export async function createScatterTraces(columns, selected, config, scales, sha
         c.resolvedValues = moveSelectedToFront(c.resolvedValues, selected);
     });
     const shapeScale = config.shape
-        ? d3v7
-            .scaleOrdinal()
+        ? d3.scale
+            .ordinal()
             .domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))])
             .range(shapes)
         : null;
     let min = 0;
     let max = 0;
     if (config.color) {
-        min = d3v7.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
-        max = d3v7.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+        min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+        max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
     }
     const numericalColorScale = config.color
-        ? d3v7
-            .scaleLinear()
+        ? d3.scale
+            .linear()
             .domain([max, (max + min) / 2, min])
             .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL
             ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')]

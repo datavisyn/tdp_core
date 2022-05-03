@@ -9,8 +9,8 @@ import {
   symbolTriangle,
   symbolWye,
   SymbolType,
-  bisector as d3bisector,
-} from 'd3v7';
+} from 'd3-shape';
+import { bisector as d3bisector } from 'd3-array';
 
 /**
  * a symbol renderer renderes a bunch of data points using `render` at the end `done` will be called

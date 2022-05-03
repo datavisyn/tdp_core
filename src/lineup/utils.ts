@@ -19,7 +19,7 @@ export class AScoreAccessorProxy<T> {
    */
   readonly accessor: IAccessorFunc<T> = (row: IDataRow) => this.access(row.v);
 
-  private readonly scores = new Map<string, T>();
+  public readonly scores = new Map<string, T>();
 
   constructor(private readonly missingValue: T = null) {}
 

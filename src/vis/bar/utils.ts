@@ -26,7 +26,7 @@ export function isBar(s: IVisConfig): s is IBarConfig {
   return s.type === ESupportedPlotlyVis.BAR;
 }
 
-export const defaultBarConfig: IBarConfig = {
+const defaultConfig: IBarConfig = {
   type: ESupportedPlotlyVis.BAR,
   numColumnsSelected: [],
   catColumnSelected: null,
@@ -42,7 +42,7 @@ export const defaultBarConfig: IBarConfig = {
 const TICK_LABEL_LENGTH = 8;
 
 export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig): IVisConfig {
-  const merged = merge({}, defaultBarConfig, config);
+  const merged = merge({}, defaultConfig, config);
 
   const catCols = columns.filter((c) => c.type === EColumnTypes.CATEGORICAL);
   const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
@@ -56,6 +56,10 @@ export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig):
   }
 
   return merged;
+}
+
+function createAxisLabel(aggregateType: EAggregateTypes, aggregateColumn: VisColumn) {
+  return aggregateType === EAggregateTypes.COUNT ? aggregateType : `${aggregateType} of ${aggregateColumn.info.name}`;
 }
 
 /**
@@ -166,6 +170,8 @@ async function setPlotsWithGroupsAndMultiples(
         })
         .flat();
 
+      const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
+
       plots.push({
         data: {
           x: vertFlag ? uniqueColVals : aggregateVals,
@@ -183,8 +189,8 @@ async function setPlotsWithGroupsAndMultiples(
             color: scales.color(uniqueGroup),
           },
         },
-        xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggregateType,
-        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggregateType) : catColValues.info.name,
+        xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
         xTicks: vertFlag ? uniqueColVals : null,
         xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
         yTicks: !vertFlag ? uniqueColVals : null,
@@ -201,14 +207,14 @@ async function setPlotsWithGroups(
   columns: VisColumn[],
   catCol: VisCategoricalColumn,
   aggregateType: EAggregateTypes,
-  aggColumn: VisNumericalColumn,
+  aggregateColumn: VisNumericalColumn,
   config: IBarConfig,
   plots: PlotlyData[],
   scales: Scales,
   plotCounter: number,
 ): Promise<number> {
   const catColValues = await resolveSingleColumn(catCol);
-  const aggColValues = await resolveSingleColumn(aggColumn);
+  const aggColValues = await resolveSingleColumn(aggregateColumn);
 
   const vertFlag = config.direction === EBarDirection.VERTICAL;
   const normalizedFlag = config.display === EBarDisplayType.NORMALIZED;
@@ -239,6 +245,8 @@ async function setPlotsWithGroups(
       })
       .flat();
 
+    const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
+
     plots.push({
       data: {
         x: vertFlag ? uniqueColVals : finalAggregateValues,
@@ -256,8 +264,8 @@ async function setPlotsWithGroups(
           color: scales.color(uniqueVal),
         },
       },
-      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : aggregateType,
-      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : aggregateType) : catColValues.info.name,
+      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
       xTicks: vertFlag ? uniqueColVals : null,
       xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
@@ -272,14 +280,14 @@ async function setPlotsWithMultiples(
   columns: VisColumn[],
   catCol: VisCategoricalColumn,
   aggregateType: EAggregateTypes,
-  aggColumn: VisNumericalColumn,
+  aggregateColumn: VisNumericalColumn,
   config: IBarConfig,
   plots: PlotlyData[],
   plotCounter: number,
 ): Promise<number> {
   let plotCounterEdit = plotCounter;
   const catColValues = await resolveSingleColumn(catCol);
-  const aggColValues = await resolveSingleColumn(aggColumn);
+  const aggColValues = await resolveSingleColumn(aggregateColumn);
   const multiplesColumn = await resolveSingleColumn(getCol(columns, config.multiples));
 
   const vertFlag = config.direction === EBarDirection.VERTICAL;
@@ -298,6 +306,7 @@ async function setPlotsWithMultiples(
         return joinedObjs.length === 0 ? [0] : getAggregateValues(aggregateType, joinedObjs, aggColValues?.resolvedValues as VisNumericalValue[]);
       })
       .flat();
+    const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
     plots.push({
       data: {
@@ -313,8 +322,8 @@ async function setPlotsWithMultiples(
         type: 'bar',
         name: uniqueVal,
       },
-      xLabel: vertFlag ? catColValues.info.name : aggregateType,
-      yLabel: vertFlag ? aggregateType : catColValues.info.name,
+      xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
+      yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
       xTicks: vertFlag ? uniqueColVals : null,
       xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
@@ -349,6 +358,8 @@ async function setPlotsBasic(
   ) as any[];
 
   const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))];
+  const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
+
   plots.push({
     data: {
       x: vertFlag ? valArr : aggValues,
@@ -364,8 +375,8 @@ async function setPlotsBasic(
       name: catColValues.info.name,
       showlegend: false,
     },
-    xLabel: vertFlag ? catColValues.info.name : aggregateType,
-    yLabel: vertFlag ? aggregateType : catColValues.info.name,
+    xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
+    yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
     xTicks: vertFlag ? valArr : null,
     xTickLabels: vertFlag ? valArr.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
     yTicks: !vertFlag ? valArr : null,

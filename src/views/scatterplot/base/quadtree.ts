@@ -1,4 +1,5 @@
-import { Quadtree, QuadtreeInternalNode, QuadtreeLeaf, shuffle } from 'd3v7';
+import { Quadtree, QuadtreeInternalNode, QuadtreeLeaf } from 'd3-quadtree';
+import { shuffle } from 'd3-array';
 
 export interface IBoundsPredicate {
   (x0: number, y0: number, x1: number, y1: number): boolean;

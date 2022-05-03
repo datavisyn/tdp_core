@@ -73,7 +73,6 @@ export class LineupVisWrapper {
     };
 
     const mapData = <T extends ValueColumn<number | string>>(innerData: IDataRow[], column: T) => {
-      // TODO: This should be _visyn_id?
       return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: d.v.id, val: column.getRaw(d) });
     };
 

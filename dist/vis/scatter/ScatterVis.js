@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as d3v7 from 'd3v7';
+import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
 import { InvalidCols } from '../general/InvalidCols';
@@ -18,7 +18,17 @@ const defaultExtensions = {
 };
 export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selected = {}, setConfig, hideSidebar = false, scales, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
+    const plotlyDivRef = React.useRef(null);
     useEffect(() => {
+        const ro = new ResizeObserver(() => {
+            const plotDiv = document.getElementById(`plotlyDiv${id}`);
+            if (plotDiv) {
+                Plotly.Plots.resize(plotDiv);
+            }
+        });
+        if (plotlyDivRef) {
+            ro.observe(plotlyDivRef.current);
+        }
         if (hideSidebar) {
             return;
         }
@@ -29,7 +39,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         menu.addEventListener('shown.bs.collapse', () => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
-    }, [id, hideSidebar]);
+    }, [id, hideSidebar, plotlyDivRef]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
@@ -53,7 +63,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces, config.dragMode]);
-    return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
+    return (React.createElement("div", { ref: plotlyDivRef, className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
             traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onSelected: (sel) => {
@@ -62,14 +72,14 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 // plotly redraws everything on updates, so you need to reappend title and
                 // change opacity on update, instead of just in a use effect
                 onInitialized: () => {
-                    d3v7.selectAll('g .traces').style('opacity', config.alphaSliderVal);
-                    d3v7.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
+                    d3.selectAll('g .traces').style('opacity', config.alphaSliderVal);
+                    d3.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
                 }, onUpdate: () => {
-                    d3v7.selectAll('g .traces').style('opacity', config.alphaSliderVal);
-                    d3v7.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
+                    d3.selectAll('g .traces').style('opacity', config.alphaSliderVal);
+                    d3.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
                     for (const p of traces.plots) {
-                        d3v7.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
-                        d3v7.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+                        d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+                        d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
             React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x" },

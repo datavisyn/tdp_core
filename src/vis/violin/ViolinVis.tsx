@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as d3v7 from 'd3v7';
+import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
@@ -46,10 +46,21 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
 
   const id = React.useMemo(() => uniqueId('ViolinVis'), []);
 
+  const plotlyDivRef = React.useRef(null);
+
   useEffect(() => {
+    const ro = new ResizeObserver(() => {
+      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+    });
+
+    if (plotlyDivRef) {
+      ro.observe(plotlyDivRef.current);
+    }
+
     if (hideSidebar) {
       return;
     }
+
     const menu = document.getElementById(`generalVisBurgerMenu${id}`);
 
     menu.addEventListener('hidden.bs.collapse', () => {
@@ -59,7 +70,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
     menu.addEventListener('shown.bs.collapse', () => {
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
-  }, [id, hideSidebar]);
+  }, [id, hideSidebar, plotlyDivRef]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -83,7 +94,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
   }, [traces]);
 
   return (
-    <div className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
+    <div ref={plotlyDivRef} className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
       <div
         className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
           traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
@@ -102,9 +113,9 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             // plotly redraws everything on updates, so you need to reappend title and
             onUpdate={() => {
               for (const p of traces.plots) {
-                d3v7.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+                d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
 
-                d3v7.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+                d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
               }
             }}
           />

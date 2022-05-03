@@ -1,4 +1,4 @@
-import { ColumnInfo, EColumnTypes, PlotlyInfo, VisCategoricalValue, VisColumn, VisNumericalValue } from '../interfaces';
+import { PlotlyInfo, VisColumn } from '../interfaces';
 import { Plotly } from '../Plot';
 
 /**
@@ -36,7 +36,7 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
         standoff: 10,
         text: traces.plots.length > 1 ? truncateText(t.xLabel, 15) : truncateText(t.xLabel, 50),
         font: {
-          family: 'Courier New, monospace',
+          family: 'Roboto',
           size: traces.plots.length > 9 ? 10 : 14,
           color: '#7f7f7f',
         },
@@ -59,7 +59,7 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
         standoff: 10,
         text: traces.plots.length > 1 ? truncateText(t.yLabel, 15) : truncateText(t.yLabel, 50),
         font: {
-          family: 'Courier New, monospace',
+          family: 'Roboto',
           size: traces.plots.length > 9 ? 10 : 14,
           color: '#7f7f7f',
         },
@@ -146,21 +146,11 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
   return layoutEdit;
 }
 
-export function resolveColumnValues(columns: VisColumn[]): Promise<
-  {
-    resolvedValues: (VisNumericalValue | VisCategoricalValue)[];
-    type: EColumnTypes.NUMERICAL | EColumnTypes.CATEGORICAL;
-    info: ColumnInfo;
-  }[]
-> {
+export function resolveColumnValues(columns: VisColumn[]) {
   return Promise.all(columns.map(async (col) => ({ ...col, resolvedValues: await col.values() })));
 }
 
-export async function resolveSingleColumn(column: VisColumn): Promise<{
-  resolvedValues: (VisNumericalValue | VisCategoricalValue)[];
-  type: EColumnTypes.NUMERICAL | EColumnTypes.CATEGORICAL;
-  info: ColumnInfo;
-}> {
+export async function resolveSingleColumn(column: VisColumn) {
   if (!column) {
     return null;
   }

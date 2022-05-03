@@ -5,5 +5,9 @@ export declare class WebpackEnv {
     static __BUILD_ID__: string;
     static __APP_CONTEXT__: string;
     static __DEBUG__: string;
+    /**
+     * enables features that used in reprovisyn
+     */
+    static ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES: boolean;
 }
 //# sourceMappingURL=WebpackEnv.d.ts.map
