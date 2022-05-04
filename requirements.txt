@@ -23,5 +23,5 @@ requests==2.27.1
 SQLAlchemy==1.4.32
 sqlmodel==0.0.6
 urllib3==1.26.9
-uvicorn==0.17.6
+uvicorn[standard]==0.17.6
 yamlreader==3.0.4
