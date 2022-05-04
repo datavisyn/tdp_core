@@ -18,15 +18,18 @@ export class PanelAddColumnButton {
         this.node.addEventListener('mouseleave', () => {
             this.node.classList.remove('once');
         });
-        const button = new PanelButton(this.node, Object.assign(options, {
-            title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
-            faIcon: 'fas fa-plus',
-            onClick: () => {
-                this.node.classList.add('once');
-                this.search.node.querySelector('input').focus();
-                this.search.focus();
+        const button = new PanelButton(this.node, {
+            ...options,
+            ...{
+                title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.addColumnButton'),
+                faIcon: 'fas fa-plus',
+                onClick: () => {
+                    this.node.classList.add('once');
+                    this.search.node.querySelector('input').focus();
+                    this.search.focus();
+                },
             },
-        }));
+        });
         this.node.appendChild(button.node);
         this.node.appendChild(this.search.node);
     }

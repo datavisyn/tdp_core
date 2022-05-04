@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ColumnInfo, EColumnTypes, VisColumn } from '../interfaces';
 interface SingleColumnSelectProps {
     callback: (s: ColumnInfo) => void;
