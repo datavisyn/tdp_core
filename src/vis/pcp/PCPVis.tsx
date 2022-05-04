@@ -84,7 +84,7 @@ export function PCPVis({
           autosize: true,
           grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
           font: {
-            family: 'Roboto',
+            family: 'Roboto, sans-serif',
           },
           shapes: [],
           violingap: 0,

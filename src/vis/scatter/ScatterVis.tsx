@@ -123,7 +123,7 @@ export function ScatterVis({
         },
       },
       font: {
-        family: 'Roboto',
+        family: 'Roboto, sans-serif',
       },
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
