@@ -12,7 +12,7 @@ export class PanelDownloadButton {
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('dropdown', 'download-data-dropdown');
         this.node.innerHTML = `
-      <button type="button" class="btn btn-text-dark btn-sm" data-bs-toggle="dropdown"
+      <button type="button" class="btn btn-text-dark btn-sm" data-testid="download-data-button" data-bs-toggle="dropdown"
        aria-haspopup="true" aria-expanded="false" title="${I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.downloadData')}">
       <i class="fas fa-download fa-fw"></i>
       </button>

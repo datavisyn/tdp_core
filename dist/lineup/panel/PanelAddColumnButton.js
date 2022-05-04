@@ -14,6 +14,7 @@ export class PanelAddColumnButton {
         this.search = search;
         this.node = parent.ownerDocument.createElement('div');
         this.node.classList.add('lu-adder');
+        this.node.setAttribute('data-testid', 'lu-adder-div');
         this.node.addEventListener('mouseleave', () => {
             this.node.classList.remove('once');
         });
