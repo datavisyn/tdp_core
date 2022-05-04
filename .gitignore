@@ -5,6 +5,7 @@
 /build/
 /storybook-static/
 /dist/tsBuildInfoFile
+/dist_python/
 /lib/
 *.egg-info/
 *.egg

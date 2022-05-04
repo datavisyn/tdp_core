@@ -1,11 +1,12 @@
 import { I18nextManager } from '../i18n';
+import { Ajax, AjaxError, isAjaxError } from './ajax';
 import { NotificationHandler } from './NotificationHandler';
 
 export class ErrorAlertHandler {
-  private errorAlertHandler = (error: any) => {
-    if (error instanceof Response || error.response instanceof Response) {
+  private errorAlertHandler = (error: Error | AjaxError) => {
+    if (error instanceof Response || isAjaxError(error)) {
       const xhr: Response = error instanceof Response ? error : error.response;
-      return xhr.text().then((body: string) => {
+      return Promise.resolve(isAjaxError(error) ? error.message : Ajax.getErrorMessageFromResponse(xhr)).then((body: string) => {
         if (xhr.status === 408) {
           body = I18nextManager.getInstance().i18n.t('tdp:core.timeoutMessage');
         }
@@ -36,9 +37,11 @@ export class ErrorAlertHandler {
   }
 
   public errorMessage(error: any) {
-    if (error instanceof Response || error.response instanceof Response) {
+    if (error instanceof Response || isAjaxError(error)) {
       const xhr: Response = error instanceof Response ? error : error.response;
-      return `<strong>${error.message.replace('\n', '<br>')}</strong><br><small>${xhr.status} (${xhr.statusText})</small>`;
+      return `<strong>${(isAjaxError(error) ? error.message : error.statusText).replace('\n', '<br>')}</strong><br><small>${xhr.status} (${
+        xhr.statusText
+      })</small>`;
     }
     if (error instanceof Error) {
       return `<strong>${error.name}</strong>: ${error.message.replace('\n', '<br>')}`;

@@ -1,84 +1,89 @@
-###############################################################################
-# Caleydo - Visualization for Molecular Biology - http://caleydo.org
-# Copyright (c) The Caleydo Team. All rights reserved.
-# Licensed under the new BSD license, available at http://caleydo.org/license
-###############################################################################
+from .plugin.model import AVisynPlugin, RegHelper
 
 
-def phovea(registry):
-  """
-  register extension points
-  :param registry:
-  """
-  # generator-phovea:begin
-  registry.append('namespace', 'tdp_core', 'tdp_core.proxy',
-                  {
-                      'namespace': '/api/tdp/proxy'
-                  })
+class VisynPlugin(AVisynPlugin):
+    def register(self, registry: RegHelper):
+        # phovea_server
+        registry.append(
+            "namespace",
+            "caleydo-dataset",
+            "tdp_core.dataset.dataset_api",
+            {"namespace": "/api/dataset", "factory": "create_dataset"},
+        )
+        registry.append(
+            "namespace",
+            "caleydo-idtype",
+            "tdp_core.id_mapping.idtype_api",
+            {"namespace": "/api/idtype", "factory": "create_idtype"},
+        )
+        registry.append("json-encoder", "numpy", "tdp_core.encoder.json_encoder")
+        registry.append("json-encoder", "set-encoder", "tdp_core.encoder.set_encoder", {})
 
-  registry.append('namespace', 'db_connector', 'tdp_core.sql',
-                  {
-                      'namespace': '/api/tdp/db'
-                  })
+        registry.append(
+            "dataset-specific-handler",
+            "handler-graph",
+            "tdp_core.dataset.graph.graph_api",
+            {"datatype": "graph", "factory": "add_graph_handler"},
+        )
+        registry.append(
+            "graph-formatter",
+            "formatter-json",
+            "tdp_core.dataset.graph.graph_api",
+            {"format": "json", "factory": "format_json"},
+        )
+        registry.append(
+            "graph-parser",
+            "parser-json",
+            "tdp_core.dataset.graph.graph_parser",
+            {"format": "json", "factory": "parse_json"},
+        )
 
-  registry.append('namespace', 'tdp_storage', 'tdp_core.storage',
-                  {
-                      'namespace': '/api/tdp/storage'
-                  })
-  registry.append('namespace', 'tdp_swagger', 'tdp_core.swagger',
-                  {
-                      'namespace': '/api/tdp/ui'
-                  })
-  registry.append('namespace', 'tdp_config', 'tdp_core.config',
-                  {
-                      'namespace': '/api/tdp/config'
-                  })
-  registry.append('namespace', 'tdp_xlsx2json', 'tdp_core.xlsx',
-                  {
-                      'namespace': '/api/tdp/xlsx'
-                  })
-  registry.append('mapping_provider', 'tdp_core', 'tdp_core.mapping_table')
-  registry.append('greenifier', 'psycopg2', 'tdp_core.sql_use_gevent', {})
-  registry.append('json-encoder', 'bytes-to-string-encoder', 'tdp_core.bytes_to_string_encoder', {})
+        # tdp_core
+        registry.append("namespace", "tdp_core", "tdp_core.proxy", {"namespace": "/api/tdp/proxy"})
 
-  # DB migration plugins
-  registry.append('manager', 'db-migration-manager', 'tdp_core.dbmigration', {'singleton': True, 'factory': 'create_migration_manager'})
-  registry.append('command', 'db-migration', 'tdp_core.dbmigration', {'factory': 'create_migration_command'})
-  registry.append('json-encoder', 'db-migration-encoder', 'tdp_core.dbmigration_api', {'factory': 'create_migration_encoder'})
-  registry.append('namespace', 'db-migration-api', 'tdp_core.dbmigration_api',
-                  {
-                      'factory': 'create_migration_api',
-                      'namespace': '/api/tdp/db-migration'
-                  })
+        registry.append("namespace", "db_connector", "tdp_core.sql", {"namespace": "/api/tdp/db"})
 
-  # phovea_clue
-  registry.append('namespace', 'caleydo-clue-screenshot', 'tdp_core.remoteplayer',
-                  {
-                      'namespace': '/api/clue',
-                      'factory': 'create'
-                  })
+        registry.append(
+            "namespace",
+            "tdp_storage",
+            "tdp_core.storage",
+            {"namespace": "/api/tdp/storage"},
+        )
+        registry.append("namespace", "tdp_swagger", "tdp_core.swagger", {"namespace": "/api/tdp/ui"})
+        # TODO:
+        registry.append("namespace", "tdp_core_main", "tdp_core.server.mainapp", {"namespace": "/app"})
+        registry.append_router("tdp_config_router", "tdp_core.settings.router", {})
+        registry.append_router("tdp_plugin_router", "tdp_core.plugin.router", {})
+        registry.append("namespace", "tdp_xlsx2json", "tdp_core.xlsx", {"namespace": "/api/tdp/xlsx"})
+        registry.append("mapping_provider", "tdp_core", "tdp_core.mapping_table")
+        # TODO: Check if this is still required?
+        registry.append("greenifier", "psycopg2", "tdp_core.sql_use_gevent", {})
 
-  # phovea_security_flask
-  # TODO: Add ENV variables to allow disabling
-  registry.append('manager', 'security_manager', 'tdp_core.flask_login_impl', dict(singleton=True))
-  registry.append('user_stores', 'alb_security_store', 'tdp_core.security.store.ALBSecurityStore', {})
+        # DB migration plugins
+        registry.append(
+            "command",
+            "db-migration",
+            "tdp_core.dbmigration.manager",
+            {"factory": "create_migration_command"},
+        )
+        registry.append(
+            "namespace",
+            "db-migration-api",
+            "tdp_core.dbmigration.router",
+            {"factory": "create_migration_api", "namespace": "/api/tdp/db-migration"},
+        )
 
-  # tdp_matomo
-  registry.append('tdp-config-safe-keys', 'matomo', '', {
-   'configKey': 'tdp_core.matomo'
-  })
+        # phovea_security_flask
+        # TODO: Add ENV variables to allow disabling
+        registry.append(
+            "user_stores",
+            "alb_security_store",
+            "tdp_core.security.store.alb_security_store",
+            {},
+        )
 
-  # phovea_data_mongo
-  registry.append('dataset-provider', 'dataset-graph', 'tdp_core.graph', {})
-  # generator-phovea:end
-  pass
+        # tdp_matomo
+        registry.append("tdp-config-safe-keys", "matomo", "", {"configKey": "tdp_core.matomo"})
 
-
-def phovea_config():
-  """
-  :return: file pointer to config file
-  """
-  from os import path
-  here = path.abspath(path.dirname(__file__))
-  config_file = path.join(here, 'config.json')
-  return config_file if path.exists(config_file) else None
+        # phovea_data_mongo
+        registry.append("dataset-provider", "dataset-graph", "tdp_core.graph", {})
