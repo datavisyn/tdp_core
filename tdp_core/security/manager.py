@@ -123,26 +123,26 @@ class SecurityManager:
             return None
 
     def load_from_request(self, request: Request):
+        # Load user from any of the stores
+        user = self._load_from_key(request) or self._delegate_stores_until_not_none("load_from_request", request)
+        if user:
+            return user
+
+        # Load JWT user from header
         if "headers" in manager.settings.jwt_token_location:
-            # Load JWT user from Authorization header
             scheme, token = get_authorization_scheme_param(request.headers.get(manager.settings.jwt_header_name))
             if token and scheme.lower() == manager.settings.jwt_header_type:
                 user = access_token_to_user(token)
                 if user:
                     return user
 
+        # Load JWT user from cookie
         if "cookies" in manager.settings.jwt_token_location:
-            # Load JWT user from cookie
             token_from_cookie = request.cookies.get(manager.settings.jwt_access_cookie_name)
             if token_from_cookie:
                 user = access_token_to_user(token_from_cookie)
                 if user:
                     return user
-
-        # Otherwise, login using the request
-        user = self._load_from_key(request) or self._delegate_stores_until_not_none("load_from_request", request)
-        if user:
-            return user
 
         # Raise an exception is no user could be loaded
         raise HTTPException(
