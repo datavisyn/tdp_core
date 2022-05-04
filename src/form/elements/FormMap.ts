@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import 'select2';
-import { event as d3event } from 'd3';
+import { event as d3event } from 'd3v3';
 import $ from 'jquery';
 import * as d3 from 'd3v3';
 import { AFormElement } from './AFormElement';

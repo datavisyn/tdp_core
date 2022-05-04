@@ -1,4 +1,4 @@
-import { select, Selection } from 'd3';
+import { select, Selection } from 'd3v3';
 import { ISelection, IViewContext } from '../base/interfaces';
 import { AView } from './AView';
 

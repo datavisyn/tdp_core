@@ -1,4 +1,3 @@
-/// <reference types="d3" />
 import * as d3 from 'd3v3';
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc, FormElementType } from '../interfaces';

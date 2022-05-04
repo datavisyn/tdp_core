@@ -1,4 +1,4 @@
-import { select } from 'd3';
+import { select } from 'd3v3';
 import { PHOVEA_UI_FormDialog } from '../components';
 import { FormBuilder } from './FormBuilder';
 import { BaseUtils } from '../base';

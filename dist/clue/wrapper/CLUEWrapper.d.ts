@@ -1,6 +1,5 @@
 /// <amd-dependency path="font-awesome" />
 /// <amd-dependency path="bootstrap" />
-/// <reference types="d3" />
 import * as d3 from 'd3v3';
 import { IObjectRef, ProvenanceGraph } from '../provenance';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
