@@ -98,7 +98,12 @@ export class AFormElement extends EventHandler {
         const colWidth = this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12';
         // TODO: Better move this logic to the corresponding class, i.e. FormCheckbox.
         const labelClass = this.elementDesc.type === FormElementType.CHECKBOX ? 'form-check-label' : 'col-form-label';
-        return $node.append('label').classed(`${labelClass} ${colWidth}`, true).attr('for', this.elementDesc.attributes.id).text(this.elementDesc.label);
+        return $node
+            .append('label')
+            .classed(`${labelClass} ${colWidth}`, true)
+            .attr('for', this.elementDesc.attributes.id)
+            .attr('data-testid', this.elementDesc.label)
+            .text(this.elementDesc.label);
     }
     /**
      * Set a list of object properties and values to a given node

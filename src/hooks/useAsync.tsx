@@ -55,7 +55,8 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
   const execute = React.useCallback(
     (...args: Parameters<typeof asyncFunction>) => {
       setStatus('pending');
-      setValue(null);
+      // Do not unset the value, as we mostly want to retain the last value to avoid flickering, i.e. for "silent" updates.
+      // setValue(null);
       setError(null);
       const currentPromise = Promise.resolve(asyncFunction(...args))
         .then((response: T) => {
@@ -67,6 +68,7 @@ export const useAsync = <F extends (...args: any[]) => any, E = Error, T = Await
         })
         .catch((e: E) => {
           if (mountedRef.current && currentPromise === latestPromiseRef.current) {
+            setValue(null);
             setError(e);
             setStatus('error');
           }

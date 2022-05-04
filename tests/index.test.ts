@@ -47,7 +47,7 @@ describe('uniqueString', () => {
 describe('resolveIn', () => {
   it('200ms', async () => {
     const past = Date.now();
-    await BaseUtils.resolveIn(200).then(() => {
+    await BaseUtils.resolveIn(201).then(() => {
       const present = Date.now();
       const actual = present - past;
       expect(actual).toBeGreaterThanOrEqual(200);

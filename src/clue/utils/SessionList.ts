@@ -28,31 +28,31 @@ abstract class ASessionList {
   protected static createButton(type: 'delete' | 'select' | 'clone' | 'persist' | 'edit') {
     switch (type) {
       case 'delete':
-        return `<a href="#" data-action="delete" title="${I18nextManager.getInstance().i18n.t(
+        return `<a href="#" data-action="delete" data-testid="delete-link" title="${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.deleteSession',
         )}" ><i class="fas fa-trash" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.delete',
         )}</span></a>`;
       case 'select':
-        return `<a href="#" data-action="select" title="${I18nextManager.getInstance().i18n.t(
+        return `<a href="#" data-action="select" data-testid="select-link" title="${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.continueSession',
         )}"><i class="fas fa-folder-open" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.continue',
         )}</span></a>`;
       case 'clone':
-        return `<a href="#" data-action="clone" title="${I18nextManager.getInstance().i18n.t(
+        return `<a href="#" data-action="clone" data-testid="clone-link" title="${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.cloneToTemporary',
         )}"><i class="fas fa-clone" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.cloneToTemporary',
         )}</span></a>`;
       case 'persist':
-        return `<a href="#" data-action="persist" title="${I18nextManager.getInstance().i18n.t(
+        return `<a href="#" data-action="persist" data-testid="persist-link" title="${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.saveSession',
         )}"><i class="fas fa-cloud" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.saveSession',
         )}</span></a>`;
       case 'edit':
-        return `<a href="#" data-action="edit" title="${I18nextManager.getInstance().i18n.t(
+        return `<a href="#" data-action="edit" data-testid="edit-link" title="${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.editSession',
         )}"><i class="fas fa-edit" aria-hidden="true"></i><span class="visually-hidden">${I18nextManager.getInstance().i18n.t(
           'tdp:core.SessionList.editSession',
@@ -189,7 +189,6 @@ export class TemporarySessionList extends ASessionList {
 
     const updateTable = (data: IProvenanceGraphDataDescription[]) => {
       const $tr = $table.select('tbody').selectAll('tr').data(data);
-
       const $trEnter = $tr.enter().append('tr').html(`
           <td></td>
           <td></td>
@@ -206,6 +205,7 @@ export class TemporarySessionList extends ASessionList {
             ? (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status') as string)
             : (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.status', { context: 'private' }) as string),
         );
+      $tr.select('td:nth-of-type(3)').attr('data-testid', (d) => d.id);
       $tr
         .select('td:nth-of-type(2)')
         .text((d) => (d.ts ? TDPApplicationUtils.fromNow(d.ts) : (I18nextManager.getInstance().i18n.t('tdp:core.SessionList.unknown') as string)))
