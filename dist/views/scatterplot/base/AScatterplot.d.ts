@@ -264,7 +264,7 @@ export declare abstract class AScatterplot<T, C extends IScatterplotOptions<T>> 
     get domain(): IWindow;
     protected hasTooltips(): boolean;
     protected resized(): void;
-    protected getMouseNormalizedPos(canvasPixelPox?: number[]): {
+    protected getMouseNormalizedPos(canvasPixelPox: number[]): {
         x: number;
         y: number;
         clickRadiusX: number;
@@ -303,7 +303,7 @@ export declare abstract class AScatterplot<T, C extends IScatterplotOptions<T>> 
      */
     private adaptMaxTranslation;
     protected rescale(axis: EScaleAxes, scale: IScale): IScale;
-    protected mousePosAtCanvas(): number[];
+    protected mousePosAtCanvas(event: MouseEvent): number[];
     private setTransform;
     private window2transform;
     /**

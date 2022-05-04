@@ -4,8 +4,7 @@ import {
   extent,
   format,
   select,
-  mouse,
-  event as d3event,
+  pointer,
   zoom as d3zoom,
   ZoomScale,
   ZoomTransform,
@@ -13,6 +12,7 @@ import {
   zoomIdentity,
   ZoomBehavior,
   drag as d3drag,
+  D3DragEvent,
   scaleLinear,
   quadtree,
   Quadtree,
@@ -409,7 +409,7 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
           [0, 0],
           [+Infinity, +Infinity],
         ])
-        .filter(() => d3event.button === 0 && (typeof this.props.isSelectEvent !== 'function' || !this.props.isSelectEvent(<MouseEvent>d3event)));
+        .filter((event: MouseEvent) => event.button === 0 && (typeof this.props.isSelectEvent !== 'function' || !this.props.isSelectEvent(event)));
       if (this.props.zoomWindow != null) {
         this.window = this.props.zoomWindow;
       } else {
@@ -428,11 +428,11 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
         .on('start', this.onDragStart.bind(this))
         .on('drag', this.onDrag.bind(this))
         .on('end', this.onDragEnd.bind(this))
-        .filter(() => d3event.button === 0 && typeof this.props.isSelectEvent === 'function' && this.props.isSelectEvent(<MouseEvent>d3event));
-      $parent.call(drag).on('click', () => this.onClick(d3event));
+        .filter((event: MouseEvent) => event.button === 0 && typeof this.props.isSelectEvent === 'function' && this.props.isSelectEvent(event));
+      $parent.call(drag).on('click', (event: MouseEvent) => this.onClick(event));
     }
     if (this.hasTooltips()) {
-      $parent.on('mouseleave', () => this.onMouseLeave(d3event)).on('mousemove', () => this.onMouseMove(d3event));
+      $parent.on('mouseleave', (event: MouseEvent) => this.onMouseLeave(event)).on('mousemove', (event: MouseEvent) => this.onMouseMove(event));
     }
 
     this.parent.classList.add(TDP_SCATTERPLOT_CSS_PREFIX);
@@ -473,7 +473,7 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
     select(this.parent)
       .select<HTMLElement>(`.${TDP_SCATTERPLOT_CSS_PREFIX}-draw-area`)
       .call(this.zoomBehavior)
-      .on('wheel', () => d3event.preventDefault());
+      .on('wheel', (event: WheelEvent) => event.preventDefault());
   }
 
   protected setDataImpl(data: T[]) {
@@ -519,7 +519,7 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
     this.render(ERenderReason.DIRTY);
   }
 
-  protected getMouseNormalizedPos(canvasPixelPox = this.mousePosAtCanvas()) {
+  protected getMouseNormalizedPos(canvasPixelPox: number[]) {
     const { n2pX, n2pY } = this.transformedNormalized2PixelScales();
 
     function range(r: number[]) {
@@ -715,8 +715,8 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
     throw new Error('Not Implemented');
   }
 
-  protected mousePosAtCanvas() {
-    const pos = mouse(this.parent);
+  protected mousePosAtCanvas(event: MouseEvent) {
+    const pos = pointer(event, this.parent);
     // shift by the margin since the scales doesn't include them for better scaling experience
     return [pos[0] - this.props.marginLeft, pos[1] - this.props.marginTop];
   }
@@ -800,9 +800,8 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
     return t;
   }
 
-  private onZoom() {
-    const evt = <D3ZoomEvent<any, any>>d3event;
-    const newValue: ZoomTransform = this.shiftTransform(evt.transform);
+  private onZoom(event: D3ZoomEvent<any, any>) {
+    const newValue: ZoomTransform = this.shiftTransform(event.transform);
     const oldValue = this.currentTransform;
     this.currentTransform = newValue;
     const { scale } = this.props;
@@ -825,7 +824,7 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
       this.render(ERenderReason.PERFORM_TRANSLATE, delta);
     }
     // nothing if no change
-    this.emit(AScatterplot.EVENT_ZOOM_CHANGED, d3event);
+    this.emit(AScatterplot.EVENT_ZOOM_CHANGED, event);
   }
 
   private onZoomEnd() {
@@ -843,20 +842,20 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
     }
   }
 
-  private onDragStart() {
-    this.lasso.start(d3event.x, d3event.y);
+  private onDragStart(event: D3DragEvent<any, any, any>) {
+    this.lasso.start(event.x, event.y);
     if (!this.clearSelectionImpl(true)) {
       this.render(ERenderReason.SELECTION_CHANGED);
     }
   }
 
-  private onDrag() {
+  private onDrag(event: D3DragEvent<any, any, any>) {
     if (this.dragHandle < 0) {
       this.dragHandle = window.setInterval(this.updateDrag.bind(this), this.props.lasso.interval);
     }
-    this.lasso.setCurrent(d3event.x, d3event.y);
+    this.lasso.setCurrent(event.x, event.y);
     this.render(ERenderReason.SELECTION_CHANGED);
-    this.emit(AScatterplot.EVENT_DRAGGED, d3event);
+    this.emit(AScatterplot.EVENT_DRAGGED, event);
   }
 
   private updateDrag() {
@@ -865,11 +864,11 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
     }
   }
 
-  private onDragEnd() {
+  private onDragEnd(event: D3DragEvent<any, any, any>) {
     clearInterval(this.dragHandle);
     this.dragHandle = -1;
 
-    this.lasso.end(d3event.x, d3event.y);
+    this.lasso.end(event.x, event.y);
     if (!this.retestLasso()) {
       this.render(ERenderReason.SELECTION_CHANGED);
     }
@@ -890,7 +889,7 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
       this.selection = [];
       return;
     }
-    const { x, y, clickRadiusX, clickRadiusY } = this.getMouseNormalizedPos();
+    const { x, y, clickRadiusX, clickRadiusY } = this.getMouseNormalizedPos(this.mousePosAtCanvas(event));
     // find closest data item
     const tester = QuadtreeUtils.ellipseTester(x, y, clickRadiusX, clickRadiusY);
     this.selectWithTester(tester);
@@ -914,7 +913,7 @@ export abstract class AScatterplot<T, C extends IScatterplotOptions<T>> extends 
     if (this.showTooltipHandle >= 0) {
       this.onMouseLeave(event);
     }
-    const pos = this.mousePosAtCanvas();
+    const pos = this.mousePosAtCanvas(event);
     // TODO find a more efficient way or optimize the timing
     this.showTooltipHandle = window.setTimeout(this.showTooltip.bind(this, pos, event), this.props.tooltipDelay);
     this.emit(AScatterplot.EVENT_MOUSE_MOVED, event);

@@ -1,7 +1,7 @@
 /**
  * Created by sam on 19.12.2016.
  */
-import { select, event as d3event, scaleLinear, brushX, brushY, brush } from 'd3v7';
+import { select, scaleLinear, brushX, brushY, brush } from 'd3v7';
 import { Scatterplot } from './Scatterplot';
 import { TDP_SCATTERPLOT_CSS_PREFIX } from './constants';
 import { EScaleAxes } from './AScatterplot';
@@ -36,8 +36,8 @@ export class MiniMap {
         $node.call(this.brush.on('brush', this.brushed.bind(this)));
         plot.on(Scatterplot.EVENT_WINDOW_CHANGED, this.update.bind(this));
     }
-    brushed() {
-        const s = d3event.selection;
+    brushed(event) {
+        const s = event.selection;
         let xMinMax = this.xscale.domain();
         let yMinMax = this.yscale.domain();
         let sx;
