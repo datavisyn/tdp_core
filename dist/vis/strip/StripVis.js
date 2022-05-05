@@ -8,13 +8,15 @@ import { beautifyLayout } from '../general/layoutUtils';
 import { createStripTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { StripVisSidebar } from './StripVisSidebar';
+import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import { CloseButton } from '../sidebar/CloseButton';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
     preSidebar: null,
     postSidebar: null,
 };
-export function StripVis({ config, extensions, columns, setConfig, selectionCallback = () => null, selected = {}, scales, hideSidebar = false, }) {
+export function StripVis({ config, extensions, columns, setConfig, selectionCallback = () => null, selected = {}, scales, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, }) {
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
@@ -50,6 +52,9 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
                 itemclick: false,
                 itemdoubleclick: false,
             },
+            font: {
+                family: 'Roboto, sans-serif',
+            },
             autosize: true,
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
@@ -71,11 +76,9 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
                         d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
-            mergedExtensions.postPlot),
-        !hideSidebar ? (React.createElement("div", { className: "position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2" },
-            React.createElement("button", { className: "btn btn-primary-outline", type: "button", "data-bs-toggle": "collapse", "data-bs-target": `#generalVisBurgerMenu${id}`, "aria-expanded": "true", "aria-controls": "generalVisBurgerMenu" },
-                React.createElement("i", { className: "fas fa-bars" })),
-            React.createElement("div", { className: "collapse show collapse-horizontal", id: `generalVisBurgerMenu${id}` },
-                React.createElement(StripVisSidebar, { config: config, extensions: extensions, columns: columns, setConfig: setConfig })))) : null));
+            mergedExtensions.postPlot,
+            showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
+        !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
+            React.createElement(StripVisSidebar, { config: config, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
 }
 //# sourceMappingURL=StripVis.js.map
