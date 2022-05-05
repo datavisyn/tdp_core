@@ -1,5 +1,6 @@
 alembic==1.7.7
 fastapi==0.75.0
+cachetools==5.0.0
 flask-smorest==0.37.0
 flask-swagger-ui==3.36.0
 Flask==2.0.3
