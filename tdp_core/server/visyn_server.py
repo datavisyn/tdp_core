@@ -4,7 +4,8 @@ import sys
 import threading
 from typing import Dict, Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exception_handlers import http_exception_handler
 from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
 from pydantic.utils import deep_update
@@ -45,7 +46,6 @@ def create_visyn_server(
     logging.info("All settings successfully loaded")
 
     app = FastAPI(
-        # TODO: Remove debug
         debug=manager.settings.is_development_mode,
         title="Visyn Server",
         # TODO: Extract version from package.json
@@ -55,6 +55,13 @@ def create_visyn_server(
         redoc_url="/api/redoc",
         **fast_api_args,
     )
+
+    @app.exception_handler(Exception)
+    async def all_exception_handler(request: Request, e: Exception):
+        logging.exception("An unhandled exception occurred")
+        return await http_exception_handler(
+            request, HTTPException(status_code=500, detail=str(e) if manager.settings.is_development_mode else "Internal server error")
+        )
 
     # Store all globals also in app.state.<manager> to allow access in FastAPI routes via request.app.state.<manager>.
     app.state.settings = manager.settings
