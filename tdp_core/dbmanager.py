@@ -94,10 +94,10 @@ class DBManager(object):
         session = self.create_session(engine_or_id)
 
         try:
-            existing_session = get_request().state.db_sessions
+            existing_sessions = get_request().state.db_sessions
         except (KeyError, AttributeError):
-            existing_session = []
-            get_request().state.db_sessions = existing_session
-        existing_session.append(session)
+            existing_sessions = []
+            get_request().state.db_sessions = existing_sessions
+        existing_sessions.append(session)
 
         return session

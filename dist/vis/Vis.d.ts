@@ -1,5 +1,5 @@
 import { IVisConfig, VisColumn, EFilterOptions } from './interfaces';
-export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, setExternalConfig, externalConfig, hideSidebar, }: {
+export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, setExternalConfig, closeCallback, showCloseButton, externalConfig, hideSidebar, }: {
     /**
      * Required data columns which are displayed.
      */
@@ -25,6 +25,8 @@ export declare function Vis({ columns, selected, colors, shapes, selectionCallba
      */
     filterCallback?: (s: EFilterOptions) => void;
     setExternalConfig?: (config: IVisConfig) => void;
+    closeCallback?: () => void;
+    showCloseButton?: boolean;
     externalConfig?: IVisConfig;
     hideSidebar?: boolean;
 }): JSX.Element;

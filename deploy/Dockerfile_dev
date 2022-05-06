@@ -13,7 +13,7 @@ RUN echo '#!/bin/sh\npip install --no-cache-dir --no-deps -r /phovea/requirement
 RUN chmod +x /tmp/entrypoint.sh
 ENTRYPOINT [ "/tmp/entrypoint.sh" ]
 
-# Default command is to start the server in debug mode
-CMD [ "python -m debugpy --listen 0.0.0.0:5678 -m uvicorn tdp_core.server.main:app --reload --host 0.0.0.0 --port 9000"]
+# Default command is to start the server
+CMD [ "python -m uvicorn tdp_core.server.main:app --reload --host 0.0.0.0 --port 9000" ]
 
 EXPOSE 9000
