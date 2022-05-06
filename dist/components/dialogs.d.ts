@@ -1,6 +1,5 @@
 /// <reference types="jquery" />
 /// <reference types="select2" />
-/// <reference types="cypress" />
 /// <reference types="jquery.scrollto" />
 /// <reference types="bootstrap" />
 import '../webpack/_bootstrap';
