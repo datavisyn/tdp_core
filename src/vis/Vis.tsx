@@ -21,6 +21,7 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
+import { isSankey, SankeyVis } from './sankey';
 
 const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
@@ -181,6 +182,8 @@ export function Vis({
 
   return (
     <>
+      {isSankey(visConfig) ? <SankeyVis config={visConfig} /> : null}
+
       {isScatter(visConfig) ? (
         <ScatterVis
           config={visConfig}

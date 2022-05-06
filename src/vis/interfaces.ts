@@ -6,6 +6,7 @@ export enum ESupportedPlotlyVis {
   VIOLIN = 'Violin Plot',
   STRIP = 'Strip Plot',
   BAR = 'Bar Chart',
+  SANKEY = 'Sankey',
 }
 
 export const allVisTypes: ESupportedPlotlyVis[] = [
@@ -14,6 +15,7 @@ export const allVisTypes: ESupportedPlotlyVis[] = [
   ESupportedPlotlyVis.VIOLIN,
   ESupportedPlotlyVis.STRIP,
   ESupportedPlotlyVis.PCP,
+  ESupportedPlotlyVis.SANKEY,
 ];
 
 export enum EBarDisplayType {
@@ -115,7 +117,11 @@ export interface IPCPConfig {
   allColumnsSelected: ColumnInfo[];
 }
 
-export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
+export interface ISankeyConfig {
+  type: ESupportedPlotlyVis.SANKEY;
+}
+
+export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig | ISankeyConfig;
 
 type ValueGetter<T> = () => T | Promise<T>;
 
