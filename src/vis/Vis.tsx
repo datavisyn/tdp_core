@@ -21,7 +21,7 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
-import { isSankey, SankeyVis } from './sankey';
+import { isSankey, sankeyMergeDefaultConfig, SankeyVis } from './sankey';
 
 const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
@@ -128,6 +128,10 @@ export function Vis({
   }, []);
 
   React.useEffect(() => {
+    if (isSankey(inconsistentVisConfig)) {
+      const newConfig = sankeyMergeDefaultConfig(columns, inconsistentVisConfig);
+      _setVisConfig({ current: newConfig, consistent: newConfig });
+    }
     if (isScatter(inconsistentVisConfig)) {
       const newConfig = scatterMergeDefaultConfig(columns, inconsistentVisConfig);
       _setVisConfig({ current: newConfig, consistent: newConfig });
@@ -182,7 +186,7 @@ export function Vis({
 
   return (
     <>
-      {isSankey(visConfig) ? <SankeyVis config={visConfig} /> : null}
+      {isSankey(visConfig) ? <SankeyVis config={visConfig} setConfig={setVisConfig} columns={columns} /> : null}
 
       {isScatter(visConfig) ? (
         <ScatterVis

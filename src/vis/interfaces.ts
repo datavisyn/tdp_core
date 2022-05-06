@@ -119,7 +119,23 @@ export interface IPCPConfig {
 
 export interface ISankeyConfig {
   type: ESupportedPlotlyVis.SANKEY;
+  catColumnsSelected: ColumnInfo[];
 }
+
+type Test = { type: string } | { type: number; test: number };
+
+const k: IVisConfig = {
+  type: ESupportedPlotlyVis.SANKEY,
+};
+
+const t: ISankeyConfig = {
+  type: ESupportedPlotlyVis.SANKEY,
+};
+
+const p: IVisConfig = { ...t };
+
+const d: { type: string }[] = [];
+d.push(k);
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig | ISankeyConfig;
 

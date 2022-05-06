@@ -12,6 +12,8 @@ import { StripVisSidebar } from './strip/StripVisSidebar';
 import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
 import { useSyncedRef } from '../hooks';
+import { isSankey, sankeyMergeDefaultConfig } from './sankey';
+import { SankeyVisSidebar } from './sankey/SankeyVisSidebar';
 
 export type VisSidebarProps = {
   /**
@@ -44,6 +46,9 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
   }, [visConfig, setExternalConfigRef]);
 
   useEffect(() => {
+    if (isSankey(visConfig)) {
+      setVisConfig(sankeyMergeDefaultConfig(columns, visConfig));
+    }
     if (isScatter(visConfig)) {
       setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
     }
@@ -64,6 +69,8 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
   }, [visConfig.type]);
   return (
     <>
+      {isSankey(visConfig) ? <SankeyVisSidebar config={visConfig} setConfig={setVisConfig} className={className} style={style} columns={columns} /> : null}
+
       {isScatter(visConfig) ? (
         <ScatterVisSidebar
           config={visConfig}
