@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { LocalDataProvider, IColumnDesc } from 'lineupjs';
 import { ILazyLoadedColumn } from './internal/column';
 import { EViewMode, IAdditionalColumnDesc, IScoreRow, ISelection } from '../base/interfaces';
