@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { merge, sum, mean, min, max } from 'lodash';
 import { median } from 'd3';
 import { I18nextManager } from '../../i18n';
@@ -104,6 +105,7 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, ag
                     x: vertFlag ? uniqueColVals : aggregateVals,
                     y: !vertFlag ? uniqueColVals : aggregateVals,
                     text: uniqueColVals,
+                    ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueMultiples}, ${uniqueGroup}`),
                     textposition: 'none',
                     hoverinfo: vertFlag ? 'y+text' : 'x+text',
                     orientation: vertFlag ? 'v' : 'h',
@@ -154,6 +156,7 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggregateColum
                 x: vertFlag ? uniqueColVals : finalAggregateValues,
                 y: !vertFlag ? uniqueColVals : finalAggregateValues,
                 text: uniqueColVals,
+                ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueVal}`),
                 textposition: 'none',
                 hoverinfo: vertFlag ? 'y+text' : 'x+text',
                 orientation: vertFlag ? 'v' : 'h',
@@ -198,6 +201,7 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateCo
             data: {
                 x: vertFlag ? uniqueColVals : finalAggregateValues,
                 y: !vertFlag ? uniqueColVals : finalAggregateValues,
+                ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueVal}`),
                 text: uniqueColVals,
                 textposition: 'none',
                 hoverinfo: vertFlag ? 'y+text' : 'x+text',
@@ -217,7 +221,7 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateCo
         });
         plotCounterEdit += 1;
     });
-    return plotCounterEdit;
+    return plotCounter;
 }
 async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, config, plots, scales, plotCounter) {
     let plotCounterEdit = plotCounter;
@@ -226,6 +230,8 @@ async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, co
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const aggValues = getAggregateValues(aggregateType, catColValues.resolvedValues, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
     const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
+    const valIdArr = valArr.map((val) => []);
+    catColValues.resolvedValues.forEach((row) => valIdArr[valArr.indexOf(row.val)].push(row.id));
     const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
     plots.push({
         data: {
@@ -235,6 +241,7 @@ async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, co
             textposition: 'none',
             hoverinfo: vertFlag ? 'y+text' : 'x+text',
             ids: valArr,
+            customdata: valIdArr,
             orientation: vertFlag ? 'v' : 'h',
             xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
             yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,

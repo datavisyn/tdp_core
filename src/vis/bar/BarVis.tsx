@@ -144,6 +144,12 @@ export function BarVis({
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
+            onClick={(e: any) => {
+              const clickedCategory = e.points[0].id;
+              console.log(e);
+              console.log(config.group)
+              console.log(clickedCategory);
+            }}
             // plotly redraws everything on updates, so you need to reappend title and
             onUpdate={() => {
               for (const p of traces.plots) {
