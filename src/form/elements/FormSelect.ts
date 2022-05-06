@@ -116,7 +116,15 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+    const testId = this.elementDesc.label
+      .replace(/<\/?[^>]+(>|$)/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .toLowerCase();
+    this.$rootNode = $formNode
+      .append('div')
+      .classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true)
+      .attr('data-testid', testId);
     const rowNode = this.$rootNode.append('div').classed('row', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel(rowNode);
@@ -124,6 +132,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     const $colDiv = rowNode.append('div').classed('col', true);
     this.$inputNode = $colDiv.append('select');
     this.elementDesc.attributes.clazz = this.elementDesc.attributes.clazz.replace('form-control', 'form-select'); // filter out the form-control class, because the border it creates doesn't contain the whole element due to absolute positioning and it isn't necessary
+    this.$inputNode.attr('data-testid', 'form-select');
     this.setAttributes(this.$inputNode, this.elementDesc.attributes);
   }
 

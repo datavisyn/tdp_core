@@ -102,7 +102,8 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       this.$inputNode
         .select('span.badge')
         .html(text)
-        .attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text }) as string);
+        .attr('title', I18nextManager.getInstance().i18n.t('tdp:core.FormMap.badgeTitle', { text }) as string)
+        .attr('data-testid', 'form-map-dropdown');
     });
   }
 
@@ -131,7 +132,11 @@ export class FormMap extends AFormElement<IFormMapDesc> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$rootNode = $formNode.append('div').classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+    // use label for data testid and remove special characters such as a colon
+    this.$rootNode = $formNode
+      .append('div')
+      .classed(this.inline ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true)
+      .attr('data-testid', this.elementDesc.label.replace(/[^\w\s]/gi, ''));
     this.$inputNode = this.$rootNode.append('div');
     this.setVisible(this.elementDesc.visible);
 
@@ -153,17 +158,19 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       this.$inputNode.classed('dropdown', true);
 
       this.$inputNode.html(`
-          <button class="btn bg-white border border-gray-400 border-1 dropdown-toggle" type="button" id="${
+          <button class="btn bg-white border border-gray-400 border-1 dropdown-toggle" data-testid="form-map-button" type="button" id="${
             this.elementDesc.attributes.id
           }l" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             ${this.elementDesc.label}
             <span class="badge rounded-pill bg-secondary"></span>
             <span class="caret"></span>
           </button>
-          <div class="dropdown-menu p-2" data-bs-popper="static" aria-labelledby="${this.elementDesc.attributes.id}l" style="min-width: 25em">
+          <div class="dropdown-menu p-2" data-bs-popper="static" data-testid="form-map-dropdown" aria-labelledby="${
+            this.elementDesc.attributes.id
+          }l" style="min-width: 25em">
             <div class="form-map-container"></div>
             <div class="form-map-apply mt-3">
-                <button class="btn btn-secondary btn-sm">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
+                <button class="btn btn-secondary btn-sm" data-testid="apply-button">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.apply')}</button>
             </div>
           </div>
       `);
@@ -258,7 +265,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
 
     switch (desc.type) {
       case FormElementType.SELECT:
-        parent.insertAdjacentHTML('afterbegin', `<select class="form-control from-control-sm" style="width: 100%"></select>`);
+        parent.insertAdjacentHTML('afterbegin', `<select class="form-control from-control-sm" data-testid="form-select" style="width: 100%"></select>`);
         // register on change listener
         parent.firstElementChild.addEventListener('change', function (this: HTMLSelectElement) {
           row.value = this.value;
@@ -278,7 +285,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
         });
         break;
       case FormElementType.SELECT2:
-        parent.insertAdjacentHTML('afterbegin', `<select class="form-control form-control-sm" style="width: 100%"></select>`);
+        parent.insertAdjacentHTML('afterbegin', `<select class="form-control form-control-sm" data-testid="select2" style="width: 100%"></select>`);
 
         FormSelect.resolveData(desc.optionsData)([]).then((values: IFormSelectOption[]) => {
           const initially = initialValue ? (Array.isArray(initialValue) ? initialValue : [initialValue]).map((d) => (typeof d === 'string' ? d : d.id)) : [];
@@ -291,6 +298,9 @@ export class FormMap extends AFormElement<IFormMapDesc> {
           const $s = <any>$(s);
           // merge only the default options if we have no local data
           $s.select2(merge({}, desc.ajax ? FormSelect2.DEFAULT_AJAX_OPTIONS : FormSelect2.DEFAULT_OPTIONS, desc));
+          const $searchContainer = $('.select2.select2-container', parent);
+          const $search = $searchContainer.find('input');
+          $search.attr('data-testid', 'select2-search-field');
           if (initialValue) {
             $s.val(initially).trigger('change');
           } else if (!defaultSelection && that.elementDesc.options.uniqueKeys) {
@@ -341,7 +351,7 @@ export class FormMap extends AFormElement<IFormMapDesc> {
         break;
       }
       default:
-        parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" value="${initialValue || ''}">`);
+        parent.insertAdjacentHTML('afterbegin', `<input class="form-control form-control-sm" data-testid="default-select" value="${initialValue || ''}">`);
         parent.firstElementChild.addEventListener('change', function (this: HTMLInputElement) {
           row.value = this.value;
           that.fire(FormMap.EVENT_CHANGE, that.value, that.$group);
@@ -392,16 +402,17 @@ export class FormMap extends AFormElement<IFormMapDesc> {
       row.classList.add('row');
       row.classList.add('d-flex');
       row.classList.add('align-items-top');
+      row.setAttribute('data-testid', `row-${this.rows.length}`);
       group.appendChild(row);
       row.innerHTML = `
-        <div class="col-sm-4 form-map-row-key pe-0">
-          <select class="form-select form-select-sm map-selector">
+        <div class="col-sm-4 form-map-row-key pe-0" data-testid="key">
+          <select class="form-select form-select-sm map-selector" data-testid="form-select">
             <option value="">${I18nextManager.getInstance().i18n.t('tdp:core.FormMap.select')}</option>
             ${entries.map((o) => `<option value="${o.value}" ${o.value === d.key ? 'selected="selected"' : ''}>${o.name}</option>`).join('')}
           </select>
         </div>
-        <div class="col-sm-7 form-map-row-value ps-1 pe-1"></div>
-        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" title="${I18nextManager.getInstance().i18n.t(
+        <div class="col-sm-7 form-map-row-value ps-1 pe-1" data-testid="value"></div>
+        <div class="col-sm-1 ps-0 pe-0"><button class="btn-close btn-sm" data-testid="close-button" title="${I18nextManager.getInstance().i18n.t(
           'tdp:core.FormMap.remove',
         )}"></button></div>`;
 

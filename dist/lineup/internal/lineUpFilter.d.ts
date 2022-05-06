@@ -125,13 +125,13 @@ export declare class LineUpFilterUtils {
      * The return value of this function can be passed to `JSON.stringify()` and stored in the provenance graph.
      * @param groupBy Value returned from the `Group By` dialog
      */
-    static serializeGroupByValue(groupBy: IStringGroupCriteria): IStringGroupCriteria;
+    static serializeGroupByValue(groupBy: IStringGroupCriteria): any;
     /**
      * Restores LineUp StringColumn's Group By` dialog's values from the provenance graph and returns an `IStringGroupCriteria`.
      * @param groupBy Value as saved in the provenance graph.
      */
     static restoreGroupByValue(groupBy: ISerializedStringGroupCriteria): ISerializedStringGroupCriteria | {
-        type: import("lineupjs").EStringGroupCriteriaType.regex;
+        type: any;
         values: RegExp[];
     };
 }

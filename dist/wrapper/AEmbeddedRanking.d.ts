@@ -20,7 +20,7 @@ export declare abstract class AEmbeddedRanking<T extends IRow> implements IViewP
     data: LocalDataProvider;
     constructor(node: HTMLElement);
     getInstance(): IEmbeddedRanking;
-    protected buildRanking(graph: ProvenanceGraph, refKey: string, options?: Partial<IARankingViewOptions>): Promise<LocalDataProvider>;
+    protected buildRanking(graph: ProvenanceGraph, refKey: string, options?: Partial<IARankingViewOptions>): Promise<any>;
     protected abstract loadColumnDescs(): Promise<IColumnDesc[]> | IColumnDesc[];
     protected abstract loadRows(): Promise<T[]> | T[];
     protected abstract createInitialRanking(lineup: LocalDataProvider): void;

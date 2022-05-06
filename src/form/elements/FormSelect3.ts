@@ -49,7 +49,15 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+    const testId = this.elementDesc.label
+      .replace(/<\/?[^>]+(>|$)/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .toLowerCase();
+    this.$rootNode = $formNode
+      .append('div')
+      .classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true)
+      .attr('data-testid', testId);
     const rowNode = this.$rootNode.append('div').classed('row', true);
     this.setVisible(this.elementDesc.visible);
     this.appendLabel(rowNode);

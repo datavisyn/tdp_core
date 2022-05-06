@@ -1,6 +1,7 @@
 /// <reference types="jquery" />
 /// <reference types="select2" />
 /// <reference types="cypress" />
+/// <reference types="jquery.scrollto" />
 /// <reference types="bootstrap" />
 /**
  * Check if typing text in form input element has been completed

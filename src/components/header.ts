@@ -9,7 +9,7 @@ import { AppMetaDataUtils } from './metaData';
 const getTemplate = () => {
   return `<nav class="navbar phovea-navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid">
-    <a class="navbar-brand" href="#" data-header="appLink"></a>
+    <a class="navbar-brand" data-testid="logo-tab" href="#" data-header="appLink"></a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#headerNavBar" aria-controls="headerNavBar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -28,7 +28,7 @@ const getTemplate = () => {
                 </a>
             </li>
             <li class="nav-item" hidden data-header="aboutLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerAboutDialog" title="${I18nextManager.getInstance().i18n.t(
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerAboutDialog" data-testid="header-about-link" title="${I18nextManager.getInstance().i18n.t(
                   'phovea:ui.about',
                 )}">
                     <i class="fas fa-info fa-fw" aria-hidden="true"></i>
@@ -36,7 +36,7 @@ const getTemplate = () => {
                 </a>
             </li>
             <li class="nav-item" hidden data-header="bugLink">
-                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerReportBugDialog" title="${I18nextManager.getInstance().i18n.t(
+                <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#headerReportBugDialog" data-testid="header-report-bug-link" title="${I18nextManager.getInstance().i18n.t(
                   'phovea:ui.reportBug',
                 )}">
                     <i class="fas fa-bug fa-fw" aria-hidden="true"></i>
@@ -63,7 +63,9 @@ const getTemplate = () => {
       <div class="modal-content">
           <div class="modal-header">
               <h4 class="modal-title"> ${I18nextManager.getInstance().i18n.t('phovea:ui.about')}</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label=" ${I18nextManager.getInstance().i18n.t('phovea:ui.close')}">
+              <button type="button" class="btn-close" data-testid="close-button" data-bs-dismiss="modal" aria-label=" ${I18nextManager.getInstance().i18n.t(
+                'phovea:ui.close',
+              )}">
               </button>
           </div>
           <div class="modal-body" data-header="about">
@@ -87,7 +89,9 @@ const getTemplate = () => {
       <div class="modal-content">
           <div class="modal-header">
               <h4 class="modal-title"> ${I18nextManager.getInstance().i18n.t('phovea:ui.reportBug')}</h4>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label=" ${I18nextManager.getInstance().i18n.t('phovea:ui.close')}">
+              <button type="button" class="btn-close" data-bs-dismiss="modal" data-testid="close-button" aria-label=" ${I18nextManager.getInstance().i18n.t(
+                'phovea:ui.close',
+              )}">
               </button>
           </div>
           <div class="modal-body" data-header="bug">

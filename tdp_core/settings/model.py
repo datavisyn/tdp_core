@@ -28,14 +28,15 @@ class DisableSettings(BaseModel):
     extensions: List[str] = []
 
 
-class SecurityStoreSettings(BaseModel):
+class AlbSecurityStoreSettings(BaseModel):
     enable: bool = False
     cookie_name: Optional[str] = None
     signout_url: Optional[str] = None
 
 
 class SecurityStoreSettings(BaseModel):
-    alb_security_store: SecurityStoreSettings = SecurityStoreSettings()
+    alb_security_store: AlbSecurityStoreSettings = AlbSecurityStoreSettings()
+    """Settings for the ALB security store"""
 
 
 class SecuritySettings(BaseModel):
@@ -102,13 +103,20 @@ class TDPCoreSettings(BaseModel):
 class GlobalSettings(BaseSettings):
     env: Literal["development", "production"] = "development"
     secret_key: str = "VERY_SECRET_STUFF_T0IB84wlQrdMH8RVT28w"
+
+    # JWT options mostly inspired by flask-jwt-extended: https://flask-jwt-extended.readthedocs.io/en/stable/options/#general-options
+    jwt_token_location: List[str] = ["headers", "cookies"]
     jwt_expire_in_seconds: int = 24 * 60 * 60
     jwt_refresh_if_expiring_in_seconds: int = 30 * 60
     jwt_algorithm: str = "HS256"
     jwt_access_cookie_name: str = "dv_access_token"
+    jwt_header_name: str = "Authorization"
+    jwt_header_type: str = "Bearer"
     jwt_cookie_secure: bool = False
     jwt_cookie_samesite: str = "Strict"
     jwt_access_cookie_path: str = "/"
+
+    # General settings for tdp_core
     tdp_core: TDPCoreSettings = TDPCoreSettings()
 
     @property

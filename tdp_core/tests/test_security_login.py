@@ -78,3 +78,35 @@ def test_jwt_login(client: TestClient):
     response = client.get("/loggedinas")
     assert response.status_code == 200
     assert response.json() == '"not_yet_logged_in"'
+
+
+def test_jwt_token_location(client: TestClient):
+    # Login to set a cookie
+    response = client.post("/login", data={"username": "admin", "password": "admin"})
+    assert response.status_code == 200
+    access_token = response.json()["access_token"]
+
+    # Disallow all methods
+    manager.settings.jwt_token_location = []
+
+    # Does not work even though both header and cookies are passed
+    response = client.get("/loggedinas", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json() == '"not_yet_logged_in"'
+
+    # Allow headers
+    manager.settings.jwt_token_location = ["headers"]
+
+    # Does not work as only headers are accepted
+    response = client.get("/loggedinas")
+    assert response.json() == '"not_yet_logged_in"'
+
+    # Does work as header is passed
+    response = client.get("/loggedinas", headers={"Authorization": f"Bearer {access_token}"})
+    assert response.json() == '"not_yet_logged_in"'
+
+    # Allow cookies
+    manager.settings.jwt_token_location = ["cookies"]
+
+    # Does work even without header
+    response = client.get("/loggedinas")
+    assert response.json() != '"not_yet_logged_in"'

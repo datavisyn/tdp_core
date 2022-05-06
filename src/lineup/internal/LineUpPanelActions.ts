@@ -121,6 +121,7 @@ export class LineUpPanelActions extends EventHandler {
 
     this.node = doc.createElement('aside');
     this.node.classList.add('lu-side-panel-wrapper');
+    this.node.setAttribute('data-testid', 'side-panel-wrapper');
 
     this.header = new PanelHeader(this.node);
 

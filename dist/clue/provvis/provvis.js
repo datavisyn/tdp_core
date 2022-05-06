@@ -405,7 +405,7 @@ export class LayoutedProvVis extends AVisInstance {
             d3.select('header.clue-modeselector').classed('collapsed', true);
         }
         $p.html(`
-      <a href="#" class="btn-collapse" title="${this.options.provVisCollapsed
+      <a href="#" class="btn-collapse" data-testid="show-provenance-button" title="${this.options.provVisCollapsed
             ? I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph')
             : I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph')}"><i class="far ${this.options.provVisCollapsed ? 'fa-arrow-alt-circle-left' : 'fa-arrow-alt-circle-right'}"></i></a>
       <div>

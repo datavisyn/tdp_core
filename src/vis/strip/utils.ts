@@ -13,6 +13,7 @@ import {
   IStripConfig,
 } from '../interfaces';
 import { resolveColumnValues } from '../general/layoutUtils';
+import { DEFAULT_COLOR, SELECT_COLOR } from '../general/constants';
 
 export function isStrip(s: IVisConfig): s is IStripConfig {
   return s.type === ESupportedPlotlyVis.STRIP;
@@ -81,13 +82,13 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
           // @ts-ignore
           selected: {
             marker: {
-              color: '#E29609',
+              color: SELECT_COLOR,
               opacity: 1,
             },
           },
           unselected: {
             marker: {
-              color: '#2e2e2e',
+              color: DEFAULT_COLOR,
               opacity: 0.5,
             },
           },
@@ -130,13 +131,13 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
           // @ts-ignore
           selected: {
             marker: {
-              color: '#E29609',
+              color: SELECT_COLOR,
               opacity: 1,
             },
           },
           unselected: {
             marker: {
-              color: '#2e2e2e',
+              color: DEFAULT_COLOR,
               opacity: 0.5,
             },
           },
