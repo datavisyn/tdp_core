@@ -93,10 +93,9 @@ ButtonStory.parameters = {
       const valueArr = src.match(valueRegex);
 
       const props: Iprops = {};
-
-      varArr.forEach((idx) => {
-        props[varArr[idx]] = valueArr[idx];
-      });
+      for (const i in varArr) {
+        if (varArr[i] && valueArr[i]) props[varArr[i]] = valueArr[i];
+      }
 
       return `
       <button type="button" className="btn${props.type && props.type !== 'default' ? `-${props.type}` : ''}${props.themeColor ? `-${props.themeColor}` : ''}${
