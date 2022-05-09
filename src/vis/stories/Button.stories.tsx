@@ -85,8 +85,7 @@ interface Iprops {
 ButtonStory.parameters = {
   backgrounds: { default: 'light' },
   docs: {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    transformSource: (src: string, _: unknown) => {
+    transformSource: (src: string) => {
       const varRegex = /\w+(?=(\s)*(=))/g;
       const valueRegex = /(?<=(["']))(?:(?=(\\?))\2.)*?(?=\1)/g;
 
@@ -94,10 +93,10 @@ ButtonStory.parameters = {
       const valueArr = src.match(valueRegex);
 
       const props: Iprops = {};
-      // eslint-disable-next-line guard-for-in
-      for (const i in varArr) {
-        props[varArr[i]] = valueArr[i];
-      }
+
+      varArr.forEach((idx) => {
+        props[varArr[idx]] = valueArr[idx];
+      });
 
       return `
       <button type="button" className="btn${props.type && props.type !== 'default' ? `-${props.type}` : ''}${props.themeColor ? `-${props.themeColor}` : ''}${
