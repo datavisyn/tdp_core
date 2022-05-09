@@ -120,7 +120,11 @@ export interface IPCPConfig {
 export interface IHeatConfig {
   type: ESupportedPlotlyVis.HEAT;
   numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
+  color: ColumnInfo | null;
+  numColorScaleType: ENumericalColorScaleType;
+  shape: ColumnInfo | null;
+  dragMode: EScatterSelectSettings;
+  alphaSliderVal: number;
 }
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig | IHeatConfig;

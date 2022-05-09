@@ -1,18 +1,24 @@
 import { merge } from 'lodash';
-import { I18nextManager } from '../../i18n';
+import d3 from 'd3';
 import {
   PlotlyInfo,
   PlotlyData,
-  VisCategoricalColumn,
   EColumnTypes,
-  ESupportedPlotlyVis,
-  IVisConfig,
   VisNumericalColumn,
+  IVisConfig,
   Scales,
+  ESupportedPlotlyVis,
   VisColumn,
   IHeatConfig,
+  ENumericalColorScaleType,
+  VisCategoricalValue,
+  VisNumericalValue,
+  EScatterSelectSettings,
 } from '../interfaces';
-import { resolveColumnValues } from '../general/layoutUtils';
+import { getCol } from '../sidebar';
+import { getCssValue } from '../../utils';
+import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
+import { I18nextManager } from '../../i18n';
 import { DEFAULT_COLOR, SELECT_COLOR } from '../general/constants';
 
 export function isHeat(s: IVisConfig): s is IHeatConfig {
@@ -22,154 +28,352 @@ export function isHeat(s: IVisConfig): s is IHeatConfig {
 const defaultConfig: IHeatConfig = {
   type: ESupportedPlotlyVis.HEAT,
   numColumnsSelected: [],
-  catColumnsSelected: [],
+  color: null,
+  numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+  shape: null,
+  dragMode: EScatterSelectSettings.RECTANGLE,
+  alphaSliderVal: 0.5,
 };
 
-export function stripMergeDefaultConfig(columns: VisColumn[], config: IHeatConfig): IVisConfig {
+export function heatMergeDefaultConfig(columns: VisColumn[], config: IHeatConfig): IVisConfig {
   const merged = merge({}, defaultConfig, config);
 
   const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
 
-  if (merged.numColumnsSelected.length === 0 && numCols.length > 0) {
+  if (merged.numColumnsSelected.length === 0 && numCols.length > 1) {
     merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
+    merged.numColumnsSelected.push(numCols[numCols.length - 2].info);
+  } else if (merged.numColumnsSelected.length === 1 && numCols.length > 1) {
+    if (numCols[numCols.length - 1].info.id !== merged.numColumnsSelected[0].id) {
+      merged.numColumnsSelected.push(numCols[numCols.length - 1].info);
+    } else {
+      merged.numColumnsSelected.push(numCols[numCols.length - 2].info);
+    }
   }
 
   return merged;
 }
 
-export async function createStripTraces(columns: VisColumn[], config: IHeatConfig, selected: { [key: string]: boolean }, scales: Scales): Promise<PlotlyInfo> {
+export function moveSelectedToFront(
+  col: (VisCategoricalValue | VisNumericalValue)[],
+  selectedMap: { [key: string]: boolean },
+): (VisCategoricalValue | VisNumericalValue)[] {
+  const selectedVals = col.filter((v) => selectedMap[v.id]);
+  const remainingVals = col.filter((v) => !selectedMap[v.id]);
+
+  const sortedCol = [...remainingVals, ...selectedVals];
+
+  return sortedCol;
+}
+
+export async function createHeatTraces(
+  columns: VisColumn[],
+  selected: { [key: string]: boolean },
+  config: IHeatConfig,
+  scales: Scales,
+  shapes: string[] | null,
+): Promise<PlotlyInfo> {
   let plotCounter = 1;
 
-  if (!config.numColumnsSelected || !config.catColumnsSelected) {
-    return {
-      plots: [],
-      legendPlots: [],
-      rows: 0,
-      cols: 0,
-      errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
-      errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
-    };
+  const emptyVal = {
+    plots: [],
+    legendPlots: [],
+    rows: 0,
+    cols: 0,
+    errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.heatError'),
+    errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
+
+    formList: ['color', 'shape', 'bubble', 'opacity'],
+  };
+
+  if (!config.numColumnsSelected) {
+    return emptyVal;
   }
+
+  const hasSelected = Object.values(selected).includes(true);
 
   const numCols: VisNumericalColumn[] = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
-  const catCols: VisCategoricalColumn[] = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisCategoricalColumn);
   const plots: PlotlyData[] = [];
 
-  const numColValues = await resolveColumnValues(numCols);
-  const catColValues = await resolveColumnValues(catCols);
+  const validCols = await resolveColumnValues(numCols);
+  const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
+  const colorCol = await resolveSingleColumn(getCol(columns, config.color));
 
-  // if we only have numerical columns, add them individually
-  if (catColValues.length === 0) {
-    for (const numCurr of numColValues) {
-      plots.push({
-        data: {
-          y: numCurr.resolvedValues.map((v) => v.val),
-          xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
-          yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-          ids: numCurr.resolvedValues.map((v) => v.id.toString()),
-          showlegend: false,
-          type: 'box',
-          boxpoints: 'all',
-          name: 'All points',
-          mode: 'none',
-          pointpos: 0,
-          selectedpoints: numCurr.resolvedValues
-            .map((v, i) => {
-              return { index: i, selected: selected[v.id] };
-            })
-            .filter((v) => v.selected)
-            .map((v) => v.index),
-          // @ts-ignore
-          selected: {
-            marker: {
-              color: SELECT_COLOR,
-              opacity: 1,
-            },
-          },
-          unselected: {
-            marker: {
-              color: DEFAULT_COLOR,
-              opacity: 0.5,
-            },
-          },
-          // @ts-ignore
-          box: {
-            visible: true,
-          },
-          line: {
-            color: 'rgba(255, 255, 255, 0)',
-          },
+  validCols.forEach((c) => {
+    c.resolvedValues = moveSelectedToFront(c.resolvedValues, selected);
+  });
+
+  if (colorCol) {
+    colorCol.resolvedValues = moveSelectedToFront(colorCol.resolvedValues, selected);
+  }
+
+  const shapeScale = config.shape
+    ? d3.scale
+        .ordinal<string>()
+        .domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))] as string[])
+        .range(shapes)
+    : null;
+
+  let min = 0;
+  let max = 0;
+
+  if (config.color) {
+    min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+    max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+  }
+
+  const numericalColorScale = config.color
+    ? d3.scale
+        .linear<string, number>()
+        .domain([max, (max + min) / 2, min])
+        .range(
+          config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL
+            ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')]
+            : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')],
+        )
+    : null;
+
+  const legendPlots: PlotlyData[] = [];
+
+  // cant currently do 1d scatterplots
+  if (validCols.length === 1) {
+    return emptyVal;
+  }
+
+  // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
+  if (validCols.length === 2) {
+    // prepare data for plotly heatmap
+    const xValues = validCols[0].resolvedValues.map((v) => v.val);
+    const xUniqueValues = [...new Set(xValues)];
+    const yValues = validCols[1].resolvedValues.map((v) => v.val);
+    const yUniqueValues = [...new Set(yValues)];
+    // create array for heatmap values
+    const zValues = new Array(xUniqueValues.length);
+    for (let i = 0; i < zValues.length; i++) {
+      zValues[i] = new Array(yUniqueValues.length).fill(0);
+    }
+
+    // fill array
+    for (let i = 0; i < xValues.length; i++) {
+      const x = xValues[i];
+      const y = yValues[i];
+      const xIdx = xUniqueValues.indexOf(x);
+      const yIdx = yUniqueValues.indexOf(y);
+      zValues[xIdx][yIdx] += 1;
+    }
+
+    plots.push({
+      data: {
+        z: zValues,
+        x: yUniqueValues,
+        y: xUniqueValues,
+        ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
+        xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+        yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+        type: 'heatmap',
+        mode: 'markers',
+        showlegend: false,
+        hoverlabel: {
+          bgcolor: 'black',
         },
-        xLabel: numCurr.info.name,
-        yLabel: numCurr.info.name,
-      });
-      plotCounter += 1;
+        hovertext: validCols[0].resolvedValues.map(
+          (v, i) =>
+            `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${
+              colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
+            }`,
+        ),
+        hoverinfo: 'text',
+        text: validCols[0].resolvedValues.map((v) => v.id.toString()),
+        marker: {
+          line: {
+            width: 0,
+          },
+          symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+          color: colorCol
+            ? hasSelected
+              ? colorCol.resolvedValues.map((v) =>
+                  selected[v.id] ? (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)) : DEFAULT_COLOR,
+                )
+              : colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
+            : validCols[0].resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
+          opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
+          size: 8,
+        },
+      },
+      xLabel: validCols[0].info.name,
+      yLabel: validCols[1].info.name,
+    });
+  } else {
+    for (const yCurr of validCols) {
+      for (const xCurr of validCols) {
+        // if on the diagonal, make a histogram.
+        if (xCurr.info.id === yCurr.info.id) {
+          plots.push({
+            data: {
+              x: xCurr.resolvedValues.map((v) => v.val),
+              xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+              yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+              type: 'histogram',
+              hoverlabel: {
+                namelength: 5,
+              },
+              showlegend: false,
+              marker: {
+                color: DEFAULT_COLOR,
+              },
+              opacity: config.alphaSliderVal,
+            },
+            xLabel: xCurr.info.name,
+            yLabel: yCurr.info.name,
+          });
+          // otherwise, make a scatterplot
+        } else {
+          plots.push({
+            data: {
+              x: xCurr.resolvedValues.map((v) => v.val),
+              y: yCurr.resolvedValues.map((v) => v.val),
+              ids: xCurr.resolvedValues.map((v) => v.id.toString()),
+              xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+              yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+              type: 'heatmap',
+              mode: 'markers',
+              hovertext: xCurr.resolvedValues.map(
+                (v, i) =>
+                  `${v.id}<br>x: ${v.val}<br>y: ${yCurr.resolvedValues[i].val}<br>${
+                    colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
+                  }`,
+              ),
+              hoverinfo: 'text',
+              hoverlabel: {
+                bgcolor: 'black',
+              },
+              showlegend: false,
+              text: validCols[0].resolvedValues.map((v) => v.id.toString()),
+              marker: {
+                line: {
+                  width: 0,
+                },
+                symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+                color: colorCol
+                  ? hasSelected
+                    ? colorCol.resolvedValues.map((v) =>
+                        selected[v.id]
+                          ? colorCol.type === EColumnTypes.NUMERICAL
+                            ? numericalColorScale(v.val as number)
+                            : scales.color(v.val)
+                          : DEFAULT_COLOR,
+                      )
+                    : colorCol.resolvedValues.map((v) =>
+                        colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
+                      )
+                  : xCurr.resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
+                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
+                size: 8,
+              },
+            },
+            xLabel: xCurr.info.name,
+            yLabel: yCurr.info.name,
+          });
+        }
+
+        plotCounter += 1;
+      }
     }
   }
 
-  for (const numCurr of numColValues) {
-    for (const catCurr of catColValues) {
-      plots.push({
-        data: {
-          x: catCurr.resolvedValues.map((v) => v.val),
-          y: numCurr.resolvedValues.map((v) => v.val),
-          ids: numCurr.resolvedValues.map((v) => v.id.toString()),
-          xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
-          yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-          showlegend: false,
-          type: 'box',
-          boxpoints: 'all',
-          name: 'All points',
-          mode: 'none',
-          pointpos: 0,
-          selectedpoints: catCurr.resolvedValues
-            .map((v, i) => {
-              return { index: i, selected: selected[v.id] };
-            })
-            .filter((v) => v.selected)
-            .map((v) => v.index),
-          // @ts-ignore
-          selected: {
-            marker: {
-              color: SELECT_COLOR,
-              opacity: 1,
-            },
-          },
-          unselected: {
-            marker: {
-              color: DEFAULT_COLOR,
-              opacity: 0.5,
-            },
-          },
-          box: {
-            visible: true,
-          },
-          line: {
-            color: '#FFFFFF',
-          },
-          meanline: {
-            visible: true,
-          },
-          transforms: [
-            {
-              type: 'groupby',
-              groups: catCurr.resolvedValues.map((v) => v.val) as string[],
-            },
-          ],
+  // if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
+  if (colorCol && colorCol.type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
+    legendPlots.push({
+      data: {
+        x: validCols[0].resolvedValues.map((v) => v.val),
+        y: validCols[0].resolvedValues.map((v) => v.val),
+        ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
+        xaxis: 'x',
+        yaxis: 'y',
+        type: 'heatmap',
+        mode: 'markers',
+        visible: 'legendonly',
+        legendgroup: 'color',
+        // @ts-ignore
+        legendgrouptitle: {
+          text: colorCol.info.name,
         },
-        xLabel: catCurr.info.name,
-        yLabel: numCurr.info.name,
-      });
-      plotCounter += 1;
-    }
+        marker: {
+          line: {
+            width: 0,
+          },
+          symbol: 'circle',
+          size: 8,
+          color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : DEFAULT_COLOR,
+          opacity: config.alphaSliderVal,
+        },
+        transforms: [
+          {
+            type: 'groupby',
+            groups: colorCol.resolvedValues.map((v) => v.val as string),
+            styles: [
+              ...[...new Set<string>(colorCol.resolvedValues.map((v) => v.val) as string[])].map((c) => {
+                return { target: c, value: { name: c } };
+              }),
+            ],
+          },
+        ],
+      },
+      xLabel: validCols[0].info.name,
+      yLabel: validCols[0].info.name,
+    });
+  }
+
+  // if we have a column for the shape, add a legendPlot that creates a legend.
+  if (shapeCol) {
+    legendPlots.push({
+      data: {
+        x: validCols[0].resolvedValues.map((v) => v.val),
+        y: validCols[0].resolvedValues.map((v) => v.val),
+        ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
+        xaxis: 'x',
+        yaxis: 'y',
+        type: 'heatmap',
+        mode: 'markers',
+        visible: 'legendonly',
+        showlegend: true,
+        legendgroup: 'shape',
+        // @ts-ignore
+        legendgrouptitle: {
+          text: shapeCol.info.name,
+        },
+        marker: {
+          line: {
+            width: 0,
+          },
+          opacity: config.alphaSliderVal,
+          size: 8,
+          symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+          color: DEFAULT_COLOR,
+        },
+        transforms: [
+          {
+            type: 'groupby',
+            groups: shapeCol.resolvedValues.map((v) => v.val as string),
+            styles: [
+              ...[...new Set<string>(shapeCol.resolvedValues.map((v) => v.val) as string[])].map((c) => {
+                return { target: c, value: { name: c } };
+              }),
+            ],
+          },
+        ],
+      },
+      xLabel: validCols[0].info.name,
+      yLabel: validCols[0].info.name,
+    });
   }
 
   return {
     plots,
-    legendPlots: [],
-    rows: numColValues.length,
-    cols: catColValues.length > 0 ? catColValues.length : 1,
-    errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.stripError'),
+    legendPlots,
+    rows: Math.sqrt(plots.length),
+    cols: Math.sqrt(plots.length),
+    errorMessage: I18nextManager.getInstance().i18n.t('tdp:core.vis.heatError'),
     errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
   };
 }

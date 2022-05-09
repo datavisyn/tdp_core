@@ -49,6 +49,22 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
         />
       ) : null}
 
+      {isHeat(externalConfig) ? (
+        <HeatVisSidebar
+          config={externalConfig}
+          optionsConfig={{
+            color: {
+              enable: true,
+            },
+          }}
+          setConfig={setExternalConfig}
+          filterCallback={filterCallback}
+          columns={columns}
+          className={className}
+          style={style}
+        />
+      ) : null}
+
       {isViolin(externalConfig) ? (
         <ViolinVisSidebar
           config={externalConfig}
@@ -74,10 +90,6 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
 
       {isBar(externalConfig) ? (
         <BarVisSidebar config={externalConfig} setConfig={setExternalConfig} columns={columns} className={className} style={style} />
-      ) : null}
-
-      {isHeat(externalConfig) ? (
-        <HeatVisSidebar config={externalConfig} setConfig={setExternalConfig} columns={columns} className={className} style={style} />
       ) : null}
     </>
   );
