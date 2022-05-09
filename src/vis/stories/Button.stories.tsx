@@ -101,8 +101,7 @@ ButtonStory.parameters = {
       <button type="button" className="btn${props.type && props.type !== 'default' ? `-${props.type}` : ''}${props.themeColor ? `-${props.themeColor}` : ''}${
         props.size && props.size !== 'default' ? ` ${props.size}` : ''
       }${props.disable && props.disable !== 'default' ? ` ${props.disable}` : ''}">
-    ${props.icon ? `<i className={${props.icon} ${props.text ? 'me-2' : ''}} />` : ''}
-    ${props.text}
+    ${props.icon ? `<i className={${props.icon} ${props.text ? 'me-2' : ''}} />\n    ${props.text}` : `${props.text}`}
 </button>
       `;
     },
