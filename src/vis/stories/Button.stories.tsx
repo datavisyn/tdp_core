@@ -32,7 +32,7 @@ function Button({
 
 // create default export to show story
 export default {
-  title: 'Example/Styles/Buttons',
+  title: 'Example/UI/Buttons',
   component: Button,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
   argTypes: {
