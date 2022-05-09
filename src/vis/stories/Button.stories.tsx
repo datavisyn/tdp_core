@@ -1,5 +1,6 @@
 import React from 'react';
 import { ComponentStory } from '@storybook/react';
+import { Title, Subtitle, Description, Primary, ArgsTable, Stories, PRIMARY_STORY } from '@storybook/addon-docs';
 
 // Create function for displaying a button with all customization options
 type ThemeColorTypes = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark' | 'gray';
@@ -8,19 +9,22 @@ function Button({
   type,
   text,
   size,
-  addIcon,
-  isDisabled,
+  icon,
+  disable,
 }: {
   themeColor: ThemeColorTypes;
   type?: 'icon' | 'text' | 'outline' | 'default';
   size?: 'btn-sm' | 'btn-lg' | 'default';
   text: string | null;
-  addIcon: boolean;
-  isDisabled: boolean;
+  icon: string;
+  disable: 'default' | 'disabled';
 }) {
   return (
-    <button type="button" className={`btn btn${type !== 'default' ? `-${type}` : ''}-${themeColor} ${size !== 'default' && size} ${isDisabled && 'disabled'}`}>
-      {addIcon && <i className={`fas fa-plus ${text ? 'me-2' : ''}`} />}
+    <button
+      type="button"
+      className={`btn btn${type !== 'default' ? `-${type}` : ''}-${themeColor} ${size !== 'default' && size} ${disable !== 'default' && disable} `}
+    >
+      {icon && <i className={`${icon} ${text ? 'me-2' : ''}`} />}
       {text}
     </button>
   );
@@ -44,6 +48,10 @@ export default {
       options: ['btn-sm', 'btn-lg', 'default'],
       control: { type: 'radio' },
     },
+    disable: {
+      options: ['default', 'disabled'],
+      control: { type: 'radio' },
+    },
   },
 };
 
@@ -59,8 +67,8 @@ export const ButtonStory = Template.bind({}) as typeof Template;
 ButtonStory.args = {
   text: 'Test Button',
   themeColor: 'primary',
-  addIcon: false,
-  isDisabled: false,
+  icon: 'fas fa-plus',
+  disable: 'default',
   type: 'default',
   size: 'default',
 };
@@ -69,6 +77,9 @@ interface Iprops {
   text?: string;
   themeColor?: string;
   type?: string;
+  size?: string;
+  disable?: string;
+  icon?: string;
 }
 
 ButtonStory.parameters = {
@@ -77,7 +88,7 @@ ButtonStory.parameters = {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     transformSource: (src: string, _: unknown) => {
       const varRegex = /\w+(?=(\s)*(=))/g;
-      const valueRegex = /(?<=(=)[\s'"]*)\w+/g;
+      const valueRegex = /(?<=(["']))(?:(?=(\\?))\2.)*?(?=\1)/g;
 
       const varArr = src.match(varRegex);
       const valueArr = src.match(valueRegex);
@@ -88,9 +99,37 @@ ButtonStory.parameters = {
         props[varArr[i]] = valueArr[i];
       }
 
-      return `<button type="button" className="btn${props.type ? `-${props.type}` : ''}${props.themeColor ? `-${props.themeColor}` : ''}">
-      ${props.text}
-      </button>`;
+      return `
+      <button type="button" className="btn${props.type && props.type !== 'default' ? `-${props.type}` : ''}${props.themeColor ? `-${props.themeColor}` : ''}${
+        props.size && props.size !== 'default' ? ` ${props.size}` : ''
+      }${props.disable && props.disable !== 'default' ? ` ${props.disable}` : ''}">
+    ${props.icon ? `<i className={${props.icon} ${props.text ? 'me-2' : ''}} />` : ''}
+    ${props.text}
+</button>
+      `;
     },
+    page: () => (
+      <>
+        <Title />
+        <Subtitle>Configure Button</Subtitle>
+        <Primary />
+        <ArgsTable story={PRIMARY_STORY} />
+        <Stories />
+        <Subtitle>Documentation</Subtitle>
+        <Description>
+          An in depth documentation about styling of Buttons can be found in the style guid:
+          https://docs.google.com/document/d/1O3SX49CRacjR2WyteFByPO8rKrFYklh7YJ5FsaBjuDQ/edit#heading=h.h4bfja47lkm7
+        </Description>
+        <Description>The button element can be styled with the following properties:</Description>
+        <Description
+          markdown="
+        - Theme Color: `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `light`, `dark`, `gray`"
+        />
+        <Description markdown="- Type: `icon`, `text`, `outline`, `default` (not specifying a type leads to `default`)" />
+        <Description markdown="- Size: `btn-sm`, `btn-lg`, `default` (not specifying a size leads to `default` size)" />
+        <Description markdown="- disabled: `disabled`, `default` (not specifying disabled leads to `default`)" />
+        <Description markdown="- icon: icons can be added in front of buttons" />
+      </>
+    ),
   },
 };
