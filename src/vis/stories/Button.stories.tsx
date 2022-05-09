@@ -85,7 +85,9 @@ interface Iprops {
 ButtonStory.parameters = {
   backgrounds: { default: 'light' },
   docs: {
+    // change source in documentation to display code for button
     transformSource: (src: string) => {
+      // src contains string of call to Button component from above, using regex to parse parameters and return nice code for button
       const varRegex = /\w+(?=(\s)*(=))/g;
       const valueRegex = /(?<=(["']))(?:(?=(\\?))\2.)*?(?=\1)/g;
 
