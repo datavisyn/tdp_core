@@ -22,6 +22,7 @@ import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
 import { useSyncedRef } from '../hooks/useSyncedRef';
+import { HeatVis, isHeat } from './heat';
 
 const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
@@ -259,6 +260,20 @@ export function Vis({
         <BarVis
           config={visConfig}
           setConfig={setVisConfig}
+          columns={columns}
+          scales={scales}
+          hideSidebar={hideSidebar}
+          showCloseButton={showCloseButton}
+          closeButtonCallback={closeCallback}
+        />
+      ) : null}
+
+      {isHeat(visConfig) ? (
+        <HeatVis
+          config={visConfig}
+          selectionCallback={selectionCallback}
+          setConfig={setVisConfig}
+          selected={selectedMap}
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}

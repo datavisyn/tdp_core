@@ -201,3 +201,29 @@ ParallelCoordinatesPlot.args = {
     ],
   },
 };
+
+export const HeatmapPlot = Template.bind({}) as typeof Template;
+HeatmapPlot.args = {
+  externalConfig: {
+    type: ESupportedPlotlyVis.HEAT,
+    numColumnsSelected: [
+      {
+        description: '',
+        id: 'sepalLength',
+        name: 'Sepal Length',
+      },
+      {
+        description: '',
+        id: 'sepalWidth',
+        name: 'Sepal Width',
+      },
+    ],
+    catColumnsSelected: [
+      {
+        description: '',
+        id: 'species',
+        name: 'Species',
+      },
+    ],
+  },
+};

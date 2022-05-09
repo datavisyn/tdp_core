@@ -10,6 +10,8 @@ import { BarVisSidebar } from './bar/BarVisSidebar';
 import { StripVisSidebar } from './strip/StripVisSidebar';
 import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
+import { isHeat } from './heat';
+import { HeatVisSidebar } from './heat/HeatVisSidebar';
 
 export type VisSidebarProps = {
   /**
@@ -72,6 +74,10 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
 
       {isBar(externalConfig) ? (
         <BarVisSidebar config={externalConfig} setConfig={setExternalConfig} columns={columns} className={className} style={style} />
+      ) : null}
+
+      {isHeat(externalConfig) ? (
+        <HeatVisSidebar config={externalConfig} setConfig={setExternalConfig} columns={columns} className={className} style={style} />
       ) : null}
     </>
   );
