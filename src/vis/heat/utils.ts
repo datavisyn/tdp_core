@@ -148,9 +148,9 @@ export async function createHeatTraces(
     const yValues = validCols[1].resolvedValues.map((v) => v.val);
     const yUniqueValues = [...new Set(yValues)];
     // create array for heatmap values
-    const zValues = new Array(xUniqueValues.length);
+    const zValues = new Array(yUniqueValues.length);
     for (let i = 0; i < zValues.length; i++) {
-      zValues[i] = new Array(yUniqueValues.length).fill(0);
+      zValues[i] = new Array(xUniqueValues.length).fill(0);
     }
 
     // fill array
@@ -159,14 +159,14 @@ export async function createHeatTraces(
       const y = yValues[i];
       const xIdx = xUniqueValues.indexOf(x);
       const yIdx = yUniqueValues.indexOf(y);
-      zValues[xIdx][yIdx] += 1;
+      zValues[yIdx][xIdx] += 1;
     }
 
     plots.push({
       data: {
         z: zValues,
-        x: yUniqueValues,
-        y: xUniqueValues,
+        x: xUniqueValues,
+        y: yUniqueValues,
         ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
         xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
         yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -176,13 +176,13 @@ export async function createHeatTraces(
         hoverlabel: {
           bgcolor: 'black',
         },
-        hovertext: validCols[0].resolvedValues.map(
-          (v, i) =>
-            `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${
-              colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
-            }`,
-        ),
-        hoverinfo: 'text',
+        // hovertext: validCols[0].resolvedValues.map(
+        //   (v, i) =>
+        //     `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${
+        //       colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
+        //     }`,
+        // ),
+        // hoverinfo: 'text',
         text: validCols[0].resolvedValues.map((v) => v.id.toString()),
         marker: {
           line: {
