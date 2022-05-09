@@ -1,117 +1,103 @@
 import logging
+from typing import Dict, Union
 
-from phovea_server.config import view as configview
-from phovea_server.plugin import list as list_plugins
+from fastapi import FastAPI
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session
 
-__author__ = 'Samuel Gratzl'
+from . import manager
+from .dbview import DBConnector
+from .middleware.close_web_sessions_middleware import CloseWebSessionsMiddleware
+from .middleware.request_context_middleware import get_request
+
 _log = logging.getLogger(__name__)
 
 
 class DBManager(object):
-  def __init__(self):
-    self._initialized = False
+    def __init__(self):
+        self._initialized = False
 
-    self.connectors = {}
-    self._plugins = {}
-    self._engines = dict()
-    self._sessionmakers = dict()
+        self.connectors: Dict[str, DBConnector] = {}
+        self._plugins = {}
+        self._engines = dict()
+        self._sessionmakers = dict()
 
-    for p in list_plugins('tdp-sql-database-definition'):
-      config = configview(p.configKey)
-      connector = p.load().factory()
-      if not connector.dburl:
-        connector.dburl = config['dburl']
-      if not connector.statement_timeout:
-        connector.statement_timeout = config.get('statement_timeout', default=None)
-      if not connector.statement_timeout_query:
-        connector.statement_timeout_query = config.get('statement_timeout_query', default=None)
-      if not connector.dburl:
-        _log.critical('no db url defined for %s at config key %s - is your configuration up to date?', p.id,
-                      p.configKey)
-        continue
+    def init_app(self, app: FastAPI):
+        app.add_middleware(CloseWebSessionsMiddleware)
 
-      self._plugins[p.id] = p
-      self.connectors[p.id] = connector
+        for p in manager.registry.list("tdp-sql-database-definition"):
+            config = manager.settings.get_nested(p.configKey)
+            connector: DBConnector = p.load().factory()
+            if not connector.dburl:
+                connector.dburl = config["dburl"]
+            if not connector.statement_timeout:
+                connector.statement_timeout = config.get("statement_timeout", None)
+            if not connector.statement_timeout_query:
+                connector.statement_timeout_query = config.get("statement_timeout_query", None)
+            if not connector.dburl:
+                _log.critical(
+                    "no db url defined for %s at config key %s - is your configuration up to date?",
+                    p.id,
+                    p.configKey,
+                )
+                continue
 
-    for p in list_plugins('tdp-sql-database-extension'):
-      base_connector = self.connectors.get(p.base)
-      if not base_connector:
-        _log.critical('invalid database extension no base found: %s base: %s' % (p.id, p.base))
-        continue
-      connector = p.load().factory()
-      if not connector.statement_timeout:
-        connector.statement_timeout = base_connector.statement_timeout
-      if not connector.statement_timeout_query:
-        connector.statement_timeout_query = base_connector.statement_timeout_query
+            self._plugins[p.id] = p
+            self.connectors[p.id] = connector
 
-      self._plugins[p.id] = p
-      self.connectors[p.id] = connector
+    def _load_engine(self, item):
+        if not self._initialized:
+            self._initialized = True
+            for p in manager.registry.list("greenifier"):
+                _log.info("run greenifier: %s", p.id)
+                p.load().factory()
+        if item in self._engines:
+            return self._engines[item]
 
-  def _load_engine(self, item):
-    if not self._initialized:
-      self._initialized = True
-      for p in list_plugins('greenifier'):
-        _log.info('run greenifier: %s', p.id)
-        p.load().factory()
-    if item in self._engines:
-      return self._engines[item]
+        p = self._plugins[item]
+        connector = self.connectors[item]
+        config = manager.settings.get_nested(p.configKey)
 
-    p = self._plugins[item]
-    if p.type == 'tdp-sql-database-extension':
-      engine = self._load_engine(p.base)
-      self._engines[item] = engine
-      return engine
+        engine = connector.create_engine(config)
+        maker = connector.create_sessionmaker(engine)
 
-    connector = self.connectors[item]
-    # _log.info('%s -> %s', p.id, connector.dburl)
-    config = configview(p.configKey)
+        self._engines[item] = engine
+        self._sessionmakers[engine] = maker
 
-    engine = connector.create_engine(config)
-    maker = connector.create_sessionmaker(engine)
+        return engine
 
-    self._engines[item] = engine
-    self._sessionmakers[engine] = maker
+    def connector_and_engine(self, item):
+        if item not in self.connectors:
+            raise NotImplementedError("missing db connector: " + item)
+        return self.connectors[item], self._load_engine(item)
 
-    return engine
+    def connector(self, item) -> DBConnector:
+        if item not in self.connectors:
+            raise NotImplementedError("missing db connector: " + item)
+        return self.connectors[item]
 
-  def __getitem__(self, item):
-    if item not in self:
-      raise NotImplementedError('missing db connector: ' + item)
-    return self.connectors[item], self._load_engine(item)
+    def engine(self, item: Union[Engine, str]) -> Engine:
+        if isinstance(item, Engine):
+            return item
 
-  def connector(self, item):
-    if item not in self:
-      raise NotImplementedError('missing db connector: ' + item)
-    return self.connectors[item]
+        if item not in self.connectors:
+            raise NotImplementedError("missing db connector: " + item)
+        return self._load_engine(item)
 
-  def engine(self, item):
-    if item not in self:
-      raise NotImplementedError('missing db connector: ' + item)
-    return self._load_engine(item)
+    def create_session(self, engine_or_id: Union[Engine, str]) -> Session:
+        return self._sessionmakers[self.engine(engine_or_id)]()
 
-  def create_session(self, engine):
-    return self._sessionmakers[engine]()
+    def create_web_session(self, engine_or_id: Union[Engine, str]) -> Session:
+        """
+        Create a session that is added to the request state as db_session, which automatically closes it in the db_session middleware.
+        """
+        session = self.create_session(engine_or_id)
 
-  def create_web_session(self, engine):
-    """
-    create a session that is scoped by the current flask request.
-    Note: if an exception occurs in the debug mode, flask for debugging reason won't destroy it
-    """
-    from flask import after_this_request
+        try:
+            existing_sessions = get_request().state.db_sessions
+        except (KeyError, AttributeError):
+            existing_sessions = []
+            get_request().state.db_sessions = existing_sessions
+        existing_sessions.append(session)
 
-    session = self.create_session(engine)
-
-    @after_this_request
-    def close_db(response_or_exc):
-      session.close()
-      return response_or_exc
-
-    return session
-
-  def __contains__(self, item):
-    return item in self.connectors
-
-  def get(self, item, default=None):
-    if item not in self:
-      return default
-    return self[item]
+        return session

@@ -74,6 +74,8 @@ export class LineupVisWrapper {
                 selected: selectedList,
                 selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
                 filterCallback: (s) => this.filterCallback(s),
+                showCloseButton: true,
+                closeCallback: () => this.hide(),
             }), this.node);
         };
         this.toggleCustomVis = () => {
@@ -85,7 +87,6 @@ export class LineupVisWrapper {
             this.updateCustomVis();
         };
         this.hide = () => {
-            ReactDOM.unmountComponentAtNode(this.node);
             this.viewable = false;
             this.node.style.display = 'none';
         };

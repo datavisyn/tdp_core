@@ -31,10 +31,12 @@ interface BarVisProps {
         postSidebar?: React.ReactNode;
     };
     columns: VisColumn[];
+    closeButtonCallback?: () => void;
+    showCloseButton?: boolean;
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
     hideSidebar?: boolean;
 }
-export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar }: BarVisProps): JSX.Element;
+export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar, showCloseButton, closeButtonCallback, }: BarVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=BarVis.d.ts.map
