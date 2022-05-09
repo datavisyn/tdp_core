@@ -483,7 +483,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     }
 
     $p.html(`
-      <a href="#" class="btn-collapse" title="${
+      <a href="#" class="btn-collapse" data-testid="show-provenance-button" title="${
         this.options.provVisCollapsed
           ? I18nextManager.getInstance().i18n.t('phovea:clue.provvis.showProvenanceGraph')
           : I18nextManager.getInstance().i18n.t('phovea:clue.provvis.hideProvenanceGraph')
