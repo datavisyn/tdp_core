@@ -2,7 +2,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
-import React from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
 import { LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
@@ -91,6 +91,7 @@ export function Ranking({ data = [], itemSelection = { idtype: null, ids: [] }, 
  * Maybe refactor this when using the native lineup implementation of scores
  */
 onAddScoreColumn, }) {
+    var _a, _b;
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
     const options = merge({}, defaults, opts);
@@ -109,13 +110,13 @@ onAddScoreColumn, }) {
         itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const addColumn = (colDesc, d, id = null, position) => {
+    const addColumn = useCallback((colDesc, d, id = null, position) => {
         // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
         colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : colorsRef.current.getColumnColor(id);
         return LazyColumn.addLazyColumn(colDesc, d, providerRef.current, position, () => {
             taggleRef.current.update();
         });
-    };
+    }, [colorsRef]);
     const addScoreColumn = (score) => {
         const args = typeof options.additionalComputeScoreParameter === 'function' ? options.additionalComputeScoreParameter() : options.additionalComputeScoreParameter;
         const colDesc = score.createDesc(args);
@@ -340,6 +341,21 @@ onAddScoreColumn, }) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    const stringCols = (_b = (_a = providerRef.current) === null || _a === void 0 ? void 0 : _a.getLastRanking()) === null || _b === void 0 ? void 0 : _b.flatColumns.toString();
+    const columns = useMemo(() => {
+        var _a;
+        const ranking = (_a = providerRef.current) === null || _a === void 0 ? void 0 : _a.getLastRanking();
+        return ranking ? ranking.flatColumns : [];
+    }, [stringCols]);
+    useEffect(() => {
+        const context = {
+            columns,
+            freeColor: (id) => colorsRef.current.freeColumnColor(id),
+            add: (columns) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
+            remove: (columns) => columns.forEach((c) => c.removeMe()),
+        };
+        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
+    }, [addColumn, columns, onContextChanged, colorsRef]);
     const build = React.useMemo(() => async () => {
         setBusy(true);
         columnDesc.forEach((c) => providerRef.current.pushDesc({ ...c }));

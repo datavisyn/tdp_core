@@ -1,7 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable import/no-cycle */
-/* eslint-disable @typescript-eslint/no-shadow */
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Ranking, IRankingProps } from './Ranking';
 import { ISelection } from '../base/interfaces';
 import { IContext, ISelectionAdapter } from './selection/ISelectionAdapter';
@@ -44,9 +42,12 @@ export function RankingViewComponent({
    */
   onAddScoreColumn,
 }: IRankingViewComponentProps) {
-  const isMounted = useRef(false);
-  const selections = new Map<string, ISelection>();
   const [context, setContext] = React.useState<IContext>(null);
+
+  const selections = useMemo(() => {
+    return new Map<string, ISelection>();
+  }, []);
+
   const viewRef = React.useRef<HTMLDivElement | null>(null);
 
   const runAuthorizations = useCallback(async (): Promise<void> => {
@@ -111,6 +112,15 @@ export function RankingViewComponent({
   }, [runAuthorizations]);
   const { status } = useAsync(init, []);
 
+  React.useEffect(() => {
+    if (context) {
+      setContext({ ...context, selection: inputSelection });
+    }
+  }, [inputSelection]);
+
+  // TODO:: Pretty sure this only works by blind luck, because the parameter changed update gets canceled on
+  // selection change because theyre both running at the same time, but its a race case
+
   /**
    * onInputSelectionChanged
    */
@@ -128,20 +138,25 @@ export function RankingViewComponent({
         }
       }
     }
-  }, [status, inputSelection, context]);
+  }, [status, context, selectionAdapter, inputSelection, selections]);
 
   /**
    * onParametersChanged
    */
   React.useEffect(() => {
-    // ignore first time parameter are passed since there is no change
-    if (status === 'success' && parameters && isMounted.current) {
+    if (status === 'success' && parameters) {
       if (selectionAdapter) {
         selectionAdapter.parameterChanged(null, () => context);
       }
     }
-    isMounted.current = true;
-  }, [status, parameters, context]);
+  }, [status, parameters, context, selectionAdapter]);
+
+  const onContextChangedCallback = useCallback(
+    (newContext: Omit<IContext, 'selection'>) => {
+      setContext({ ...newContext, selection: inputSelection });
+    },
+    [inputSelection],
+  );
 
   return (
     <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${status !== 'success' && 'tdp-busy'}`}>
@@ -151,7 +166,7 @@ export function RankingViewComponent({
         itemSelection={itemSelection}
         options={options}
         onItemSelect={onItemSelect}
-        onContextChanged={(context: Omit<IContext, 'selection'>) => setContext({ ...context, selection: inputSelection })}
+        onContextChanged={onContextChangedCallback}
         onAddScoreColumn={onAddScoreColumn}
         onBuiltLineUp={onBuiltLineUp}
         onItemSelectionChanged={onItemSelectionChanged}

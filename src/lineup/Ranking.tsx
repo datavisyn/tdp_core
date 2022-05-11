@@ -20,7 +20,7 @@ import {
   Ranking as LineUpRanking,
   UIntTypedArray,
 } from 'lineupjs';
-import React from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
 import { ILazyLoadedColumn, LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
@@ -182,13 +182,16 @@ export function Ranking({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const addColumn = (colDesc: any, d: Promise<IScoreRow<any>[]>, id: string = null, position?: number) => {
-    // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
-    colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : colorsRef.current.getColumnColor(id);
-    return LazyColumn.addLazyColumn(colDesc, d, providerRef.current, position, () => {
-      taggleRef.current.update();
-    });
-  };
+  const addColumn = useCallback(
+    (colDesc: any, d: Promise<IScoreRow<any>[]>, id: string = null, position?: number) => {
+      // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
+      colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : colorsRef.current.getColumnColor(id);
+      return LazyColumn.addLazyColumn(colDesc, d, providerRef.current, position, () => {
+        taggleRef.current.update();
+      });
+    },
+    [colorsRef],
+  );
 
   const addScoreColumn = (score: IScore<any>) => {
     const args =
@@ -380,6 +383,7 @@ export function Ranking({
             return { ...r, ...{ data: await r.data } };
           }),
         );
+
         onAddScoreColumn?.(loadedResults);
       });
 
@@ -447,6 +451,23 @@ export function Ranking({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const stringCols = providerRef.current?.getLastRanking()?.flatColumns.toString();
+
+  const columns = useMemo(() => {
+    const ranking = providerRef.current?.getLastRanking();
+    return ranking ? ranking.flatColumns : [];
+  }, [stringCols]);
+
+  useEffect(() => {
+    const context = {
+      columns,
+      freeColor: (id: string) => colorsRef.current.freeColumnColor(id),
+      add: (columns: ISelectionColumn[]) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
+      remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
+    };
+    onContextChanged?.(context);
+  }, [addColumn, columns, onContextChanged, colorsRef]);
 
   const build = React.useMemo(
     () => async () => {
