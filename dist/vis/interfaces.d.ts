@@ -5,7 +5,8 @@ export declare enum ESupportedPlotlyVis {
     PCP = "Parallel Coordinates Plot",
     VIOLIN = "Violin Plot",
     STRIP = "Strip Plot",
-    BAR = "Bar Chart"
+    BAR = "Bar Chart",
+    SANKEY = "Sankey"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EBarDisplayType {
@@ -92,7 +93,11 @@ export interface IPCPConfig {
     type: ESupportedPlotlyVis.PCP;
     allColumnsSelected: ColumnInfo[];
 }
-export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
+export interface ISankeyConfig {
+    type: ESupportedPlotlyVis.SANKEY;
+    catColumnsSelected: ColumnInfo[];
+}
+export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig | ISankeyConfig;
 declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**

@@ -7,4 +7,5 @@ export declare const BarChart: ComponentStory<typeof Vis>;
 export declare const ViolinPlot: ComponentStory<typeof Vis>;
 export declare const StripPlot: ComponentStory<typeof Vis>;
 export declare const ParallelCoordinatesPlot: ComponentStory<typeof Vis>;
+export declare const SankeyCoordinatesPlot: ComponentStory<typeof Vis>;
 //# sourceMappingURL=Iris.stories.d.ts.map

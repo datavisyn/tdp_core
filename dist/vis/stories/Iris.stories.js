@@ -49,6 +49,15 @@ function fetchIrisData() {
             type: EColumnTypes.CATEGORICAL,
             values: () => dataPromise.then((data) => data.map((r) => r.species).map((val, i) => ({ id: i.toString(), val }))),
         },
+        {
+            info: {
+                description: '',
+                id: 'attribute1',
+                name: 'Attribute1',
+            },
+            type: EColumnTypes.CATEGORICAL,
+            values: () => dataPromise.then((data) => data.map((r) => r.attribute1).map((val, i) => ({ id: i.toString(), val }))),
+        },
     ];
 }
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
@@ -177,6 +186,12 @@ ParallelCoordinatesPlot.args = {
                 name: 'Sepal Width',
             },
         ],
+    },
+};
+export const SankeyCoordinatesPlot = Template.bind({});
+SankeyCoordinatesPlot.args = {
+    externalConfig: {
+        type: ESupportedPlotlyVis.SANKEY,
     },
 };
 //# sourceMappingURL=Iris.stories.js.map

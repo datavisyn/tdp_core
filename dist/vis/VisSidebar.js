@@ -12,6 +12,8 @@ import { StripVisSidebar } from './strip/StripVisSidebar';
 import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
 import { useSyncedRef } from '../hooks';
+import { isSankey, sankeyMergeDefaultConfig } from './sankey';
+import { SankeyVisSidebar } from './sankey/SankeyVisSidebar';
 export function VisSidebar({ columns, filterCallback = () => null, externalConfig = null, setExternalConfig = null, className, style }) {
     const [visConfig, setVisConfig] = useState(externalConfig || {
         type: ESupportedPlotlyVis.SCATTER,
@@ -28,6 +30,9 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
         (_a = setExternalConfigRef.current) === null || _a === void 0 ? void 0 : _a.call(setExternalConfigRef, visConfig);
     }, [visConfig, setExternalConfigRef]);
     useEffect(() => {
+        if (isSankey(visConfig)) {
+            setVisConfig(sankeyMergeDefaultConfig(columns, visConfig));
+        }
         if (isScatter(visConfig)) {
             setVisConfig(scatterMergeDefaultConfig(columns, visConfig));
         }
@@ -47,6 +52,7 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [visConfig.type]);
     return (React.createElement(React.Fragment, null,
+        isSankey(visConfig) ? React.createElement(SankeyVisSidebar, { config: visConfig, setConfig: setVisConfig, className: className, style: style, columns: columns }) : null,
         isScatter(visConfig) ? (React.createElement(ScatterVisSidebar, { config: visConfig, optionsConfig: {
                 color: {
                     enable: true,

@@ -85,6 +85,7 @@
     "plotly.js-dist-min": "^2.8.3",
     "popper.js": "^1.15.0",
     "react": "^16.13.0",
+    "react-dnd": "^16.0.1",
     "react-dom": "^16.13.0",
     "react-highlight-words": "^0.17.0",
     "react-plotly.js": "^2.5.1",

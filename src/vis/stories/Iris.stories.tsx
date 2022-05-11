@@ -63,6 +63,15 @@ function fetchIrisData(): VisColumn[] {
       type: EColumnTypes.CATEGORICAL,
       values: () => dataPromise.then((data) => data.map((r) => r.species).map((val, i) => ({ id: i.toString(), val }))),
     },
+    {
+      info: {
+        description: '',
+        id: 'attribute1',
+        name: 'Attribute1',
+      },
+      type: EColumnTypes.CATEGORICAL,
+      values: () => dataPromise.then((data) => data.map((r) => r.attribute1).map((val, i) => ({ id: i.toString(), val }))),
+    },
   ];
 }
 

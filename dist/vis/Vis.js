@@ -8,6 +8,7 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
+import { isSankey, sankeyMergeDefaultConfig, SankeyVis } from './sankey';
 const DEFAULT_COLORS = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
@@ -64,6 +65,10 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         });
     }, []);
     React.useEffect(() => {
+        if (isSankey(inconsistentVisConfig)) {
+            const newConfig = sankeyMergeDefaultConfig(columns, inconsistentVisConfig);
+            _setVisConfig({ current: newConfig, consistent: newConfig });
+        }
         if (isScatter(inconsistentVisConfig)) {
             const newConfig = scatterMergeDefaultConfig(columns, inconsistentVisConfig);
             _setVisConfig({ current: newConfig, consistent: newConfig });
@@ -109,6 +114,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         return React.createElement("div", { className: "tdp-busy" });
     }
     return (React.createElement(React.Fragment, null,
+        isSankey(visConfig) ? React.createElement(SankeyVis, { config: visConfig, setConfig: setVisConfig, columns: columns }) : null,
         isScatter(visConfig) ? (React.createElement(ScatterVis, { config: visConfig, optionsConfig: {
                 color: {
                     enable: true,
