@@ -457,6 +457,8 @@ export function Ranking({
   const columns = useMemo(() => {
     const ranking = providerRef.current?.getLastRanking();
     return ranking ? ranking.flatColumns : [];
+    // This dep is needed because the columns are not part of a normal variable, only part of a ref. Probably should think of a better way.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stringCols]);
 
   useEffect(() => {

@@ -67,11 +67,6 @@ onAddScoreColumn, }) {
         });
     }, [runAuthorizations]);
     const { status } = useAsync(init, []);
-    React.useEffect(() => {
-        if (context) {
-            setContext({ ...context, selection: inputSelection });
-        }
-    }, [inputSelection]);
     // TODO:: Pretty sure this only works by blind luck, because the parameter changed update gets canceled on
     // selection change because theyre both running at the same time, but its a race case
     /**
@@ -87,7 +82,9 @@ onAddScoreColumn, }) {
             selections.set(name, inputSelection);
             if (name === AView.DEFAULT_SELECTION_NAME) {
                 if (selectionAdapter) {
-                    selectionAdapter.selectionChanged(null, () => context);
+                    selectionAdapter.selectionChanged(null, () => {
+                        return { ...context, selection: inputSelection };
+                    });
                 }
             }
         }
@@ -98,13 +95,15 @@ onAddScoreColumn, }) {
     React.useEffect(() => {
         if (status === 'success' && parameters) {
             if (selectionAdapter) {
-                selectionAdapter.parameterChanged(null, () => context);
+                selectionAdapter.parameterChanged(null, () => {
+                    return { ...context, selection: inputSelection };
+                });
             }
         }
-    }, [status, parameters, context, selectionAdapter]);
+    }, [status, parameters, context, selectionAdapter, inputSelection]);
     const onContextChangedCallback = useCallback((newContext) => {
-        setContext({ ...newContext, selection: inputSelection });
-    }, [inputSelection]);
+        setContext(newContext);
+    }, []);
     return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${status !== 'success' && 'tdp-busy'}` },
         React.createElement(Ranking, { data: data, columnDesc: columnDesc, itemSelection: itemSelection, options: options, onItemSelect: onItemSelect, onContextChanged: onContextChangedCallback, onAddScoreColumn: onAddScoreColumn, onBuiltLineUp: onBuiltLineUp, onItemSelectionChanged: onItemSelectionChanged, onCustomizeRanking: onCustomizeRanking, onUpdateEntryPoint: onUpdateEntryPoint })));
 }

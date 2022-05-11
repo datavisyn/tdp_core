@@ -346,6 +346,8 @@ onAddScoreColumn, }) {
         var _a;
         const ranking = (_a = providerRef.current) === null || _a === void 0 ? void 0 : _a.getLastRanking();
         return ranking ? ranking.flatColumns : [];
+        // This dep is needed because the columns are not part of a normal variable, only part of a ref. Probably should think of a better way.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stringCols]);
     useEffect(() => {
         const context = {

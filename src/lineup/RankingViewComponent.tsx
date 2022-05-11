@@ -42,7 +42,7 @@ export function RankingViewComponent({
    */
   onAddScoreColumn,
 }: IRankingViewComponentProps) {
-  const [context, setContext] = React.useState<IContext>(null);
+  const [context, setContext] = React.useState<Omit<IContext, 'selection'>>(null);
 
   const selections = useMemo(() => {
     return new Map<string, ISelection>();
@@ -112,12 +112,6 @@ export function RankingViewComponent({
   }, [runAuthorizations]);
   const { status } = useAsync(init, []);
 
-  React.useEffect(() => {
-    if (context) {
-      setContext({ ...context, selection: inputSelection });
-    }
-  }, [inputSelection]);
-
   // TODO:: Pretty sure this only works by blind luck, because the parameter changed update gets canceled on
   // selection change because theyre both running at the same time, but its a race case
 
@@ -134,7 +128,9 @@ export function RankingViewComponent({
       selections.set(name, inputSelection);
       if (name === AView.DEFAULT_SELECTION_NAME) {
         if (selectionAdapter) {
-          selectionAdapter.selectionChanged(null, () => context);
+          selectionAdapter.selectionChanged(null, () => {
+            return { ...context, selection: inputSelection };
+          });
         }
       }
     }
@@ -146,17 +142,16 @@ export function RankingViewComponent({
   React.useEffect(() => {
     if (status === 'success' && parameters) {
       if (selectionAdapter) {
-        selectionAdapter.parameterChanged(null, () => context);
+        selectionAdapter.parameterChanged(null, () => {
+          return { ...context, selection: inputSelection };
+        });
       }
     }
-  }, [status, parameters, context, selectionAdapter]);
+  }, [status, parameters, context, selectionAdapter, inputSelection]);
 
-  const onContextChangedCallback = useCallback(
-    (newContext: Omit<IContext, 'selection'>) => {
-      setContext({ ...newContext, selection: inputSelection });
-    },
-    [inputSelection],
-  );
+  const onContextChangedCallback = useCallback((newContext: Omit<IContext, 'selection'>) => {
+    setContext(newContext);
+  }, []);
 
   return (
     <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${status !== 'success' && 'tdp-busy'}`}>
