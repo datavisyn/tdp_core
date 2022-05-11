@@ -106,7 +106,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
   build($formNode: d3.Selection<any>) {
     this.addChangeListener();
 
-    const testId = this.elementDesc.label
+    const testId = (this.elementDesc.label || this.elementDesc.id)
       .replace(/<\/?[^>]+(>|$)/g, '')
       .trim()
       .replace(/\s+/g, '-')
