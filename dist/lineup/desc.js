@@ -30,7 +30,7 @@ export class ColumnDescUtils {
      * @param {Partial<IColumnOptions>} options
      * @returns {IAdditionalColumnDesc}
      */
-    static numberCol(column, min, max, options = {}) {
+    static numberCol(column, min = Number.NaN, max = Number.NaN, options = {}) {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
             type: 'number',
             domain: [min, max],

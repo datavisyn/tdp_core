@@ -76,7 +76,7 @@ export class ColumnDescUtils {
    * @param {Partial<IColumnOptions>} options
    * @returns {IAdditionalColumnDesc}
    */
-  static numberCol(column: string, min: number, max: number, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
+  static numberCol(column: string, min: number = Number.NaN, max: number = Number.NaN, options: Partial<IColumnOptions> = {}): IAdditionalColumnDesc {
     return Object.assign(ColumnDescUtils.baseColumn(column, options), {
       type: 'number',
       domain: [min, max],
