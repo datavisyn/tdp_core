@@ -42,7 +42,7 @@ export declare class ColumnDescUtils {
      * @param {Partial<IColumnOptions>} options
      * @returns {IAdditionalColumnDesc}
      */
-    static numberCol(column: string, min: number, max: number, options?: Partial<IColumnOptions>): IAdditionalColumnDesc;
+    static numberCol(column: string, min?: number, max?: number, options?: Partial<IColumnOptions>): IAdditionalColumnDesc;
     /**
      * creates a new LineUp description for a categorical column
      * @param {string} column the column name to use
