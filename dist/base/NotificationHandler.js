@@ -1,15 +1,19 @@
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { v4 as uuidv4 } from 'uuid';
 import { I18nextManager } from '../i18n';
 export class NotificationHandler {
-    static pushNotification(level, msg, autoHideInMs = -1) {
-        let parent = document.body.querySelector('div.toast-container-custom');
+    static pushNotification(level, content, autoHideInMs = -1) {
+        const uuid = `push-notification-${uuidv4()}`;
+        let parent = document.body.querySelector(`div.toast-container-custom`);
         if (!parent) {
             document.body.insertAdjacentHTML('beforeend', `<div class="toast-container-custom"></div>`);
             parent = document.body.lastElementChild;
         }
         parent.classList.add('push');
-        parent.insertAdjacentHTML('afterbegin', `<div class="alert alert-${level === 'error' ? 'danger' : level} alert-dismissible" role="alert">
+        parent.insertAdjacentHTML('afterbegin', `<div class="alert alert-${level === 'error' ? 'danger' : level} alert-dismissible ${uuid}" role="alert">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    ${msg}</div>`);
+    </div>`);
         const alert = parent.firstElementChild;
         // fix link color
         Array.from(alert.querySelectorAll('a')).forEach((a) => a.classList.add('alert-link'));
@@ -22,6 +26,9 @@ export class NotificationHandler {
                 setTimeout(() => alert.querySelector('button').click(), autoHideInMs);
             }
         }, 10); // wait dom rendered
+        ReactDOM.render(React.createElement(React.Fragment, null,
+            React.createElement("button", { type: "button", className: "btn-close", "data-bs-dismiss": "alert", "aria-label": "Close" }),
+            content), document.getElementsByClassName(uuid)[0]);
     }
     static successfullySaved(type, name) {
         NotificationHandler.pushNotification('success', I18nextManager.getInstance().i18n.t('tdp:core.savedNotification', { type, name }), NotificationHandler.DEFAULT_SUCCESS_AUTO_HIDE);
