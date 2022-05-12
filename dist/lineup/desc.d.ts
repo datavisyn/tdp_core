@@ -49,6 +49,7 @@ export declare class ColumnDescUtils {
      * @param {(string | Partial<ICategory>)[]} categories description of the categories
      * @param {Partial<IColumnOptions>} options
      * @returns {IAdditionalColumnDesc}
+     * @deprecated use `LineUpBuilder` instead, i.e. `buildCategoricalColumn(column).categories(categories).custom('initialRanking', true)`.
      */
     static categoricalCol(column: string, categories: (string | Partial<ICategory>)[], options?: Partial<IColumnOptions>): IAdditionalColumnDesc;
     static hierarchicalCol(column: string, hierarchy: ICategoryNode, options?: Partial<IColumnOptions>): IAdditionalColumnDesc;
