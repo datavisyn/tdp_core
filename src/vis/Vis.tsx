@@ -1,6 +1,6 @@
 import * as React from 'react';
 import d3 from 'd3';
-import { useMemo, useEffect } from 'react';
+import {useMemo, useEffect} from 'react';
 import {
   ESupportedPlotlyVis,
   IVisConfig,
@@ -15,13 +15,13 @@ import {
   EScatterSelectSettings,
   EAggregateTypes,
 } from './interfaces';
-import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
-import { barMergeDefaultConfig, isBar, BarVis } from './bar';
-import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
-import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
-import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
-import { getCssValue } from '../utils';
-import { isSankey, sankeyMergeDefaultConfig, SankeyVis } from './sankey';
+import {isScatter, scatterMergeDefaultConfig, ScatterVis} from './scatter';
+import {barMergeDefaultConfig, isBar, BarVis} from './bar';
+import {isViolin, violinMergeDefaultConfig, ViolinVis} from './violin';
+import {isStrip, stripMergeDefaultConfig, StripVis} from './strip';
+import {isPCP, pcpMergeDefaultConfig, PCPVis} from './pcp';
+import {getCssValue} from '../utils';
+import {isSankey, sankeyMergeDefaultConfig, SankeyVis} from './sankey';
 
 const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
@@ -82,14 +82,14 @@ export function Vis({
   // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
   // To ensure that we never render an incosistent config, keep a consistent and a current in the config. Always render the consistent.
   // eslint-disable-next-line @typescript-eslint/naming-convention
-  const [{ consistent: visConfig, current: inconsistentVisConfig }, _setVisConfig] = React.useState<{
+  const [{consistent: visConfig, current: inconsistentVisConfig}, _setVisConfig] = React.useState<{
     consistent: IVisConfig;
     current: IVisConfig;
   }>(
     externalConfig
-      ? { consistent: null, current: externalConfig }
+      ? {consistent: null, current: externalConfig}
       : columns.filter((c) => c.type === EColumnTypes.NUMERICAL).length > 1
-      ? {
+        ? {
           consistent: null,
           current: {
             type: ESupportedPlotlyVis.SCATTER,
@@ -101,7 +101,7 @@ export function Vis({
             alphaSliderVal: 0.5,
           },
         }
-      : {
+        : {
           consistent: null,
           current: {
             type: ESupportedPlotlyVis.BAR,
@@ -130,27 +130,27 @@ export function Vis({
   React.useEffect(() => {
     if (isSankey(inconsistentVisConfig)) {
       const newConfig = sankeyMergeDefaultConfig(columns, inconsistentVisConfig);
-      _setVisConfig({ current: newConfig, consistent: newConfig });
+      _setVisConfig({current: newConfig, consistent: newConfig});
     }
     if (isScatter(inconsistentVisConfig)) {
       const newConfig = scatterMergeDefaultConfig(columns, inconsistentVisConfig);
-      _setVisConfig({ current: newConfig, consistent: newConfig });
+      _setVisConfig({current: newConfig, consistent: newConfig});
     }
     if (isViolin(inconsistentVisConfig)) {
       const newConfig = violinMergeDefaultConfig(columns, inconsistentVisConfig);
-      _setVisConfig({ current: newConfig, consistent: newConfig });
+      _setVisConfig({current: newConfig, consistent: newConfig});
     }
     if (isStrip(inconsistentVisConfig)) {
       const newConfig = stripMergeDefaultConfig(columns, inconsistentVisConfig);
-      _setVisConfig({ current: newConfig, consistent: newConfig });
+      _setVisConfig({current: newConfig, consistent: newConfig});
     }
     if (isPCP(inconsistentVisConfig)) {
       const newConfig = pcpMergeDefaultConfig(columns, inconsistentVisConfig);
-      _setVisConfig({ current: newConfig, consistent: newConfig });
+      _setVisConfig({current: newConfig, consistent: newConfig});
     }
     if (isBar(inconsistentVisConfig)) {
       const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
-      _setVisConfig({ current: newConfig, consistent: newConfig });
+      _setVisConfig({current: newConfig, consistent: newConfig});
     }
     // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -184,9 +184,14 @@ export function Vis({
     return <div className="tdp-busy" />;
   }
 
+  const defaultProps = {
+    setConfig: setVisConfig,
+    columns
+  }
+
   return (
     <>
-      {isSankey(visConfig) ? <SankeyVis config={visConfig} setConfig={setVisConfig} columns={columns} /> : null}
+      {isSankey(visConfig) ? <SankeyVis {...defaultProps} config={visConfig} /> : null}
 
       {isScatter(visConfig) ? (
         <ScatterVis

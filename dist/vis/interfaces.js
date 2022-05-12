@@ -7,14 +7,6 @@ export var ESupportedPlotlyVis;
     ESupportedPlotlyVis["BAR"] = "Bar Chart";
     ESupportedPlotlyVis["SANKEY"] = "Sankey";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
-export const allVisTypes = [
-    ESupportedPlotlyVis.SCATTER,
-    ESupportedPlotlyVis.BAR,
-    ESupportedPlotlyVis.VIOLIN,
-    ESupportedPlotlyVis.STRIP,
-    ESupportedPlotlyVis.PCP,
-    ESupportedPlotlyVis.SANKEY,
-];
 export var EBarDisplayType;
 (function (EBarDisplayType) {
     EBarDisplayType["ABSOLUTE"] = "Absolute";
@@ -73,13 +65,4 @@ export var EScatterSelectSettings;
     EScatterSelectSettings["ZOOM"] = "zoom";
     EScatterSelectSettings["PAN"] = "pan";
 })(EScatterSelectSettings || (EScatterSelectSettings = {}));
-const k = {
-    type: ESupportedPlotlyVis.SANKEY,
-};
-const t = {
-    type: ESupportedPlotlyVis.SANKEY,
-};
-const p = { ...t };
-const d = [];
-d.push(k);
 //# sourceMappingURL=interfaces.js.map

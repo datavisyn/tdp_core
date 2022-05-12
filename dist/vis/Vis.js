@@ -113,8 +113,12 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
     if (!visConfig) {
         return React.createElement("div", { className: "tdp-busy" });
     }
+    const defaultProps = {
+        setConfig: setVisConfig,
+        columns
+    };
     return (React.createElement(React.Fragment, null,
-        isSankey(visConfig) ? React.createElement(SankeyVis, { config: visConfig, setConfig: setVisConfig, columns: columns }) : null,
+        isSankey(visConfig) ? React.createElement(SankeyVis, { ...defaultProps, config: visConfig }) : null,
         isScatter(visConfig) ? (React.createElement(ScatterVis, { config: visConfig, optionsConfig: {
                 color: {
                     enable: true,

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Select from 'react-select';
-import { allVisTypes, ESupportedPlotlyVis } from '../interfaces';
+import { ESupportedPlotlyVis } from '../interfaces';
 
 interface VisTypeSelectProps {
   callback: (s: ESupportedPlotlyVis) => void;
@@ -16,7 +16,7 @@ export function VisTypeSelect({ callback, currentSelected }: VisTypeSelectProps)
         // components={{Option: optionLayout}}
         onChange={(e) => callback(e.value)}
         name="visTypes"
-        options={allVisTypes.map((t) => {
+        options={Object.values(ESupportedPlotlyVis).map((t) => {
           return {
             value: t,
             label: t,

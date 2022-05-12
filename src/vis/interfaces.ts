@@ -1,4 +1,4 @@
-import { Plotly } from './Plot';
+import {Plotly} from './Plot';
 
 export enum ESupportedPlotlyVis {
   SCATTER = 'Scatter Plot',
@@ -8,15 +8,6 @@ export enum ESupportedPlotlyVis {
   BAR = 'Bar Chart',
   SANKEY = 'Sankey',
 }
-
-export const allVisTypes: ESupportedPlotlyVis[] = [
-  ESupportedPlotlyVis.SCATTER,
-  ESupportedPlotlyVis.BAR,
-  ESupportedPlotlyVis.VIOLIN,
-  ESupportedPlotlyVis.STRIP,
-  ESupportedPlotlyVis.PCP,
-  ESupportedPlotlyVis.SANKEY,
-];
 
 export enum EBarDisplayType {
   ABSOLUTE = 'Absolute',
@@ -122,21 +113,6 @@ export interface ISankeyConfig {
   catColumnsSelected: ColumnInfo[];
 }
 
-type Test = { type: string } | { type: number; test: number };
-
-const k: IVisConfig = {
-  type: ESupportedPlotlyVis.SANKEY,
-};
-
-const t: ISankeyConfig = {
-  type: ESupportedPlotlyVis.SANKEY,
-};
-
-const p: IVisConfig = { ...t };
-
-const d: { type: string }[] = [];
-d.push(k);
-
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig | ISankeyConfig;
 
 type ValueGetter<T> = () => T | Promise<T>;
@@ -206,4 +182,10 @@ export type Scales = {
 export interface ICommonVisSideBarProps {
   style?: React.CSSProperties | undefined;
   className?: string | undefined;
+}
+
+export interface ICommonVisProps<T extends IVisConfig> {
+  config: T;
+  setConfig: (config: T) => void;
+  columns: VisColumn[];
 }

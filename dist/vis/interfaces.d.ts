@@ -8,7 +8,6 @@ export declare enum ESupportedPlotlyVis {
     BAR = "Bar Chart",
     SANKEY = "Sankey"
 }
-export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EBarDisplayType {
     ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
@@ -153,6 +152,11 @@ export declare type Scales = {
 export interface ICommonVisSideBarProps {
     style?: React.CSSProperties | undefined;
     className?: string | undefined;
+}
+export interface ICommonVisProps<T extends IVisConfig> {
+    config: T;
+    setConfig: (config: T) => void;
+    columns: VisColumn[];
 }
 export {};
 //# sourceMappingURL=interfaces.d.ts.map

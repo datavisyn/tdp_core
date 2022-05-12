@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {uniqueId, values} from 'lodash';
 import {PlotlyComponent} from '../Plot';
-import {ISankeyConfig, IVisConfig, PlotlyData, VisCategoricalColumn, VisColumn} from '../interfaces';
+import {ICommonVisProps, ISankeyConfig, IVisConfig, PlotlyData, VisCategoricalColumn, VisColumn} from '../interfaces';
 import {SankeyVisSidebar} from './SankeyVisSidebar';
 import {resolveColumnValues} from '../general/layoutUtils';
 import {useAsync} from '../../hooks/useAsync';
@@ -21,10 +21,7 @@ const layout = {
   },
 };
 
-interface SankeyVisProps {
-  config: ISankeyConfig;
-  setConfig: (config: IVisConfig) => void;
-  columns: VisColumn[];
+type SankeyVisProps = ICommonVisProps<ISankeyConfig> & {
 }
 
 

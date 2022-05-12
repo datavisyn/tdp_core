@@ -1,10 +1,6 @@
 /// <reference types="react" />
-import { ISankeyConfig, IVisConfig, VisColumn } from '../interfaces';
-interface SankeyVisProps {
-    config: ISankeyConfig;
-    setConfig: (config: IVisConfig) => void;
-    columns: VisColumn[];
-}
+import { ICommonVisProps, ISankeyConfig, VisColumn } from '../interfaces';
+declare type SankeyVisProps = ICommonVisProps<ISankeyConfig> & {};
 export declare function fetchData(columns: VisColumn[], config: ISankeyConfig): Promise<{
     nodes: {
         labels: string[];
