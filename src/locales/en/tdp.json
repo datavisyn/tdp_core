@@ -307,6 +307,8 @@
 
       "noViews": "No views defined",
 
+      "emptyProxyView": "Select a datapoint",
+
       "formSelectName": "No mapping found",
 
       "authorizationRequired": "{{name}} authorization is required for this view.",
