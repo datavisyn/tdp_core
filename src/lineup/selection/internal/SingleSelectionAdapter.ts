@@ -23,7 +23,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
     super();
   }
 
-  protected parameterChangedImpl(context: IContext) {
+  protected async parameterChangedImpl(context: IContext): Promise<void> {
     // remove all and start again
     const selectedIds = context.selection.ids;
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
@@ -31,7 +31,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
 
     // remove deselected columns
     if (lineupColIds.length > 0) {
-      this.removeDynamicColumns(context, lineupColIds);
+      await this.removeDynamicColumns(context, lineupColIds);
     }
     // add new columns to the end
     if (selectedIds.length <= 0) {

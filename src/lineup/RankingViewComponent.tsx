@@ -124,7 +124,7 @@ export function RankingViewComponent({
       selections.set(name, inputSelection);
       if (name === AView.DEFAULT_SELECTION_NAME) {
         if (selectionAdapter) {
-          selectionAdapter.selectionChanged(null, selectionAdapterContext);
+          selectionAdapter.selectionChanged(selectionAdapterContext);
         }
       }
     }
@@ -137,7 +137,7 @@ export function RankingViewComponent({
     // ignore first time parameter are passed since there is no change
     if (status === 'success' && parameters && isMounted.current) {
       if (selectionAdapter) {
-        selectionAdapter.parameterChanged(null, selectionAdapterContext);
+        selectionAdapter.parameterChanged(selectionAdapterContext);
       }
     }
     isMounted.current = true;

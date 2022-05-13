@@ -3,24 +3,24 @@ import { IAdditionalColumnDesc } from '../../../base/interfaces';
 import { ISelectionColumn, IContext, ISelectionAdapter } from '../ISelectionAdapter';
 
 export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
-  protected async addDynamicColumns(context: IContext, ids: string[]) {
-    return Promise.all(ids.map((id) => this.createColumnsFor(context, id))).then((columns) => {
-      // sort new columns to insert them in the correct order
-      const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
-      flattenedColumns.sort(({ d: a, i: ai }, { d: b, i: bi }) => {
-        if (a.position === b.position) {
-          // equal position, sort latter element of original array to lower position in sorted array
-          return bi - ai; // the latter in the array the better
-        }
-        return b.position - a.position; // sort descending by default
-      });
-      context.add(flattenedColumns.map((d) => d.d));
+  protected async addDynamicColumns(context: IContext, ids: string[]): Promise<void> {
+    const columns = await Promise.all(ids.map((id) => this.createColumnsFor(context, id)));
+
+    // sort new columns to insert them in the correct order
+    const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
+    flattenedColumns.sort(({ d: a, i: ai }, { d: b, i: bi }) => {
+      if (a.position === b.position) {
+        // equal position, sort latter element of original array to lower position in sorted array
+        return bi - ai; // the latter in the array the better
+      }
+      return b.position - a.position; // sort descending by default
     });
+    return context.add(flattenedColumns.map((d) => d.d));
   }
 
-  protected removeDynamicColumns(context: IContext, ids: string[]): void {
+  protected removeDynamicColumns(context: IContext, ids: string[]): Promise<void> {
     const { columns } = context;
-    context.remove(
+    return context.remove(
       [].concat(
         ...ids.map((id) => {
           context.freeColor(id);
@@ -30,56 +30,74 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     );
   }
 
-  private waitingForSelection: Promise<any> | null = null;
-
-  private waitingForParameter: Promise<any> | null = null;
-
   /**
    * Add or remove columns in LineUp ranking when the selected items in the selection adapter context change
-   * @param waitForIt additional promise to wait (e.g., wait for view to be loaded) before continuing
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  selectionChanged(waitForIt: Promise<any> | null, context: IContext): Promise<any> {
-    if (this.waitingForSelection) {
-      return this.waitingForSelection;
-    }
-
-    return (this.waitingForSelection = Promise.resolve(waitForIt)
-      .then(() => this.selectionChangedImpl(context))
-      .then(() => {
-        this.waitingForSelection = null;
-      }));
+  selectionChanged(context: IContext): Promise<void> {
+    return this.selectionChangedImpl(context);
   }
 
   /**
    * Add or remove columns in LineUp ranking when the parametrs in the selection adapter context change
-   * @param waitForIt additional promise to wait (e.g., wait for view to be loaded) before continuing
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  parameterChanged(waitForIt: Promise<any> | null, context: IContext) {
-    if (this.waitingForSelection) {
-      return this.waitingForSelection;
-    }
-    if (this.waitingForParameter) {
-      return this.waitingForParameter;
-    }
-    return (this.waitingForParameter = Promise.resolve(waitForIt)
-      .then(() => {
-        if (this.waitingForSelection) {
-          return undefined; // abort selection more important
-        }
-        return this.parameterChangedImpl(context);
-      })
-      .then(() => {
-        this.waitingForParameter = null;
-      }));
+  parameterChanged(context: IContext): Promise<void> {
+    return this.parameterChangedImpl(context);
   }
 
-  protected abstract parameterChangedImpl(context: IContext): Promise<any>;
+  // private waitingForSelection: Promise<any> | null = null;
 
-  protected selectionChangedImpl(context: IContext) {
+  // private waitingForParameter: Promise<any> | null = null;
+
+  // /**
+  //  * Add or remove columns in LineUp ranking when the selected items in the selection adapter context change
+  //  * @param waitForIt additional promise to wait (e.g., wait for view to be loaded) before continuing
+  //  * @param context selection adapter context
+  //  * @returns A promise that can waited for until the columns have been changed.
+  //  */
+  // selectionChanged(waitForIt: Promise<any> | null, context: IContext): Promise<any> {
+  //   if (this.waitingForSelection) {
+  //     return this.waitingForSelection;
+  //   }
+
+  //   return (this.waitingForSelection = Promise.resolve(waitForIt)
+  //     .then(() => this.selectionChangedImpl(context))
+  //     .then(() => {
+  //       this.waitingForSelection = null;
+  //     }));
+  // }
+
+  // /**
+  //  * Add or remove columns in LineUp ranking when the parametrs in the selection adapter context change
+  //  * @param waitForIt additional promise to wait (e.g., wait for view to be loaded) before continuing
+  //  * @param context selection adapter context
+  //  * @returns A promise that can waited for until the columns have been changed.
+  //  */
+  // parameterChanged(waitForIt: Promise<any> | null, context: IContext): Promise<any> {
+  //   if (this.waitingForSelection) {
+  //     return this.waitingForSelection;
+  //   }
+  //   if (this.waitingForParameter) {
+  //     return this.waitingForParameter;
+  //   }
+  //   return (this.waitingForParameter = Promise.resolve(waitForIt)
+  //     .then(() => {
+  //       if (this.waitingForSelection) {
+  //         return undefined; // abort selection more important
+  //       }
+  //       return this.parameterChangedImpl(context);
+  //     })
+  //     .then(() => {
+  //       this.waitingForParameter = null;
+  //     }));
+  // }
+
+  protected abstract parameterChangedImpl(context: IContext): Promise<void>;
+
+  protected async selectionChangedImpl(context: IContext): Promise<void> {
     const selectedIds = context.selection.ids;
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
@@ -91,7 +109,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     // remove deselected columns
     if (diffRemoved.length > 0) {
       // console.log('remove columns', diffRemoved);
-      this.removeDynamicColumns(context, diffRemoved);
+      await this.removeDynamicColumns(context, diffRemoved);
     }
     // add new columns to the end
     if (diffAdded.length <= 0) {

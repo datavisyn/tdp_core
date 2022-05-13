@@ -460,20 +460,22 @@ export function Ranking({
       ColumnDescUtils.createInitialRanking(providerRef.current, {});
       const ranking = providerRef.current.getLastRanking();
       const columns = ranking ? ranking.flatColumns : [];
-      const context = {
+      const selectionAdapterContext: Omit<IContext, 'selection'> = {
         columns,
         freeColor: (id: string) => colorsRef.current.freeColumnColor(id),
-        add: (columns: ISelectionColumn[]) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
-        remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
+        // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
+        add: (columns: ISelectionColumn[]) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
+        // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
+        remove: (columns: Column[]) => Promise.resolve(columns.forEach((c) => c.removeMe())),
       };
-      onContextChanged?.(context);
+      onContextChanged?.(selectionAdapterContext);
       onCustomizeRanking?.(LineupUtils.wrapRanking(providerRef.current, ranking));
 
       return (
         Promise.resolve()
           // TODO: check if this is needed
           // .then(async () => {
-          //   return selectionAdapter?.selectionChanged(null, () => createContext(selection));
+          //   return selectionAdapter?.selectionChanged(createContext(selection));
           // })
           .then(() => {
             onBuiltLineUp?.(providerRef.current);

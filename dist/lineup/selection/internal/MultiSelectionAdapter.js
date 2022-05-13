@@ -13,10 +13,10 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
      * @param context selection adapter context
      * @returns A promise to wait until all new columns have been added
      */
-    parameterChangedImpl(context) {
+    async parameterChangedImpl(context) {
         const selectedIds = context.selection.ids;
-        this.removePartialDynamicColumns(context, selectedIds); // sync function
-        return this.addDynamicColumns(context, selectedIds); // async function
+        await this.removePartialDynamicColumns(context, selectedIds);
+        return this.addDynamicColumns(context, selectedIds);
     }
     /**
      * Create one or multiple LineUp column descs + additional information for each selected sub-type and given id.
@@ -61,7 +61,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
             ? this.adapter.diffSubtypes(dynamicColumnSubtypes, selectedSubtypes)
             : difference(dynamicColumnSubtypes, selectedSubtypes); // type cast to string[] because of generic `T = string`
         const columsToRemove = removedSubtypes.map((subtype) => usedCols.filter((d) => d.desc.selectedSubtype === subtype)).flat();
-        context.remove(columsToRemove);
+        return context.remove(columsToRemove);
     }
     computePositionToInsert(context, id) {
         const ids = context.columns.map((col) => col.desc.selectedId);

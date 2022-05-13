@@ -2,24 +2,20 @@ import { IAdditionalColumnDesc } from '../../../base/interfaces';
 import { ISelectionColumn, IContext, ISelectionAdapter } from '../ISelectionAdapter';
 export declare abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     protected addDynamicColumns(context: IContext, ids: string[]): Promise<void>;
-    protected removeDynamicColumns(context: IContext, ids: string[]): void;
-    private waitingForSelection;
-    private waitingForParameter;
+    protected removeDynamicColumns(context: IContext, ids: string[]): Promise<void>;
     /**
      * Add or remove columns in LineUp ranking when the selected items in the selection adapter context change
-     * @param waitForIt additional promise to wait (e.g., wait for view to be loaded) before continuing
      * @param context selection adapter context
      * @returns A promise that can waited for until the columns have been changed.
      */
-    selectionChanged(waitForIt: Promise<any> | null, context: IContext): Promise<any>;
+    selectionChanged(context: IContext): Promise<void>;
     /**
      * Add or remove columns in LineUp ranking when the parametrs in the selection adapter context change
-     * @param waitForIt additional promise to wait (e.g., wait for view to be loaded) before continuing
      * @param context selection adapter context
      * @returns A promise that can waited for until the columns have been changed.
      */
-    parameterChanged(waitForIt: Promise<any> | null, context: IContext): Promise<any>;
-    protected abstract parameterChangedImpl(context: IContext): Promise<any>;
+    parameterChanged(context: IContext): Promise<void>;
+    protected abstract parameterChangedImpl(context: IContext): Promise<void>;
     protected selectionChangedImpl(context: IContext): Promise<void>;
     /**
      * Create a column desc with additional metadata for a given selected id.

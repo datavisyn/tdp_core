@@ -55,10 +55,10 @@ export class MultiSelectionAdapter<T = string> extends ABaseSelectionAdapter {
    * @param context selection adapter context
    * @returns A promise to wait until all new columns have been added
    */
-  protected parameterChangedImpl(context: IContext): Promise<void> {
+  protected async parameterChangedImpl(context: IContext): Promise<void> {
     const selectedIds = context.selection.ids;
-    this.removePartialDynamicColumns(context, selectedIds); // sync function
-    return this.addDynamicColumns(context, selectedIds); // async function
+    await this.removePartialDynamicColumns(context, selectedIds);
+    return this.addDynamicColumns(context, selectedIds);
   }
 
   /**
@@ -99,7 +99,7 @@ export class MultiSelectionAdapter<T = string> extends ABaseSelectionAdapter {
     return columnsToBeAdded.map((desc, i) => ({ desc, data: data[i], id, position }));
   }
 
-  private removePartialDynamicColumns(context: IContext, ids: string[]): void {
+  private removePartialDynamicColumns(context: IContext, ids: string[]): Promise<void> {
     const { columns } = context;
     const selectedSubtypes = this.adapter.getSelectedSubTypes();
     if (selectedSubtypes.length === 0) {
@@ -118,7 +118,7 @@ export class MultiSelectionAdapter<T = string> extends ABaseSelectionAdapter {
 
     const columsToRemove = removedSubtypes.map((subtype) => usedCols.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedSubtype === subtype)).flat();
 
-    context.remove(columsToRemove);
+    return context.remove(columsToRemove);
   }
 
   private computePositionToInsert(context: IContext, id: string): number {
