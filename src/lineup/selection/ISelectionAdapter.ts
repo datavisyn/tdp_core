@@ -1,9 +1,9 @@
-import { Column, IColumnDesc } from 'lineupjs';
-import { ISelection, IScoreRow } from '../../base/interfaces';
+import { Column } from 'lineupjs';
+import { ISelection, IScoreRow, IAdditionalColumnDesc } from '../../base/interfaces';
 
 export interface ISelectionColumn {
   readonly id: string;
-  readonly desc: IColumnDesc;
+  readonly desc: IAdditionalColumnDesc;
   readonly data: Promise<IScoreRow<any>[]>;
   readonly position?: number;
 }

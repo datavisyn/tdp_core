@@ -54,7 +54,9 @@ export class ABaseSelectionAdapter {
         }
         return this.addDynamicColumns(context, diffAdded);
     }
+    // TODO this function is currently useless, because it requires an `IAdditionalColumnDesc` where `selectedId` is mandatory and then assigns it again
     static patchDesc(desc, selectedId) {
+        // FIXME avoid mutation of original desc
         desc.selectedId = selectedId;
         return desc;
     }

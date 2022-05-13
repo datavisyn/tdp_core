@@ -48,6 +48,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     return this.parameterChangedImpl(context);
   }
 
+  // TODO test at run-time if we really need the following promises or if it can be removed. it might be necessary when replaying the a CLUE provenence graph. if we need it, a queue might be the better solution.
   // private waitingForSelection: Promise<any> | null = null;
 
   // private waitingForParameter: Promise<any> | null = null;
@@ -130,7 +131,9 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
    */
   protected abstract createColumnsFor(context: IContext, id: string): Promise<ISelectionColumn[]>;
 
-  static patchDesc(desc: IAdditionalColumnDesc, selectedId: string) {
+  // TODO this function is currently useless, because it requires an `IAdditionalColumnDesc` where `selectedId` is mandatory and then assigns it again
+  static patchDesc(desc: IAdditionalColumnDesc, selectedId: string): IAdditionalColumnDesc {
+    // FIXME avoid mutation of original desc
     desc.selectedId = selectedId;
     return desc;
   }

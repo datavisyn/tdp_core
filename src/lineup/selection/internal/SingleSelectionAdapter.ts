@@ -24,7 +24,8 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
   }
 
   protected async parameterChangedImpl(context: IContext): Promise<void> {
-    // remove all and start again
+    // TODO check if why it is necessary to remove **all** dynamic columns on parameter change and if it can be refactored so that it works the same as `MultiSelectionAdapter.parameterChangedImpl()`
+    // remove **all** dynamic columns and start again
     const selectedIds = context.selection.ids;
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
