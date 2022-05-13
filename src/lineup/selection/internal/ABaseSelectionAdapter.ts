@@ -3,7 +3,7 @@ import { IAdditionalColumnDesc } from '../../../base/interfaces';
 import { ISelectionColumn, IContext, ISelectionAdapter } from '../ISelectionAdapter';
 
 export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
-  protected addDynamicColumns(context: IContext, ids: string[]) {
+  protected async addDynamicColumns(context: IContext, ids: string[]) {
     return Promise.all(ids.map((id) => this.createColumnsFor(context, id))).then((columns) => {
       // sort new columns to insert them in the correct order
       const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));

@@ -1,5 +1,5 @@
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
-import { IContext } from '../ISelectionAdapter';
+import { IContext, ISelectionColumn } from '../ISelectionAdapter';
 import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
 
 export interface ISingleSelectionAdapter {
@@ -40,7 +40,7 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
     return this.addDynamicColumns(context, selectedIds);
   }
 
-  protected createColumnsFor(context: IContext, id: string) {
+  protected createColumnsFor(context: IContext, id: string): PromiseLike<ISelectionColumn[]> {
     return Promise.resolve(this.adapter.createDesc(id)).then((desc) => [
       {
         desc: ABaseSelectionAdapter.patchDesc(desc, id),
