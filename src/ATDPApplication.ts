@@ -106,6 +106,36 @@ export interface ITDPClientConfig {
   [key: string]: any;
 }
 
+class MemoryStorage implements Storage {
+  map = new Map<string, string>();
+
+  // [name: string]: any;
+
+  public get length(): number {
+    return this.map.size;
+  }
+
+  clear(): void {
+    this.map.clear();
+  }
+
+  getItem(key: string): string {
+    return this.map.get(key);
+  }
+
+  key(index: number): string {
+    throw new Error('Method not implemented.');
+  }
+
+  removeItem(key: string): void {
+    this.map.delete(key);
+  }
+
+  setItem(key: string, value: string): void {
+    this.map.set(key, value);
+  }
+}
+
 /**
  * base class for TDP based applications
  */
@@ -248,7 +278,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     // load all available provenance graphs
     const manager = new MixedStorageProvenanceGraphManager({
       prefix: this.options.prefix,
-      storage: localStorage,
+      storage: new MemoryStorage(),
       application: this.options.prefix,
       ...(this.options.provenanceManagerOptions || {}),
     });

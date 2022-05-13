@@ -14,6 +14,30 @@ import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';
 import { MixedStorageProvenanceGraphManager } from './clue/provenance';
 import { VisLoader } from './clue/provvis';
+class MemoryStorage {
+    constructor() {
+        this.map = new Map();
+    }
+    // [name: string]: any;
+    get length() {
+        return this.map.size;
+    }
+    clear() {
+        this.map.clear();
+    }
+    getItem(key) {
+        return this.map.get(key);
+    }
+    key(index) {
+        throw new Error('Method not implemented.');
+    }
+    removeItem(key) {
+        this.map.delete(key);
+    }
+    setItem(key, value) {
+        this.map.set(key, value);
+    }
+}
 /**
  * base class for TDP based applications
  */
@@ -123,7 +147,7 @@ export class ATDPApplication extends ACLUEWrapper {
         // load all available provenance graphs
         const manager = new MixedStorageProvenanceGraphManager({
             prefix: this.options.prefix,
-            storage: localStorage,
+            storage: new MemoryStorage(),
             application: this.options.prefix,
             ...(this.options.provenanceManagerOptions || {}),
         });
