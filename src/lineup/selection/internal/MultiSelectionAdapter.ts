@@ -68,34 +68,35 @@ export class MultiSelectionAdapter<T = string> extends ABaseSelectionAdapter {
    * @param id id for which columns should be added
    * @returns a promise that returns a list of LineUp column desc and additional information to add them to the ranking
    */
-  protected createColumnsFor(context: IContext, id: string): PromiseLike<ISelectionColumn[]> {
+  protected async createColumnsFor(context: IContext, id: string): Promise<ISelectionColumn[]> {
     const selectedSubtypes = this.adapter.getSelectedSubTypes();
 
-    return Promise.resolve(this.adapter.createDescs(id, selectedSubtypes)).then((descs) => {
-      if (descs.length <= 0) {
-        return [];
-      }
-      descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, id));
+    const descs = await this.adapter.createDescs(id, selectedSubtypes);
 
-      const usedCols = context.columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
-      const dynamicColumnIDs = usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`);
-      // Save which columns have been added for a specific element in the selection
-      const selectedElements = descs.map((desc) => `${id}_${desc.selectedSubtype}`);
+    if (descs.length <= 0) {
+      return [];
+    }
 
-      // Check which items are new and should therefore be added as columns
-      const addedParameters = difference(selectedElements, dynamicColumnIDs);
+    descs.forEach((d) => ABaseSelectionAdapter.patchDesc(d, id));
 
-      if (addedParameters.length <= 0) {
-        return [];
-      }
-      // Filter the descriptions to only leave the new columns and load them
-      const columnsToBeAdded = descs.filter((desc) => addedParameters.includes(`${id}_${desc.selectedSubtype}`));
-      const data = this.adapter.loadData(id, columnsToBeAdded);
+    const usedCols = context.columns.filter((col) => (<IAdditionalColumnDesc>col.desc).selectedSubtype !== undefined);
+    const dynamicColumnIDs = usedCols.map((col) => `${(<IAdditionalColumnDesc>col.desc).selectedId}_${(<IAdditionalColumnDesc>col.desc).selectedSubtype}`);
+    // Save which columns have been added for a specific element in the selection
+    const selectedElements = descs.map((desc) => `${id}_${desc.selectedSubtype}`);
 
-      const position = this.computePositionToInsert(context, id);
+    // Check which items are new and should therefore be added as columns
+    const addedParameters = difference(selectedElements, dynamicColumnIDs);
 
-      return columnsToBeAdded.map((desc, i) => ({ desc, data: data[i], id, position }));
-    });
+    if (addedParameters.length <= 0) {
+      return [];
+    }
+    // Filter the descriptions to only leave the new columns and load them
+    const columnsToBeAdded = descs.filter((desc) => addedParameters.includes(`${id}_${desc.selectedSubtype}`));
+    const data = this.adapter.loadData(id, columnsToBeAdded);
+
+    const position = this.computePositionToInsert(context, id);
+
+    return columnsToBeAdded.map((desc, i) => ({ desc, data: data[i], id, position }));
   }
 
   private removePartialDynamicColumns(context: IContext, ids: string[]): void {

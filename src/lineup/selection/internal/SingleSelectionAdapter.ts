@@ -40,13 +40,21 @@ export class SingleSelectionAdapter extends ABaseSelectionAdapter {
     return this.addDynamicColumns(context, selectedIds);
   }
 
-  protected createColumnsFor(context: IContext, id: string): PromiseLike<ISelectionColumn[]> {
-    return Promise.resolve(this.adapter.createDesc(id)).then((desc) => [
+  /**
+   * Creates a single column desc with additional metadata for a given selected id.
+   *
+   * @param context selection adapter context
+   * @param id id of the selected item
+   * @returns A promise with a list containing a single columns + additional metadata
+   */
+  protected async createColumnsFor(_context: IContext, id: string): Promise<ISelectionColumn[]> {
+    const desc = await this.adapter.createDesc(id);
+    return [
       {
         desc: ABaseSelectionAdapter.patchDesc(desc, id),
         data: this.adapter.loadData(id),
         id,
       },
-    ]);
+    ];
   }
 }

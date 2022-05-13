@@ -4,7 +4,7 @@ export class ABaseSelectionAdapter {
         this.waitingForSelection = null;
         this.waitingForParameter = null;
     }
-    addDynamicColumns(context, ids) {
+    async addDynamicColumns(context, ids) {
         return Promise.all(ids.map((id) => this.createColumnsFor(context, id))).then((columns) => {
             // sort new columns to insert them in the correct order
             const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
@@ -25,6 +25,12 @@ export class ABaseSelectionAdapter {
             return columns.filter((d) => d.desc.selectedId === id);
         })));
     }
+    /**
+     * Add or remove columns in LineUp ranking when the selected items in the selection adapter context change
+     * @param waitForIt additional promise to wait (e.g., wait for view to be loaded) before continuing
+     * @param context selection adapter context
+     * @returns A promise that can waited for until the columns have been changed.
+     */
     selectionChanged(waitForIt, context) {
         if (this.waitingForSelection) {
             return this.waitingForSelection;
@@ -35,6 +41,12 @@ export class ABaseSelectionAdapter {
             this.waitingForSelection = null;
         }));
     }
+    /**
+     * Add or remove columns in LineUp ranking when the parametrs in the selection adapter context change
+     * @param waitForIt additional promise to wait (e.g., wait for view to be loaded) before continuing
+     * @param context selection adapter context
+     * @returns A promise that can waited for until the columns have been changed.
+     */
     parameterChanged(waitForIt, context) {
         if (this.waitingForSelection) {
             return this.waitingForSelection;
