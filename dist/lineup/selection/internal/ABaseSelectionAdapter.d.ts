@@ -11,14 +11,14 @@ export declare abstract class ABaseSelectionAdapter implements ISelectionAdapter
      * @param context selection adapter context
      * @returns A promise that can waited for until the columns have been changed.
      */
-    selectionChanged(waitForIt: Promise<any> | null, context: () => IContext): Promise<any>;
+    selectionChanged(waitForIt: Promise<any> | null, context: IContext): Promise<any>;
     /**
      * Add or remove columns in LineUp ranking when the parametrs in the selection adapter context change
      * @param waitForIt additional promise to wait (e.g., wait for view to be loaded) before continuing
      * @param context selection adapter context
      * @returns A promise that can waited for until the columns have been changed.
      */
-    parameterChanged(waitForIt: Promise<any> | null, context: () => IContext): Promise<any>;
+    parameterChanged(waitForIt: Promise<any> | null, context: IContext): Promise<any>;
     protected abstract parameterChangedImpl(context: IContext): Promise<any>;
     protected selectionChangedImpl(context: IContext): Promise<void>;
     /**

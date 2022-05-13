@@ -286,7 +286,7 @@ export class ARankingView extends AView {
     parameterChanged(name) {
         super.parameterChanged(name);
         if (this.selectionAdapter) {
-            return this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
+            return this.selectionAdapter.parameterChanged(this.built, this.createSelectionAdapterContext());
         }
         return undefined;
     }
@@ -297,11 +297,11 @@ export class ARankingView extends AView {
     }
     selectionChanged() {
         if (this.selectionAdapter) {
-            return this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
+            return this.selectionAdapter.selectionChanged(this.built, this.createSelectionAdapterContext());
         }
         return undefined;
     }
-    createContext() {
+    createSelectionAdapterContext() {
         const ranking = this.provider.getLastRanking();
         const columns = ranking ? ranking.flatColumns : [];
         return {
@@ -555,7 +555,7 @@ export class ARankingView extends AView {
             .then(() => {
             if (this.selectionAdapter) {
                 // init first time
-                return this.selectionAdapter.selectionChanged(null, () => this.createContext());
+                return this.selectionAdapter.selectionChanged(null, this.createSelectionAdapterContext());
             }
             return undefined;
         })

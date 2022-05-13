@@ -40,13 +40,13 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  selectionChanged(waitForIt: Promise<any> | null, context: () => IContext): Promise<any> {
+  selectionChanged(waitForIt: Promise<any> | null, context: IContext): Promise<any> {
     if (this.waitingForSelection) {
       return this.waitingForSelection;
     }
 
     return (this.waitingForSelection = Promise.resolve(waitForIt)
-      .then(() => this.selectionChangedImpl(context()))
+      .then(() => this.selectionChangedImpl(context))
       .then(() => {
         this.waitingForSelection = null;
       }));
@@ -58,7 +58,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  parameterChanged(waitForIt: Promise<any> | null, context: () => IContext) {
+  parameterChanged(waitForIt: Promise<any> | null, context: IContext) {
     if (this.waitingForSelection) {
       return this.waitingForSelection;
     }
@@ -70,7 +70,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
         if (this.waitingForSelection) {
           return undefined; // abort selection more important
         }
-        return this.parameterChangedImpl(context());
+        return this.parameterChangedImpl(context);
       })
       .then(() => {
         this.waitingForParameter = null;

@@ -46,7 +46,7 @@ export function RankingViewComponent({
 }: IRankingViewComponentProps) {
   const isMounted = useRef(false);
   const selections = new Map<string, ISelection>();
-  const [context, setContext] = React.useState<IContext>(null);
+  const [selectionAdapterContext, setSelectionAdapterContext] = React.useState<IContext>(null);
   const viewRef = React.useRef<HTMLDivElement | null>(null);
 
   const runAuthorizations = useCallback(async (): Promise<void> => {
@@ -124,11 +124,11 @@ export function RankingViewComponent({
       selections.set(name, inputSelection);
       if (name === AView.DEFAULT_SELECTION_NAME) {
         if (selectionAdapter) {
-          selectionAdapter.selectionChanged(null, () => context);
+          selectionAdapter.selectionChanged(null, selectionAdapterContext);
         }
       }
     }
-  }, [status, inputSelection, context]);
+  }, [status, inputSelection, selectionAdapterContext]);
 
   /**
    * onParametersChanged
@@ -137,11 +137,11 @@ export function RankingViewComponent({
     // ignore first time parameter are passed since there is no change
     if (status === 'success' && parameters && isMounted.current) {
       if (selectionAdapter) {
-        selectionAdapter.parameterChanged(null, () => context);
+        selectionAdapter.parameterChanged(null, selectionAdapterContext);
       }
     }
     isMounted.current = true;
-  }, [status, parameters, context]);
+  }, [status, parameters, selectionAdapterContext]);
 
   return (
     <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${status !== 'success' && 'tdp-busy'}`}>
@@ -151,7 +151,7 @@ export function RankingViewComponent({
         itemSelection={itemSelection}
         options={options}
         onItemSelect={onItemSelect}
-        onContextChanged={(context: Omit<IContext, 'selection'>) => setContext({ ...context, selection: inputSelection })}
+        onContextChanged={(context: Omit<IContext, 'selection'>) => setSelectionAdapterContext({ ...context, selection: inputSelection })}
         onAddScoreColumn={onAddScoreColumn}
         onBuiltLineUp={onBuiltLineUp}
         onItemSelectionChanged={onItemSelectionChanged}

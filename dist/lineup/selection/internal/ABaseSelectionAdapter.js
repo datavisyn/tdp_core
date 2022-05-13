@@ -36,7 +36,7 @@ export class ABaseSelectionAdapter {
             return this.waitingForSelection;
         }
         return (this.waitingForSelection = Promise.resolve(waitForIt)
-            .then(() => this.selectionChangedImpl(context()))
+            .then(() => this.selectionChangedImpl(context))
             .then(() => {
             this.waitingForSelection = null;
         }));
@@ -59,7 +59,7 @@ export class ABaseSelectionAdapter {
             if (this.waitingForSelection) {
                 return undefined; // abort selection more important
             }
-            return this.parameterChangedImpl(context());
+            return this.parameterChangedImpl(context);
         })
             .then(() => {
             this.waitingForParameter = null;

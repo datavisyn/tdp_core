@@ -90,7 +90,7 @@ export declare abstract class ARankingView extends AView {
     protected parameterChanged(name: string): PromiseLike<any> | void;
     protected itemSelectionChanged(): PromiseLike<any> | void;
     protected selectionChanged(): PromiseLike<any> | void;
-    private createContext;
+    private createSelectionAdapterContext;
     /**
      * Expand/collapse certain columns on mode change.
      * Expand = focus view

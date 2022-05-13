@@ -16,7 +16,7 @@ export function RankingViewComponent({ data = [], selection: inputSelection, ite
 onAddScoreColumn, }) {
     const isMounted = useRef(false);
     const selections = new Map();
-    const [context, setContext] = React.useState(null);
+    const [selectionAdapterContext, setSelectionAdapterContext] = React.useState(null);
     const viewRef = React.useRef(null);
     const runAuthorizations = useCallback(async () => {
         await TDPTokenManager.runAuthorizations(authorization, {
@@ -81,11 +81,11 @@ onAddScoreColumn, }) {
             selections.set(name, inputSelection);
             if (name === AView.DEFAULT_SELECTION_NAME) {
                 if (selectionAdapter) {
-                    selectionAdapter.selectionChanged(null, () => context);
+                    selectionAdapter.selectionChanged(null, selectionAdapterContext);
                 }
             }
         }
-    }, [status, inputSelection, context]);
+    }, [status, inputSelection, selectionAdapterContext]);
     /**
      * onParametersChanged
      */
@@ -93,12 +93,12 @@ onAddScoreColumn, }) {
         // ignore first time parameter are passed since there is no change
         if (status === 'success' && parameters && isMounted.current) {
             if (selectionAdapter) {
-                selectionAdapter.parameterChanged(null, () => context);
+                selectionAdapter.parameterChanged(null, selectionAdapterContext);
             }
         }
         isMounted.current = true;
-    }, [status, parameters, context]);
+    }, [status, parameters, selectionAdapterContext]);
     return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${status !== 'success' && 'tdp-busy'}` },
-        React.createElement(Ranking, { data: data, columnDesc: columnDesc, itemSelection: itemSelection, options: options, onItemSelect: onItemSelect, onContextChanged: (context) => setContext({ ...context, selection: inputSelection }), onAddScoreColumn: onAddScoreColumn, onBuiltLineUp: onBuiltLineUp, onItemSelectionChanged: onItemSelectionChanged, onCustomizeRanking: onCustomizeRanking, onUpdateEntryPoint: onUpdateEntryPoint })));
+        React.createElement(Ranking, { data: data, columnDesc: columnDesc, itemSelection: itemSelection, options: options, onItemSelect: onItemSelect, onContextChanged: (context) => setSelectionAdapterContext({ ...context, selection: inputSelection }), onAddScoreColumn: onAddScoreColumn, onBuiltLineUp: onBuiltLineUp, onItemSelectionChanged: onItemSelectionChanged, onCustomizeRanking: onCustomizeRanking, onUpdateEntryPoint: onUpdateEntryPoint })));
 }
 //# sourceMappingURL=RankingViewComponent.js.map
