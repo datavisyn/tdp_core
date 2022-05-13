@@ -3,7 +3,6 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import { I18nextManager } from '../../../i18n/I18nextManager';
 
-
 export interface IProxyViewProps {
   /**
    * Selection of the previous view
