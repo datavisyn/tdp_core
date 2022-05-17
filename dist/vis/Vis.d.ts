@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { IVisConfig, VisColumn, EFilterOptions } from './interfaces';
 export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, setExternalConfig, closeCallback, showCloseButton, externalConfig, hideSidebar, }: {
     /**
