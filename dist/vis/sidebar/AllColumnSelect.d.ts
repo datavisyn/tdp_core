@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ColumnInfo, VisColumn } from '../interfaces';
 interface AllColumnSelectProps {
     callback: (allCols: ColumnInfo[]) => void;

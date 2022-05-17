@@ -1,0 +1,27 @@
+@import '../abstracts/variables';
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  // box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.15);
+  background-color: rgba(108, 117, 125, 0.2);
+  // background-color: transparent;
+  border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background-color: rgb(108, 117, 125, 0.55);
+  transition: background-color 5s;
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(108, 117, 125, 0.65);
+}
