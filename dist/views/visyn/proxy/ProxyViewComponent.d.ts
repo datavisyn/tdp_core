@@ -1,14 +1,12 @@
 export interface IProxyViewProps {
     /**
-     * Selection of the previous view
+     * Site that you want to view
      */
     site: string;
-    argument: string;
-    currentId: string;
 }
 /**
  * This simple proxy view is intended to be used inside of a visyn view component which does the required mapping between
- * types. See {link} for an example.
+ * types. Shows a loading icon while the website is loading.
  */
-export declare function ProxyViewComponent({ site, argument, currentId }: IProxyViewProps): JSX.Element;
+export declare function ProxyViewComponent({ site }: IProxyViewProps): JSX.Element;
 //# sourceMappingURL=ProxyViewComponent.d.ts.map
