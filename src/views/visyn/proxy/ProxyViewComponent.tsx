@@ -23,17 +23,17 @@ export function ProxyViewComponent({ site, argument, currentId }: IProxyViewProp
   }, [argument, site, currentId]);
 
   const loadingFrame = useRef<HTMLIFrameElement>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [websiteLoading, setWebsiteLoading] = useState<boolean>(true);
 
   React.useEffect(() => {
     const listener = () => {
-      setIsLoading(false);
+      setWebsiteLoading(false);
     };
 
     const currentNode = loadingFrame.current;
 
     if (currentNode) {
-      setIsLoading(true);
+      setWebsiteLoading(true);
       currentNode.addEventListener('load', listener);
       currentNode.addEventListener('loadstart', listener);
     }
@@ -42,10 +42,11 @@ export function ProxyViewComponent({ site, argument, currentId }: IProxyViewProp
   }, [loadingFrame, site, argument, currentId]);
 
   return currentId ? (
-    <div className={`w-100 h-100 ${isLoading ? 'tdp-busy' : ''}`}>
+    <div className={`w-100 h-100 ${websiteLoading ? 'tdp-busy' : ''}`}>
       <iframe ref={loadingFrame} className="w-100 h-100" src={editedSite} />
     </div>
   ) : (
+    // This error message is really just here for developers. currentId being null should be caught before this component is rendered in a production application.
     <div className="d-flex justify-content-center align-items-center  w-100 h-100">
       <div className="flex-grow-1 text-center emptyViewText">{I18nextManager.getInstance().i18n.t('tdp:core.views.emptyProxyView')}</div>
     </div>

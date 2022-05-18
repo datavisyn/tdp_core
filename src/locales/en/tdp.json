@@ -307,7 +307,7 @@
 
       "noViews": "No views defined",
 
-      "emptyProxyView": "Select a datapoint",
+      "emptyProxyView": "ID passed to view was undefined",
 
       "formSelectName": "No mapping found",
 

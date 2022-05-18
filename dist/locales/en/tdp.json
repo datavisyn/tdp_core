@@ -279,7 +279,7 @@
             "cannotMap": "Cannot map <i>{{name}}</i> ('{{selectedItemId}}') to <i>{{to}}</i>.",
             "screwed": "We are all screwed :(",
             "noViews": "No views defined",
-            "emptyProxyView": "Select a datapoint",
+            "emptyProxyView": "ID passed to view was undefined",
             "formSelectName": "No mapping found",
             "authorizationRequired": "{{name}} authorization is required for this view.",
             "authorizationFailed": "<strong>Authorization failed: </strong>An error occurred when authorizing this page.",
