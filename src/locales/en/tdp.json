@@ -307,8 +307,6 @@
 
       "noViews": "No views defined",
 
-      "emptyProxyView": "ID passed to view was undefined",
-
       "formSelectName": "No mapping found",
 
       "authorizationRequired": "{{name}} authorization is required for this view.",
