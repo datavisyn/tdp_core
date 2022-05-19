@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Ranking } from './Ranking';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
 import { TDPTokenManager, TokenManager } from '../auth/TokenManager';
@@ -7,6 +7,21 @@ import { I18nextManager } from '../i18n/I18nextManager';
 import { AView } from '../views/AView';
 import { useAsync } from '../hooks/useAsync';
 import { ViewUtils } from '../views/ViewUtils';
+function isSameParameters(current, inputSelection) {
+    if (!current || !inputSelection || current.length !== inputSelection.length) {
+        return false;
+    }
+    for (let i = 0; i < current.length; ++i) {
+        const a = current[i];
+        const b = inputSelection[i];
+        for (const key in Object.keys(a)) {
+            if (a[key] !== b[key]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 export function RankingViewComponent({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = false, selectionAdapter = null, options = {}, authorization = null, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, onUpdateEntryPoint, 
 /**
  * Maybe refactor this when using the native lineup implementation of scores
@@ -15,6 +30,7 @@ onAddScoreColumn, }) {
     const selections = useMemo(() => {
         return new Map();
     }, []);
+    const [prevParameters, setPrevParameters] = useState(null);
     const [selectionAdapterContext, setSelectionAdapterContext] = React.useState(null);
     const viewRef = React.useRef(null);
     const runAuthorizations = useCallback(async () => {
@@ -83,23 +99,25 @@ onAddScoreColumn, }) {
             selections.set(name, inputSelection);
             if (name === AView.DEFAULT_SELECTION_NAME) {
                 if (selectionAdapter) {
-                    console.log('calling selection changed');
                     selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection });
                 }
             }
         }
-    }, [status, selectionAdapterContext, selectionAdapter, inputSelection, selections]);
+    }, [status, inputSelection, selectionAdapterContext, selections, selectionAdapter]);
     /**
      * onParametersChanged
      */
     React.useEffect(() => {
-        if (status === 'success' && parameters) {
+        if (isSameParameters(parameters, prevParameters)) {
+            return;
+        }
+        if (status === 'success') {
             if (selectionAdapter) {
-                console.log('calling parameters changed');
-                selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection });
+                selectionAdapter === null || selectionAdapter === void 0 ? void 0 : selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection });
+                setPrevParameters(parameters);
             }
         }
-    }, [status, selectionAdapter]);
+    }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters]);
     const onContextChangedCallback = useCallback((newContext) => {
         setSelectionAdapterContext(newContext);
     }, []);

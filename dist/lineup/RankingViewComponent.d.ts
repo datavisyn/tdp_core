@@ -10,7 +10,7 @@ export interface IRankingViewComponentProps extends IRankingProps {
      * Selection of the previous view
      */
     selection?: ISelection;
-    parameters: any;
+    parameters: any[];
     selectionAdapter?: ISelectionAdapter;
     authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
 }

@@ -1,5 +1,6 @@
 /* eslint-disable import/no-cycle */
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { param } from 'jquery';
 import { Ranking, IRankingProps } from './Ranking';
 import { ISelection } from '../base/interfaces';
 import { IContext, ISelectionAdapter } from './selection/ISelectionAdapter';
@@ -10,6 +11,23 @@ import { AView } from '../views/AView';
 import { useAsync } from '../hooks/useAsync';
 import { ViewUtils } from '../views/ViewUtils';
 
+function isSameParameters(current: any[], inputSelection: any[]) {
+  if (!current || !inputSelection || current.length !== inputSelection.length) {
+    return false;
+  }
+
+  for (let i = 0; i < current.length; ++i) {
+    const a = current[i];
+    const b = inputSelection[i];
+
+    for (const key in Object.keys(a)) {
+      if (a[key] !== b[key]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
 /**
  *
  */
@@ -18,7 +36,7 @@ export interface IRankingViewComponentProps extends IRankingProps {
    * Selection of the previous view
    */
   selection?: ISelection;
-  parameters: any;
+  parameters: any[];
   selectionAdapter?: ISelectionAdapter;
   authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
 }
@@ -45,6 +63,8 @@ export function RankingViewComponent({
   const selections = useMemo(() => {
     return new Map<string, ISelection>();
   }, []);
+
+  const [prevParameters, setPrevParameters] = useState<any>(null);
 
   const [selectionAdapterContext, setSelectionAdapterContext] = React.useState<Omit<IContext, 'selection'>>(null);
   const viewRef = React.useRef<HTMLDivElement | null>(null);
@@ -128,25 +148,27 @@ export function RankingViewComponent({
       selections.set(name, inputSelection);
       if (name === AView.DEFAULT_SELECTION_NAME) {
         if (selectionAdapter) {
-          console.log('calling selection changed');
           selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection });
         }
       }
     }
-  }, [status, selectionAdapterContext, selectionAdapter, inputSelection, selections]);
+  }, [status, inputSelection, selectionAdapterContext, selections, selectionAdapter]);
 
   /**
    * onParametersChanged
    */
   React.useEffect(() => {
-    if (status === 'success' && parameters) {
-      if (selectionAdapter) {
-        console.log('calling parameters changed');
+    if (isSameParameters(parameters, prevParameters)) {
+      return;
+    }
 
-        selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection });
+    if (status === 'success') {
+      if (selectionAdapter) {
+        selectionAdapter?.parameterChanged({ ...selectionAdapterContext, selection: inputSelection });
+        setPrevParameters(parameters);
       }
     }
-  }, [status, selectionAdapter]);
+  }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters]);
 
   const onContextChangedCallback = useCallback((newContext: Omit<IContext, 'selection'>) => {
     setSelectionAdapterContext(newContext);
