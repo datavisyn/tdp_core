@@ -1,11 +1,8 @@
 import codecs
-import logging
 import os
 from typing import Any, Dict
 
 import jsoncfg
-
-_log = logging.getLogger(__name__)
 
 
 def load_workspace_config() -> Dict[str, Any]:

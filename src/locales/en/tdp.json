@@ -221,7 +221,7 @@
 
       "LineupPanelActions": {
         "rankingPanelTabTitle": "Ranking Configuration",
-        "searchPlaceholder": "Add Column &hellip;",
+        "searchPlaceholder": "Add Column \u2026",
         "addColumnButton": "Add Column",
         "addButton": "Add",
         "collapseButton": "(Un)Collapse",
@@ -306,6 +306,8 @@
       "screwed": "We are all screwed :(",
 
       "noViews": "No views defined",
+
+      "emptyProxyView": "Please select an item first.",
 
       "formSelectName": "No mapping found",
 

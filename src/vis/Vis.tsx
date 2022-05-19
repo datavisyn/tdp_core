@@ -22,6 +22,7 @@ import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
 import { isSankey, sankeyMergeDefaultConfig, SankeyVis } from './sankey';
+import { useSyncedRef } from '../hooks/useSyncedRef';
 
 const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
@@ -45,6 +46,7 @@ export function Vis({
   shapes = DEFAULT_SHAPES,
   selectionCallback = () => null,
   filterCallback = () => null,
+  setExternalConfig = () => null,
   closeCallback = () => null,
   showCloseButton = false,
   externalConfig = null,
@@ -74,6 +76,7 @@ export function Vis({
    * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
    */
   filterCallback?: (s: EFilterOptions) => void;
+  setExternalConfig?: (config: IVisConfig) => void;
   closeCallback?: () => void;
   showCloseButton?: boolean;
   externalConfig?: IVisConfig;
@@ -118,6 +121,12 @@ export function Vis({
         },
   );
 
+  const setExternalConfigRef = useSyncedRef(setExternalConfig);
+  useEffect(() => {
+    setExternalConfigRef.current?.(visConfig);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visConfig, setExternalConfigRef]);
+
   const setVisConfig = React.useCallback((newConfig: IVisConfig) => {
     _setVisConfig((oldConfig) => {
       return {
@@ -154,7 +163,7 @@ export function Vis({
     }
     // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inconsistentVisConfig.type, columns]);
+  }, [inconsistentVisConfig.type]);
 
   useEffect(() => {
     if (externalConfig) {
