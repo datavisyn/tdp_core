@@ -4,12 +4,12 @@ import sys
 import threading
 from typing import Dict, Optional
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.exception_handlers import http_exception_handler
+from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
 from pydantic.utils import deep_update
 
+from ..middleware.exception_handler_middleware import ExceptionHandlerMiddleware
 from ..middleware.request_context_middleware import RequestContextMiddleware
 
 
@@ -56,15 +56,8 @@ def create_visyn_server(
         **fast_api_args,
     )
 
-    @app.exception_handler(Exception)
-    async def all_exception_handler(request: Request, e: Exception):
-        logging.exception("An error occurred in FastAPI")
-        return await http_exception_handler(
-            request,
-            e
-            if isinstance(e, HTTPException)
-            else HTTPException(status_code=500, detail=str(e) if manager.settings.is_development_mode else None),
-        )
+    # TODO: For some reason, a @app.exception_handler(Exception) is not called here. We use a middleware instead.
+    app.add_middleware(ExceptionHandlerMiddleware)
 
     # Store all globals also in app.state.<manager> to allow access in FastAPI routes via request.app.state.<manager>.
     app.state.settings = manager.settings
