@@ -117,9 +117,9 @@ function TransposeData(
     });
 
     for (const lik in links) {
-      if (links.hasOwnProperty(lik)) {
+      if (Object.prototype.hasOwnProperty.call(links, lik)) {
         for (const rik in links[lik]) {
-          if (links[lik].hasOwnProperty(rik)) {
+          if (Object.prototype.hasOwnProperty.call(links[lik], rik)) {
             plotly.links.source.push(lane.nodes.find((node) => node.value === lik).id);
             plotly.links.target.push(next.nodes.find((node) => node.value === rik).id);
             plotly.links.value.push(links[lik][rik].count);
@@ -136,8 +136,6 @@ function TransposeData(
 
 export async function fetchData(columns: VisColumn[], config: ISankeyConfig) {
   const catCols: VisCategoricalColumn[] = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisCategoricalColumn);
-  const plots: PlotlyData[] = [];
-
   const catColValues2 = await resolveColumnValues(catCols);
 
   return TransposeData(catColValues2);
@@ -186,7 +184,7 @@ export function SankeyVis({ config, setConfig, columns }: SankeyVisProps) {
 
   const { value: data } = useAsync(fetchData, [columns, config]);
 
-  const [plotly, setPlotly] = React.useState<any[]>();
+  const [plotly, setPlotly] = React.useState<unknown[]>();
 
   // When we have new data -> recreate plotly
   React.useEffect(() => {
@@ -207,18 +205,19 @@ export function SankeyVis({ config, setConfig, columns }: SankeyVisProps) {
             divId={`plotlyDiv${id}`}
             data={plotly}
             layout={layout}
-            onClick={(sel: any) => {
+            onClick={(sel) => {
               if (!sel.points[0]) {
                 return;
               }
 
               const element = sel.points[0];
+              console.log(element.pointIndex, element);
 
               if ('sourceLinks' in element) {
-                // node
+                // @ts-ignore
                 setSelection(data.nodes.inverseLookup[element.index]);
               } else {
-                // link
+                // @ts-ignore
                 setSelection(data.links.inverseLookup[element.index]);
               }
             }}
