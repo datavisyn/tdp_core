@@ -6,6 +6,7 @@ import { resolveColumnValues } from '../general/layoutUtils';
 import { useAsync } from '../../hooks/useAsync';
 const NODE_SELECTION_COLOR = 'rgba(51, 122, 183, 1)';
 const NODE_DEFAULT_COLOR = 'rgba(51, 122, 183, 1)';
+const NODE_GRAYED_COLOR = 'rgba(51, 122, 183, 0.2)';
 const LINK_SELECTION_COLOR = 'rgba(51, 122, 183, 0.2)';
 const LINK_DEFAULT_COLOR = 'rgba(68, 68, 68, 0.2)';
 const layout = {
@@ -22,28 +23,27 @@ const layout = {
  * @returns a plotly spec
  */
 function TransposeData(data) {
-    const selection = new Set('0');
     let nodeIndex = 0;
     const plotly = {
         nodes: {
             labels: new Array(),
             color: new Array(),
-            inverseLookup: []
+            inverseLookup: [],
         },
         links: {
             source: new Array(),
             target: new Array(),
             value: new Array(),
             color: new Array(),
-            inverseLookup: []
-        }
+            inverseLookup: [],
+        },
     };
     if (data.length < 2) {
         return null;
     }
     const lanes = data.map((lane) => {
         const values = lane.resolvedValues.map((value) => value.val);
-        //const nodes = Array.from(new Set(values)).map((value) => ({id: nodeIndex++, value}))
+        // const nodes = Array.from(new Set(values)).map((value) => ({id: nodeIndex++, value}))
         const nodes = new Array();
         const nodesSet = new Set();
         lane.resolvedValues.forEach((value) => {
@@ -63,7 +63,7 @@ function TransposeData(data) {
         return {
             info: lane.info,
             nodes,
-            values
+            values,
         };
     });
     lanes.forEach((lane, i) => {
@@ -76,7 +76,7 @@ function TransposeData(data) {
             const right = next.values[vi];
             if (left in links) {
                 if (right in links[left]) {
-                    links[left][right].count = links[left][right].count + 1;
+                    links[left][right].count += 1;
                     links[left][right].inverseLookup.push(vi.toString());
                 }
                 else {
@@ -87,18 +87,22 @@ function TransposeData(data) {
                 links[left] = {
                     [right]: {
                         count: 1,
-                        inverseLookup: [vi.toString()]
-                    }
+                        inverseLookup: [vi.toString()],
+                    },
                 };
             }
         });
         for (const lik in links) {
-            for (const rik in links[lik]) {
-                plotly.links.source.push(lane.nodes.find((node) => node.value === lik).id);
-                plotly.links.target.push(next.nodes.find((node) => node.value === rik).id);
-                plotly.links.value.push(links[lik][rik].count);
-                plotly.links.color.push(LINK_DEFAULT_COLOR);
-                plotly.links.inverseLookup.push(links[lik][rik].inverseLookup);
+            if (links.hasOwnProperty(lik)) {
+                for (const rik in links[lik]) {
+                    if (links[lik].hasOwnProperty(rik)) {
+                        plotly.links.source.push(lane.nodes.find((node) => node.value === lik).id);
+                        plotly.links.target.push(next.nodes.find((node) => node.value === rik).id);
+                        plotly.links.value.push(links[lik][rik].count);
+                        plotly.links.color.push(LINK_DEFAULT_COLOR);
+                        plotly.links.inverseLookup.push(links[lik][rik].inverseLookup);
+                    }
+                }
             }
         }
     });
@@ -119,7 +123,8 @@ function isNodeSelected(selection, inverseLookup) {
     return false;
 }
 function generatePlotly(data, optimisedSelection) {
-    return [{
+    return [
+        {
             type: 'sankey',
             arrangement: 'fixed',
             orientation: 'h',
@@ -131,13 +136,14 @@ function generatePlotly(data, optimisedSelection) {
                     width: 0.5,
                 },
                 label: data.nodes.labels,
-                color: data.nodes.color.map((color, i) => isNodeSelected(optimisedSelection, data.nodes.inverseLookup[i]) ? NODE_SELECTION_COLOR : 'rgba(51, 122, 183, 0.2)')
+                color: data.nodes.color.map((color, i) => (isNodeSelected(optimisedSelection, data.nodes.inverseLookup[i]) ? NODE_SELECTION_COLOR : NODE_GRAYED_COLOR)),
             },
             link: {
                 ...data.links,
-                color: data.links.color.map((color, i) => isNodeSelected(optimisedSelection, data.links.inverseLookup[i]) ? 'rgba(51, 122, 183, 0.2)' : 'rgba(68, 68, 68, 0.2)')
+                color: data.links.color.map((color, i) => isNodeSelected(optimisedSelection, data.links.inverseLookup[i]) ? LINK_SELECTION_COLOR : LINK_DEFAULT_COLOR),
             },
-        }];
+        },
+    ];
 }
 export function SankeyVis({ config, setConfig, columns }) {
     const id = React.useMemo(() => uniqueId('SankeyVis'), []);
@@ -153,31 +159,23 @@ export function SankeyVis({ config, setConfig, columns }) {
         else {
             setPlotly(generatePlotly(data, optimisedSelection));
         }
-    }, [data]);
-    // When selection changes and we have data -> recreate plotly
-    React.useEffect(() => {
-        if (data) {
-            const optimisedSelection = new Set(selection);
-            setPlotly(generatePlotly(data, optimisedSelection));
-        }
-    }, [selection]);
+    }, [selection, data]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ` },
-            plotly ?
-                React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: plotly, layout: layout, onClick: (sel) => {
-                        if (!sel.points[0]) {
-                            return;
-                        }
-                        const element = sel.points[0];
-                        if ('sourceLinks' in element) {
-                            // node
-                            setSelection(data.nodes.inverseLookup[element.index]);
-                        }
-                        else {
-                            // link
-                            setSelection(data.links.inverseLookup[element.index]);
-                        }
-                    } }) : React.createElement("p", { className: "h4" }, "Select at least 2 categorical attributes."),
+            plotly ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: plotly, layout: layout, onClick: (sel) => {
+                    if (!sel.points[0]) {
+                        return;
+                    }
+                    const element = sel.points[0];
+                    if ('sourceLinks' in element) {
+                        // node
+                        setSelection(data.nodes.inverseLookup[element.index]);
+                    }
+                    else {
+                        // link
+                        setSelection(data.links.inverseLookup[element.index]);
+                    }
+                } })) : (React.createElement("p", { className: "h4" }, "Select at least 2 categorical attributes.")),
             React.createElement(SankeyVisSidebar, { config: config, setConfig: setConfig, columns: columns }))));
 }
 //# sourceMappingURL=SankeyVis.js.map

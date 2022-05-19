@@ -192,6 +192,7 @@ export const SankeyCoordinatesPlot = Template.bind({});
 SankeyCoordinatesPlot.args = {
     externalConfig: {
         type: ESupportedPlotlyVis.SANKEY,
+        catColumnsSelected: []
     },
 };
 //# sourceMappingURL=Iris.stories.js.map

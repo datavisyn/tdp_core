@@ -115,7 +115,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
     }
     const defaultProps = {
         setConfig: setVisConfig,
-        columns
+        columns,
     };
     return (React.createElement(React.Fragment, null,
         isSankey(visConfig) ? React.createElement(SankeyVis, { ...defaultProps, config: visConfig }) : null,

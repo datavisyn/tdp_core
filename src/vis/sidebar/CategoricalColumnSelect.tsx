@@ -1,7 +1,7 @@
 import * as React from 'react';
-import Select, {components, MultiValueProps, Props} from 'react-select';
-import {MultiValueGenericProps} from 'react-select/src/components/MultiValue';
-import {SortableContainer, SortableContainerProps, SortableElement, SortableHandle, SortEndHandler} from 'react-sortable-hoc';
+import Select, { components, MultiValueProps, Props } from 'react-select';
+import { MultiValueGenericProps } from 'react-select/src/components/MultiValue';
+import { SortableContainer, SortableContainerProps, SortableElement, SortableHandle, SortEndHandler } from 'react-sortable-hoc';
 import { ColumnInfo, EColumnTypes, VisColumn } from '../interfaces';
 import { formatOptionLabel } from './utils';
 
@@ -10,7 +10,6 @@ interface CategoricalColumnSelectProps {
   columns: VisColumn[];
   currentSelected: ColumnInfo[];
 }
-
 
 function arrayMove<T>(array: readonly T[], from: number, to: number) {
   const slicedArray = array.slice();
