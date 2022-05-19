@@ -25,7 +25,6 @@ export const EP_TDP_CORE_LINEUP_PANEL_TAB = 'epTdpCoreLineupPanelTab';
  * @factoryReturns {IFormElement} An instance of the form element
  */
 export const EP_TDP_CORE_FORM_ELEMENT = 'epTdpCoreFormElement';
-export const EP_TDP_CORE_SCORE_COLUMN_PATCHER = 'epTdpCoreScoreColumnPatcher';
 /**
  * Provides the loaded provenance graph
  *

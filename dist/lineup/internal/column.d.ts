@@ -10,6 +10,5 @@ export declare class LazyColumn {
         pushDesc(col: IColumnDesc): void;
     }, position: number, done?: () => void): ILazyLoadedColumn;
     private static markLoaded;
-    private static patchColumn;
 }
 //# sourceMappingURL=column.d.ts.map

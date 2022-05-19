@@ -58,9 +58,12 @@ def create_visyn_server(
 
     @app.exception_handler(Exception)
     async def all_exception_handler(request: Request, e: Exception):
-        logging.exception("An unhandled exception occurred")
+        logging.exception("An error occurred in FastAPI")
         return await http_exception_handler(
-            request, HTTPException(status_code=500, detail=str(e) if manager.settings.is_development_mode else "Internal server error")
+            request,
+            e
+            if isinstance(e, HTTPException)
+            else HTTPException(status_code=500, detail=str(e) if manager.settings.is_development_mode else None),
         )
 
     # Store all globals also in app.state.<manager> to allow access in FastAPI routes via request.app.state.<manager>.

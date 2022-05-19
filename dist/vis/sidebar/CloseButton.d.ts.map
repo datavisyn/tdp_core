@@ -1,1 +1,1 @@
-{"version":3,"file":"CloseButton.d.ts","sourceRoot":"","sources":["../../../src/vis/sidebar/CloseButton.tsx"],"names":[],"mappings":"AAEA,wBAAgB,WAAW,CAAC,EAAE,aAAa,EAAE,EAAE;IAAE,aAAa,EAAE,MAAM,IAAI,CAAA;CAAE,eAM3E"}
+{"version":3,"file":"CloseButton.d.ts","sourceRoot":"","sources":["../../../src/vis/sidebar/CloseButton.tsx"],"names":[],"mappings":";AAEA,wBAAgB,WAAW,CAAC,EAAE,aAAa,EAAE,EAAE;IAAE,aAAa,EAAE,MAAM,IAAI,CAAA;CAAE,eAM3E"}

@@ -73,14 +73,15 @@ const defaults = {
             node.classList.toggle('lu-searchbox-summary-entry', Boolean(summary));
             if (summary) {
                 const label = node.ownerDocument.createElement('span');
-                label.textContent = item.desc.label;
+                label.innerHTML = item.desc.label;
                 node.appendChild(label);
                 const desc = node.ownerDocument.createElement('span');
-                desc.textContent = summary;
+                desc.innerHTML = summary;
                 node.appendChild(desc);
                 return undefined;
             }
         }
+        node.innerHTML = item.text;
         return item.text;
     },
     panelAddColumnBtnOptions: {},
@@ -367,18 +368,20 @@ onAddScoreColumn, }) {
         ColumnDescUtils.createInitialRanking(providerRef.current, {});
         const ranking = providerRef.current.getLastRanking();
         const columns = ranking ? ranking.flatColumns : [];
-        const context = {
+        const selectionAdapterContext = {
             columns,
             freeColor: (id) => colorsRef.current.freeColumnColor(id),
-            add: (columns) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
-            remove: (columns) => columns.forEach((c) => c.removeMe()),
+            // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
+            add: (columns) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
+            // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
+            remove: (columns) => Promise.resolve(columns.forEach((c) => c.removeMe())),
         };
-        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
+        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(selectionAdapterContext);
         onCustomizeRanking === null || onCustomizeRanking === void 0 ? void 0 : onCustomizeRanking(LineupUtils.wrapRanking(providerRef.current, ranking));
         return (Promise.resolve()
             // TODO: check if this is needed
             // .then(async () => {
-            //   return selectionAdapter?.selectionChanged(null, () => createContext(selection));
+            //   return selectionAdapter?.selectionChanged(createContext(selection));
             // })
             .then(() => {
             onBuiltLineUp === null || onBuiltLineUp === void 0 ? void 0 : onBuiltLineUp(providerRef.current);

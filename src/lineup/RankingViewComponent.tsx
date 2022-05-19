@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Ranking, IRankingProps } from './Ranking';
 import { ISelection } from '../base/interfaces';
 import { IContext, ISelectionAdapter } from './selection/ISelectionAdapter';
@@ -42,12 +42,11 @@ export function RankingViewComponent({
    */
   onAddScoreColumn,
 }: IRankingViewComponentProps) {
-  const [context, setContext] = React.useState<Omit<IContext, 'selection'>>(null);
-
   const selections = useMemo(() => {
     return new Map<string, ISelection>();
   }, []);
 
+  const [selectionAdapterContext, setSelectionAdapterContext] = React.useState<Omit<IContext, 'selection'>>(null);
   const viewRef = React.useRef<HTMLDivElement | null>(null);
 
   const runAuthorizations = useCallback(async (): Promise<void> => {
@@ -93,6 +92,7 @@ export function RankingViewComponent({
   React.useEffect(() => {
     // set input and item selections
     selections.set(AView.DEFAULT_SELECTION_NAME, inputSelection);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const init = useCallback(async () => {
@@ -128,13 +128,12 @@ export function RankingViewComponent({
       selections.set(name, inputSelection);
       if (name === AView.DEFAULT_SELECTION_NAME) {
         if (selectionAdapter) {
-          selectionAdapter.selectionChanged(null, () => {
-            return { ...context, selection: inputSelection };
-          });
+          console.log('calling selection changed');
+          selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection });
         }
       }
     }
-  }, [status, context, selectionAdapter, inputSelection, selections]);
+  }, [status, selectionAdapterContext, selectionAdapter, inputSelection, selections]);
 
   /**
    * onParametersChanged
@@ -142,15 +141,15 @@ export function RankingViewComponent({
   React.useEffect(() => {
     if (status === 'success' && parameters) {
       if (selectionAdapter) {
-        selectionAdapter.parameterChanged(null, () => {
-          return { ...context, selection: inputSelection };
-        });
+        console.log('calling parameters changed');
+
+        selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection });
       }
     }
-  }, [status, parameters, context, selectionAdapter, inputSelection]);
+  }, [status, selectionAdapter]);
 
   const onContextChangedCallback = useCallback((newContext: Omit<IContext, 'selection'>) => {
-    setContext(newContext);
+    setSelectionAdapterContext(newContext);
   }, []);
 
   return (
