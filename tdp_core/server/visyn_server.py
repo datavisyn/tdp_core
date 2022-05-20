@@ -9,8 +9,10 @@ from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
 from pydantic.utils import deep_update
 
-from ..middleware.exception_handler_middleware import ExceptionHandlerMiddleware
-from ..middleware.request_context_middleware import RequestContextMiddleware
+from ..settings.constants import default_logging_dict
+
+# Initialize the logging very early as otherwise the already created loggers receive a default loglevel WARN, leading to logs not being shown.
+logging.config.dictConfig(default_logging_dict)
 
 
 def create_visyn_server(
@@ -32,7 +34,8 @@ def create_visyn_server(
     workspace_config = workspace_config if isinstance(workspace_config, dict) else load_workspace_config()
     manager.settings = GlobalSettings(**workspace_config)
     logging.config.dictConfig(manager.settings.tdp_core.logging)
-    logging.info("Workspace settings successfully loaded")
+    _log = logging.getLogger(__name__)
+    _log.info("Workspace settings successfully loaded")
 
     # Load the initial plugins
     from ..plugin.parser import get_config_from_plugins, load_all_plugins
@@ -43,7 +46,7 @@ def create_visyn_server(
     visyn_server_settings = create_model("VisynServerSettings", __base__=GlobalSettings, **plugin_settings_models)
     # Patch the global settings by instantiating the new settings model with the global config, all config.json(s), and pydantic models
     manager.settings = visyn_server_settings(**deep_update(*plugin_config_files, workspace_config))
-    logging.info("All settings successfully loaded")
+    _log.info("All settings successfully loaded")
 
     app = FastAPI(
         debug=manager.settings.is_development_mode,
@@ -55,6 +58,9 @@ def create_visyn_server(
         redoc_url="/api/redoc",
         **fast_api_args,
     )
+
+    from ..middleware.exception_handler_middleware import ExceptionHandlerMiddleware
+    from ..middleware.request_context_middleware import RequestContextMiddleware
 
     # TODO: For some reason, a @app.exception_handler(Exception) is not called here. We use a middleware instead.
     app.add_middleware(ExceptionHandlerMiddleware)
@@ -68,7 +74,7 @@ def create_visyn_server(
     app.state.registry = manager.registry = Registry()
     manager.registry.init_app(app, plugins)
 
-    logging.info("Plugin registry successfully initialized")
+    _log.info("Plugin registry successfully initialized")
 
     from ..dbmanager import DBManager
 
@@ -94,9 +100,9 @@ def create_visyn_server(
 
     alternative_start_command = parse_command_string(start_cmd)
     if alternative_start_command:
-        logging.info(f"Received start command: {start_cmd}")
+        _log.info(f"Received start command: {start_cmd}")
         alternative_start_command()
-        logging.info("Successfully executed command, exiting server...")
+        _log.info("Successfully executed command, exiting server...")
         # TODO: How to properly exit here? Should a command support the "continuation" of the server, i.e. by returning True?
         sys.exit(0)
 
@@ -104,17 +110,17 @@ def create_visyn_server(
     from .utils import init_legacy_app, load_after_server_started_hooks
 
     namespace_plugins = manager.registry.list("namespace")
-    logging.info(f"Registering {len(namespace_plugins)} legacy namespaces via WSGIMiddleware")
+    _log.info(f"Registering {len(namespace_plugins)} legacy namespaces via WSGIMiddleware")
     for p in namespace_plugins:
-        logging.info(f"Registering legacy namespace: {p.namespace}")
+        _log.info(f"Registering legacy namespace: {p.namespace}")
         app.mount(p.namespace, WSGIMiddleware(init_legacy_app(p.load().factory())))
 
     # Load all FastAPI apis
     router_plugins = manager.registry.list("fastapi_router")
-    logging.info(f"Registering {len(router_plugins)} API-routers")
+    _log.info(f"Registering {len(router_plugins)} API-routers")
     # Load all namespace plugins as WSGIMiddleware plugins
     for p in router_plugins:
-        logging.info(f"Registering router: {p.id}")
+        _log.info(f"Registering router: {p.id}")
         app.include_router(p.load().factory())
 
     # load `after_server_started` extension points which are run immediately after server started,
