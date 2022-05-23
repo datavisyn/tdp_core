@@ -84,8 +84,6 @@ onAddScoreColumn, }) {
         });
     }, [runAuthorizations]);
     const { status } = useAsync(init, []);
-    // TODO:: Pretty sure this only works by blind luck, because the parameter changed update gets canceled on
-    // selection change because theyre both running at the same time, but its a race case
     /**
      * onInputSelectionChanged
      */
@@ -113,7 +111,7 @@ onAddScoreColumn, }) {
         }
         if (status === 'success') {
             if (selectionAdapter) {
-                selectionAdapter === null || selectionAdapter === void 0 ? void 0 : selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection });
+                selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection });
                 setPrevParameters(parameters);
             }
         }
