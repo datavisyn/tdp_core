@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ColumnInfo, EBarDisplayType, EBarGroupingType, VisColumn } from '../interfaces';
 interface GroupSelectProps {
     groupColumnSelectCallback: (c: ColumnInfo) => void;

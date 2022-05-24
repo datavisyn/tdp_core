@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ColumnInfo, EAggregateTypes, VisColumn } from '../interfaces';
 interface AggregateTypeSelectProps {
     aggregateTypeSelectCallback: (s: EAggregateTypes) => void;
