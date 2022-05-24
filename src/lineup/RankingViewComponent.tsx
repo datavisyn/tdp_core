@@ -132,6 +132,10 @@ export function RankingViewComponent({
   }, [runAuthorizations]);
   const { status } = useAsync(init, []);
 
+  const onContextChangedCallback = useCallback((newContext: Omit<IContext, 'selection'>) => {
+    setSelectionAdapterContext(newContext);
+  }, []);
+
   /**
    * onInputSelectionChanged
    */
@@ -145,11 +149,11 @@ export function RankingViewComponent({
       selections.set(name, inputSelection);
       if (name === AView.DEFAULT_SELECTION_NAME) {
         if (selectionAdapter) {
-          selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection });
+          selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
         }
       }
     }
-  }, [status, inputSelection, selectionAdapterContext, selections, selectionAdapter]);
+  }, [status, inputSelection, selectionAdapterContext, selections, selectionAdapter, onContextChangedCallback]);
 
   /**
    * onParametersChanged
@@ -161,15 +165,11 @@ export function RankingViewComponent({
 
     if (status === 'success') {
       if (selectionAdapter) {
-        selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection });
+        selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
         setPrevParameters(parameters);
       }
     }
-  }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters]);
-
-  const onContextChangedCallback = useCallback((newContext: Omit<IContext, 'selection'>) => {
-    setSelectionAdapterContext(newContext);
-  }, []);
+  }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters, onContextChangedCallback]);
 
   return (
     <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${status !== 'success' && 'tdp-busy'}`}>

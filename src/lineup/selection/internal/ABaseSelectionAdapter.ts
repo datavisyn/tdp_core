@@ -35,8 +35,8 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  selectionChanged(context: IContext): Promise<void> {
-    return this.selectionChangedImpl(context);
+  selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void> {
+    return this.selectionChangedImpl(context, onContextChanged);
   }
 
   /**
@@ -44,8 +44,8 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  parameterChanged(context: IContext): Promise<void> {
-    return this.parameterChangedImpl(context);
+  parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void> {
+    return this.parameterChangedImpl(context, onContextChanged);
   }
 
   // TODO test at run-time if we really need the following promises or if it can be removed. it might be necessary when replaying the a CLUE provenence graph. if we need it, a queue might be the better solution.
@@ -96,9 +96,9 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
   //     }));
   // }
 
-  protected abstract parameterChangedImpl(context: IContext): Promise<void>;
+  protected abstract parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
 
-  protected async selectionChangedImpl(context: IContext): Promise<void> {
+  protected async selectionChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void> {
     const selectedIds = context.selection.ids;
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
@@ -106,17 +106,17 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     // compute the difference
     const diffAdded = difference(selectedIds, lineupColIds);
     const diffRemoved = difference(lineupColIds, selectedIds);
-
     // remove deselected columns
     if (diffRemoved.length > 0) {
       // console.log('remove columns', diffRemoved);
       await this.removeDynamicColumns(context, diffRemoved);
     }
     // add new columns to the end
-    if (diffAdded.length <= 0) {
-      return null;
+    if (diffAdded.length) {
+      await this.addDynamicColumns(context, diffAdded);
     }
-    return this.addDynamicColumns(context, diffAdded);
+
+    return onContextChanged?.(context);
   }
 
   /**

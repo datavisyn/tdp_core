@@ -13,10 +13,11 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
      * @param context selection adapter context
      * @returns A promise to wait until all new columns have been added
      */
-    async parameterChangedImpl(context) {
+    async parameterChangedImpl(context, onContextChanged) {
         const selectedIds = context.selection.ids;
         await this.removePartialDynamicColumns(context, selectedIds);
-        return this.addDynamicColumns(context, selectedIds);
+        await this.addDynamicColumns(context, selectedIds);
+        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
     }
     /**
      * Create one or multiple LineUp column descs + additional information for each selected sub-type and given id.

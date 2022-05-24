@@ -84,6 +84,9 @@ onAddScoreColumn, }) {
         });
     }, [runAuthorizations]);
     const { status } = useAsync(init, []);
+    const onContextChangedCallback = useCallback((newContext) => {
+        setSelectionAdapterContext(newContext);
+    }, []);
     /**
      * onInputSelectionChanged
      */
@@ -97,11 +100,11 @@ onAddScoreColumn, }) {
             selections.set(name, inputSelection);
             if (name === AView.DEFAULT_SELECTION_NAME) {
                 if (selectionAdapter) {
-                    selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection });
+                    selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
                 }
             }
         }
-    }, [status, inputSelection, selectionAdapterContext, selections, selectionAdapter]);
+    }, [status, inputSelection, selectionAdapterContext, selections, selectionAdapter, onContextChangedCallback]);
     /**
      * onParametersChanged
      */
@@ -111,14 +114,11 @@ onAddScoreColumn, }) {
         }
         if (status === 'success') {
             if (selectionAdapter) {
-                selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection });
+                selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
                 setPrevParameters(parameters);
             }
         }
-    }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters]);
-    const onContextChangedCallback = useCallback((newContext) => {
-        setSelectionAdapterContext(newContext);
-    }, []);
+    }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters, onContextChangedCallback]);
     return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${status !== 'success' && 'tdp-busy'}` },
         React.createElement(Ranking, { data: data, columnDesc: columnDesc, itemSelection: itemSelection, options: options, onItemSelect: onItemSelect, onContextChanged: onContextChangedCallback, onAddScoreColumn: onAddScoreColumn, onBuiltLineUp: onBuiltLineUp, onItemSelectionChanged: onItemSelectionChanged, onCustomizeRanking: onCustomizeRanking, onUpdateEntryPoint: onUpdateEntryPoint })));
 }

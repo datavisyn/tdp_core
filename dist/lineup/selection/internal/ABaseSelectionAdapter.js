@@ -25,18 +25,18 @@ export class ABaseSelectionAdapter {
      * @param context selection adapter context
      * @returns A promise that can waited for until the columns have been changed.
      */
-    selectionChanged(context) {
-        return this.selectionChangedImpl(context);
+    selectionChanged(context, onContextChanged) {
+        return this.selectionChangedImpl(context, onContextChanged);
     }
     /**
      * Add or remove columns in LineUp ranking when the parametrs in the selection adapter context change
      * @param context selection adapter context
      * @returns A promise that can waited for until the columns have been changed.
      */
-    parameterChanged(context) {
-        return this.parameterChangedImpl(context);
+    parameterChanged(context, onContextChanged) {
+        return this.parameterChangedImpl(context, onContextChanged);
     }
-    async selectionChangedImpl(context) {
+    async selectionChangedImpl(context, onContextChanged) {
         const selectedIds = context.selection.ids;
         const usedCols = context.columns.filter((d) => d.desc.selectedId != null);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
@@ -49,10 +49,10 @@ export class ABaseSelectionAdapter {
             await this.removeDynamicColumns(context, diffRemoved);
         }
         // add new columns to the end
-        if (diffAdded.length <= 0) {
-            return null;
+        if (diffAdded.length) {
+            await this.addDynamicColumns(context, diffAdded);
         }
-        return this.addDynamicColumns(context, diffAdded);
+        return onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
     }
     // TODO this function is currently useless, because it requires an `IAdditionalColumnDesc` where `selectedId` is mandatory and then assigns it again
     static patchDesc(desc, selectedId) {
