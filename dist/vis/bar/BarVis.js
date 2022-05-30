@@ -1,7 +1,7 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { EBarGroupingType } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
@@ -17,13 +17,14 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, }) {
+export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, selectionCallback = () => null, selectedMap = {}, selectedList = [], hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, }) {
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
     const id = React.useMemo(() => uniqueId('BarVis'), []);
     const plotlyDivRef = React.useRef(null);
+    const [selectedCategories, setSelectedCategories] = useState([]);
     useEffect(() => {
         const ro = new ResizeObserver(() => {
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
@@ -64,14 +65,60 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces, config.groupType]);
+    // Make sure selected values is right for each plot.
+    useEffect(() => {
+        let selectedFlag = false;
+        const allSelected = [];
+        traces === null || traces === void 0 ? void 0 : traces.plots.forEach((plot) => {
+            const tracePoints = plot.data.customdata;
+            const selectedArr = [];
+            tracePoints.forEach((trace, index) => {
+                if (trace.length === 0 || selectedList.length < trace.length) {
+                    return;
+                }
+                for (const i of trace) {
+                    if (!selectedMap[i]) {
+                        return;
+                    }
+                }
+                selectedArr.push(index);
+                allSelected.push(trace);
+                selectedFlag = true;
+            });
+            if (selectedArr.length > 0) {
+                plot.data.selectedpoints = selectedArr;
+            }
+            else {
+                plot.data.selectedpoints = null;
+            }
+        });
+        if (selectedFlag) {
+            traces === null || traces === void 0 ? void 0 : traces.plots.forEach((plot) => {
+                if (plot.data.selectedpoints === null) {
+                    plot.data.selectedpoints = [];
+                }
+            });
+        }
+        setSelectedCategories(allSelected);
+    }, [traces, selectedMap, selectedList]);
+    const traceData = useMemo(() => {
+        if (!traces) {
+            return null;
+        }
+        return [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)];
+    }, [traces]);
     return (React.createElement("div", { ref: plotlyDivRef, className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
-            traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (e) => {
-                    const clickedCategory = e.points[0].id;
-                    console.log(e);
-                    console.log(config.group);
-                    console.log(clickedCategory);
+            traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (e) => {
+                    const selectedPoints = e.points[0].customdata;
+                    if (e.event.ctrlKey) {
+                        const newList = Array.from(new Set([...selectedList, ...selectedPoints]));
+                        selectionCallback(newList);
+                    }
+                    else {
+                        selectionCallback(selectedPoints);
+                    }
                 }, 
                 // plotly redraws everything on updates, so you need to reappend title and
                 onUpdate: () => {

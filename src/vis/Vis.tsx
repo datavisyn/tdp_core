@@ -259,6 +259,9 @@ export function Vis({
         <BarVis
           config={visConfig}
           setConfig={setVisConfig}
+          selectionCallback={selectionCallback}
+          selectedMap={selectedMap}
+          selectedList={selected}
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}

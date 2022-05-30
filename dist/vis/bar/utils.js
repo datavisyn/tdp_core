@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/naming-convention */
 import { merge, sum, mean, min, max } from 'lodash';
 import { median } from 'd3';
@@ -8,6 +9,7 @@ import { getCol } from '../sidebar';
 export function isBar(s) {
     return s.type === ESupportedPlotlyVis.BAR;
 }
+const UNSELECTED_OPACITY = '0.2';
 const defaultConfig = {
     type: ESupportedPlotlyVis.BAR,
     numColumnsSelected: [],
@@ -100,12 +102,16 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, ag
             })
                 .flat();
             const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
+            let valIdArr = uniqueColVals.map((val) => []);
+            catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val)].push(row.id));
+            valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val) && allMultiplesObjsIds.has(val)));
             plots.push({
                 data: {
                     x: vertFlag ? uniqueColVals : aggregateVals,
                     y: !vertFlag ? uniqueColVals : aggregateVals,
                     text: uniqueColVals,
                     ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueMultiples}, ${uniqueGroup}`),
+                    customdata: valIdArr,
                     textposition: 'none',
                     hoverinfo: vertFlag ? 'y+text' : 'x+text',
                     orientation: vertFlag ? 'v' : 'h',
@@ -116,6 +122,17 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, ag
                     name: uniqueGroup,
                     marker: {
                         color: scales.color(uniqueGroup),
+                    },
+                    // @ts-ignore
+                    selected: {
+                        marker: {
+                            opacity: '1',
+                        },
+                    },
+                    unselected: {
+                        marker: {
+                            opacity: UNSELECTED_OPACITY,
+                        },
                     },
                 },
                 xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
@@ -151,12 +168,16 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggregateColum
         })
             .flat();
         const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
+        let valIdArr = uniqueColVals.map((val) => []);
+        catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val)].push(row.id));
+        valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val)));
         plots.push({
             data: {
                 x: vertFlag ? uniqueColVals : finalAggregateValues,
                 y: !vertFlag ? uniqueColVals : finalAggregateValues,
                 text: uniqueColVals,
                 ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueVal}`),
+                customdata: valIdArr,
                 textposition: 'none',
                 hoverinfo: vertFlag ? 'y+text' : 'x+text',
                 orientation: vertFlag ? 'v' : 'h',
@@ -168,6 +189,17 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggregateColum
                 marker: {
                     color: scales.color(uniqueVal),
                 },
+                // @ts-ignore
+                selected: {
+                    marker: {
+                        opacity: '1',
+                    },
+                },
+                unselected: {
+                    marker: {
+                        opacity: UNSELECTED_OPACITY,
+                    },
+                },
             },
             xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
             yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
@@ -177,6 +209,15 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggregateColum
             yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
         });
     });
+    // const hasSelected = plots.find((plot) => plot.data.selectedpoints !== null);
+    // // Need to check if we need to tell all of the traces that there is a selection so they can be opaque
+    // if (hasSelected) {
+    //   plots.forEach((p) => {
+    //     if (p.data.selectedpoints === null) {
+    //       p.data.selectedpoints = [];
+    //     }
+    //   });
+    // }
     return plotCounter;
 }
 async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateColumn, config, plots, plotCounter) {
@@ -197,6 +238,9 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateCo
         })
             .flat();
         const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
+        let valIdArr = uniqueColVals.map((val) => []);
+        catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val)].push(row.id));
+        valIdArr = valIdArr.map((arr) => arr.filter((val) => allMultiplesObjsIds.has(val)));
         plots.push({
             data: {
                 x: vertFlag ? uniqueColVals : finalAggregateValues,
@@ -204,6 +248,7 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateCo
                 ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueVal}`),
                 text: uniqueColVals,
                 textposition: 'none',
+                customdata: valIdArr,
                 hoverinfo: vertFlag ? 'y+text' : 'x+text',
                 orientation: vertFlag ? 'v' : 'h',
                 xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
@@ -211,6 +256,17 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateCo
                 showlegend: false,
                 type: 'bar',
                 name: uniqueVal,
+                // @ts-ignore
+                selected: {
+                    marker: {
+                        opacity: '1',
+                    },
+                },
+                unselected: {
+                    marker: {
+                        opacity: UNSELECTED_OPACITY,
+                    },
+                },
             },
             xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
             yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
@@ -221,7 +277,7 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateCo
         });
         plotCounterEdit += 1;
     });
-    return plotCounter;
+    return plotCounterEdit;
 }
 async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, config, plots, scales, plotCounter) {
     let plotCounterEdit = plotCounter;
@@ -235,17 +291,28 @@ async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, co
     const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
     plots.push({
         data: {
+            type: 'bar',
             x: vertFlag ? valArr : aggValues,
             y: !vertFlag ? valArr : aggValues,
             text: valArr,
             textposition: 'none',
             hoverinfo: vertFlag ? 'y+text' : 'x+text',
             ids: valArr,
+            // @ts-ignore
+            selected: {
+                marker: {
+                    opacity: '1',
+                },
+            },
+            unselected: {
+                marker: {
+                    opacity: UNSELECTED_OPACITY,
+                },
+            },
             customdata: valIdArr,
             orientation: vertFlag ? 'v' : 'h',
             xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
             yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-            type: 'bar',
             name: catColValues.info.name,
             showlegend: false,
         },
