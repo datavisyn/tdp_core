@@ -1,9 +1,6 @@
-import logging
 from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, BaseSettings, Extra, Field
-
-_log = logging.getLogger(__name__)
 
 
 class DBMigrationSettings(BaseModel):
@@ -65,7 +62,6 @@ class TDPCoreSettings(BaseModel):
                     "stream": "ext://sys.stdout",
                 }
             },
-            "loggers": {"geventwebsocket.handler": {"level": "WARN", "handlers": ["console"]}},
             "root": {"level": "INFO", "handlers": ["console"]},
         }
     )

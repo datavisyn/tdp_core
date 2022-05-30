@@ -221,7 +221,7 @@
 
       "LineupPanelActions": {
         "rankingPanelTabTitle": "Ranking Configuration",
-        "searchPlaceholder": "Add Column &hellip;",
+        "searchPlaceholder": "Add Column \u2026",
         "addColumnButton": "Add Column",
         "addButton": "Add",
         "collapseButton": "(Un)Collapse",
@@ -304,11 +304,8 @@
       "unknown": "Unknown",
       "cannotMap": "Cannot map <i>{{name}}</i> ('{{selectedItemId}}') to <i>{{to}}</i>.",
       "screwed": "We are all screwed :(",
-
       "noViews": "No views defined",
-
       "formSelectName": "No mapping found",
-
       "authorizationRequired": "{{name}} authorization is required for this view.",
       "authorizationFailed": "<strong>Authorization failed: </strong>An error occurred when authorizing this page.",
       "authorizationButtonLoading": "Loading",

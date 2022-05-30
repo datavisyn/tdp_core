@@ -15,6 +15,7 @@ import {
   updateLodRules,
   UIntTypedArray,
   IGroupSearchItem,
+  IValueColumnDesc,
 } from 'lineupjs';
 import { merge } from 'lodash';
 import { AView } from '../views/AView';
@@ -131,6 +132,11 @@ export abstract class ARankingView extends AView {
       maxGroupColumns: Infinity,
       filterGlobally: true,
       propagateAggregationState: false,
+      /**
+       * Specify the task executor to use `direct` = no delay, `scheduled` = run when idle
+       * `scheduled` also improve scalability and performance by using web workers
+       */
+      taskExecutor: 'scheduled',
     },
     showInContextMode: (col: Column) => (<any>col.desc).column === 'id',
     formatSearchBoxItem: (item: ISearchOption | IGroupSearchItem<ISearchOption>, node: HTMLElement): string | void => {
@@ -145,14 +151,15 @@ export abstract class ARankingView extends AView {
         node.classList.toggle('lu-searchbox-summary-entry', Boolean(summary));
         if (summary) {
           const label = node.ownerDocument.createElement('span');
-          label.textContent = item.desc.label;
+          label.innerHTML = item.desc.label;
           node.appendChild(label);
           const desc = node.ownerDocument.createElement('span');
-          desc.textContent = summary;
+          desc.innerHTML = summary;
           node.appendChild(desc);
           return undefined;
         }
       }
+      node.innerHTML = item.text;
       return item.text;
     },
     panelAddColumnBtnOptions: {},
@@ -452,9 +459,9 @@ export abstract class ARankingView extends AView {
     this.fire(AView.EVENT_UPDATE_ENTRY_POINT, namedSet);
   }
 
-  private addColumn(colDesc: any, data: Promise<IScoreRow<any>[]>, id: string = null, position?: number): ILazyLoadedColumn {
+  private addColumn(colDesc: IValueColumnDesc<any>, data: Promise<IScoreRow<any>[]>, id: string = null, position?: number): ILazyLoadedColumn {
     // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
-    colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : this.colors.getColumnColor(id);
+    (<any>colDesc).colorMapping = (<any>colDesc).colorMapping ? (<any>colDesc).colorMapping : colDesc.color ? colDesc.color : this.colors.getColumnColor(id);
     return LazyColumn.addLazyColumn(colDesc, data, this.provider, position, () => {
       this.taggle.update();
     });
