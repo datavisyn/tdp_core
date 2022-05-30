@@ -46,7 +46,7 @@ export function RankingViewComponent({
   selection: inputSelection,
   itemSelection = { idtype: null, ids: [] },
   columnDesc = [],
-  parameters = false,
+  parameters = null,
   selectionAdapter = null,
   options = {},
   authorization = null,
