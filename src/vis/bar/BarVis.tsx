@@ -1,6 +1,6 @@
 import * as React from 'react';
 import d3 from 'd3';
-import { merge, uniqueId } from 'lodash';
+import { merge, uniqueId, difference } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
@@ -203,7 +203,19 @@ export function BarVis({
             onClick={(e: any) => {
               const selectedPoints: string[] = e.points[0].customdata;
 
-              if (e.event.ctrlKey) {
+              let removeSelectionFlag = true;
+
+              for (const j of selectedPoints) {
+                if (!selectedMap[j]) {
+                  removeSelectionFlag = false;
+                  break;
+                }
+              }
+
+              if (removeSelectionFlag) {
+                const newList = difference(selectedList, selectedPoints);
+                selectionCallback(newList);
+              } else if (e.event.ctrlKey) {
                 const newList = Array.from(new Set([...selectedList, ...selectedPoints]));
                 selectionCallback(newList);
               } else {
