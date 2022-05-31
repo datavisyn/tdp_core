@@ -1,7 +1,7 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId, difference } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { EBarGroupingType } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
@@ -22,54 +22,15 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
-    const id = React.useMemo(() => uniqueId('BarVis'), []);
-    const plotlyDivRef = React.useRef(null);
-    const [selectedCategories, setSelectedCategories] = useState([]);
-    useEffect(() => {
-        const ro = new ResizeObserver(() => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-        });
-        if (plotlyDivRef) {
-            ro.observe(plotlyDivRef.current);
-        }
-        if (hideSidebar) {
-            return;
-        }
-        const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-        menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-        });
-        menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-        });
-    }, [id, hideSidebar, plotlyDivRef]);
-    const layout = React.useMemo(() => {
+    // Make sure selected values is right for each plot.
+    const finalTraces = useMemo(() => {
         if (!traces) {
             return null;
         }
-        const innerLayout = {
-            showlegend: true,
-            legend: {
-                // @ts-ignore
-                itemclick: false,
-                itemdoubleclick: false,
-            },
-            font: {
-                family: 'Roboto, sans-serif',
-            },
-            autosize: true,
-            grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
-            shapes: [],
-            violingap: 0,
-            barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
-        };
-        return beautifyLayout(traces, innerLayout);
-    }, [traces, config.groupType]);
-    // Make sure selected values is right for each plot.
-    useEffect(() => {
         let selectedFlag = false;
+        const editedTraces = { ...traces };
         const allSelected = [];
-        traces === null || traces === void 0 ? void 0 : traces.plots.forEach((plot) => {
+        editedTraces === null || editedTraces === void 0 ? void 0 : editedTraces.plots.forEach((plot) => {
             const tracePoints = plot.data.customdata;
             const selectedArr = [];
             tracePoints.forEach((trace, index) => {
@@ -93,24 +54,68 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             }
         });
         if (selectedFlag) {
-            traces === null || traces === void 0 ? void 0 : traces.plots.forEach((plot) => {
+            editedTraces === null || editedTraces === void 0 ? void 0 : editedTraces.plots.forEach((plot) => {
                 if (plot.data.selectedpoints === null) {
                     plot.data.selectedpoints = [];
                 }
             });
         }
-        setSelectedCategories(allSelected);
+        return editedTraces;
     }, [traces, selectedMap, selectedList]);
-    const traceData = useMemo(() => {
-        if (!traces) {
+    const id = React.useMemo(() => uniqueId('BarVis'), []);
+    const plotlyDivRef = React.useRef(null);
+    useEffect(() => {
+        const ro = new ResizeObserver(() => {
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+        });
+        if (plotlyDivRef) {
+            ro.observe(plotlyDivRef.current);
+        }
+        if (hideSidebar) {
+            return;
+        }
+        const menu = document.getElementById(`generalVisBurgerMenu${id}`);
+        menu.addEventListener('hidden.bs.collapse', () => {
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+        });
+        menu.addEventListener('shown.bs.collapse', () => {
+            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
+        });
+    }, [id, hideSidebar, plotlyDivRef]);
+    const layout = React.useMemo(() => {
+        if (!finalTraces) {
             return null;
         }
-        return [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)];
-    }, [traces]);
+        const innerLayout = {
+            showlegend: true,
+            legend: {
+                // @ts-ignore
+                itemclick: false,
+                itemdoubleclick: false,
+            },
+            font: {
+                family: 'Roboto, sans-serif',
+            },
+            autosize: true,
+            grid: { rows: finalTraces.rows, columns: finalTraces.cols, xgap: 0.3, pattern: 'independent' },
+            shapes: [],
+            violingap: 0,
+            barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
+        };
+        return beautifyLayout(finalTraces, innerLayout);
+    }, [finalTraces, config.groupType]);
+    const traceData = useMemo(() => {
+        if (!finalTraces) {
+            return null;
+        }
+        return [...finalTraces.plots.map((p) => p.data), ...finalTraces.legendPlots.map((p) => p.data)];
+    }, [finalTraces]);
     return (React.createElement("div", { ref: plotlyDivRef, className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
-            traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (e) => {
+            traceStatus === 'success' && (finalTraces === null || finalTraces === void 0 ? void 0 : finalTraces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
+                // The types on this event dont seem to work correctly with Plotly types, thus the any typing.
+                onClick: (e) => {
                     const selectedPoints = e.points[0].customdata;
                     let removeSelectionFlag = true;
                     for (const j of selectedPoints) {
@@ -133,11 +138,11 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                 }, 
                 // plotly redraws everything on updates, so you need to reappend title and
                 onUpdate: () => {
-                    for (const p of traces.plots) {
+                    for (const p of finalTraces.plots) {
                         d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
                         d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
-                } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
+                } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: finalTraces === null || finalTraces === void 0 ? void 0 : finalTraces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (finalTraces === null || finalTraces === void 0 ? void 0 : finalTraces.errorMessage) })) : null,
             mergedExtensions.postPlot,
             showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
