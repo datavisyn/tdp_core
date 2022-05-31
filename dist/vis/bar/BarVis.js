@@ -101,6 +101,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             shapes: [],
             violingap: 0,
             barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
+            dragmode: false,
         };
         return beautifyLayout(finalTraces, innerLayout);
     }, [finalTraces, config.groupType]);
@@ -117,6 +118,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                 // The types on this event dont seem to work correctly with Plotly types, thus the any typing.
                 onClick: (e) => {
                     const selectedPoints = e.points[0].customdata;
+                    console.log(e);
                     let removeSelectionFlag = true;
                     for (const j of selectedPoints) {
                         if (!selectedMap[j]) {

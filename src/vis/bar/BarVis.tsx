@@ -176,6 +176,7 @@ export function BarVis({
       shapes: [],
       violingap: 0,
       barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
+      dragmode: false,
     };
 
     return beautifyLayout(finalTraces, innerLayout);
@@ -208,6 +209,8 @@ export function BarVis({
             // The types on this event dont seem to work correctly with Plotly types, thus the any typing.
             onClick={(e: any) => {
               const selectedPoints: string[] = e.points[0].customdata;
+
+              console.log(e);
 
               let removeSelectionFlag = true;
 
