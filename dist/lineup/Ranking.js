@@ -354,8 +354,8 @@ onAddScoreColumn, }) {
         const context = {
             columns,
             freeColor: (id) => colorsRef.current.freeColumnColor(id),
-            add: (columns) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
-            remove: (columns) => columns.forEach((c) => c.removeMe()),
+            add: (columns) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
+            remove: (columns) => Promise.resolve(columns.forEach((c) => c.removeMe())),
         };
         onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
     }, [addColumn, columns, onContextChanged, colorsRef]);

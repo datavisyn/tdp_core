@@ -467,8 +467,8 @@ export function Ranking({
     const context = {
       columns,
       freeColor: (id: string) => colorsRef.current.freeColumnColor(id),
-      add: (columns: ISelectionColumn[]) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
-      remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
+      add: (columns: ISelectionColumn[]) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
+      remove: (columns: Column[]) => Promise.resolve(columns.forEach((c) => c.removeMe())),
     };
     onContextChanged?.(context);
   }, [addColumn, columns, onContextChanged, colorsRef]);
