@@ -18,13 +18,19 @@ class ALBSecurityStore(BaseStore):
     def load_from_request(self, req):
         if "X-Amzn-Oidc-Identity" in req.headers and "X-Amzn-Oidc-Accesstoken" in req.headers and "X-Amzn-Oidc-Data" in req.headers:
             try:
+                roles = []
                 # Get token data from header
                 encoded = req.headers["X-Amzn-Oidc-Data"]
                 # Try to decode the oidc data jwt
                 user = jwt.decode(encoded, options={"verify_signature": False})
                 # Create new user from given attributes
                 email = user["email"]
-                return User(id=email, roles=[])
+                if "roles" in user:
+                    roles.extend(user["roles"])
+                if "groups" in user:
+                    roles.extend(user["groups"])
+                _log.debug(f"load_from_request - email: {email}, roles: {roles}")
+                return User(id=email, roles=roles)
             except Exception:
                 _log.exception("Error in load_from_request")
                 return None
