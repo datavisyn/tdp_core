@@ -6,6 +6,7 @@ import { getCssValue } from '../../utils';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
 import { DEFAULT_COLOR, SELECT_COLOR } from '../general/constants';
+const COLOR_SELECT_OPACITY = 0.05;
 export function isScatter(s) {
     return s.type === ESupportedPlotlyVis.SCATTER;
 }
@@ -120,7 +121,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                             ? colorCol.resolvedValues.map((v) => selected[v.id] ? (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : DEFAULT_COLOR)
                             : colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)))
                         : validCols[0].resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
-                    opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
+                    opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? COLOR_SELECT_OPACITY : config.alphaSliderVal)),
                     size: 8,
                 },
             },
@@ -184,7 +185,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                                             : DEFAULT_COLOR)
                                         : colorCol.resolvedValues.map((v) => colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
                                     : xCurr.resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
-                                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
+                                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? COLOR_SELECT_OPACITY : config.alphaSliderVal)),
                                 size: 8,
                             },
                         },
