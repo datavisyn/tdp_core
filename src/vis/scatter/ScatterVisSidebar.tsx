@@ -33,24 +33,15 @@ const defaultConfig = {
   },
 };
 
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
 export function ScatterVisSidebar({
   config,
   optionsConfig,
-  extensions,
   columns,
   filterCallback = () => null,
   setConfig,
   className = '',
   style: { width = '20em', ...style } = {},
 }: {
-  config: IScatterConfig;
   optionsConfig?: {
     color?: {
       enable?: boolean;
@@ -65,23 +56,10 @@ export function ScatterVisSidebar({
       customComponent?: React.ReactNode;
     };
   };
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  columns: VisColumn[];
-  filterCallback?: (s: EFilterOptions) => void;
-  setConfig: (config: IVisConfig) => void;
-} & ICommonVisSideBarProps) {
+} & ICommonVisSideBarProps<IScatterConfig>) {
   const mergedOptionsConfig = useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
   }, [optionsConfig]);
-
-  const mergedExtensions = useMemo(() => {
-    return merge({}, defaultExtensions, extensions);
-  }, [extensions]);
 
   return (
     <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
@@ -94,7 +72,6 @@ export function ScatterVisSidebar({
         currentSelected={config.numColumnsSelected || []}
       />
       <hr />
-      {mergedExtensions.preSidebar}
 
       {mergedOptionsConfig.color.enable
         ? mergedOptionsConfig.color.customComponent || (
@@ -114,8 +91,6 @@ export function ScatterVisSidebar({
         : null}
       <hr />
       {mergedOptionsConfig.filter.enable ? mergedOptionsConfig.filter.customComponent || <FilterButtons callback={filterCallback} /> : null}
-
-      {mergedExtensions.postSidebar}
     </div>
   );
 }

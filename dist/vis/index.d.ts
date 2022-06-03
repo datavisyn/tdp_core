@@ -1,6 +1,5 @@
 export * from './bar';
 export * from './general';
-export * from './pcp';
 export * from './scatter';
 export * from './strip';
 export * from './violin';

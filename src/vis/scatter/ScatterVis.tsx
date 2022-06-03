@@ -1,8 +1,8 @@
 import * as React from 'react';
 import d3 from 'd3';
-import { merge, uniqueId } from 'lodash';
+import { uniqueId } from 'lodash';
 import { useEffect } from 'react';
-import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
+import { IScatterConfig, EScatterSelectSettings, ICommonVisProps } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../general/layoutUtils';
@@ -14,17 +14,9 @@ import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
 export function ScatterVis({
   config,
   optionsConfig,
-  extensions,
   columns,
   shapes = ['circle', 'square', 'triangle-up', 'star'],
   filterCallback = () => null,
@@ -36,40 +28,7 @@ export function ScatterVis({
   showCloseButton = false,
   closeButtonCallback = () => null,
   scales,
-}: {
-  config: IScatterConfig;
-  optionsConfig?: {
-    color?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    shape?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    filter?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-  };
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  shapes?: string[];
-  columns: VisColumn[];
-  filterCallback?: (s: EFilterOptions) => void;
-  selectionCallback?: (ids: string[]) => void;
-  closeButtonCallback?: () => void;
-  selectedMap?: { [key: string]: boolean };
-  selectedList: string[];
-  setConfig: (config: IVisConfig) => void;
-  scales: Scales;
-  hideSidebar?: boolean;
-  showCloseButton?: boolean;
-}) {
+}: ICommonVisProps<IScatterConfig>) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
   const plotlyDivRef = React.useRef(null);
 
@@ -99,10 +58,6 @@ export function ScatterVis({
       Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
     });
   }, [id, hideSidebar, plotlyDivRef]);
-
-  const mergedExtensions = React.useMemo(() => {
-    return merge({}, defaultExtensions, extensions);
-  }, [extensions]);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selectedMap, config, scales, shapes]);
 
@@ -142,7 +97,6 @@ export function ScatterVis({
           traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
         }`}
       >
-        {mergedExtensions.prePlot}
         {traceStatus === 'success' && traces?.plots.length > 0 ? (
           <PlotlyComponent
             divId={`plotlyDiv${id}`}
@@ -186,19 +140,11 @@ export function ScatterVis({
           <BrushOptionButtons callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
           <OpacitySlider callback={(e) => setConfig({ ...config, alphaSliderVal: e })} currentValue={config.alphaSliderVal} />
         </div>
-        {mergedExtensions.postPlot}
         {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>
-          <ScatterVisSidebar
-            config={config}
-            optionsConfig={optionsConfig}
-            extensions={extensions}
-            columns={columns}
-            filterCallback={filterCallback}
-            setConfig={setConfig}
-          />
+          <ScatterVisSidebar config={config} optionsConfig={optionsConfig} columns={columns} filterCallback={filterCallback} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}
     </div>

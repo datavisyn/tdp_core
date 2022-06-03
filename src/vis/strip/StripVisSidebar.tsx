@@ -1,40 +1,17 @@
 import * as React from 'react';
-import { useMemo } from 'react';
-import { merge } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, IStripConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, IStripConfig, ICommonVisSideBarProps } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
 export function StripVisSidebar({
   config,
-  extensions,
   columns,
   setConfig,
   className = '',
   style: { width = '20em', ...style } = {},
-}: {
-  config: IStripConfig;
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  columns: VisColumn[];
-  setConfig: (config: IVisConfig) => void;
-} & ICommonVisSideBarProps) {
-  const mergedExtensions = useMemo(() => {
-    return merge({}, defaultExtensions, extensions);
-  }, [extensions]);
-
+}: ICommonVisSideBarProps<IStripConfig>) {
   return (
     <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
       <WarningMessage />
@@ -51,8 +28,6 @@ export function StripVisSidebar({
         currentSelected={config.catColumnsSelected || []}
       />
       <hr />
-      {mergedExtensions.preSidebar}
-      {mergedExtensions.postSidebar}
     </div>
   );
 }

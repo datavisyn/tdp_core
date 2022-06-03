@@ -19,7 +19,6 @@ import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
-import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
 import { isSankey, sankeyMergeDefaultConfig, SankeyVis } from './sankey';
 import { useSyncedRef } from '../hooks/useSyncedRef';
@@ -153,10 +152,6 @@ export function Vis({
       const newConfig = stripMergeDefaultConfig(columns, inconsistentVisConfig);
       _setVisConfig({ current: newConfig, consistent: newConfig });
     }
-    if (isPCP(inconsistentVisConfig)) {
-      const newConfig = pcpMergeDefaultConfig(columns, inconsistentVisConfig);
-      _setVisConfig({ current: newConfig, consistent: newConfig });
-    }
     if (isBar(inconsistentVisConfig)) {
       const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
       _setVisConfig({ current: newConfig, consistent: newConfig });
@@ -193,91 +188,36 @@ export function Vis({
     return <div className="tdp-busy" />;
   }
 
-  const defaultProps = {
+  const props = {
+    optionsConfig: {
+      color: {
+        enable: true,
+      },
+    },
+    shapes,
     setConfig: setVisConfig,
+    filterCallback,
+    selectionCallback,
+    selectedMap,
+    selectedList: selected,
     columns,
+    scales,
+    hideSidebar,
+    showCloseButton,
+    closeButtonCallback: closeCallback,
   };
 
   return (
     <>
-      {isSankey(visConfig) ? <SankeyVis {...defaultProps} config={visConfig} /> : null}
+      {isSankey(visConfig) ? <SankeyVis {...props} config={visConfig} /> : null}
 
-      {isScatter(visConfig) ? (
-        <ScatterVis
-          config={visConfig}
-          optionsConfig={{
-            color: {
-              enable: true,
-            },
-          }}
-          shapes={shapes}
-          setConfig={setVisConfig}
-          filterCallback={filterCallback}
-          selectionCallback={selectionCallback}
-          selectedMap={selectedMap}
-          selectedList={selected}
-          columns={columns}
-          scales={scales}
-          hideSidebar={hideSidebar}
-          showCloseButton={showCloseButton}
-          closeButtonCallback={closeCallback}
-        />
-      ) : null}
+      {isScatter(visConfig) ? <ScatterVis {...props} config={visConfig} /> : null}
 
-      {isViolin(visConfig) ? (
-        <ViolinVis
-          config={visConfig}
-          optionsConfig={{
-            overlay: {
-              enable: true,
-            },
-          }}
-          setConfig={setVisConfig}
-          columns={columns}
-          scales={scales}
-          hideSidebar={hideSidebar}
-          showCloseButton={showCloseButton}
-          closeButtonCallback={closeCallback}
-        />
-      ) : null}
+      {isViolin(visConfig) ? <ViolinVis {...props} config={visConfig} /> : null}
 
-      {isStrip(visConfig) ? (
-        <StripVis
-          config={visConfig}
-          selectionCallback={selectionCallback}
-          setConfig={setVisConfig}
-          selected={selectedMap}
-          columns={columns}
-          scales={scales}
-          hideSidebar={hideSidebar}
-          showCloseButton={showCloseButton}
-          closeButtonCallback={closeCallback}
-        />
-      ) : null}
+      {isStrip(visConfig) ? <StripVis {...props} config={visConfig} /> : null}
 
-      {isPCP(visConfig) ? (
-        <PCPVis
-          config={visConfig}
-          selected={selectedMap}
-          setConfig={setVisConfig}
-          columns={columns}
-          hideSidebar={hideSidebar}
-          showCloseButton={showCloseButton}
-          closeButtonCallback={closeCallback}
-        />
-      ) : null}
-
-      {isBar(visConfig) ? (
-        <BarVis
-          config={visConfig}
-          setConfig={setVisConfig}
-          columns={columns}
-          scales={scales}
-          hideSidebar={hideSidebar}
-          showCloseButton={showCloseButton}
-          closeButtonCallback={closeCallback}
-        />
-      ) : null}
+      {isBar(visConfig) ? <BarVis {...props} config={visConfig} /> : null}
     </>
   );
 }

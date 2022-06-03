@@ -5,6 +5,7 @@ import { Vis } from './Vis';
 import { EColumnTypes, ColumnInfo, VisColumn, EFilterOptions, IVisCommonValue } from './interfaces';
 import { IRow } from '../base/rest';
 import { I18nextManager } from '../i18n/I18nextManager';
+import { VisContainer } from './VisContainer';
 
 export class LineupVisWrapper {
   /**
@@ -111,13 +112,15 @@ export class LineupVisWrapper {
     }
 
     ReactDOM.render(
-      React.createElement(Vis, {
-        columns: cols,
-        selected: selectedList,
-        selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
-        filterCallback: (s: string) => this.filterCallback(s),
-        showCloseButton: true,
-        closeCallback: () => this.hide(),
+      React.createElement(VisContainer, {
+        visualization: React.createElement(Vis, {
+          columns: cols,
+          selected: selectedList,
+          selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
+          filterCallback: (s: string) => this.filterCallback(s),
+          showCloseButton: true,
+          closeCallback: () => this.hide(),
+        }),
       }),
       this.node,
     );

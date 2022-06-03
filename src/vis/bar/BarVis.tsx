@@ -1,8 +1,8 @@
 import * as React from 'react';
 import d3 from 'd3';
-import { merge, uniqueId } from 'lodash';
+import { uniqueId } from 'lodash';
 import { useEffect } from 'react';
-import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
+import { IBarConfig, EBarGroupingType, ICommonVisProps } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
@@ -12,67 +12,16 @@ import { BarVisSidebar } from './BarVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 
-interface BarVisProps {
-  config: IBarConfig;
-  optionsConfig?: {
-    group?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    multiples?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    direction?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    groupingType?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-    display?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-  };
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  columns: VisColumn[];
-  closeButtonCallback?: () => void;
-  showCloseButton?: boolean;
-
-  setConfig: (config: IVisConfig) => void;
-  scales: Scales;
-  hideSidebar?: boolean;
-}
-
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
 export function BarVis({
   config,
   optionsConfig,
-  extensions,
   columns,
   setConfig,
   scales,
   hideSidebar = false,
   showCloseButton = false,
   closeButtonCallback = () => null,
-}: BarVisProps) {
-  const mergedExtensions = React.useMemo(() => {
-    return merge({}, defaultExtensions, extensions);
-  }, [extensions]);
-
+}: ICommonVisProps<IBarConfig>) {
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
 
   const id = React.useMemo(() => uniqueId('BarVis'), []);
@@ -135,7 +84,6 @@ export function BarVis({
           traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
         }`}
       >
-        {mergedExtensions.prePlot}
         {traceStatus === 'success' && traces?.plots.length > 0 ? (
           <PlotlyComponent
             divId={`plotlyDiv${id}`}
@@ -156,12 +104,11 @@ export function BarVis({
         ) : traceStatus !== 'pending' ? (
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
-        {mergedExtensions.postPlot}
         {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>
-          <BarVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
+          <BarVisSidebar config={config} optionsConfig={optionsConfig} columns={columns} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}
     </div>

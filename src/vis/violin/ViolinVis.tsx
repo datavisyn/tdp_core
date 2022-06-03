@@ -1,8 +1,8 @@
 import * as React from 'react';
 import d3 from 'd3';
-import { merge, uniqueId } from 'lodash';
+import { uniqueId } from 'lodash';
 import { useEffect } from 'react';
-import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
+import { Scales, VisColumn, IVisConfig, IViolinConfig, ICommonVisProps } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
@@ -12,51 +12,16 @@ import { ViolinVisSidebar } from './ViolinVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 
-interface ViolinVisProps {
-  config: IViolinConfig;
-  optionsConfig?: {
-    overlay?: {
-      enable?: boolean;
-      customComponent?: React.ReactNode;
-    };
-  };
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  columns: VisColumn[];
-  setConfig: (config: IVisConfig) => void;
-  closeButtonCallback?: () => void;
-
-  scales: Scales;
-  hideSidebar?: boolean;
-  showCloseButton?: boolean;
-}
-
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
 export function ViolinVis({
   config,
   optionsConfig,
-  extensions,
   columns,
   setConfig,
   scales,
   hideSidebar = false,
   showCloseButton = false,
   closeButtonCallback = () => null,
-}: ViolinVisProps) {
-  const mergedExtensions = React.useMemo(() => {
-    return merge({}, defaultExtensions, extensions);
-  }, [extensions]);
-
+}: ICommonVisProps<IViolinConfig>) {
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
 
   const id = React.useMemo(() => uniqueId('ViolinVis'), []);
@@ -118,8 +83,6 @@ export function ViolinVis({
           traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
         }`}
       >
-        {mergedExtensions.prePlot}
-
         {traceStatus === 'success' && traces?.plots.length > 0 ? (
           <PlotlyComponent
             divId={`plotlyDiv${id}`}
@@ -140,12 +103,11 @@ export function ViolinVis({
         ) : traceStatus !== 'pending' ? (
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
-        {mergedExtensions.postPlot}
         {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>
-          <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
+          <ViolinVisSidebar config={config} optionsConfig={optionsConfig} columns={columns} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}
     </div>

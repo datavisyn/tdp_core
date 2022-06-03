@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { IBarConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
-export declare function BarVisSidebar({ config, optionsConfig, extensions, columns, setConfig, className, style: { width, ...style }, }: {
+export declare function BarVisSidebar({ config, optionsConfig, columns, setConfig, className, style: { width, ...style }, }: {
     config: IBarConfig;
     optionsConfig?: {
         group?: {
@@ -23,12 +23,6 @@ export declare function BarVisSidebar({ config, optionsConfig, extensions, colum
             enable?: boolean;
             customComponent?: React.ReactNode;
         };
-    };
-    extensions?: {
-        prePlot?: React.ReactNode;
-        postPlot?: React.ReactNode;
-        preSidebar?: React.ReactNode;
-        postSidebar?: React.ReactNode;
     };
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;

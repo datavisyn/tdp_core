@@ -145,7 +145,7 @@ export function StripVis({
       </div>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>
-          <StripVisSidebar config={config} extensions={extensions} columns={columns} setConfig={setConfig} />
+          <StripVisSidebar config={config} columns={columns} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}
     </div>

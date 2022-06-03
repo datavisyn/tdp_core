@@ -1,6 +1,6 @@
 import * as React from 'react';
 import d3 from 'd3';
-import { merge, uniqueId } from 'lodash';
+import { uniqueId } from 'lodash';
 import { useEffect } from 'react';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
@@ -12,13 +12,7 @@ import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
-const defaultExtensions = {
-    prePlot: null,
-    postPlot: null,
-    preSidebar: null,
-    postSidebar: null,
-};
-export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, scales, }) {
+export function ScatterVis({ config, optionsConfig, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, scales, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
     const plotlyDivRef = React.useRef(null);
     useEffect(() => {
@@ -42,9 +36,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
         });
     }, [id, hideSidebar, plotlyDivRef]);
-    const mergedExtensions = React.useMemo(() => {
-        return merge({}, defaultExtensions, extensions);
-    }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selectedMap, config, scales, shapes]);
     const layout = React.useMemo(() => {
         if (!traces) {
@@ -74,7 +65,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     }, [traces, config.dragMode]);
     return (React.createElement("div", { ref: plotlyDivRef, className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
-            mergedExtensions.prePlot,
             traceStatus === 'success' && (traces === null || traces === void 0 ? void 0 : traces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
                     const clickedId = event.points[0].id;
                     if (selectedMap[clickedId]) {
@@ -102,9 +92,8 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x" },
                 React.createElement(BrushOptionButtons, { callback: (dragMode) => setConfig({ ...config, dragMode }), dragMode: config.dragMode }),
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
-            mergedExtensions.postPlot,
             showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
-            React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));
+            React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));
 }
 //# sourceMappingURL=ScatterVis.js.map

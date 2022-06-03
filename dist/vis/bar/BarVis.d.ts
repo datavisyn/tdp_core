@@ -1,42 +1,4 @@
-import * as React from 'react';
-import { Scales, VisColumn, IVisConfig, IBarConfig } from '../interfaces';
-interface BarVisProps {
-    config: IBarConfig;
-    optionsConfig?: {
-        group?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        };
-        multiples?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        };
-        direction?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        };
-        groupingType?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        };
-        display?: {
-            enable?: boolean;
-            customComponent?: React.ReactNode;
-        };
-    };
-    extensions?: {
-        prePlot?: React.ReactNode;
-        postPlot?: React.ReactNode;
-        preSidebar?: React.ReactNode;
-        postSidebar?: React.ReactNode;
-    };
-    columns: VisColumn[];
-    closeButtonCallback?: () => void;
-    showCloseButton?: boolean;
-    setConfig: (config: IVisConfig) => void;
-    scales: Scales;
-    hideSidebar?: boolean;
-}
-export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar, showCloseButton, closeButtonCallback, }: BarVisProps): JSX.Element;
-export {};
+/// <reference types="react" />
+import { IBarConfig, ICommonVisProps } from '../interfaces';
+export declare function BarVis({ config, optionsConfig, columns, setConfig, scales, hideSidebar, showCloseButton, closeButtonCallback, }: ICommonVisProps<IBarConfig>): JSX.Element;
 //# sourceMappingURL=BarVis.d.ts.map

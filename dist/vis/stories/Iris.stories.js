@@ -1,7 +1,7 @@
 import React from 'react';
 import { Vis } from '../Vis';
 import { EAggregateTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, EScatterSelectSettings, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
-function fetchIrisData() {
+export function fetchIrisData() {
     const dataPromise = import('./irisData').then((m) => m.iris);
     return [
         {
@@ -192,7 +192,7 @@ export const SankeyCoordinatesPlot = Template.bind({});
 SankeyCoordinatesPlot.args = {
     externalConfig: {
         type: ESupportedPlotlyVis.SANKEY,
-        catColumnsSelected: []
+        catColumnsSelected: [],
     },
 };
 //# sourceMappingURL=Iris.stories.js.map

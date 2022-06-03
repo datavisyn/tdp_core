@@ -24,6 +24,7 @@ const layout = {
  */
 function TransposeData(data) {
     let nodeIndex = 0;
+    const { length } = data;
     const plotly = {
         nodes: {
             labels: new Array(),
@@ -93,9 +94,9 @@ function TransposeData(data) {
             }
         });
         for (const lik in links) {
-            if (links.hasOwnProperty(lik)) {
+            if (Object.prototype.hasOwnProperty.call(links, lik)) {
                 for (const rik in links[lik]) {
-                    if (links[lik].hasOwnProperty(rik)) {
+                    if (Object.prototype.hasOwnProperty.call(links[lik], rik)) {
                         plotly.links.source.push(lane.nodes.find((node) => node.value === lik).id);
                         plotly.links.target.push(next.nodes.find((node) => node.value === rik).id);
                         plotly.links.value.push(links[lik][rik].count);
@@ -110,7 +111,6 @@ function TransposeData(data) {
 }
 export async function fetchData(columns, config) {
     const catCols = config.catColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
-    const plots = [];
     const catColValues2 = await resolveColumnValues(catCols);
     return TransposeData(catColValues2);
 }
@@ -167,12 +167,13 @@ export function SankeyVis({ config, setConfig, columns }) {
                         return;
                     }
                     const element = sel.points[0];
+                    console.log(element.pointIndex, element);
                     if ('sourceLinks' in element) {
-                        // node
+                        // @ts-ignore
                         setSelection(data.nodes.inverseLookup[element.index]);
                     }
                     else {
-                        // link
+                        // @ts-ignore
                         setSelection(data.links.inverseLookup[element.index]);
                     }
                 } })) : (React.createElement("p", { className: "h4" }, "Select at least 2 categorical attributes.")),

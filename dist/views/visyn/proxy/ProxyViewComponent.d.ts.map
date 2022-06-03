@@ -1,1 +1,1 @@
-{"version":3,"file":"ProxyViewComponent.d.ts","sourceRoot":"","sources":["../../../../src/views/visyn/proxy/ProxyViewComponent.tsx"],"names":[],"mappings":"AAIA,MAAM,WAAW,eAAe;IAC9B;;OAEG;IACH,IAAI,EAAE,MAAM,CAAC;CACd;AAED;;;GAGG;AAEH,wBAAgB,kBAAkB,CAAC,EAAE,IAAI,EAAE,EAAE,eAAe,eAyB3D"}
+{"version":3,"file":"ProxyViewComponent.d.ts","sourceRoot":"","sources":["../../../../src/views/visyn/proxy/ProxyViewComponent.tsx"],"names":[],"mappings":";AAIA,MAAM,WAAW,eAAe;IAC9B;;OAEG;IACH,IAAI,EAAE,MAAM,CAAC;CACd;AAED;;;GAGG;AAEH,wBAAgB,kBAAkB,CAAC,EAAE,IAAI,EAAE,EAAE,eAAe,eAyB3D"}

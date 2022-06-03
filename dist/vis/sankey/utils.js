@@ -5,7 +5,7 @@ export function isSankey(s) {
 }
 const defaultConfig = {
     type: ESupportedPlotlyVis.SANKEY,
-    catColumnsSelected: []
+    catColumnsSelected: [],
 };
 export function sankeyMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultConfig, config);

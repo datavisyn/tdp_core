@@ -98,6 +98,8 @@ export function VisynDemoView({ desc, parameters, onParametersChanged }: DemoVis
 export function VisynDemoViewSidebar({ parameters, onParametersChanged }: DemoVisynViewPluginType['props']) {
   return parameters.columns ? (
     <VisSidebar
+      config={parameters.config}
+      setConfig={() => null}
       style={{
         justifySelf: 'center',
         alignSelf: 'center',

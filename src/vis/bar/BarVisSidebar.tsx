@@ -19,8 +19,6 @@ import { WarningMessage } from '../sidebar/WarningMessage';
 import { GroupSelect } from '../sidebar/GroupSelect';
 import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
-import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
-import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
 import { SingleColumnSelect } from '../sidebar/SingleColumnSelect';
 import { AggregateTypeSelect } from '../sidebar/AggregateTypeSelect';
 
@@ -47,23 +45,14 @@ const defaultConfig = {
   },
 };
 
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
 export function BarVisSidebar({
   config,
   optionsConfig,
-  extensions,
   columns,
   setConfig,
   className = '',
   style: { width = '20em', ...style } = {},
 }: {
-  config: IBarConfig;
   optionsConfig?: {
     group?: {
       enable?: boolean;
@@ -86,22 +75,10 @@ export function BarVisSidebar({
       customComponent?: React.ReactNode;
     };
   };
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  columns: VisColumn[];
-  setConfig: (config: IVisConfig) => void;
-} & ICommonVisSideBarProps) {
+} & ICommonVisSideBarProps<IBarConfig>) {
   const mergedOptionsConfig = useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
   }, [optionsConfig]);
-
-  const mergedExtensions = useMemo(() => {
-    return merge({}, defaultExtensions, extensions);
-  }, [extensions]);
 
   return (
     <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
@@ -136,7 +113,6 @@ export function BarVisSidebar({
         aggregateColumn={config.aggregateColumn}
       />
       <hr />
-      {mergedExtensions.preSidebar}
 
       {mergedOptionsConfig.group.enable
         ? mergedOptionsConfig.group.customComponent || (
@@ -166,8 +142,6 @@ export function BarVisSidebar({
             <BarDirectionButtons callback={(direction: EBarDirection) => setConfig({ ...config, direction })} currentSelected={config.direction} />
           )
         : null}
-
-      {mergedExtensions.postSidebar}
     </div>
   );
 }

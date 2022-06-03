@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, EViolinOverlay, IViolinConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, EViolinOverlay, IViolinConfig, ICommonVisSideBarProps } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';
@@ -14,44 +14,25 @@ const defaultConfig = {
     customComponent: null,
   },
 };
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
+
 export function ViolinVisSidebar({
   config,
   optionsConfig,
-  extensions,
   columns,
   setConfig,
   className = '',
   style: { width = '20em', ...style } = {},
 }: {
-  config: IViolinConfig;
   optionsConfig?: {
     overlay?: {
       enable?: boolean;
       customComponent?: React.ReactNode;
     };
   };
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  columns: VisColumn[];
-  setConfig: (config: IVisConfig) => void;
-} & ICommonVisSideBarProps) {
+} & ICommonVisSideBarProps<IViolinConfig>) {
   const mergedOptionsConfig = useMemo(() => {
     return merge({}, defaultConfig, optionsConfig);
   }, [optionsConfig]);
-
-  const mergedExtensions = useMemo(() => {
-    return merge({}, defaultExtensions, extensions);
-  }, [extensions]);
 
   return (
     <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
@@ -69,7 +50,6 @@ export function ViolinVisSidebar({
         currentSelected={config.catColumnsSelected || []}
       />
       <hr />
-      {mergedExtensions.preSidebar}
 
       {mergedOptionsConfig.overlay.enable
         ? mergedOptionsConfig.overlay.customComponent || (
@@ -79,8 +59,6 @@ export function ViolinVisSidebar({
             />
           )
         : null}
-
-      {mergedExtensions.postSidebar}
     </div>
   );
 }
