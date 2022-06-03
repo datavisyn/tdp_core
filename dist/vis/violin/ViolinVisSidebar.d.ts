@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IViolinConfig, ICommonVisSideBarProps } from '../interfaces';
+import { ICommonVisSideBarProps, IViolinConfig } from '../interfaces';
 export declare function ViolinVisSidebar({ config, optionsConfig, columns, setConfig, className, style: { width, ...style }, }: {
     optionsConfig?: {
         overlay?: {

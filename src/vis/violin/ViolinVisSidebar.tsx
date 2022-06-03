@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
-import { ColumnInfo, ESupportedPlotlyVis, EViolinOverlay, IViolinConfig, ICommonVisSideBarProps } from '../interfaces';
+import { ColumnInfo, ESupportedPlotlyVis, EViolinOverlay, ICommonVisSideBarProps, IViolinConfig } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
 import { WarningMessage } from '../sidebar/WarningMessage';

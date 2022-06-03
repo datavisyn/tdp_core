@@ -1,8 +1,9 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { uniqueId } from 'lodash';
+import { ESupportedPlotlyVis } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
-import { createScatterTraces } from './utils';
+import { createScatterTraces, scatterMergeDefaultConfig } from './utils';
 import { beautifyLayout } from '../general/layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
@@ -10,6 +11,7 @@ import { PlotlyComponent } from '../Plot';
 import { useAsync } from '../../hooks';
 import { CloseButton } from '../sidebar/CloseButton';
 import { useVisResize } from '../useVisResize';
+import { CreateVisualization } from '../AllVisualizations';
 export function ScatterVis({ config, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, showCloseButton = false, closeButtonCallback = () => null, scales, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
     const plotlyDivRef = React.useRef(null);
@@ -72,4 +74,5 @@ export function ScatterVis({ config, columns, shapes = ['circle', 'square', 'tri
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
             showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null)));
 }
+CreateVisualization(ScatterVis, scatterMergeDefaultConfig, ESupportedPlotlyVis.SCATTER, 'scatter');
 //# sourceMappingURL=ScatterVis.js.map

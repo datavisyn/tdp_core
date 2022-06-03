@@ -1,13 +1,15 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { uniqueId } from 'lodash';
+import { ESupportedPlotlyVis } from '../interfaces';
 import { PlotlyComponent } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
-import { createStripTraces } from './utils';
+import { createStripTraces, stripMergeDefaultConfig } from './utils';
 import { useAsync } from '../../hooks';
 import { CloseButton } from '../sidebar/CloseButton';
 import { useVisResize } from '../useVisResize';
+import { CreateVisualization } from '../AllVisualizations';
 export function StripVis({ config, columns, selectionCallback = () => null, selectedMap = {}, scales, showCloseButton = false, closeButtonCallback = () => null, }) {
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createStripTraces, [columns, config, selectedMap, scales]);
     const id = React.useMemo(() => uniqueId('StripVis'), []);
@@ -49,4 +51,5 @@ export function StripVis({ config, columns, selectionCallback = () => null, sele
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
             showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null)));
 }
+CreateVisualization(StripVis, stripMergeDefaultConfig, ESupportedPlotlyVis.STRIP, 'strip');
 //# sourceMappingURL=StripVis.js.map

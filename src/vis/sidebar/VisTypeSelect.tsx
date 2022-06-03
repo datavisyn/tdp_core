@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Select from 'react-select';
+import { GetVisualizations } from '../AllVisualizations';
 import { ESupportedPlotlyVis } from '../interfaces';
 
 interface VisTypeSelectProps {
@@ -16,12 +17,10 @@ export function VisTypeSelect({ callback, currentSelected }: VisTypeSelectProps)
         // components={{Option: optionLayout}}
         onChange={(e) => callback(e.value)}
         name="visTypes"
-        options={Object.values(ESupportedPlotlyVis).map((t) => {
-          return {
-            value: t,
-            label: t,
-          };
-        })}
+        options={GetVisualizations().map((vis) => ({
+          value: vis.type,
+          label: vis.type,
+        }))}
         value={{ value: currentSelected, label: currentSelected }}
       />
     </>

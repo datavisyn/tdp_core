@@ -1,15 +1,15 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { uniqueId } from 'lodash';
-import { useEffect } from 'react';
-import { IBarConfig, EBarGroupingType, ICommonVisProps } from '../interfaces';
+import { IBarConfig, EBarGroupingType, ICommonVisProps, ESupportedPlotlyVis } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';
-import { createBarTraces } from './utils';
+import { barMergeDefaultConfig, createBarTraces } from './utils';
 import { CloseButton } from '../sidebar/CloseButton';
 import { useVisResize } from '../useVisResize';
+import { CreateVisualization } from '../AllVisualizations';
 
 export function BarVis({ config, columns, scales, showCloseButton = false, closeButtonCallback = () => null }: ICommonVisProps<IBarConfig>) {
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
@@ -77,3 +77,5 @@ export function BarVis({ config, columns, scales, showCloseButton = false, close
     </div>
   );
 }
+
+CreateVisualization(BarVis, barMergeDefaultConfig, ESupportedPlotlyVis.BAR, 'bar');

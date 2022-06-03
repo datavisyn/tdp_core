@@ -2,13 +2,9 @@ import * as React from 'react';
 import d3 from 'd3';
 import { useMemo, useEffect } from 'react';
 import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, EAggregateTypes, } from './interfaces';
-import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
-import { barMergeDefaultConfig, isBar, BarVis } from './bar';
-import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
-import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { getCssValue } from '../utils';
-import { isSankey, sankeyMergeDefaultConfig, SankeyVis } from './sankey';
 import { useSyncedRef } from '../hooks/useSyncedRef';
+import { GetVisualizations } from './AllVisualizations';
 const DEFAULT_COLORS = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
@@ -71,26 +67,9 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         });
     }, []);
     React.useEffect(() => {
-        if (isSankey(inconsistentVisConfig)) {
-            const newConfig = sankeyMergeDefaultConfig(columns, inconsistentVisConfig);
-            _setVisConfig({ current: newConfig, consistent: newConfig });
-        }
-        if (isScatter(inconsistentVisConfig)) {
-            const newConfig = scatterMergeDefaultConfig(columns, inconsistentVisConfig);
-            _setVisConfig({ current: newConfig, consistent: newConfig });
-        }
-        if (isViolin(inconsistentVisConfig)) {
-            const newConfig = violinMergeDefaultConfig(columns, inconsistentVisConfig);
-            _setVisConfig({ current: newConfig, consistent: newConfig });
-        }
-        if (isStrip(inconsistentVisConfig)) {
-            const newConfig = stripMergeDefaultConfig(columns, inconsistentVisConfig);
-            _setVisConfig({ current: newConfig, consistent: newConfig });
-        }
-        if (isBar(inconsistentVisConfig)) {
-            const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
-            _setVisConfig({ current: newConfig, consistent: newConfig });
-        }
+        const vis = GetVisualizations().find((renderer) => renderer.type === inconsistentVisConfig.type);
+        const newConfig = vis === null || vis === void 0 ? void 0 : vis.initialiteConfig(columns, inconsistentVisConfig, vis.defaultConfig);
+        _setVisConfig({ current: newConfig, consistent: newConfig });
         // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inconsistentVisConfig.type]);
@@ -132,11 +111,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         showCloseButton,
         closeButtonCallback: closeCallback,
     };
-    return (React.createElement(React.Fragment, null,
-        isSankey(visConfig) ? React.createElement(SankeyVis, { ...props, config: visConfig }) : null,
-        isScatter(visConfig) ? React.createElement(ScatterVis, { ...props, config: visConfig }) : null,
-        isViolin(visConfig) ? React.createElement(ViolinVis, { ...props, config: visConfig }) : null,
-        isStrip(visConfig) ? React.createElement(StripVis, { ...props, config: visConfig }) : null,
-        isBar(visConfig) ? React.createElement(BarVis, { ...props, config: visConfig }) : null));
+    const renderer = GetVisualizations().find((r) => r.type === (visConfig === null || visConfig === void 0 ? void 0 : visConfig.type));
+    return React.createElement(renderer.renderer, { ...props, config: visConfig });
 }
 //# sourceMappingURL=Vis.js.map

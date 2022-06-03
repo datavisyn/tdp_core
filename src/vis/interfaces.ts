@@ -66,21 +66,22 @@ export enum EScatterSelectSettings {
   PAN = 'pan',
 }
 
-export interface IViolinConfig {
-  type: ESupportedPlotlyVis.VIOLIN;
+export interface BaseConfig<T extends string> {
+  type: T;
+}
+
+export interface IViolinConfig extends BaseConfig<ESupportedPlotlyVis.VIOLIN> {
   numColumnsSelected: ColumnInfo[];
   catColumnsSelected: ColumnInfo[];
   violinOverlay: EViolinOverlay;
 }
 
-export interface IStripConfig {
-  type: ESupportedPlotlyVis.STRIP;
+export interface IStripConfig extends BaseConfig<ESupportedPlotlyVis.STRIP> {
   numColumnsSelected: ColumnInfo[];
   catColumnsSelected: ColumnInfo[];
 }
 
-export interface IScatterConfig {
-  type: ESupportedPlotlyVis.SCATTER;
+export interface IScatterConfig extends BaseConfig<ESupportedPlotlyVis.SCATTER> {
   numColumnsSelected: ColumnInfo[];
   color: ColumnInfo | null;
   numColorScaleType: ENumericalColorScaleType;
@@ -89,8 +90,7 @@ export interface IScatterConfig {
   alphaSliderVal: number;
 }
 
-export interface IBarConfig {
-  type: ESupportedPlotlyVis.BAR;
+export interface IBarConfig extends BaseConfig<'Bar Chart'> {
   multiples: ColumnInfo | null;
   group: ColumnInfo | null;
   direction: EBarDirection;
@@ -102,10 +102,9 @@ export interface IBarConfig {
   aggregateColumn: ColumnInfo | null;
 }
 
-export interface ISankeyConfig {
-  type: ESupportedPlotlyVis.SANKEY;
+export type ISankeyConfig = BaseConfig<'Sankey'> & {
   catColumnsSelected: ColumnInfo[];
-}
+};
 
 export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | ISankeyConfig;
 
@@ -182,7 +181,7 @@ export interface ICommonVisSideBarProps<T extends IVisConfig> {
   filterCallback?: (s: EFilterOptions) => void;
 }
 
-export interface ICommonVisProps<T extends IVisConfig> {
+export interface ICommonVisProps<T extends BaseConfig<N>, N extends string> {
   config: T;
   setConfig: (config: T) => void;
   columns: VisColumn[];

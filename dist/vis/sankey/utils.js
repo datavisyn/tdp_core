@@ -3,11 +3,11 @@ import { ESupportedPlotlyVis } from '../interfaces';
 export function isSankey(s) {
     return s.type === ESupportedPlotlyVis.SANKEY;
 }
-const defaultConfig = {
-    type: ESupportedPlotlyVis.SANKEY,
-    catColumnsSelected: [],
-};
-export function sankeyMergeDefaultConfig(columns, config) {
+/**const defaultConfig: ISankeyConfig = {
+  type: 'Sankey',
+  catColumnsSelected: [],
+};**/
+export function sankeyMergeDefaultConfig(columns, config, defaultConfig) {
     const merged = merge({}, defaultConfig, config);
     return merged;
 }

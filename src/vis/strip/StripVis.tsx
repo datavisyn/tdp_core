@@ -1,15 +1,15 @@
 import * as React from 'react';
 import d3 from 'd3';
-import { merge, uniqueId } from 'lodash';
-import { useMemo, useEffect } from 'react';
-import { IVisConfig, VisColumn, IStripConfig, Scales, ICommonVisProps } from '../interfaces';
+import { uniqueId } from 'lodash';
+import { IStripConfig, ICommonVisProps, ESupportedPlotlyVis } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
-import { createStripTraces } from './utils';
+import { createStripTraces, stripMergeDefaultConfig } from './utils';
 import { useAsync } from '../../hooks';
 import { CloseButton } from '../sidebar/CloseButton';
 import { useVisResize } from '../useVisResize';
+import { CreateVisualization } from '../AllVisualizations';
 
 export function StripVis({
   config,
@@ -88,3 +88,5 @@ export function StripVis({
     </div>
   );
 }
+
+CreateVisualization(StripVis, stripMergeDefaultConfig, ESupportedPlotlyVis.STRIP, 'strip');

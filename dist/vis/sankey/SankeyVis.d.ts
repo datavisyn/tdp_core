@@ -1,5 +1,5 @@
 import { ICommonVisProps, ISankeyConfig, VisColumn } from '../interfaces';
-declare type SankeyVisProps = ICommonVisProps<ISankeyConfig>;
+declare type SankeyVisProps = ICommonVisProps<ISankeyConfig, 'Sankey'>;
 export declare function fetchData(columns: VisColumn[], config: ISankeyConfig): Promise<{
     nodes: {
         labels: string[];

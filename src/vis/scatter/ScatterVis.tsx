@@ -2,16 +2,17 @@ import * as React from 'react';
 import d3 from 'd3';
 import { uniqueId } from 'lodash';
 import { useEffect } from 'react';
-import { IScatterConfig, EScatterSelectSettings, ICommonVisProps } from '../interfaces';
+import { IScatterConfig, EScatterSelectSettings, ICommonVisProps, ESupportedPlotlyVis } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
-import { createScatterTraces } from './utils';
+import { createScatterTraces, scatterMergeDefaultConfig } from './utils';
 import { beautifyLayout } from '../general/layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
 import { CloseButton } from '../sidebar/CloseButton';
-import {useVisResize} from '../useVisResize';
+import { useVisResize } from '../useVisResize';
+import { CreateVisualization } from '../AllVisualizations';
 
 export function ScatterVis({
   config,
@@ -116,3 +117,5 @@ export function ScatterVis({
     </div>
   );
 }
+
+CreateVisualization(ScatterVis, scatterMergeDefaultConfig, ESupportedPlotlyVis.SCATTER, 'scatter');

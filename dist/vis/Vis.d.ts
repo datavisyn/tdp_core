@@ -5,10 +5,7 @@ export declare function Vis({ columns, selected, colors, shapes, selectionCallba
      */
     columns: VisColumn[];
     /**
-     * Optional Prop for identifying which points are selected. Any ids that are in this array will be considered selected.
-     */
-    selected?: string[];
-    /**
+     * Optional Prop for identiISankeyConfig
      * Optional Prop for changing the colors that are used in color mapping. Defaults to the Datavisyn categorical color scheme
      */
     colors?: string[];

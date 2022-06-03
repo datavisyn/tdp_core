@@ -55,19 +55,19 @@ export declare enum EScatterSelectSettings {
     ZOOM = "zoom",
     PAN = "pan"
 }
-export interface IViolinConfig {
-    type: ESupportedPlotlyVis.VIOLIN;
+export interface BaseConfig<T extends string> {
+    type: T;
+}
+export interface IViolinConfig extends BaseConfig<ESupportedPlotlyVis.VIOLIN> {
     numColumnsSelected: ColumnInfo[];
     catColumnsSelected: ColumnInfo[];
     violinOverlay: EViolinOverlay;
 }
-export interface IStripConfig {
-    type: ESupportedPlotlyVis.STRIP;
+export interface IStripConfig extends BaseConfig<ESupportedPlotlyVis.STRIP> {
     numColumnsSelected: ColumnInfo[];
     catColumnsSelected: ColumnInfo[];
 }
-export interface IScatterConfig {
-    type: ESupportedPlotlyVis.SCATTER;
+export interface IScatterConfig extends BaseConfig<ESupportedPlotlyVis.SCATTER> {
     numColumnsSelected: ColumnInfo[];
     color: ColumnInfo | null;
     numColorScaleType: ENumericalColorScaleType;
@@ -75,8 +75,7 @@ export interface IScatterConfig {
     dragMode: EScatterSelectSettings;
     alphaSliderVal: number;
 }
-export interface IBarConfig {
-    type: ESupportedPlotlyVis.BAR;
+export interface IBarConfig extends BaseConfig<'Bar Chart'> {
     multiples: ColumnInfo | null;
     group: ColumnInfo | null;
     direction: EBarDirection;
@@ -87,10 +86,9 @@ export interface IBarConfig {
     aggregateType: EAggregateTypes;
     aggregateColumn: ColumnInfo | null;
 }
-export interface ISankeyConfig {
-    type: ESupportedPlotlyVis.SANKEY;
+export declare type ISankeyConfig = BaseConfig<'Sankey'> & {
     catColumnsSelected: ColumnInfo[];
-}
+};
 export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | ISankeyConfig;
 declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
@@ -152,7 +150,7 @@ export interface ICommonVisSideBarProps<T extends IVisConfig> {
     columns: VisColumn[];
     filterCallback?: (s: EFilterOptions) => void;
 }
-export interface ICommonVisProps<T extends IVisConfig> {
+export interface ICommonVisProps<T extends BaseConfig<N>, N extends string> {
     config: T;
     setConfig: (config: T) => void;
     columns: VisColumn[];

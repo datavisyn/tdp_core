@@ -1,9 +1,22 @@
 import * as React from 'react';
 import { uniqueId } from 'lodash';
 import { PlotlyComponent } from '../Plot';
-import { ICommonVisProps, ISankeyConfig, VisCategoricalColumn, VisColumn } from '../interfaces';
+import {
+  EAggregateTypes,
+  EBarDirection,
+  EBarDisplayType,
+  EBarGroupingType,
+  ESupportedPlotlyVis,
+  ICommonVisProps,
+  ISankeyConfig,
+  VisCategoricalColumn,
+  VisColumn,
+} from '../interfaces';
 import { resolveColumnValues } from '../general/layoutUtils';
 import { useAsync } from '../../hooks/useAsync';
+import { sankeyMergeDefaultConfig } from './utils';
+import { CreateVisualization } from '../AllVisualizations';
+import { barMergeDefaultConfig, BarVis } from '../bar';
 
 const NODE_SELECTION_COLOR = 'rgba(51, 122, 183, 1)';
 const NODE_DEFAULT_COLOR = 'rgba(51, 122, 183, 1)';
@@ -19,7 +32,7 @@ const layout = {
   },
 };
 
-type SankeyVisProps = ICommonVisProps<ISankeyConfig>;
+type SankeyVisProps = ICommonVisProps<ISankeyConfig, 'Sankey'>;
 
 /**
  * Performs the data transformation that maps the fetched data to
@@ -228,3 +241,7 @@ export function SankeyVis({ config, setConfig, columns }: SankeyVisProps) {
     </div>
   );
 }
+
+CreateVisualization(SankeyVis, sankeyMergeDefaultConfig, 'Sankey', {
+  catColumnsSelected: [],
+});

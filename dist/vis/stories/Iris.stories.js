@@ -173,7 +173,7 @@ StripPlot.args = {
 export const SankeyCoordinatesPlot = Template.bind({});
 SankeyCoordinatesPlot.args = {
     externalConfig: {
-        type: ESupportedPlotlyVis.SANKEY,
+        type: 'Sankey',
         catColumnsSelected: [],
     },
 };

@@ -9,8 +9,8 @@ import {
   VisNumericalColumn,
   Scales,
   VisColumn,
-  IViolinConfig,
   EViolinOverlay,
+  IViolinConfig,
 } from '../interfaces';
 import { resolveColumnValues } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';

@@ -192,11 +192,10 @@ StripPlot.args = {
   },
 };
 
-
 export const SankeyCoordinatesPlot = Template.bind({}) as typeof Template;
 SankeyCoordinatesPlot.args = {
   externalConfig: {
-    type: ESupportedPlotlyVis.SANKEY,
+    type: 'Sankey',
     catColumnsSelected: [],
   },
 };

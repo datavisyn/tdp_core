@@ -3,6 +3,8 @@ import { uniqueId } from 'lodash';
 import { PlotlyComponent } from '../Plot';
 import { resolveColumnValues } from '../general/layoutUtils';
 import { useAsync } from '../../hooks/useAsync';
+import { sankeyMergeDefaultConfig } from './utils';
+import { CreateVisualization } from '../AllVisualizations';
 const NODE_SELECTION_COLOR = 'rgba(51, 122, 183, 1)';
 const NODE_DEFAULT_COLOR = 'rgba(51, 122, 183, 1)';
 const NODE_GRAYED_COLOR = 'rgba(51, 122, 183, 0.2)';
@@ -176,4 +178,7 @@ export function SankeyVis({ config, setConfig, columns }) {
                 }
             } })) : (React.createElement("p", { className: "h4" }, "Select at least 2 categorical attributes.")))));
 }
+CreateVisualization(SankeyVis, sankeyMergeDefaultConfig, 'Sankey', {
+    catColumnsSelected: [],
+});
 //# sourceMappingURL=SankeyVis.js.map
