@@ -1,6 +1,5 @@
-/// <reference types="react" />
 import { IVisConfig, VisColumn, EFilterOptions } from './interfaces';
-export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, setExternalConfig, closeCallback, showCloseButton, externalConfig, hideSidebar, }: {
+export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, setExternalConfig, closeCallback, showCloseButton, externalConfig, }: {
     /**
      * Required data columns which are displayed.
      */
@@ -29,6 +28,5 @@ export declare function Vis({ columns, selected, colors, shapes, selectionCallba
     closeCallback?: () => void;
     showCloseButton?: boolean;
     externalConfig?: IVisConfig;
-    hideSidebar?: boolean;
 }): JSX.Element;
 //# sourceMappingURL=Vis.d.ts.map

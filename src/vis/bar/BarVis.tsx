@@ -8,49 +8,17 @@ import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';
 import { createBarTraces } from './utils';
-import { BarVisSidebar } from './BarVisSidebar';
-import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { useVisResize } from '../useVisResize';
 
-export function BarVis({
-  config,
-  optionsConfig,
-  columns,
-  setConfig,
-  scales,
-  hideSidebar = false,
-  showCloseButton = false,
-  closeButtonCallback = () => null,
-}: ICommonVisProps<IBarConfig>) {
+export function BarVis({ config, columns, scales, showCloseButton = false, closeButtonCallback = () => null }: ICommonVisProps<IBarConfig>) {
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
 
   const id = React.useMemo(() => uniqueId('BarVis'), []);
 
   const plotlyDivRef = React.useRef(null);
 
-  useEffect(() => {
-    const ro = new ResizeObserver(() => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    if (plotlyDivRef) {
-      ro.observe(plotlyDivRef.current);
-    }
-
-    if (hideSidebar) {
-      return;
-    }
-
-    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-
-    menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-  }, [id, hideSidebar, plotlyDivRef]);
+  useVisResize(id, plotlyDivRef);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -106,11 +74,6 @@ export function BarVis({
         ) : null}
         {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id}>
-          <BarVisSidebar config={config} optionsConfig={optionsConfig} columns={columns} setConfig={setConfig} />
-        </VisSidebarWrapper>
-      ) : null}
     </div>
   );
 }

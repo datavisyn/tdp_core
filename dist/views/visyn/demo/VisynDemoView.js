@@ -78,7 +78,7 @@ export function VisynDemoView({ desc, parameters, onParametersChanged }) {
             } })) : null));
 }
 export function VisynDemoViewSidebar({ parameters, onParametersChanged }) {
-    return parameters.columns ? (React.createElement(VisSidebar, { style: {
+    return parameters.columns ? (React.createElement(VisSidebar, { config: parameters.config, setConfig: () => null, style: {
             justifySelf: 'center',
             alignSelf: 'center',
         }, columns: parameters.columns, externalConfig: parameters.config, setExternalConfig: (config) => {

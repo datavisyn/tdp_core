@@ -1,8 +1,3 @@
-/// <reference types="react" />
-import { ICommonVisSideBarProps, ISankeyConfig, IVisConfig, VisColumn } from '../interfaces';
-export declare function SankeyVisSidebar({ config, setConfig, className, columns, style: { width, ...style }, }: {
-    config: ISankeyConfig;
-    setConfig: (config: IVisConfig) => void;
-    columns: VisColumn[];
-} & ICommonVisSideBarProps): JSX.Element;
+import { ICommonVisSideBarProps, ISankeyConfig } from '../interfaces';
+export declare function SankeyVisSidebar({ config, setConfig, className, columns, style: { width, ...style }, }: ICommonVisSideBarProps<ISankeyConfig>): JSX.Element;
 //# sourceMappingURL=SankeyVisSidebar.d.ts.map

@@ -2,86 +2,31 @@ import * as React from 'react';
 import d3 from 'd3';
 import { merge, uniqueId } from 'lodash';
 import { useMemo, useEffect } from 'react';
-import { IVisConfig, VisColumn, IStripConfig, Scales } from '../interfaces';
+import { IVisConfig, VisColumn, IStripConfig, Scales, ICommonVisProps } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { createStripTraces } from './utils';
 import { useAsync } from '../../hooks';
-import { StripVisSidebar } from './StripVisSidebar';
-import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
-
-interface StripVisProps {
-  config: IStripConfig;
-  extensions?: {
-    prePlot?: React.ReactNode;
-    postPlot?: React.ReactNode;
-    preSidebar?: React.ReactNode;
-    postSidebar?: React.ReactNode;
-  };
-  columns: VisColumn[];
-  setConfig: (config: IVisConfig) => void;
-  scales: Scales;
-  selectionCallback?: (s: string[]) => void;
-  closeButtonCallback?: () => void;
-  selected?: { [key: string]: boolean };
-  hideSidebar?: boolean;
-  showCloseButton?: boolean;
-}
-
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
+import { useVisResize } from '../useVisResize';
 
 export function StripVis({
   config,
-  extensions,
   columns,
-  setConfig,
   selectionCallback = () => null,
-  selected = {},
+  selectedMap = {},
   scales,
-  hideSidebar = false,
   showCloseButton = false,
   closeButtonCallback = () => null,
-}: StripVisProps) {
-  const mergedExtensions = useMemo(() => {
-    return merge({}, defaultExtensions, extensions);
-  }, [extensions]);
-
-  const { value: traces, status: traceStatus, error: traceError } = useAsync(createStripTraces, [columns, config, selected, scales]);
+}: ICommonVisProps<IStripConfig>) {
+  const { value: traces, status: traceStatus, error: traceError } = useAsync(createStripTraces, [columns, config, selectedMap, scales]);
 
   const id = React.useMemo(() => uniqueId('StripVis'), []);
 
   const plotlyDivRef = React.useRef(null);
 
-  useEffect(() => {
-    const ro = new ResizeObserver(() => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    if (plotlyDivRef) {
-      ro.observe(plotlyDivRef.current);
-    }
-
-    if (hideSidebar) {
-      return;
-    }
-
-    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-
-    menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-  }, [id, hideSidebar, plotlyDivRef]);
+  useVisResize(id, plotlyDivRef);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -115,8 +60,6 @@ export function StripVis({
           traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
         }`}
       >
-        {mergedExtensions.prePlot}
-
         {traceStatus === 'success' && traces?.plots.length > 0 ? (
           <PlotlyComponent
             divId={`plotlyDiv${id}`}
@@ -140,14 +83,8 @@ export function StripVis({
         ) : traceStatus !== 'pending' ? (
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
-        {mergedExtensions.postPlot}
         {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id}>
-          <StripVisSidebar config={config} columns={columns} setConfig={setConfig} />
-        </VisSidebarWrapper>
-      ) : null}
     </div>
   );
 }

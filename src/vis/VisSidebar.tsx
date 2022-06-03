@@ -11,33 +11,24 @@ import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
 import { isSankey } from './sankey';
 import { SankeyVisSidebar } from './sankey/SankeyVisSidebar';
 
-export function VisSidebar({
-  columns,
-  filterCallback = () => null,
-  externalConfig = null,
-  setExternalConfig = null,
-  className,
-  style,
-}: { externalConfig: any; setExternalConfig: any } & ICommonVisSideBarProps<IVisConfig>) {
-  if (!externalConfig) {
+export function VisSidebar({ columns, filterCallback = () => null, config = null, setConfig = null, className, style }: ICommonVisSideBarProps<IVisConfig>) {
+  if (!config) {
     return null;
   }
 
   return (
     <>
-      {isSankey(externalConfig) ? (
-        <SankeyVisSidebar config={externalConfig} setConfig={setExternalConfig} className={className} style={style} columns={columns} />
-      ) : null}
+      {isSankey(config) ? <SankeyVisSidebar config={config} setConfig={setConfig} className={className} style={style} columns={columns} /> : null}
 
-      {isScatter(externalConfig) ? (
+      {isScatter(config) ? (
         <ScatterVisSidebar
-          config={externalConfig}
+          config={config}
           optionsConfig={{
             color: {
               enable: true,
             },
           }}
-          setConfig={setExternalConfig}
+          setConfig={setConfig}
           filterCallback={filterCallback}
           columns={columns}
           className={className}
@@ -45,28 +36,24 @@ export function VisSidebar({
         />
       ) : null}
 
-      {isViolin(externalConfig) ? (
+      {isViolin(config) ? (
         <ViolinVisSidebar
-          config={externalConfig}
+          config={config}
           optionsConfig={{
             overlay: {
               enable: true,
             },
           }}
-          setConfig={setExternalConfig}
+          setConfig={setConfig}
           columns={columns}
           className={className}
           style={style}
         />
       ) : null}
 
-      {isStrip(externalConfig) ? (
-        <StripVisSidebar config={externalConfig} setConfig={setExternalConfig} columns={columns} className={className} style={style} />
-      ) : null}
+      {isStrip(config) ? <StripVisSidebar config={config} setConfig={setConfig} columns={columns} className={className} style={style} /> : null}
 
-      {isBar(externalConfig) ? (
-        <BarVisSidebar config={externalConfig} setConfig={setExternalConfig} columns={columns} className={className} style={style} />
-      ) : null}
+      {isBar(config) ? <BarVisSidebar config={config} setConfig={setConfig} columns={columns} className={className} style={style} /> : null}
     </>
   );
 }

@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { IBarConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
+import { IBarConfig, ICommonVisSideBarProps } from '../interfaces';
 export declare function BarVisSidebar({ config, optionsConfig, columns, setConfig, className, style: { width, ...style }, }: {
-    config: IBarConfig;
     optionsConfig?: {
         group?: {
             enable?: boolean;
@@ -24,7 +23,5 @@ export declare function BarVisSidebar({ config, optionsConfig, columns, setConfi
             customComponent?: React.ReactNode;
         };
     };
-    columns: VisColumn[];
-    setConfig: (config: IVisConfig) => void;
-} & ICommonVisSideBarProps): JSX.Element;
+} & ICommonVisSideBarProps<IBarConfig>): JSX.Element;
 //# sourceMappingURL=BarVisSidebar.d.ts.map

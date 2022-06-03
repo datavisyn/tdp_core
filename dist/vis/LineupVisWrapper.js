@@ -4,6 +4,7 @@ import { CategoricalColumn, LocalDataProvider, NumberColumn, Ranking, ValueColum
 import { Vis } from './Vis';
 import { EColumnTypes, EFilterOptions } from './interfaces';
 import { I18nextManager } from '../i18n/I18nextManager';
+import { VisContainer } from './VisContainer';
 export class LineupVisWrapper {
     constructor(props) {
         this.props = props;
@@ -69,13 +70,15 @@ export class LineupVisWrapper {
                     });
                 }
             }
-            ReactDOM.render(React.createElement(Vis, {
-                columns: cols,
-                selected: selectedList,
-                selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
-                filterCallback: (s) => this.filterCallback(s),
-                showCloseButton: true,
-                closeCallback: () => this.hide(),
+            ReactDOM.render(React.createElement(VisContainer, {
+                visualization: React.createElement(Vis, {
+                    columns: cols,
+                    selected: selectedList,
+                    selectionCallback: (visynIds) => this.props.selectionCallback(visynIds),
+                    filterCallback: (s) => this.filterCallback(s),
+                    showCloseButton: true,
+                    closeCallback: () => this.hide(),
+                }),
             }), this.node);
         };
         this.toggleCustomVis = () => {

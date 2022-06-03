@@ -2,55 +2,23 @@ import * as React from 'react';
 import d3 from 'd3';
 import { uniqueId } from 'lodash';
 import { useEffect } from 'react';
-import { Scales, VisColumn, IVisConfig, IViolinConfig, ICommonVisProps } from '../interfaces';
+import { IViolinConfig, ICommonVisProps } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { createViolinTraces } from './utils';
 import { useAsync } from '../../hooks';
-import { ViolinVisSidebar } from './ViolinVisSidebar';
-import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { useVisResize } from '../useVisResize';
 
-export function ViolinVis({
-  config,
-  optionsConfig,
-  columns,
-  setConfig,
-  scales,
-  hideSidebar = false,
-  showCloseButton = false,
-  closeButtonCallback = () => null,
-}: ICommonVisProps<IViolinConfig>) {
+export function ViolinVis({ config, columns, scales, showCloseButton = false, closeButtonCallback = () => null }: ICommonVisProps<IViolinConfig>) {
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
 
   const id = React.useMemo(() => uniqueId('ViolinVis'), []);
 
   const plotlyDivRef = React.useRef(null);
 
-  useEffect(() => {
-    const ro = new ResizeObserver(() => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    if (plotlyDivRef) {
-      ro.observe(plotlyDivRef.current);
-    }
-
-    if (hideSidebar) {
-      return;
-    }
-
-    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-
-    menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-  }, [id, hideSidebar, plotlyDivRef]);
+  useVisResize(id, plotlyDivRef);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -105,11 +73,6 @@ export function ViolinVis({
         ) : null}
         {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id}>
-          <ViolinVisSidebar config={config} optionsConfig={optionsConfig} columns={columns} setConfig={setConfig} />
-        </VisSidebarWrapper>
-      ) : null}
     </div>
   );
 }

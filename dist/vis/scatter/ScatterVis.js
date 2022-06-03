@@ -1,41 +1,19 @@
 import * as React from 'react';
 import d3 from 'd3';
 import { uniqueId } from 'lodash';
-import { useEffect } from 'react';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../general/layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
-import { ScatterVisSidebar } from './ScatterVisSidebar';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../Plot';
 import { useAsync } from '../../hooks';
-import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
-export function ScatterVis({ config, optionsConfig, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, scales, }) {
+import { useVisResize } from '../useVisResize';
+export function ScatterVis({ config, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, showCloseButton = false, closeButtonCallback = () => null, scales, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
     const plotlyDivRef = React.useRef(null);
-    useEffect(() => {
-        const ro = new ResizeObserver(() => {
-            const plotDiv = document.getElementById(`plotlyDiv${id}`);
-            if (plotDiv) {
-                Plotly.Plots.resize(plotDiv);
-            }
-        });
-        if (plotlyDivRef) {
-            ro.observe(plotlyDivRef.current);
-        }
-        if (hideSidebar) {
-            return;
-        }
-        const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-        menu.addEventListener('hidden.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-        });
-        menu.addEventListener('shown.bs.collapse', () => {
-            Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-        });
-    }, [id, hideSidebar, plotlyDivRef]);
+    useVisResize(id, plotlyDivRef);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selectedMap, config, scales, shapes]);
     const layout = React.useMemo(() => {
         if (!traces) {
@@ -92,8 +70,6 @@ export function ScatterVis({ config, optionsConfig, columns, shapes = ['circle',
             React.createElement("div", { className: "position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x" },
                 React.createElement(BrushOptionButtons, { callback: (dragMode) => setConfig({ ...config, dragMode }), dragMode: config.dragMode }),
                 React.createElement(OpacitySlider, { callback: (e) => setConfig({ ...config, alphaSliderVal: e }), currentValue: config.alphaSliderVal })),
-            showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
-        !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
-            React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));
+            showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null)));
 }
 //# sourceMappingURL=ScatterVis.js.map

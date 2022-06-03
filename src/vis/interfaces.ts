@@ -2,7 +2,6 @@ import { Plotly } from './Plot';
 
 export enum ESupportedPlotlyVis {
   SCATTER = 'Scatter Plot',
-  PCP = 'Parallel Coordinates Plot',
   VIOLIN = 'Violin Plot',
   STRIP = 'Strip Plot',
   BAR = 'Bar Chart',
@@ -103,17 +102,12 @@ export interface IBarConfig {
   aggregateColumn: ColumnInfo | null;
 }
 
-export interface IPCPConfig {
-  type: ESupportedPlotlyVis.PCP;
-  allColumnsSelected: ColumnInfo[];
-}
-
 export interface ISankeyConfig {
   type: ESupportedPlotlyVis.SANKEY;
   catColumnsSelected: ColumnInfo[];
 }
 
-export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig | ISankeyConfig;
+export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | ISankeyConfig;
 
 type ValueGetter<T> = () => T | Promise<T>;
 
@@ -183,7 +177,7 @@ export interface ICommonVisSideBarProps<T extends IVisConfig> {
   style?: React.CSSProperties | undefined;
   className?: string | undefined;
   config: T;
-  setConfig: (config: T) => void;
+  setConfig: (s: T) => void;
   columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
 }
@@ -198,7 +192,6 @@ export interface ICommonVisProps<T extends IVisConfig> {
   selectionCallback: (s: string[]) => void;
   selectedMap: { [key: string]: boolean };
   selectedList: string[];
-  hideSidebar: boolean;
   showCloseButton: boolean;
   closeButtonCallback: () => void;
   scales: Scales;

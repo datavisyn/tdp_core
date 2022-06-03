@@ -9,23 +9,23 @@ import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
 import { isSankey } from './sankey';
 import { SankeyVisSidebar } from './sankey/SankeyVisSidebar';
-export function VisSidebar({ columns, filterCallback = () => null, externalConfig = null, setExternalConfig = null, className, style }) {
-    if (!externalConfig) {
+export function VisSidebar({ columns, filterCallback = () => null, config = null, setConfig = null, className, style }) {
+    if (!config) {
         return null;
     }
     return (React.createElement(React.Fragment, null,
-        isSankey(externalConfig) ? (React.createElement(SankeyVisSidebar, { config: externalConfig, setConfig: setExternalConfig, className: className, style: style, columns: columns })) : null,
-        isScatter(externalConfig) ? (React.createElement(ScatterVisSidebar, { config: externalConfig, optionsConfig: {
+        isSankey(config) ? React.createElement(SankeyVisSidebar, { config: config, setConfig: setConfig, className: className, style: style, columns: columns }) : null,
+        isScatter(config) ? (React.createElement(ScatterVisSidebar, { config: config, optionsConfig: {
                 color: {
                     enable: true,
                 },
-            }, setConfig: setExternalConfig, filterCallback: filterCallback, columns: columns, className: className, style: style })) : null,
-        isViolin(externalConfig) ? (React.createElement(ViolinVisSidebar, { config: externalConfig, optionsConfig: {
+            }, setConfig: setConfig, filterCallback: filterCallback, columns: columns, className: className, style: style })) : null,
+        isViolin(config) ? (React.createElement(ViolinVisSidebar, { config: config, optionsConfig: {
                 overlay: {
                     enable: true,
                 },
-            }, setConfig: setExternalConfig, columns: columns, className: className, style: style })) : null,
-        isStrip(externalConfig) ? (React.createElement(StripVisSidebar, { config: externalConfig, setConfig: setExternalConfig, columns: columns, className: className, style: style })) : null,
-        isBar(externalConfig) ? (React.createElement(BarVisSidebar, { config: externalConfig, setConfig: setExternalConfig, columns: columns, className: className, style: style })) : null));
+            }, setConfig: setConfig, columns: columns, className: className, style: style })) : null,
+        isStrip(config) ? React.createElement(StripVisSidebar, { config: config, setConfig: setConfig, columns: columns, className: className, style: style }) : null,
+        isBar(config) ? React.createElement(BarVisSidebar, { config: config, setConfig: setConfig, columns: columns, className: className, style: style }) : null));
 }
 //# sourceMappingURL=VisSidebar.js.map

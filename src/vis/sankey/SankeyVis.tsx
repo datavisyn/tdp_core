@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { uniqueId } from 'lodash';
 import { PlotlyComponent } from '../Plot';
-import { ICommonVisProps, ISankeyConfig, PlotlyData, VisCategoricalColumn, VisColumn } from '../interfaces';
-import { SankeyVisSidebar } from './SankeyVisSidebar';
+import { ICommonVisProps, ISankeyConfig, VisCategoricalColumn, VisColumn } from '../interfaces';
 import { resolveColumnValues } from '../general/layoutUtils';
 import { useAsync } from '../../hooks/useAsync';
 
@@ -225,8 +224,6 @@ export function SankeyVis({ config, setConfig, columns }: SankeyVisProps) {
         ) : (
           <p className="h4">Select at least 2 categorical attributes.</p>
         )}
-
-        <SankeyVisSidebar config={config} setConfig={setConfig} columns={columns} />
       </div>
     </div>
   );

@@ -9,3 +9,4 @@ export * from './Vis';
 export * from './VisSidebar';
 export * from './sidebar';
 export * from './LineupVisWrapper';
+export * from './VisContainer';

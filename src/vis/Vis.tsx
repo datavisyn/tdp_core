@@ -49,7 +49,6 @@ export function Vis({
   closeCallback = () => null,
   showCloseButton = false,
   externalConfig = null,
-  hideSidebar = false,
 }: {
   /**
    * Required data columns which are displayed.
@@ -79,7 +78,6 @@ export function Vis({
   closeCallback?: () => void;
   showCloseButton?: boolean;
   externalConfig?: IVisConfig;
-  hideSidebar?: boolean;
 }) {
   // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
   // To ensure that we never render an incosistent config, keep a consistent and a current in the config. Always render the consistent.
@@ -202,7 +200,6 @@ export function Vis({
     selectedList: selected,
     columns,
     scales,
-    hideSidebar,
     showCloseButton,
     closeButtonCallback: closeCallback,
   };

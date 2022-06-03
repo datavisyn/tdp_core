@@ -192,24 +192,6 @@ StripPlot.args = {
   },
 };
 
-export const ParallelCoordinatesPlot = Template.bind({}) as typeof Template;
-ParallelCoordinatesPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.PCP,
-    allColumnsSelected: [
-      {
-        description: '',
-        id: 'sepalLength',
-        name: 'Sepal Length',
-      },
-      {
-        description: '',
-        id: 'sepalWidth',
-        name: 'Sepal Width',
-      },
-    ],
-  },
-};
 
 export const SankeyCoordinatesPlot = Template.bind({}) as typeof Template;
 SankeyCoordinatesPlot.args = {

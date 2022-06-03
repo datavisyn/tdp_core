@@ -2,7 +2,6 @@
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter Plot",
-    PCP = "Parallel Coordinates Plot",
     VIOLIN = "Violin Plot",
     STRIP = "Strip Plot",
     BAR = "Bar Chart",
@@ -88,15 +87,11 @@ export interface IBarConfig {
     aggregateType: EAggregateTypes;
     aggregateColumn: ColumnInfo | null;
 }
-export interface IPCPConfig {
-    type: ESupportedPlotlyVis.PCP;
-    allColumnsSelected: ColumnInfo[];
-}
 export interface ISankeyConfig {
     type: ESupportedPlotlyVis.SANKEY;
     catColumnsSelected: ColumnInfo[];
 }
-export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig | ISankeyConfig;
+export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | ISankeyConfig;
 declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**
@@ -149,9 +144,13 @@ export declare type Scales = {
 /**
  * Common props for all vis sidebars.
  */
-export interface ICommonVisSideBarProps {
+export interface ICommonVisSideBarProps<T extends IVisConfig> {
     style?: React.CSSProperties | undefined;
     className?: string | undefined;
+    config: T;
+    setConfig: (s: T) => void;
+    columns: VisColumn[];
+    filterCallback?: (s: EFilterOptions) => void;
 }
 export interface ICommonVisProps<T extends IVisConfig> {
     config: T;
@@ -165,7 +164,6 @@ export interface ICommonVisProps<T extends IVisConfig> {
         [key: string]: boolean;
     };
     selectedList: string[];
-    hideSidebar: boolean;
     showCloseButton: boolean;
     closeButtonCallback: () => void;
     scales: Scales;

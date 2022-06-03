@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { ICommonVisProps, ISankeyConfig, VisColumn } from '../interfaces';
 declare type SankeyVisProps = ICommonVisProps<ISankeyConfig>;
 export declare function fetchData(columns: VisColumn[], config: ISankeyConfig): Promise<{

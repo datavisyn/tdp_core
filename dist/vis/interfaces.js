@@ -1,7 +1,6 @@
 export var ESupportedPlotlyVis;
 (function (ESupportedPlotlyVis) {
     ESupportedPlotlyVis["SCATTER"] = "Scatter Plot";
-    ESupportedPlotlyVis["PCP"] = "Parallel Coordinates Plot";
     ESupportedPlotlyVis["VIOLIN"] = "Violin Plot";
     ESupportedPlotlyVis["STRIP"] = "Strip Plot";
     ESupportedPlotlyVis["BAR"] = "Bar Chart";

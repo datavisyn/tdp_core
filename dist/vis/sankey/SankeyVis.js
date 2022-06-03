@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { uniqueId } from 'lodash';
 import { PlotlyComponent } from '../Plot';
-import { SankeyVisSidebar } from './SankeyVisSidebar';
 import { resolveColumnValues } from '../general/layoutUtils';
 import { useAsync } from '../../hooks/useAsync';
 const NODE_SELECTION_COLOR = 'rgba(51, 122, 183, 1)';
@@ -161,22 +160,20 @@ export function SankeyVis({ config, setConfig, columns }) {
         }
     }, [selection, data]);
     return (React.createElement("div", { className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
-        React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ` },
-            plotly ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: plotly, layout: layout, onClick: (sel) => {
-                    if (!sel.points[0]) {
-                        return;
-                    }
-                    const element = sel.points[0];
-                    console.log(element.pointIndex, element);
-                    if ('sourceLinks' in element) {
-                        // @ts-ignore
-                        setSelection(data.nodes.inverseLookup[element.index]);
-                    }
-                    else {
-                        // @ts-ignore
-                        setSelection(data.links.inverseLookup[element.index]);
-                    }
-                } })) : (React.createElement("p", { className: "h4" }, "Select at least 2 categorical attributes.")),
-            React.createElement(SankeyVisSidebar, { config: config, setConfig: setConfig, columns: columns }))));
+        React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ` }, plotly ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: plotly, layout: layout, onClick: (sel) => {
+                if (!sel.points[0]) {
+                    return;
+                }
+                const element = sel.points[0];
+                console.log(element.pointIndex, element);
+                if ('sourceLinks' in element) {
+                    // @ts-ignore
+                    setSelection(data.nodes.inverseLookup[element.index]);
+                }
+                else {
+                    // @ts-ignore
+                    setSelection(data.links.inverseLookup[element.index]);
+                }
+            } })) : (React.createElement("p", { className: "h4" }, "Select at least 2 categorical attributes.")))));
 }
 //# sourceMappingURL=SankeyVis.js.map

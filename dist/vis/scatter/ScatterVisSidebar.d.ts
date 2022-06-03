@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { EFilterOptions, IScatterConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
+import { IScatterConfig, ICommonVisSideBarProps } from '../interfaces';
 export declare function ScatterVisSidebar({ config, optionsConfig, columns, filterCallback, setConfig, className, style: { width, ...style }, }: {
-    config: IScatterConfig;
     optionsConfig?: {
         color?: {
             enable?: boolean;
@@ -16,8 +15,5 @@ export declare function ScatterVisSidebar({ config, optionsConfig, columns, filt
             customComponent?: React.ReactNode;
         };
     };
-    columns: VisColumn[];
-    filterCallback?: (s: EFilterOptions) => void;
-    setConfig: (config: IVisConfig) => void;
-} & ICommonVisSideBarProps): JSX.Element;
+} & ICommonVisSideBarProps<IScatterConfig>): JSX.Element;
 //# sourceMappingURL=ScatterVisSidebar.d.ts.map

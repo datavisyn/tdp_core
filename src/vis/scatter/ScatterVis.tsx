@@ -8,23 +8,19 @@ import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../general/layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { OpacitySlider } from '../sidebar/OpacitySlider';
-import { ScatterVisSidebar } from './ScatterVisSidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
-import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import {useVisResize} from '../useVisResize';
 
 export function ScatterVis({
   config,
-  optionsConfig,
   columns,
   shapes = ['circle', 'square', 'triangle-up', 'star'],
-  filterCallback = () => null,
   selectionCallback = () => null,
   selectedMap = {},
   selectedList = [],
   setConfig,
-  hideSidebar = false,
   showCloseButton = false,
   closeButtonCallback = () => null,
   scales,
@@ -32,32 +28,7 @@ export function ScatterVis({
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
   const plotlyDivRef = React.useRef(null);
 
-  useEffect(() => {
-    const ro = new ResizeObserver(() => {
-      const plotDiv = document.getElementById(`plotlyDiv${id}`);
-      if (plotDiv) {
-        Plotly.Plots.resize(plotDiv);
-      }
-    });
-
-    if (plotlyDivRef) {
-      ro.observe(plotlyDivRef.current);
-    }
-
-    if (hideSidebar) {
-      return;
-    }
-
-    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-
-    menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-  }, [id, hideSidebar, plotlyDivRef]);
+  useVisResize(id, plotlyDivRef);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selectedMap, config, scales, shapes]);
 
@@ -142,11 +113,6 @@ export function ScatterVis({
         </div>
         {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id}>
-          <ScatterVisSidebar config={config} optionsConfig={optionsConfig} columns={columns} filterCallback={filterCallback} setConfig={setConfig} />
-        </VisSidebarWrapper>
-      ) : null}
     </div>
   );
 }
