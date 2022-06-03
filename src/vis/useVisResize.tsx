@@ -1,5 +1,5 @@
-import Plotly from 'plotly.js';
 import React, { useEffect } from 'react';
+import { Plotly } from './Plot';
 
 export function useVisResize(id: string, plotlyDivRef: React.RefObject<HTMLDivElement>) {
   useEffect(() => {

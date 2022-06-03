@@ -1,1 +1,1 @@
-{"version":3,"file":"useVisResize.d.ts","sourceRoot":"","sources":["../../src/vis/useVisResize.tsx"],"names":[],"mappings":"AACA,OAAO,KAAoB,MAAM,OAAO,CAAC;AAEzC,wBAAgB,YAAY,CAAC,EAAE,EAAE,MAAM,EAAE,YAAY,EAAE,KAAK,CAAC,SAAS,CAAC,cAAc,CAAC,QAgBrF"}
+{"version":3,"file":"useVisResize.d.ts","sourceRoot":"","sources":["../../src/vis/useVisResize.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAoB,MAAM,OAAO,CAAC;AAGzC,wBAAgB,YAAY,CAAC,EAAE,EAAE,MAAM,EAAE,YAAY,EAAE,KAAK,CAAC,SAAS,CAAC,cAAc,CAAC,QAgBrF"}
