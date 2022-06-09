@@ -7,3 +7,7 @@ jobs:
     uses: datavisyn/github-workflows/.github/workflows/build-python.yml@develop
     with:
       publish: false
+  build_node:
+    uses: datavisyn/github-workflows/.github/workflows/build-node.yml@develop
+    with:
+      publish: false    
