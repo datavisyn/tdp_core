@@ -10,4 +10,4 @@ jobs:
   build_node:
     uses: datavisyn/github-workflows/.github/workflows/build-node.yml@develop
     with:
-      publish: false    
+      publish: true    
