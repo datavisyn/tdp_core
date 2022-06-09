@@ -1,7 +1,7 @@
 name: build
 
 on:
-  workflow_dispatch:
+  push:
 jobs:
   build_python:
     uses: datavisyn/github-workflows/.github/workflows/build-python.yml@develop
