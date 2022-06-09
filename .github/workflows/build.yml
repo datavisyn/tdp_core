@@ -6,4 +6,5 @@ on:
 jobs:
   build_python:
     uses: datavisyn/github-workflows/.github/workflows/build-python.yml@develop
+    with:
       publish: false
