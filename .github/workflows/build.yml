@@ -1,0 +1,9 @@
+name: Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_python:
+    uses: datavisyn/github-workflows/.github/workflows/build-python.yml@develop
+      publish: false
