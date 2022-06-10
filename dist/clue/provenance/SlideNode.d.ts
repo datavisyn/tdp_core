@@ -36,7 +36,7 @@ export declare class SlideNode extends GraphNode {
     get state(): StateNode;
     static restore(dump: any): SlideNode;
     get next(): SlideNode;
-    get nexts(): SlideNode[];
+    get nexts(): any;
     get previous(): SlideNode;
     get slideIndex(): number;
     get duration(): number;

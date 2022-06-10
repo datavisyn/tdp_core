@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer } from 'lineupjs';
 import { ISearchOption } from './ISearchOption';
 import { PanelButton, PanelNavButton } from './PanelButton';
@@ -42,6 +43,6 @@ export declare class SidePanelTab extends PanelTab {
      * @param ctx LineUp context
      * @param doc Document
      */
-    constructor(parent: HTMLElement, search: SearchBox<ISearchOption>, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, doc?: Document, options?: IPanelTabDesc);
+    constructor(parent: HTMLElement, search: SearchBox<ISearchOption>, ctx: IRankingHeaderContextContainer & IRenderContext & IEngineRankingContext, doc?: any, options?: IPanelTabDesc);
 }
 //# sourceMappingURL=PanelTab.d.ts.map

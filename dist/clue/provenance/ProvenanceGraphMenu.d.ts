@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import type { CLUEGraphManager } from '../base/CLUEGraphManager';
 import type { ProvenanceGraph } from './ProvenanceGraph';
 import type { IProvenanceGraphDataDescription } from './ICmd';

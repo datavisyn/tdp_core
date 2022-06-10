@@ -1,3 +1,5 @@
+/// <reference types="react" />
+/// <reference types="bootstrap" />
 import { IPluginDesc } from '../../base/plugin';
 import { IDataType } from '../../data/datatype';
 import { IVisPluginDesc } from './IVisPluginDesc';

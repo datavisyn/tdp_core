@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { IPanelButton } from './PanelButton';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 import { EventHandler } from '../../base';

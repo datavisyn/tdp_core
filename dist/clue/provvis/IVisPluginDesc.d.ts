@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { IPluginDesc } from '../../base/plugin';
 import { IDataType } from '../../data/datatype';
 import { IVisMetaData } from './IVisMetaData';

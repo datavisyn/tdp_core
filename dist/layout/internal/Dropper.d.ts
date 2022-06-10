@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { ALayoutContainer } from './ALayoutContainer';
 import { TabbingLayoutContainer } from './TabbingLayoutContainer';
 import { IDropArea, ILayoutContainer } from '../interfaces';

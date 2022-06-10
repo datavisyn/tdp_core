@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { AParentLayoutContainer } from './AParentLayoutContainer';
 import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuildAbleOrViewLike, IDropArea } from '../interfaces';
 import { ILayoutContainerOption } from './ALayoutContainer';
@@ -10,14 +11,12 @@ export declare class RootLayoutContainer extends AParentLayoutContainer<ILayoutC
     constructor(document: Document, build: (layout: IBuildAbleOrViewLike) => ILayoutContainer, restorer: (dump: ILayoutDump, restoreView: (referenceId: number) => PHOVEA_UI_IView) => ILayoutContainer);
     set root(root: ILayoutContainer);
     get root(): ILayoutContainer;
-    get minSize(): import("../interfaces").ISize;
+    get minSize(): any;
     protected addedChild(child: ILayoutContainer, index: number): void;
     place(child: ILayoutContainer, reference: ILayoutContainer, area: IDropArea): boolean;
     protected takeDownChild(child: ILayoutContainer): void;
     restore(dump: ILayoutDump, restoreView: (referenceId: number) => PHOVEA_UI_IView): void;
-    persist(): ILayoutDump & {
-        type: string;
-    };
+    persist(): any;
     static restore(dump: ILayoutDump, doc: Document, build: IBuildLayout, restorer: IRestoreLayout, restoreView: IViewRestorer): any;
 }
 interface IBuildLayout {

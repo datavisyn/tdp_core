@@ -1,3 +1,4 @@
+/// <reference types="react" />
 export declare enum SelectOperation {
     SET = 0,
     ADD = 1,

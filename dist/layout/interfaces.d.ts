@@ -1,3 +1,6 @@
+/// <reference types="react" />
+/// <reference types="jquery" />
+/// <reference types="cypress" />
 import { IEventHandler } from '../base';
 /**
  * [width, height]

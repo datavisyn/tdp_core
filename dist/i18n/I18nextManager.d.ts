@@ -11,7 +11,7 @@ export declare class I18nextManager {
      *  Awaits the translation files registered at the EP_PHOVEA_CORE_LOCALE extension point
      *  Initialize I18next with the translation files
      */
-    initI18n(): Promise<void>;
+    initI18n(): unknown;
     private static instance;
     static getInstance(): I18nextManager;
 }

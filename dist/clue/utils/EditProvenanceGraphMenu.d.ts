@@ -1,3 +1,5 @@
+/// <reference types="react" />
+/// <reference types="cypress" />
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { ProvenanceGraph } from '../provenance';
 export declare class EditProvenanceGraphMenu {

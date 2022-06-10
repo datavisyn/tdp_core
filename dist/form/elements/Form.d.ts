@@ -18,7 +18,7 @@ export declare class Form implements IForm {
      * @param $parent Node that the form should be attached to
      * @param formId unique form id
      */
-    constructor($parent: d3.Selection<any>, formId?: string);
+    constructor($parent: d3.Selection<any>, formId?: any);
     /**
      * Append a form element and builds it
      * Note: The initialization of the element must be done using `initAllElements()`
@@ -39,13 +39,13 @@ export declare class Form implements IForm {
     /**
      * number of form elements
      */
-    get length(): number;
+    get length(): any;
     /**
      * Returns the form element instance, if exists. Otherwise returns `null`.
      * @param id
      * @returns {IFormElement}
      */
-    getElementById(id: string): IFormElement;
+    getElementById(id: string): any;
     /**
      * Returns an object with the form element id as key and the current data as value
      * @returns {{}}
@@ -64,7 +64,7 @@ export declare class Form implements IForm {
      * validates the current form
      * @returns {boolean} if valid
      */
-    validate(): boolean;
+    validate(): any;
     /**
      * Creates a copy of the element description and modifies the description:
      * - generate a unique id based on the form id

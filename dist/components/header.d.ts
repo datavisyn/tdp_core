@@ -1,3 +1,5 @@
+/// <reference types="react" />
+/// <reference types="bootstrap" />
 /**
  * Defines a header link
  */

@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { PanelTab } from './PanelTab';
 export interface ITabContainer {
     /**

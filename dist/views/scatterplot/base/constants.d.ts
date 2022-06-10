@@ -11,8 +11,5 @@ export declare const TDP_SCATTERPLOT_DEBUG = false;
 /**
  * @internal
  */
-export declare const TDP_SCATTERPLOT_DEBUGLOG: {
-    (...data: any[]): void;
-    (message?: any, ...optionalParams: any[]): void;
-};
+export declare const TDP_SCATTERPLOT_DEBUGLOG: (message?: any, ...optionalParams: any[]) => void;
 //# sourceMappingURL=constants.d.ts.map

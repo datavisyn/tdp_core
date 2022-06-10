@@ -26,7 +26,7 @@ export declare class StateNode extends GraphNode {
      *
      * @returns {any}
      */
-    get creator(): ActionNode;
+    get creator(): any;
     get next(): ActionNode[];
     get previousState(): StateNode;
     get previousStates(): StateNode[];

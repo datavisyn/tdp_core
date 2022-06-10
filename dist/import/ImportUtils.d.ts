@@ -12,19 +12,11 @@ export declare class ImportUtils {
         name: any;
         description: any;
     };
-    static importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string): Promise<() => {
-        data: string[][];
-        desc: IDataDescription;
-    }>;
+    static importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string): unknown;
     static toTableDataDescription(config: IColumnDefinition[], data: any[], common: {
         name: string;
         description: string;
     }): IDataDescription;
-    static importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string): Promise<() => {
-        rows: string[];
-        cols: string[];
-        data: string[][];
-        desc: IDataDescription;
-    }>;
+    static importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string): unknown;
 }
 //# sourceMappingURL=ImportUtils.d.ts.map

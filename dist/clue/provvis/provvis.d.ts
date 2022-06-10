@@ -1,3 +1,5 @@
+/// <reference types="react" />
+/// <reference types="bootstrap" />
 import { ProvenanceGraph } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
 export declare class LayoutedProvVis extends AVisInstance implements IVisInstance {

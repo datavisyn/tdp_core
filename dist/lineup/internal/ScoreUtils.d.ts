@@ -4,12 +4,12 @@ export declare class ScoreUtils {
     static readonly CMD_ADD_SCORE = "tdpAddScore";
     static readonly CMD_REMOVE_SCORE = "tdpRemoveScore";
     private static addScoreLogic;
-    static addScoreImpl(inputs: IObjectRef<IViewProvider>[], parameter: any): any;
-    static addScoreAsync(inputs: IObjectRef<IViewProvider>[], parameter: any): Promise<any>;
-    static removeScoreImpl(inputs: IObjectRef<IViewProvider>[], parameter: any): any;
-    static addScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any): any;
-    static pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any): Promise<any>;
-    static removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]): any;
+    static addScoreImpl(inputs: IObjectRef<IViewProvider>[], parameter: any): unknown;
+    static addScoreAsync(inputs: IObjectRef<IViewProvider>[], parameter: any): unknown;
+    static removeScoreImpl(inputs: IObjectRef<IViewProvider>[], parameter: any): unknown;
+    static addScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any): import("../../clue/provenance").IAction;
+    static pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any): unknown;
+    static removeScore(provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any, columnId: string | string[]): import("../../clue/provenance").IAction;
     private static shallowEqualObjects;
     /**
      * compresses score creation and removal

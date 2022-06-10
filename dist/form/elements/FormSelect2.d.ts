@@ -109,7 +109,7 @@ export declare class FormSelect2 extends AFormElement<IFormSelect2> {
      * @param b
      * @returns {boolean}
      */
-    static sameIds(a: string[], b: string[]): boolean;
+    static sameIds(a: string[], b: string[]): any;
 }
 export {};
 //# sourceMappingURL=FormSelect2.d.ts.map

@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { LocalDataProvider, Ranking } from 'lineupjs';
 import { IPanelButton } from './PanelButton';
 /**

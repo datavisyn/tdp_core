@@ -1,7 +1,3 @@
-declare type Awaited<T> = T extends PromiseLike<infer U> ? {
-    0: Awaited<U>;
-    1: U;
-}[U extends PromiseLike<any> ? 0 : 1] : T;
 export declare type useAsyncStatus = 'idle' | 'pending' | 'success' | 'error';
 /**
  * Wraps an (async) function and provides value, status and error states.
@@ -27,11 +23,10 @@ export declare type useAsyncStatus = 'idle' | 'pending' | 'success' | 'error';
  * @param asyncFunction Async function to be wrapped.
  * @param immediate Null if function should not be triggered immediately, or the initial parameter array if immediate.
  */
-export declare const useAsync: <F extends (...args: any[]) => any, E = Error, T = Awaited<ReturnType<F>>>(asyncFunction: F, immediate?: Parameters<F>) => {
-    execute: (...args: Parameters<F>) => Promise<T>;
+export declare const useAsync: <F extends (...args: any[]) => any, E = Error, T = any>(asyncFunction: F, immediate?: any) => {
+    execute: (...args: Parameters<F>) => any;
     status: useAsyncStatus;
     value: T;
     error: E;
 };
-export {};
 //# sourceMappingURL=useAsync.d.ts.map

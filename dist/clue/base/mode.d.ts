@@ -1,3 +1,5 @@
+/// <reference types="react" />
+/// <reference types="bootstrap" />
 import { EventHandler } from '../../base/event';
 /**
  * generic version of the CLUE mode, a combination of exploration, authoring, and normalization

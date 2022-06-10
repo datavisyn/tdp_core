@@ -1,3 +1,5 @@
+/// <reference types="react" />
+/// <reference types="bootstrap" />
 import { Player } from '../base/Player';
 import { IStateAnnotation, ProvenanceGraph, SlideNode } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
@@ -43,6 +45,6 @@ export declare class VerticalStoryVis extends AVisInstance implements IVisInstan
         thumbnails: boolean;
     }): VerticalStoryVis;
     static to_duration(d: number): string;
-    static to_starting_time(d: SlideNode, story: SlideNode[]): number;
+    static to_starting_time(d: SlideNode, story: SlideNode[]): any;
 }
 //# sourceMappingURL=storyvis.d.ts.map
