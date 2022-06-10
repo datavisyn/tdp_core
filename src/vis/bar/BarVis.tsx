@@ -86,38 +86,37 @@ export function BarVis({
       return null;
     }
 
-    let selectedFlag = false;
+    let isTraceSelected = false;
 
     const editedTraces = { ...traces };
 
-    const allSelected = [];
     editedTraces?.plots.forEach((plot) => {
-      const tracePoints = plot.data.customdata;
+      // custom data on each trace is the ids of every element in that section of the bar.
+      const tracePoints: string[][] = plot.data.customdata as string[][];
 
-      const selectedArr = [];
-      tracePoints.forEach((trace, index) => {
-        if (trace.length === 0 || selectedList.length < trace.length) {
+      const selectedIndices = [];
+      tracePoints.forEach((points, index) => {
+        if (points.length === 0 || selectedList.length < points.length) {
           return;
         }
-        for (const i of trace) {
-          if (!selectedMap[i]) {
+        for (const point of points) {
+          if (!selectedMap[point]) {
             return;
           }
         }
 
-        selectedArr.push(index);
-        allSelected.push(trace);
-        selectedFlag = true;
+        selectedIndices.push(index);
+        isTraceSelected = true;
       });
 
-      if (selectedArr.length > 0) {
-        plot.data.selectedpoints = selectedArr;
+      if (selectedIndices.length > 0) {
+        plot.data.selectedpoints = selectedIndices;
       } else {
         plot.data.selectedpoints = null;
       }
     });
 
-    if (selectedFlag) {
+    if (isTraceSelected) {
       editedTraces?.plots.forEach((plot) => {
         if (plot.data.selectedpoints === null) {
           plot.data.selectedpoints = [];
@@ -206,16 +205,14 @@ export function BarVis({
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
-            // The types on this event dont seem to work correctly with Plotly types, thus the any typing.
-            onClick={(e: any) => {
-              const selectedPoints: string[] = e.points[0].customdata;
-
-              console.log(e);
+            onClick={(e) => {
+              // plotly types here are just wrong. So have to convert to unknown first.
+              const selectedPoints: string[] = e.points[0].customdata as unknown as string[];
 
               let removeSelectionFlag = true;
 
-              for (const j of selectedPoints) {
-                if (!selectedMap[j]) {
+              for (const pointId of selectedPoints) {
+                if (!selectedMap[pointId]) {
                   removeSelectionFlag = false;
                   break;
                 }

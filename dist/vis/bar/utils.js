@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/naming-convention */
 import { merge, sum, mean, min, max } from 'lodash';
 import { median } from 'd3';
 import { I18nextManager } from '../../i18n';
@@ -104,6 +102,7 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, ag
             const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
             let valIdArr = uniqueColVals.map((val) => []);
             catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val)].push(row.id));
+            // stores the actual points of each bar/section of bar in the custom data.
             valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val) && allMultiplesObjsIds.has(val)));
             plots.push({
                 data: {
@@ -170,6 +169,7 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggregateColum
         const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
         let valIdArr = uniqueColVals.map((val) => []);
         catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val)].push(row.id));
+        // stores the actual points of each bar/section of bar in the custom data.
         valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val)));
         plots.push({
             data: {
@@ -209,15 +209,6 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggregateColum
             yTickLabels: !vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
         });
     });
-    // const hasSelected = plots.find((plot) => plot.data.selectedpoints !== null);
-    // // Need to check if we need to tell all of the traces that there is a selection so they can be opaque
-    // if (hasSelected) {
-    //   plots.forEach((p) => {
-    //     if (p.data.selectedpoints === null) {
-    //       p.data.selectedpoints = [];
-    //     }
-    //   });
-    // }
     return plotCounter;
 }
 async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateColumn, config, plots, plotCounter) {
@@ -240,6 +231,7 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateCo
         const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
         let valIdArr = uniqueColVals.map((val) => []);
         catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val)].push(row.id));
+        // stores the actual points of each bar/section of bar in the custom data.
         valIdArr = valIdArr.map((arr) => arr.filter((val) => allMultiplesObjsIds.has(val)));
         plots.push({
             data: {
@@ -286,6 +278,7 @@ async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, co
     const vertFlag = config.direction === EBarDirection.VERTICAL;
     const aggValues = getAggregateValues(aggregateType, catColValues.resolvedValues, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
     const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
+    // stores the actual points of each bar/section of bar in the custom data.
     const valIdArr = valArr.map((val) => []);
     catColValues.resolvedValues.forEach((row) => valIdArr[valArr.indexOf(row.val)].push(row.id));
     const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);

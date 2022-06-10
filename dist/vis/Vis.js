@@ -99,6 +99,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
             setVisConfig(externalConfig);
         }
     }, [externalConfig, setVisConfig]);
+    // Converting the selected list into a map, since searching through the list to find an item is common in the vis components.
     const selectedMap = useMemo(() => {
         const currMap = {};
         selected.forEach((s) => {

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/naming-convention */
 import { merge, sum, mean, min, max } from 'lodash';
 import { median } from 'd3';
 import { I18nextManager } from '../../i18n';
@@ -175,10 +173,11 @@ async function setPlotsWithGroupsAndMultiples(
 
       const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
-      let valIdArr = uniqueColVals.map((val) => []);
+      let valIdArr: string[][] = uniqueColVals.map((val) => []);
 
       catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val as string)].push(row.id));
 
+      // stores the actual points of each bar/section of bar in the custom data.
       valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val) && allMultiplesObjsIds.has(val)));
 
       plots.push({
@@ -270,10 +269,11 @@ async function setPlotsWithGroups(
 
     const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
-    let valIdArr = uniqueColVals.map((val) => []);
+    let valIdArr: string[][] = uniqueColVals.map((val) => []);
 
     catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val as string)].push(row.id));
 
+    // stores the actual points of each bar/section of bar in the custom data.
     valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val)));
 
     plots.push({
@@ -316,17 +316,6 @@ async function setPlotsWithGroups(
     });
   });
 
-  // const hasSelected = plots.find((plot) => plot.data.selectedpoints !== null);
-
-  // // Need to check if we need to tell all of the traces that there is a selection so they can be opaque
-  // if (hasSelected) {
-  //   plots.forEach((p) => {
-  //     if (p.data.selectedpoints === null) {
-  //       p.data.selectedpoints = [];
-  //     }
-  //   });
-  // }
-
   return plotCounter;
 }
 
@@ -362,10 +351,11 @@ async function setPlotsWithMultiples(
       .flat();
     const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
-    let valIdArr = uniqueColVals.map((val) => []);
+    let valIdArr: string[][] = uniqueColVals.map((val) => []);
 
     catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val as string)].push(row.id));
 
+    // stores the actual points of each bar/section of bar in the custom data.
     valIdArr = valIdArr.map((arr) => arr.filter((val) => allMultiplesObjsIds.has(val)));
 
     plots.push({
@@ -431,6 +421,8 @@ async function setPlotsBasic(
   ) as any[];
 
   const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))];
+
+  // stores the actual points of each bar/section of bar in the custom data.
   const valIdArr: string[][] = valArr.map((val) => []);
 
   catColValues.resolvedValues.forEach((row) => valIdArr[valArr.indexOf(row.val as string)].push(row.id));

@@ -27,33 +27,32 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         if (!traces) {
             return null;
         }
-        let selectedFlag = false;
+        let isTraceSelected = false;
         const editedTraces = { ...traces };
-        const allSelected = [];
         editedTraces === null || editedTraces === void 0 ? void 0 : editedTraces.plots.forEach((plot) => {
+            // custom data on each trace is the ids of every element in that section of the bar.
             const tracePoints = plot.data.customdata;
-            const selectedArr = [];
-            tracePoints.forEach((trace, index) => {
-                if (trace.length === 0 || selectedList.length < trace.length) {
+            const selectedIndices = [];
+            tracePoints.forEach((points, index) => {
+                if (points.length === 0 || selectedList.length < points.length) {
                     return;
                 }
-                for (const i of trace) {
-                    if (!selectedMap[i]) {
+                for (const point of points) {
+                    if (!selectedMap[point]) {
                         return;
                     }
                 }
-                selectedArr.push(index);
-                allSelected.push(trace);
-                selectedFlag = true;
+                selectedIndices.push(index);
+                isTraceSelected = true;
             });
-            if (selectedArr.length > 0) {
-                plot.data.selectedpoints = selectedArr;
+            if (selectedIndices.length > 0) {
+                plot.data.selectedpoints = selectedIndices;
             }
             else {
                 plot.data.selectedpoints = null;
             }
         });
-        if (selectedFlag) {
+        if (isTraceSelected) {
             editedTraces === null || editedTraces === void 0 ? void 0 : editedTraces.plots.forEach((plot) => {
                 if (plot.data.selectedpoints === null) {
                     plot.data.selectedpoints = [];
@@ -114,14 +113,12 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
     return (React.createElement("div", { ref: plotlyDivRef, className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
-            traceStatus === 'success' && (finalTraces === null || finalTraces === void 0 ? void 0 : finalTraces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
-                // The types on this event dont seem to work correctly with Plotly types, thus the any typing.
-                onClick: (e) => {
+            traceStatus === 'success' && (finalTraces === null || finalTraces === void 0 ? void 0 : finalTraces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (e) => {
+                    // plotly types here are just wrong. So have to convert to unknown first.
                     const selectedPoints = e.points[0].customdata;
-                    console.log(e);
                     let removeSelectionFlag = true;
-                    for (const j of selectedPoints) {
-                        if (!selectedMap[j]) {
+                    for (const pointId of selectedPoints) {
+                        if (!selectedMap[pointId]) {
                             removeSelectionFlag = false;
                             break;
                         }
