@@ -2,6 +2,10 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { I18nextManager } from '../i18n';
 
+function decodeString(value: string) {
+  return new DOMParser().parseFromString(`<!doctype html><body>${value}`, 'text/html').body.textContent;
+}
+
 export class NotificationHandler {
   public static DEFAULT_SUCCESS_AUTO_HIDE = 5000;
 
@@ -11,12 +15,12 @@ export class NotificationHandler {
     let parent: HTMLElement = document.body.querySelector(`div.toast-container-custom`);
     if (!parent) {
       document.body.insertAdjacentHTML('beforeend', `<div class="toast-container-custom"></div>`);
-      parent = document.body.lastElementChild! as HTMLElement;
+      parent = document.body.lastElementChild as HTMLElement;
     }
 
     parent.classList.add('push');
     parent.insertAdjacentHTML('afterbegin', `<div class="alert alert-${level === 'error' ? 'danger' : level} alert-dismissible" role="alert"></div>`);
-    const alert = parent.firstElementChild!;
+    const alert = parent.firstElementChild;
 
     ReactDOM.render(
       <>
@@ -42,7 +46,7 @@ export class NotificationHandler {
           data-bs-dismiss="alert"
           aria-label="Close"
         />
-        {content}
+        {typeof content === 'string' ? decodeString(content) : content}
       </>,
       alert,
     );
@@ -64,3 +68,5 @@ export class NotificationHandler {
     );
   }
 }
+
+NotificationHandler.pushNotification('success', 'hello world', 1000);
