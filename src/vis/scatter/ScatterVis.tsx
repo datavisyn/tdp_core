@@ -11,6 +11,8 @@ import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
+import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import { CloseButton } from '../sidebar/CloseButton';
 
 const defaultExtensions = {
   prePlot: null,
@@ -27,9 +29,12 @@ export function ScatterVis({
   shapes = ['circle', 'square', 'triangle-up', 'star'],
   filterCallback = () => null,
   selectionCallback = () => null,
-  selected = {},
+  selectedMap = {},
+  selectedList = [],
   setConfig,
   hideSidebar = false,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
   scales,
 }: {
   config: IScatterConfig;
@@ -57,10 +62,13 @@ export function ScatterVis({
   columns: VisColumn[];
   filterCallback?: (s: EFilterOptions) => void;
   selectionCallback?: (ids: string[]) => void;
-  selected?: { [key: string]: boolean };
+  closeButtonCallback?: () => void;
+  selectedMap?: { [key: string]: boolean };
+  selectedList: string[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
   hideSidebar?: boolean;
+  showCloseButton?: boolean;
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
   const plotlyDivRef = React.useRef(null);
@@ -96,7 +104,7 @@ export function ScatterVis({
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
-  const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selected, config, scales, shapes]);
+  const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selectedMap, config, scales, shapes]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -109,6 +117,13 @@ export function ScatterVis({
         // @ts-ignore
         itemclick: false,
         itemdoubleclick: false,
+        font: {
+          // same as default label font size in the sidebar
+          size: 13.4,
+        },
+      },
+      font: {
+        family: 'Roboto, sans-serif',
       },
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
@@ -136,18 +151,26 @@ export function ScatterVis({
             config={{ responsive: true, displayModeBar: false }}
             useResizeHandler
             style={{ width: '100%', height: '100%' }}
+            onClick={(event) => {
+              const clickedId = (event.points[0] as any).id;
+              if (selectedMap[clickedId]) {
+                selectionCallback(selectedList.filter((s) => s !== clickedId));
+              } else {
+                selectionCallback([...selectedList, clickedId]);
+              }
+            }}
             onSelected={(sel) => {
               selectionCallback(sel ? sel.points.map((d) => (d as any).id) : []);
             }}
             // plotly redraws everything on updates, so you need to reappend title and
             // change opacity on update, instead of just in a use effect
             onInitialized={() => {
-              d3.selectAll('g .traces').style('opacity', config.alphaSliderVal);
-              d3.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
+              d3.selectAll('g .traces').style('opacity', 1);
+              d3.selectAll('.scatterpts').style('opacity', selectedList.length > 0 ? 1 : config.alphaSliderVal);
             }}
             onUpdate={() => {
-              d3.selectAll('g .traces').style('opacity', config.alphaSliderVal);
-              d3.selectAll('.scatterpts').style('opacity', config.alphaSliderVal);
+              d3.selectAll('g .traces').style('opacity', 1);
+              d3.selectAll('.scatterpts').style('opacity', selectedList.length > 0 ? 1 : config.alphaSliderVal);
 
               for (const p of traces.plots) {
                 d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
@@ -164,30 +187,19 @@ export function ScatterVis({
           <OpacitySlider callback={(e) => setConfig({ ...config, alphaSliderVal: e })} currentValue={config.alphaSliderVal} />
         </div>
         {mergedExtensions.postPlot}
+        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
-        <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
-          <button
-            className="btn btn-primary-outline"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target={`#generalVisBurgerMenu${id}`}
-            aria-expanded="true"
-            aria-controls="generalVisBurgerMenu"
-          >
-            <i className="fas fa-bars" />
-          </button>
-          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
-            <ScatterVisSidebar
-              config={config}
-              optionsConfig={optionsConfig}
-              extensions={extensions}
-              columns={columns}
-              filterCallback={filterCallback}
-              setConfig={setConfig}
-            />
-          </div>
-        </div>
+        <VisSidebarWrapper id={id}>
+          <ScatterVisSidebar
+            config={config}
+            optionsConfig={optionsConfig}
+            extensions={extensions}
+            columns={columns}
+            filterCallback={filterCallback}
+            setConfig={setConfig}
+          />
+        </VisSidebarWrapper>
       ) : null}
     </div>
   );

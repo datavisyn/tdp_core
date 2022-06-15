@@ -28,8 +28,17 @@ export class FormSelect2 extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+        const testId = (this.elementDesc.label || this.elementDesc.id)
+            .replace(/<\/?[^>]+(>|$)/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+            .toLowerCase();
+        this.$rootNode = $formNode
+            .append('div')
+            .classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true)
+            .attr('data-testid', testId);
         const rowNode = this.$rootNode.append('div').classed('row', true);
+        rowNode[0][0].setAttribute('data-testid', this.elementDesc.label);
         this.setVisible(this.elementDesc.visible);
         this.appendLabel(rowNode);
         const $colSelectNode = rowNode.append('div').classed('col', true);
@@ -84,6 +93,11 @@ export class FormSelect2 extends AFormElement {
         if (defaultVal) {
             this.fire(FormSelect2.EVENT_INITIAL_VALUE, this.value, null);
         }
+        // add data-testid to
+        const formNode = this.form.$node[0][0];
+        const $searchContainer = $('.select2.select2-container', formNode);
+        const $search = $searchContainer.find('input');
+        $search.attr('data-testid', 'select2-search-field');
         return this.$jqSelect;
     }
     resolveValue(items) {

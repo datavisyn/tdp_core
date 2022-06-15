@@ -22,7 +22,15 @@ export class FormSelect3 extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
+        const testId = (this.elementDesc.label || this.elementDesc.id)
+            .replace(/<\/?[^>]+(>|$)/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+            .toLowerCase();
+        this.$rootNode = $formNode
+            .append('div')
+            .classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true)
+            .attr('data-testid', testId);
         const rowNode = this.$rootNode.append('div').classed('row', true);
         this.setVisible(this.elementDesc.visible);
         this.appendLabel(rowNode);

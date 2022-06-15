@@ -7,6 +7,8 @@ import { InvalidCols } from '../general';
 import { createPCPTraces } from './utils';
 import { useAsync } from '../../hooks';
 import { PCPVisSidebar } from './PCPVisSidebar';
+import { VisSidebarWrapper } from '../VisSidebarWrapper';
+import { CloseButton } from '../sidebar/CloseButton';
 
 interface PCPVisProps {
   config: IPCPConfig;
@@ -20,6 +22,8 @@ interface PCPVisProps {
   setConfig: (config: IVisConfig) => void;
   selected?: { [key: string]: boolean };
   hideSidebar?: boolean;
+  closeButtonCallback?: () => void;
+  showCloseButton?: boolean;
 }
 
 const defaultExtensions = {
@@ -29,7 +33,16 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function PCPVis({ config, extensions, columns, setConfig, selected = {}, hideSidebar = false }: PCPVisProps) {
+export function PCPVis({
+  config,
+  extensions,
+  columns,
+  setConfig,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
+  selected = {},
+  hideSidebar = false,
+}: PCPVisProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -70,6 +83,9 @@ export function PCPVis({ config, extensions, columns, setConfig, selected = {}, 
           showlegend: true,
           autosize: true,
           grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
+          font: {
+            family: 'Roboto, sans-serif',
+          },
           shapes: [],
           violingap: 0,
         }
@@ -99,23 +115,12 @@ export function PCPVis({ config, extensions, columns, setConfig, selected = {}, 
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
         {mergedExtensions.postPlot}
+        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </div>
       {!hideSidebar ? (
-        <div className="position-relative h-100 flex-shrink-1 bg-light overflow-auto mt-2">
-          <button
-            className="btn btn-primary-outline"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target={`#generalVisBurgerMenu${id}`}
-            aria-expanded="true"
-            aria-controls="generalVisBurgerMenu"
-          >
-            <i className="fas fa-bars" />
-          </button>
-          <div className="collapse show collapse-horizontal" id={`generalVisBurgerMenu${id}`}>
-            <PCPVisSidebar config={config} extensions={extensions} columns={columns} setConfig={setConfig} />
-          </div>
-        </div>
+        <VisSidebarWrapper id={id}>
+          <PCPVisSidebar config={config} extensions={extensions} columns={columns} setConfig={setConfig} />
+        </VisSidebarWrapper>
       ) : null}
     </div>
   );

@@ -19,6 +19,7 @@ import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
 import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
+import { DEFAULT_COLOR, SELECT_COLOR } from '../general/constants';
 
 export function isScatter(s: IVisConfig): s is IScatterConfig {
   return s.type === ESupportedPlotlyVis.SCATTER;
@@ -89,6 +90,8 @@ export async function createScatterTraces(
     return emptyVal;
   }
 
+  const hasSelected = Object.values(selected).includes(true);
+
   const numCols: VisNumericalColumn[] = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
   const plots: PlotlyData[] = [];
 
@@ -99,6 +102,10 @@ export async function createScatterTraces(
   validCols.forEach((c) => {
     c.resolvedValues = moveSelectedToFront(c.resolvedValues, selected);
   });
+
+  if (colorCol) {
+    colorCol.resolvedValues = moveSelectedToFront(colorCol.resolvedValues, selected);
+  }
 
   const shapeScale = config.shape
     ? d3.scale
@@ -145,6 +152,16 @@ export async function createScatterTraces(
         type: 'scattergl',
         mode: 'markers',
         showlegend: false,
+        hoverlabel: {
+          bgcolor: 'black',
+        },
+        hovertext: validCols[0].resolvedValues.map(
+          (v, i) =>
+            `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${
+              colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
+            }`,
+        ),
+        hoverinfo: 'text',
         text: validCols[0].resolvedValues.map((v) => v.id.toString()),
         marker: {
           line: {
@@ -152,11 +169,13 @@ export async function createScatterTraces(
           },
           symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
           color: colorCol
-            ? colorCol.resolvedValues.map((v) =>
-                selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
-              )
-            : validCols[0].resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
-          opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
+            ? hasSelected
+              ? colorCol.resolvedValues.map((v) =>
+                  selected[v.id] ? (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)) : DEFAULT_COLOR,
+                )
+              : colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
+            : validCols[0].resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
+          opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
           size: 8,
         },
       },
@@ -179,7 +198,7 @@ export async function createScatterTraces(
               },
               showlegend: false,
               marker: {
-                color: '#2e2e2e',
+                color: DEFAULT_COLOR,
               },
               opacity: config.alphaSliderVal,
             },
@@ -197,8 +216,15 @@ export async function createScatterTraces(
               yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
               type: 'scattergl',
               mode: 'markers',
+              hovertext: xCurr.resolvedValues.map(
+                (v, i) =>
+                  `${v.id}<br>x: ${v.val}<br>y: ${yCurr.resolvedValues[i].val}<br>${
+                    colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
+                  }`,
+              ),
+              hoverinfo: 'text',
               hoverlabel: {
-                namelength: 5,
+                bgcolor: 'black',
               },
               showlegend: false,
               text: validCols[0].resolvedValues.map((v) => v.id.toString()),
@@ -208,11 +234,19 @@ export async function createScatterTraces(
                 },
                 symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
                 color: colorCol
-                  ? colorCol.resolvedValues.map((v) =>
-                      selected[v.id] ? '#E29609' : colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
-                    )
-                  : xCurr.resolvedValues.map((v) => (selected[v.id] ? '#E29609' : '#2e2e2e')),
-                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
+                  ? hasSelected
+                    ? colorCol.resolvedValues.map((v) =>
+                        selected[v.id]
+                          ? colorCol.type === EColumnTypes.NUMERICAL
+                            ? numericalColorScale(v.val as number)
+                            : scales.color(v.val)
+                          : DEFAULT_COLOR,
+                      )
+                    : colorCol.resolvedValues.map((v) =>
+                        colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
+                      )
+                  : xCurr.resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
+                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
                 size: 8,
               },
             },
@@ -241,7 +275,7 @@ export async function createScatterTraces(
         legendgroup: 'color',
         // @ts-ignore
         legendgrouptitle: {
-          text: 'Color',
+          text: colorCol.info.name,
         },
         marker: {
           line: {
@@ -249,7 +283,7 @@ export async function createScatterTraces(
           },
           symbol: 'circle',
           size: 8,
-          color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : '#2e2e2e',
+          color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : DEFAULT_COLOR,
           opacity: config.alphaSliderVal,
         },
         transforms: [
@@ -285,7 +319,7 @@ export async function createScatterTraces(
         legendgroup: 'shape',
         // @ts-ignore
         legendgrouptitle: {
-          text: 'Shape',
+          text: shapeCol.info.name,
         },
         marker: {
           line: {
@@ -294,7 +328,7 @@ export async function createScatterTraces(
           opacity: config.alphaSliderVal,
           size: 8,
           symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-          color: '#2e2e2e',
+          color: DEFAULT_COLOR,
         },
         transforms: [
           {

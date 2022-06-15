@@ -4,9 +4,11 @@ import { GlobalEventHandler } from './event';
 export class AjaxError extends Error {
   constructor(public readonly response: Response, message?: string) {
     super(message || response.statusText);
-    // Set the prototype explicitly. needed for Typescript 2.1
-    Object.setPrototypeOf(this, AjaxError.prototype);
   }
+}
+
+export function isAjaxError(error: any): error is AjaxError {
+  return error?.response instanceof Response;
 }
 
 export class Ajax {
@@ -19,11 +21,36 @@ export class Ajax {
    */
   public static MAX_URL_LENGTH = 4096;
 
-  static checkStatus(response: Response) {
+  /**
+   * Tries to get a proper message from a response by checking the `json()` content for `detail`, the `text()`, or the `statusText`.
+   * @param response Response where the error message is contained.
+   * @returns The extracted error message.
+   */
+  static async getErrorMessageFromResponse(response: Response): Promise<string> {
+    // try to get a message from the response, either via json detail, the text, or the status text.
+    let message = '';
+    try {
+      // Read the stream and try to parse it
+      const text = await response.text();
+      try {
+        message = message || JSON.parse(text).detail;
+      } catch (e) {
+        // ignore
+      }
+      message = message || text;
+    } catch (e) {
+      // ignore
+    }
+    message = message || response.statusText;
+    return message;
+  }
+
+  static async checkStatus(response: Response) {
     if (response.ok) {
       return response;
     }
-    throw new AjaxError(response);
+
+    throw new AjaxError(response, await Ajax.getErrorMessageFromResponse(response));
   }
 
   static parseType(expectedDataType: string, response: Response) {
@@ -116,7 +143,7 @@ export class Ajax {
 
     // there are no typings for fetch so far
     GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_PRE_SEND, url, mergedOptions);
-    const r = Ajax.checkStatus(await window.fetch(url, mergedOptions));
+    const r = await Ajax.checkStatus(await window.fetch(url, mergedOptions));
     const output = Ajax.parseType(expectedDataType, r);
     GlobalEventHandler.getInstance().fire(Ajax.GLOBAL_EVENT_AJAX_POST_SEND, url, mergedOptions, r, output);
     return output;

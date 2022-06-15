@@ -16,9 +16,11 @@ interface ViolinVisProps {
     };
     columns: VisColumn[];
     setConfig: (config: IVisConfig) => void;
+    closeButtonCallback?: () => void;
     scales: Scales;
     hideSidebar?: boolean;
+    showCloseButton?: boolean;
 }
-export declare function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar }: ViolinVisProps): JSX.Element;
+export declare function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar, showCloseButton, closeButtonCallback, }: ViolinVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=ViolinVis.d.ts.map

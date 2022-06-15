@@ -65,12 +65,14 @@ export class LoginMenu extends EventHandler {
         </a>
       </li>
       <li style="display: none" class="nav-item dropdown" id="user_menu">
-          <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" id="userMenuDropdown"
+          <a href="#" class="nav-link dropdown-toggle" data-testid="user-menu" data-bs-toggle="dropdown" role="button" aria-haspopup="true" id="userMenuDropdown"
               aria-expanded="false"><i class="fas fa-user" aria-hidden="true"></i> <span>${I18nextManager.getInstance().i18n.t(
                 'phovea:security_flask.unknown',
               )}</span></a>
           <div class="dropdown-menu dropdown-menu-end" data-bs-popper="none" aria-labelledby="userMenuDropdown">
-              <a class="dropdown-item" href="#" id="logout_link">${I18nextManager.getInstance().i18n.t('phovea:security_flask.logoutButton')}</a>
+              <a class="dropdown-item" data-testid="logout-link" href="#" id="logout_link">${I18nextManager.getInstance().i18n.t(
+                'phovea:security_flask.logoutButton',
+              )}</a>
           </div>
       </li>`;
 
@@ -131,7 +133,7 @@ export class LoginMenu extends EventHandler {
       'beforeend',
       `
       <!--login dialog-->
-      <div class="modal fade" id="loginDialog" tabindex="-1" role="dialog" aria-labelledby="loginDialog" data-keyboard="false" data-bs-backdrop="static">
+      <div class="modal fade" id="loginDialog" tabindex="-1" role="dialog" aria-labelledby="loginDialog" data-bs-keyboard="false" data-bs-backdrop="static">
         <div class="modal-dialog modal-sm">
           <div class="modal-content">
             <div class="modal-header">
