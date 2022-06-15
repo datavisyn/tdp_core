@@ -3,6 +3,8 @@ import { GraphEdge, GraphNode, IGraph, IGraphDataDescription } from './graph';
 export declare class LocalStorageGraph extends GraphBase implements IGraph {
     private storage;
     private updateHandler;
+    private setItem;
+    private getItem;
     constructor(desc: IGraphDataDescription, nodes?: GraphNode[], edges?: GraphEdge[], storage?: Storage);
     static migrate(graph: GraphBase, storage?: Storage): Promise<LocalStorageGraph>;
     migrate(): PromiseLike<{

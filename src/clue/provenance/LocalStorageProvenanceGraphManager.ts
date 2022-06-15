@@ -8,6 +8,7 @@ import { LocalStorageGraph } from '../graph/LocalStorageGraph';
 import { UserSession } from '../../app/UserSession';
 import { Permission } from '../../security/Permission';
 import { MemoryGraph } from '../graph/MemoryGraph';
+import { getCompressedFromStorage, setCompressedToStorage } from '../utils/Compression';
 
 export interface ILocalStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {
   /**
@@ -42,16 +43,11 @@ export class LocalStorageProvenanceGraphManager implements IProvenanceGraphManag
   }
 
   private loadFromLocalStorage<T>(suffix: string, defaultValue: T): T {
-    try {
-      const item = this.options.storage.getItem(this.options.prefix + suffix);
-      if (item === undefined || item === null) {
-        return defaultValue;
-      }
-      return JSON.parse(item);
-    } catch (e) {
-      console.error(e);
-      return defaultValue;
-    }
+    return getCompressedFromStorage<T>(this.options.storage, this.options.prefix + suffix, defaultValue);
+  }
+
+  private setToLocalStorage<T>(suffix: string, data: T): void {
+    setCompressedToStorage(this.options.storage, this.options.prefix + suffix, data);
   }
 
   listSync(): IProvenanceGraphDataDescription[] {
@@ -95,24 +91,24 @@ export class LocalStorageProvenanceGraphManager implements IProvenanceGraphManag
   }
 
   delete(desc: IProvenanceGraphDataDescription) {
-    const lists = JSON.parse(this.options.storage.getItem(`${this.options.prefix}_provenance_graphs`) || '[]');
+    const lists: string[] = this.loadFromLocalStorage('_provenance_graphs', []);
     lists.splice(lists.indexOf(desc.id), 1);
     LocalStorageGraph.delete(desc, this.options.storage);
     // just remove from the list
     this.options.storage.removeItem(`${this.options.prefix}_provenance_graph.${desc.id}`);
-    this.options.storage.setItem(`${this.options.prefix}_provenance_graphs`, JSON.stringify(lists));
+    this.setToLocalStorage('_provenance_graphs', lists);
     return Promise.resolve(true);
   }
 
   edit(graph: ProvenanceGraph | IProvenanceGraphDataDescription, desc: any = {}) {
     const base = graph instanceof ProvenanceGraph ? graph.desc : graph;
     merge(base, desc);
-    this.options.storage.setItem(`${this.options.prefix}_provenance_graph.${base.id}`, JSON.stringify(base));
+    this.setToLocalStorage(`_provenance_graph.${base.id}`, base);
     return Promise.resolve(base);
   }
 
   private createDesc(overrides: any = {}) {
-    const lists: string[] = JSON.parse(this.options.storage.getItem(`${this.options.prefix}_provenance_graphs`) || '[]');
+    const lists: string[] = this.loadFromLocalStorage('_provenance_graphs', []);
     const uid = lists.length > 0 ? String(1 + Math.max(...lists.map((d) => parseInt(d.slice(this.options.prefix.length), 10)))) : '0';
     const id = this.options.prefix + uid;
     const desc: IProvenanceGraphDataDescription = merge(
@@ -135,8 +131,8 @@ export class LocalStorageProvenanceGraphManager implements IProvenanceGraphManag
       overrides,
     );
     lists.push(id);
-    this.options.storage.setItem(`${this.options.prefix}_provenance_graphs`, JSON.stringify(lists));
-    this.options.storage.setItem(`${this.options.prefix}_provenance_graph.${id}`, JSON.stringify(desc));
+    this.setToLocalStorage('_provenance_graphs', lists);
+    this.setToLocalStorage(`_provenance_graph.${id}`, desc);
     return desc;
   }
 

@@ -24,6 +24,7 @@ export declare class LocalStorageProvenanceGraphManager implements IProvenanceGr
     private options;
     constructor(options?: ILocalStorageProvenanceGraphManagerOptions);
     private loadFromLocalStorage;
+    private setToLocalStorage;
     listSync(): IProvenanceGraphDataDescription[];
     list(): Promise<IProvenanceGraphDataDescription[]>;
     getGraph(desc: IProvenanceGraphDataDescription): PromiseLike<LocalStorageGraph>;

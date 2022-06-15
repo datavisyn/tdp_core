@@ -1,6 +1,7 @@
 import { IEvent } from '../../base/event';
 import { GraphBase, IGraphFactory } from './GraphBase';
 import { GraphEdge, GraphNode, IGraph, IGraphDataDescription } from './graph';
+import { setCompressedToStorage, getCompressedFromStorage } from '../utils/Compression';
 
 export class LocalStorageGraph extends GraphBase implements IGraph {
   private storage: Storage;
@@ -15,21 +16,29 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
     }
   };
 
+  private setItem<T>(key: string, value: T): void {
+    setCompressedToStorage(this.storage, key, value);
+  }
+
+  private getItem(key: string): any {
+    return getCompressedFromStorage(this.storage, key, null);
+  }
+
   constructor(desc: IGraphDataDescription, nodes: GraphNode[] = [], edges: GraphEdge[] = [], storage: Storage = sessionStorage) {
     super(desc, nodes, edges);
     this.storage = storage;
 
     const { uid } = this;
     if (nodes.length > 0 || edges.length > 0) {
-      this.storage.setItem(`${uid}.nodes`, JSON.stringify(nodes.map((d) => d.id)));
+      this.setItem(`${uid}.nodes`, JSON.stringify(nodes.map((d) => d.id)));
       nodes.forEach((n) => {
-        this.storage.setItem(`${uid}.node.${n.id}`, JSON.stringify(n.persist()));
+        this.setItem(`${uid}.node.${n.id}`, JSON.stringify(n.persist()));
         n.on('setAttr', this.updateHandler);
       });
 
-      this.storage.setItem(`${uid}.edges`, JSON.stringify(edges.map((d) => d.id)));
+      this.setItem(`${uid}.edges`, JSON.stringify(edges.map((d) => d.id)));
       edges.forEach((e) => {
-        this.storage.setItem(`${uid}.edge.${e.id}`, JSON.stringify(e.persist()));
+        this.setItem(`${uid}.edge.${e.id}`, JSON.stringify(e.persist()));
         e.on('setAttr', this.updateHandler);
       });
     }
@@ -67,21 +76,21 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
 
   private load(factory: IGraphFactory) {
     const { uid } = this;
-    if (this.storage.getItem(`${uid}.nodes`) == null) {
+    if (this.getItem(`${uid}.nodes`) == null) {
       return;
     }
-    const nodeIds: string[] = JSON.parse(this.storage.getItem(`${uid}.nodes`));
+    const nodeIds: string[] = this.getItem(`${uid}.nodes`);
     const lookup = new Map<number, GraphNode>();
     nodeIds.forEach((id) => {
-      const n = JSON.parse(this.storage.getItem(`${uid}.node.${id}`));
+      const n = this.getItem(`${uid}.node.${id}`);
       const nn = factory.makeNode(n);
       lookup.set(nn.id, nn);
       nn.on('setAttr', this.updateHandler);
       super.addNode(nn);
     });
-    const edgeIds: string[] = JSON.parse(this.storage.getItem(`${uid}.edges`));
+    const edgeIds: string[] = this.getItem(`${uid}.edges`);
     edgeIds.forEach((id) => {
-      const n = JSON.parse(this.storage.getItem(`${uid}.edge.${id}`));
+      const n = this.getItem(`${uid}.edge.${id}`);
       const nn = factory.makeEdge(n, lookup.get.bind(lookup));
       nn.on('setAttr', this.updateHandler);
       super.addEdge(nn);
@@ -125,8 +134,11 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
   addNode(n: GraphNode) {
     super.addNode(n);
     const { uid } = this;
-    this.storage.setItem(`${uid}.node.${n.id}`, JSON.stringify(n.persist()));
-    this.storage.setItem(`${uid}.nodes`, JSON.stringify(this.nodes.map((d) => d.id)));
+    this.setItem(`${uid}.node.${n.id}`, n.persist());
+    this.setItem(
+      `${uid}.nodes`,
+      this.nodes.map((d) => d.id),
+    );
     n.on('setAttr', this.updateHandler);
     return this;
   }
@@ -134,7 +146,7 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
   updateNode(n: GraphNode): any {
     super.updateNode(n);
     const { uid } = this;
-    this.storage.setItem(`${uid}.node.${n.id}`, JSON.stringify(n.persist()));
+    this.setItem(`${uid}.node.${n.id}`, n.persist());
     return this;
   }
 
@@ -143,7 +155,10 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
       return null;
     }
     const { uid } = this;
-    this.storage.setItem(`${uid}.nodes`, JSON.stringify(this.nodes.map((d) => d.id)));
+    this.setItem(
+      `${uid}.nodes`,
+      this.nodes.map((d) => d.id),
+    );
     this.storage.removeItem(`${uid}.node.${n.id}`);
     n.off('setAttr', this.updateHandler);
 
@@ -155,8 +170,11 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
       super.addEdge(edgeOrSource);
       const e = <GraphEdge>edgeOrSource;
       const { uid } = this;
-      this.storage.setItem(`${uid}.edges`, JSON.stringify(this.edges.map((d) => d.id)));
-      this.storage.setItem(`${uid}.edge.${e.id}`, JSON.stringify(e.persist()));
+      this.setItem(
+        `${uid}.edges`,
+        this.edges.map((d) => d.id),
+      );
+      this.setItem(`${uid}.edge.${e.id}`, e.persist());
       e.on('setAttr', this.updateHandler);
       return this;
     }
@@ -169,7 +187,10 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
     }
     // need to shift all
     const { uid } = this;
-    this.storage.setItem(`${uid}.edges`, JSON.stringify(this.edges.map((d) => d.id)));
+    this.setItem(
+      `${uid}.edges`,
+      this.edges.map((d) => d.id),
+    );
     this.storage.removeItem(`${uid}.edge.${e.id}`);
     e.off('setAttr', this.updateHandler);
     return this;
@@ -178,7 +199,7 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
   updateEdge(e: GraphEdge): any {
     super.updateEdge(e);
     const { uid } = this;
-    this.storage.setItem(`${uid}.edge.${e.id}`, JSON.stringify(e.persist()));
+    this.setItem(`${uid}.edge.${e.id}`, e.persist());
     return this;
   }
 
@@ -192,11 +213,11 @@ export class LocalStorageGraph extends GraphBase implements IGraph {
     this.edges.forEach((n) => n.off('setAttr', this.updateHandler));
     super.clear();
     const { uid } = this;
-    JSON.parse(this.storage.getItem(`${uid}.nodes`)).forEach((id: string) => {
+    this.getItem(`${uid}.nodes`).forEach((id: string) => {
       this.storage.removeItem(`${uid}.node.${id}`);
     });
     this.storage.removeItem(`${uid}.nodes`);
-    JSON.parse(this.storage.getItem(`${uid}.edges`)).forEach((id: string) => {
+    this.getItem(`${uid}.edges`).forEach((id: string) => {
       this.storage.removeItem(`${uid}.edge.${id}`);
     });
     this.storage.removeItem(`${uid}.edges`);
