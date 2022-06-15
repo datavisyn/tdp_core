@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
 import { AView } from '../views/AView';
@@ -51,8 +50,8 @@ export declare class ViewWrapper extends EventHandler implements IViewProvider {
     getInstance(): any;
     private createView;
     destroy(): void;
-    matchesIDType(idType: IDType): any;
-    get idType(): any;
+    matchesIDType(idType: IDType): boolean;
+    get idType(): IDType;
     private destroyInstance;
     private onParameterChange;
     getParameter(name: string): any;
@@ -60,19 +59,19 @@ export declare class ViewWrapper extends EventHandler implements IViewProvider {
     /**
      * @deprecated use setInputSelection instead
      */
-    setParameterSelection(selection?: ISelection): any;
-    setInputSelection(selection?: ISelection, name?: string): any;
+    setParameterSelection(selection?: ISelection): void | PromiseLike<void> | Promise<IView>;
+    setInputSelection(selection?: ISelection, name?: string): void | PromiseLike<void> | Promise<IView>;
     private match;
     /**
      * @deprecated use getInputSelection instead
      */
-    getParameterSelection(): any;
-    getInputSelection(name?: string): any;
+    getParameterSelection(): ISelection;
+    getInputSelection(name?: string): ISelection;
     get itemIDType(): IDType | null;
     getItemSelection(name?: string): ISelection;
     setItemSelection(sel: ISelection, name?: string): void;
     update(): void;
-    dumpReference(): any;
+    dumpReference(): number;
     dump(): IViewWrapperDump;
     selectionText(selection: any, idType: string): string;
     static guessIDType(v: IBaseViewPluginDesc): IDType | null;

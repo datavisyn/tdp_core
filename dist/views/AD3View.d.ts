@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { Selection } from 'd3';
 import { ISelection, IViewContext } from '../base/interfaces';
 import { AView } from './AView';

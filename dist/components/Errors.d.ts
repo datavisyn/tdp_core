@@ -1,3 +1,4 @@
+import { Dialog } from './dialogs';
 export declare class Errors {
     /**
      * sets the template function for generating the error details in a error dialog
@@ -20,6 +21,8 @@ export declare class Errors {
      * @param error
      * @returns {Promise<any>|Promise}
      */
-    static showErrorModalDialog(error: any, additionalCSSClasses?: string): any;
+    static showErrorModalDialog(error: any, additionalCSSClasses?: string): Promise<({ generateDialog }: {
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): Dialog;
+    }) => Promise<unknown>>;
 }
 //# sourceMappingURL=Errors.d.ts.map

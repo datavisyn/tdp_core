@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { IPanelTabDesc } from './IPanelTabDesc';
 /**
  * Interface for the LineUp panel button

@@ -1,5 +1,3 @@
-/// <reference types="lodash" />
-/// <reference types="cypress" />
 export declare enum EPermission {
     READ = 4,
     WRITE = 2,
@@ -36,10 +34,10 @@ export declare class Permission {
     toString(): string;
     clone(): Permission;
     getPermissions(entity: EEntity): Set<EPermission>;
-    hasPermission(entity: EEntity, permission: EPermission): any;
+    hasPermission(entity: EEntity, permission: EPermission): boolean;
     static toNumber(p: Set<EPermission>): number;
     static toString(p: Set<EPermission>): string;
-    static fromNumber(p: number): any;
+    static fromNumber(p: number): Set<EPermission>;
     static encode(user: Set<EPermission>, group: Set<EPermission>, others: Set<EPermission>, buddies?: Set<EPermission>): number;
     static decode(permission?: number): Permission;
 }

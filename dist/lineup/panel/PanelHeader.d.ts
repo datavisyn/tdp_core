@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { IPanelButton } from './PanelButton';
 export declare enum EPanelHeaderToolbar {
     NAV = 0,

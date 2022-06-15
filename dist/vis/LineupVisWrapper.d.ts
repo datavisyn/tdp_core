@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { LocalDataProvider } from 'lineupjs';
 export declare class LineupVisWrapper {
     protected readonly props: {

@@ -9,7 +9,7 @@ export declare class ProvenanceGraphUtils {
      * returns a compressed version of the paths where just the last selection operation remains
      * @param path
      */
-    static compressGraph(path: ActionNode[]): unknown;
+    static compressGraph(path: ActionNode[]): Promise<ActionNode[]>;
     /**
      * find common element in the list of two elements returning the indices of the first same item
      * @param a

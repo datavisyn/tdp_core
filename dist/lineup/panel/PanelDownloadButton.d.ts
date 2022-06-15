@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { LocalDataProvider } from 'lineupjs';
 import { IPanelButton } from './PanelButton';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';

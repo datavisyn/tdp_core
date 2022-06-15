@@ -55,7 +55,7 @@ export declare class Matomo {
      * Provenance graph extension point
      * @param graph ProvenanceGraph
      */
-    static trackProvenance(graph: ProvenanceGraph): any;
+    static trackProvenance(graph: ProvenanceGraph): Promise<void>;
     private static instance;
     static getInstance(): Matomo;
 }

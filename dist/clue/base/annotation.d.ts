@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import * as d3 from 'd3';
 import { SlideNode, ProvenanceGraph } from '../provenance';
 export declare class Renderer {
@@ -35,7 +34,7 @@ export declare class Renderer {
     private rendererImpl;
     private replaceVariables;
     private destroy;
-    render(state: SlideNode, withTransition?: boolean, waitBetweenTakeDown?: boolean): any;
+    render(state: SlideNode, withTransition?: boolean, waitBetweenTakeDown?: boolean): Promise<any>;
     /**
      * renders anchor hits
      * @param bounds the parent bounds where the anchors are rendered into
@@ -50,10 +49,10 @@ export declare class Renderer {
     private updateAnchor;
     private removeAnchors;
     private renderAnnotationsImpl;
-    renderAnnotations(state: SlideNode): any;
-    hideOld(): any;
-    renderSubtitle(overlay: SlideNode): any;
-    renderText(overlay: SlideNode): any;
+    renderAnnotations(state: SlideNode): Promise<unknown>;
+    hideOld(): Promise<void>;
+    renderSubtitle(overlay: SlideNode): Promise<unknown>;
+    renderText(overlay: SlideNode): Promise<Node>;
     static createAnnotation(main: HTMLElement, graph: ProvenanceGraph): {
         render: any;
     };

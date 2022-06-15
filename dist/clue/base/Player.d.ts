@@ -1,5 +1,3 @@
-/// <reference types="react" />
-/// <reference types="bootstrap" />
 import { ProvenanceGraph, SlideNode } from '../provenance';
 export declare namespace StoryTransition {
     const FACTOR = 1;
@@ -16,7 +14,7 @@ export declare class Player {
     private $play;
     constructor(graph: ProvenanceGraph, controls: Element, options?: any);
     start(): boolean;
-    render(story: SlideNode): any;
+    render(story: SlideNode): Promise<SlideNode>;
     private stopAnim;
     stop(): void;
     pause(): void;
@@ -28,11 +26,11 @@ export declare class Player {
      * jumps to the next slide
      * @returns {any}
      */
-    forward(): any;
+    forward(): Promise<SlideNode>;
     /**
      * jumps to the previous slide
      * @returns {any}
      */
-    backward(): any;
+    backward(): Promise<SlideNode>;
 }
 //# sourceMappingURL=Player.d.ts.map

@@ -14,7 +14,7 @@ export declare class OverviewColumn extends BooleanColumn {
     private overviewSelection;
     private currentOverview;
     constructor(id: string, desc: IBooleanColumnDesc);
-    getValue(row: IDataRow): any;
+    getValue(row: IDataRow): boolean;
     setOverview(rows?: any[], name?: string): void;
     getOverview(): {
         name: string;

@@ -1,5 +1,3 @@
-/// <reference types="react" />
-/// <reference types="bootstrap" />
 import { IVisInstance } from './visInstance';
 import { IVisMetaData } from './IVisMetaData';
 import { EventHandler } from '../../base/event';

@@ -9,7 +9,7 @@ export declare class UniqueIdManager {
      * @param domain
      * @return {number}
      */
-    uniqueId(domain?: string): any;
+    uniqueId(domain?: string): number;
     flagId(domain: string, id: number): number;
     /**
      * returns a string, which is a unique id for the given domain

@@ -1,8 +1,7 @@
 /// <amd-dependency path="font-awesome" />
 /// <amd-dependency path="bootstrap" />
-/// <reference types="react" />
 import * as d3 from 'd3';
-import { IObjectRef } from '../provenance';
+import { IObjectRef, ProvenanceGraph } from '../provenance';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';
 import { AppHeader, IAppHeaderOptions, IHeaderLink } from '../../components';
@@ -55,7 +54,7 @@ export declare class CLUEWrapper extends ACLUEWrapper {
     $mainRef: IObjectRef<d3.Selection<any>>;
     constructor(body: HTMLElement, options?: ICLUEWrapperOptions);
     protected buildImpl(body: HTMLElement): {
-        graph: any;
+        graph: Promise<ProvenanceGraph>;
         manager: CLUEGraphManager;
         storyVis: () => Promise<import("..").VerticalStoryVis>;
         provVis: () => Promise<import("..").LayoutedProvVis>;
@@ -77,7 +76,7 @@ export declare class CLUEWrapper extends ACLUEWrapper {
     static createWrapperFactory(body: HTMLElement, options?: any): {
         on: (...args: any[]) => number;
         $main: d3.Selection<any>;
-        graph: any;
+        graph: Promise<ProvenanceGraph>;
         jumpToStored: () => number;
     };
 }

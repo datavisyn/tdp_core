@@ -1,4 +1,3 @@
-/// <reference types="react" />
 export declare class TooltipUtils {
     private static readonly template;
     private static findTooltip;

@@ -1,4 +1,3 @@
-/// <reference types="react" />
 import { EventHandler } from './event';
 import { AppHeader } from '../components';
 export interface ILoginMenuOptions {

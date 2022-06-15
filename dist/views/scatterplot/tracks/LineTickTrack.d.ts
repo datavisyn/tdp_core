@@ -8,7 +8,6 @@
  * Proprietary and confidential. No warranty.
  *
  ******************************************************** */
-/// <reference types="react" />
 import { ATrack } from './ATrack';
 export interface ILineTickTrack {
     id: string;

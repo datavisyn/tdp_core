@@ -11,7 +11,7 @@ export declare class Session {
      * @param value
      * @returns {any}
      */
-    store(key: string, value: any): any;
+    store(key: string, value: any): string;
     /**
      * Removes the key-value pair from the session
      * @param key

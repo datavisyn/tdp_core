@@ -10,7 +10,7 @@ export declare class Compression {
      * @param toKey Unique key to check the consecutive duplicates
      * @returns A copy of the path which can be mutated in the number of items
      */
-    static lastOnly(path: ActionNode[], functionId: string, toKey: (action: ActionNode) => string): any;
+    static lastOnly(path: ActionNode[], functionId: string, toKey: (action: ActionNode) => string): ActionNode[];
     /**
      * Remove consecutive items from a path array.
      * The removal is only applied on nodes with the given function id
@@ -21,7 +21,7 @@ export declare class Compression {
      * @param toKey Unique key to check the consecutive duplicates
      * @returns A copy of the path which can be mutated in the number of items
      */
-    static lastConsecutive(path: ActionNode[], functionId: string, toKey: (action: ActionNode) => string): any;
+    static lastConsecutive(path: ActionNode[], functionId: string, toKey: (action: ActionNode) => string): ActionNode[];
     static createRemove(path: ActionNode[], createFunctionId: string, removeFunctionId: string): ActionNode[];
 }
 //# sourceMappingURL=Compression.d.ts.map

@@ -1,4 +1,3 @@
-/// <reference types="react" />
 export declare type IDragEffect = 'none' | 'copy' | 'copyLink' | 'copyMove' | 'link' | 'linkMove' | 'move' | 'all';
 export interface IDragStartResult {
     effectAllowed: IDragEffect;
@@ -19,19 +18,19 @@ export declare class DnDUtils {
      * @param typesToCheck
      * @returns {any}
      */
-    hasDnDType(e: DragEvent, ...typesToCheck: string[]): any;
+    hasDnDType(e: DragEvent, ...typesToCheck: string[]): boolean;
     /**
      * helper storage for dnd in edge since edge doesn't support custom mime-types
      * @type {Map<number, {[p: string]: string}>}
      */
     private dndTransferStorage;
-    isEdgeDnD(e: DragEvent): any;
+    isEdgeDnD(e: DragEvent): boolean;
     /**
      * checks whether it is a copy operation
      * @param e
      * @returns {boolean|RegExpMatchArray}
      */
-    copyDnD(e: DragEvent): any;
+    copyDnD(e: DragEvent): boolean;
     /**
      * updates the drop effect accoriding to the current copyDnD state
      * @param e

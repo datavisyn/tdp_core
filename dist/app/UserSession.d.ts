@@ -53,7 +53,7 @@ export declare class UserSession extends Session {
      * @returns {boolean}
      */
     canExecute(item: ISecureItem, user?: IUser): boolean;
-    hasPermission(item: ISecureItem, entity?: EEntity, permission?: EPermission): any;
+    hasPermission(item: ISecureItem, entity?: EEntity, permission?: EPermission): boolean;
     private isEqual;
     private includes;
     private static instance;
