@@ -18,7 +18,7 @@ export function AggregateTypeSelect({ aggregateTypeSelectCallback, aggregateColu
     }, [hasNumCols]);
     return (React.createElement(React.Fragment, null,
         React.createElement("label", { className: "pt-2 pb-1" }, "Aggregate Type"),
-        React.createElement(Select, { closeMenuOnSelect: true, getOptionLabel: (option) => option.label, getOptionValue: (option) => option.value, onChange: (e) => aggregateTypeSelectCallback(e.value), name: "numColumns", options: selectOptions || [], isOptionDisabled: (option) => (option.value === EAggregateTypes.COUNT ? false : !hasNumCols), value: { label: currentSelected || '', value: currentSelected || '', disabled: false } }),
+        React.createElement(Select, { closeMenuOnSelect: true, getOptionLabel: (option) => option.label, getOptionValue: (option) => option.value, onChange: (option) => aggregateTypeSelectCallback(option.value), name: "numColumns", options: selectOptions || [], isOptionDisabled: (option) => (option.value === EAggregateTypes.COUNT ? false : !hasNumCols), value: { label: currentSelected || '', value: currentSelected || '', disabled: false } }),
         currentSelected !== EAggregateTypes.COUNT ? (React.createElement(SingleColumnSelect, { type: [EColumnTypes.NUMERICAL], label: "Aggregate Column", callback: (c) => aggregateColumnSelectCallback(c), columns: columns, currentSelected: aggregateColumn })) : null));
 }
 //# sourceMappingURL=AggregateTypeSelect.js.map
