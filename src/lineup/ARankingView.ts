@@ -614,7 +614,7 @@ export abstract class ARankingView extends AView {
   }
 
   protected async withoutTracking<T>(f: () => T): Promise<T> {
-    return this.built.then(() => LineupTrackingManager.getInstance().withoutTracking(this.context.ref, f));
+    return LineupTrackingManager.getInstance().withoutTracking(this.context.ref, f);
   }
 
   /**

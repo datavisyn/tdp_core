@@ -510,7 +510,7 @@ export class ARankingView extends AView {
         return Promise.all(scores.map((d) => d._score()));
     }
     async withoutTracking(f) {
-        return this.built.then(() => LineupTrackingManager.getInstance().withoutTracking(this.context.ref, f));
+        return LineupTrackingManager.getInstance().withoutTracking(this.context.ref, f);
     }
     /**
      * used by commands to trigger adding a tracked score
