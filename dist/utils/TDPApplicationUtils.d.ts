@@ -41,10 +41,8 @@ export declare class TDPApplicationUtils {
         inverse: import("../clue/provenance").IAction;
     };
     static initSession(map: object): import("../clue/provenance").IAction;
-    static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): Promise<{
-        inverse: import("../clue/provenance").IAction;
-    }>;
-    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): import("../clue/provenance").IAction;
+    static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): any;
+    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): any;
     static compressSetParameter(path: ActionNode[]): ActionNode[];
     /**
      * @deprecated
