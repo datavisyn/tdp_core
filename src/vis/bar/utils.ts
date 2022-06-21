@@ -26,6 +26,7 @@ export function isBar(s: IVisConfig): s is IBarConfig {
   return s.type === ESupportedPlotlyVis.BAR;
 }
 
+const UNSELECTED_OPACITY = '0.2';
 const defaultConfig: IBarConfig = {
   type: ESupportedPlotlyVis.BAR,
   numColumnsSelected: [],
@@ -172,11 +173,21 @@ async function setPlotsWithGroupsAndMultiples(
 
       const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
+      let valIdArr: string[][] = uniqueColVals.map((val) => []);
+
+      catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val as string)].push(row.id));
+
+      // stores the actual points of each bar/section of bar in the custom data.
+      valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val) && allMultiplesObjsIds.has(val)));
+
       plots.push({
         data: {
           x: vertFlag ? uniqueColVals : aggregateVals,
           y: !vertFlag ? uniqueColVals : aggregateVals,
           text: uniqueColVals,
+          ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueMultiples}, ${uniqueGroup}`),
+          customdata: valIdArr,
+
           textposition: 'none',
           hoverinfo: vertFlag ? 'y+text' : 'x+text',
           orientation: vertFlag ? 'v' : 'h',
@@ -187,6 +198,17 @@ async function setPlotsWithGroupsAndMultiples(
           name: uniqueGroup,
           marker: {
             color: scales.color(uniqueGroup),
+          },
+          // @ts-ignore
+          selected: {
+            marker: {
+              opacity: '1',
+            },
+          },
+          unselected: {
+            marker: {
+              opacity: UNSELECTED_OPACITY,
+            },
           },
         },
         xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
@@ -247,11 +269,21 @@ async function setPlotsWithGroups(
 
     const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
+    let valIdArr: string[][] = uniqueColVals.map((val) => []);
+
+    catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val as string)].push(row.id));
+
+    // stores the actual points of each bar/section of bar in the custom data.
+    valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val)));
+
     plots.push({
       data: {
         x: vertFlag ? uniqueColVals : finalAggregateValues,
         y: !vertFlag ? uniqueColVals : finalAggregateValues,
         text: uniqueColVals,
+        ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueVal}`),
+        customdata: valIdArr,
+
         textposition: 'none',
         hoverinfo: vertFlag ? 'y+text' : 'x+text',
         orientation: vertFlag ? 'v' : 'h',
@@ -262,6 +294,17 @@ async function setPlotsWithGroups(
         name: uniqueVal,
         marker: {
           color: scales.color(uniqueVal),
+        },
+        // @ts-ignore
+        selected: {
+          marker: {
+            opacity: '1',
+          },
+        },
+        unselected: {
+          marker: {
+            opacity: UNSELECTED_OPACITY,
+          },
         },
       },
       xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
@@ -308,12 +351,21 @@ async function setPlotsWithMultiples(
       .flat();
     const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
+    let valIdArr: string[][] = uniqueColVals.map((val) => []);
+
+    catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val as string)].push(row.id));
+
+    // stores the actual points of each bar/section of bar in the custom data.
+    valIdArr = valIdArr.map((arr) => arr.filter((val) => allMultiplesObjsIds.has(val)));
+
     plots.push({
       data: {
         x: vertFlag ? uniqueColVals : finalAggregateValues,
         y: !vertFlag ? uniqueColVals : finalAggregateValues,
+        ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueVal}`),
         text: uniqueColVals,
         textposition: 'none',
+        customdata: valIdArr,
         hoverinfo: vertFlag ? 'y+text' : 'x+text',
         orientation: vertFlag ? 'v' : 'h',
         xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
@@ -321,6 +373,17 @@ async function setPlotsWithMultiples(
         showlegend: false,
         type: 'bar',
         name: uniqueVal,
+        // @ts-ignore
+        selected: {
+          marker: {
+            opacity: '1',
+          },
+        },
+        unselected: {
+          marker: {
+            opacity: UNSELECTED_OPACITY,
+          },
+        },
       },
       xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
       yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
@@ -358,20 +421,38 @@ async function setPlotsBasic(
   ) as any[];
 
   const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))];
+
+  // stores the actual points of each bar/section of bar in the custom data.
+  const valIdArr: string[][] = valArr.map((val) => []);
+
+  catColValues.resolvedValues.forEach((row) => valIdArr[valArr.indexOf(row.val as string)].push(row.id));
+
   const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
   plots.push({
     data: {
+      type: 'bar',
       x: vertFlag ? valArr : aggValues,
       y: !vertFlag ? valArr : aggValues,
       text: valArr,
       textposition: 'none',
       hoverinfo: vertFlag ? 'y+text' : 'x+text',
       ids: valArr,
+      // @ts-ignore
+      selected: {
+        marker: {
+          opacity: '1',
+        },
+      },
+      unselected: {
+        marker: {
+          opacity: UNSELECTED_OPACITY,
+        },
+      },
+      customdata: valIdArr,
       orientation: vertFlag ? 'v' : 'h',
       xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
       yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-      type: 'bar',
       name: catColValues.info.name,
       showlegend: false,
     },
