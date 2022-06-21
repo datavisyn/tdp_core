@@ -172,7 +172,7 @@ export function Ranking({
 
   // Stores the ranking data when collapsing columns when mode changes
   const dump = React.useRef<Set<string>>(null);
-  const colorsRef = useSyncedRef(new LineUpColors());
+  const colorsRef = React.useRef(new LineUpColors());
   const providerRef = React.useRef<LocalDataProvider>(null);
   const taggleRef = React.useRef<EngineRenderer | TaggleRenderer>(null);
   const selectionHelperRef = React.useRef<LineUpSelectionHelper>(null);

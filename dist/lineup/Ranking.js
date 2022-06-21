@@ -13,7 +13,6 @@ import { EViewMode } from '../base/interfaces';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils } from '../base/BaseUtils';
 import { IDTypeManager } from '../idtype/IDTypeManager';
-import { useSyncedRef } from '../hooks/useSyncedRef';
 import { AView } from '../views/AView';
 import { InvalidTokenError, TDPTokenManager } from '../auth/TokenManager';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
@@ -101,7 +100,7 @@ onAddScoreColumn, }) {
     const lineupContainerRef = React.useRef(null);
     // Stores the ranking data when collapsing columns when mode changes
     const dump = React.useRef(null);
-    const colorsRef = useSyncedRef(new LineUpColors());
+    const colorsRef = React.useRef(new LineUpColors());
     const providerRef = React.useRef(null);
     const taggleRef = React.useRef(null);
     const selectionHelperRef = React.useRef(null);
