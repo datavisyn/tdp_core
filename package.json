@@ -39,6 +39,8 @@
     "copy-assets": "if [ -d src/assets ]; then cp -rv src/assets/. dist/assets/; fi && if [ -d src/template ]; then shx --verbose cp -R src/template/. dist/template/; fi",
     "copy-styles": "if [ -d src/scss ]; then shx --verbose cp -R src/scss/. dist/scss/; fi",
     "copy": "npm run copy-assets && npm run copy-styles",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
     "delete-dependencies": "rimraf node_modules",
     "dist": "mkdir lib && cd dist && tar cvzf ../lib/tdp_core.tar.gz *",
     "docs": "typedoc --options typedoc.json src/**.ts",
