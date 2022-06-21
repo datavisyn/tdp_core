@@ -1,6 +1,7 @@
 import http
 import logging
 import time
+import traceback
 
 import werkzeug
 from flask import Flask, jsonify
@@ -34,11 +35,7 @@ def init_legacy_app(app: Flask):
         _log.exception("An error occurred in Flask")
         # Extract status information if a Flask#HTTPException is given, otherwise return 500 with exception information
         status_code = e.code if isinstance(e, werkzeug.exceptions.HTTPException) else 500
-        detail = (
-            e.description
-            if isinstance(e, werkzeug.exceptions.HTTPException)
-            else (str(e) if manager.settings.is_development_mode else None)
-        )
+        detail = detail_from_exception(e)
         # Exact same response as the one from FastAPI#HTTPException.
         return jsonify({"detail": detail or http.HTTPStatus(status_code).phrase}), status_code
 
@@ -64,3 +61,17 @@ def load_after_server_started_hooks():
         hook()
 
     _log.info("Elapsed time for server startup hooks: %d seconds", time.time() - start)
+
+
+def detail_from_exception(e: Exception) -> str:
+    """Returns the full stacktrace in development mode and just the error message in production mode."""
+    # Always return full stacktrace in development mode
+    if manager.settings.is_development_mode:
+        return "THIS STACKTRACE IS SHOWN IN DEVELOPMENT MODE ONLY. IN PRODUCTION, ONLY THE SPECIFIC ERROR MESSAGE IS SHOWN!" + "".join(
+            traceback.format_exception(None, e, e.__traceback__)
+        )
+    # Exception specific returns
+    if isinstance(e, werkzeug.exceptions.HTTPException):
+        return e.description
+    # Fallback to the string representation of the exception
+    return str(e)
