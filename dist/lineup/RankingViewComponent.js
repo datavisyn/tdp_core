@@ -1,5 +1,6 @@
-/* eslint-disable import/no-cycle */
 import React, { useCallback, useMemo, useState } from 'react';
+import { isEqual } from 'lodash';
+// eslint-disable-next-line import/no-cycle
 import { Ranking } from './Ranking';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
 import { TDPTokenManager, TokenManager } from '../auth/TokenManager';
@@ -7,21 +8,6 @@ import { I18nextManager } from '../i18n/I18nextManager';
 import { AView } from '../views/AView';
 import { useAsync } from '../hooks/useAsync';
 import { ViewUtils } from '../views/ViewUtils';
-function isSameParameters(current, inputSelection) {
-    if (!current || !inputSelection || current.length !== inputSelection.length) {
-        return false;
-    }
-    for (let i = 0; i < current.length; ++i) {
-        const a = current[i];
-        const b = inputSelection[i];
-        for (const key in Object.keys(a)) {
-            if (a[key] !== b[key]) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
 export function RankingViewComponent({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = null, selectionAdapter = null, options = {}, authorization = null, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, onUpdateEntryPoint, 
 /**
  * Maybe refactor this when using the native lineup implementation of scores
@@ -109,7 +95,7 @@ onAddScoreColumn, }) {
      * onParametersChanged
      */
     React.useEffect(() => {
-        if (isSameParameters(parameters, prevParameters)) {
+        if (isEqual(parameters, prevParameters)) {
             return;
         }
         if (status === 'success') {

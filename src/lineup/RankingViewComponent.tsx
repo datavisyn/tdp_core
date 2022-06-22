@@ -1,7 +1,8 @@
-/* eslint-disable import/no-cycle */
 import React, { useCallback, useMemo, useState } from 'react';
-import { param } from 'jquery';
-import { Ranking, IRankingProps } from './Ranking';
+import { isEqual } from 'lodash';
+import type { IRankingProps } from './Ranking';
+// eslint-disable-next-line import/no-cycle
+import { Ranking } from './Ranking';
 import { ISelection } from '../base/interfaces';
 import { IContext, ISelectionAdapter } from './selection/ISelectionAdapter';
 import { ERenderAuthorizationStatus, IAuthorizationConfiguration } from '../auth/interfaces';
@@ -11,23 +12,6 @@ import { AView } from '../views/AView';
 import { useAsync } from '../hooks/useAsync';
 import { ViewUtils } from '../views/ViewUtils';
 
-function isSameParameters(current: any[], inputSelection: any[]) {
-  if (!current || !inputSelection || current.length !== inputSelection.length) {
-    return false;
-  }
-
-  for (let i = 0; i < current.length; ++i) {
-    const a = current[i];
-    const b = inputSelection[i];
-
-    for (const key in Object.keys(a)) {
-      if (a[key] !== b[key]) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
 /**
  *
  */
@@ -159,7 +143,7 @@ export function RankingViewComponent({
    * onParametersChanged
    */
   React.useEffect(() => {
-    if (isSameParameters(parameters, prevParameters)) {
+    if (isEqual(parameters, prevParameters)) {
       return;
     }
 

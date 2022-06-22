@@ -1,4 +1,4 @@
-import { IRankingProps } from './Ranking';
+import type { IRankingProps } from './Ranking';
 import { ISelection } from '../base/interfaces';
 import { ISelectionAdapter } from './selection/ISelectionAdapter';
 import { IAuthorizationConfiguration } from '../auth/interfaces';
