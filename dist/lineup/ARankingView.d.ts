@@ -81,16 +81,36 @@ export declare abstract class ARankingView extends AView {
     /**
      * custom initialization function at the build will be called
      */
-    protected initImpl(): Promise<void>;
+    protected initImpl(): Promise<any>;
     /**
      * return the idType of the shown items in LineUp
      * @returns {IDType}
      */
     get itemIDType(): import("../idtype").IDType;
-    protected parameterChanged(name: string): PromiseLike<any> | void;
-    protected itemSelectionChanged(): PromiseLike<any> | void;
-    protected selectionChanged(): PromiseLike<any> | void;
-    private createContext;
+    /**
+     * The parameter of this (ranking) view has changed and this ranking needs to adapt to the change.
+     * For example, depending on the set `selectionAdapter` additional dynamic columns can be added or
+     * removed for the paramter.
+     * @param name Name of the changed parameter
+     * @returns A promise to wait for until the ranking has been updated by the selection adapter.
+     */
+    protected parameterChanged(name: string): Promise<void>;
+    /**
+     * Selection of the current LineUp ranking has changed
+     */
+    protected itemSelectionChanged(): void;
+    /**
+     * Incoming selection from another view has changed and this ranking needs to adapt to the change.
+     * For example, depending on the set `selectionAdapter` additional dynamic columns can be added or
+     * removed for the incoming selected items.
+     * @returns A promise to wait for until the ranking has been updated by the selection adapter.
+     */
+    protected selectionChanged(): Promise<void>;
+    /**
+     * Creates a selection adapter context
+     * @returns selection adapter context
+     */
+    private createSelectionAdapterContext;
     /**
      * Expand/collapse certain columns on mode change.
      * Expand = focus view
