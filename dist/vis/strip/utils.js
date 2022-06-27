@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
 import { I18nextManager } from '../../i18n';
 import { EColumnTypes, ESupportedPlotlyVis, } from '../interfaces';
-import { resolveColumnValues } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveColumnValues } from '../general/layoutUtils';
 import { DEFAULT_COLOR, SELECT_COLOR } from '../general/constants';
 export function isStrip(s) {
     return s.type === ESupportedPlotlyVis.STRIP;
@@ -78,8 +78,8 @@ export async function createStripTraces(columns, config, selected, scales) {
                         color: 'rgba(255, 255, 255, 0)',
                     },
                 },
-                xLabel: numCurr.info.name,
-                yLabel: numCurr.info.name,
+                xLabel: columnNameWithDescription(numCurr.info),
+                yLabel: columnNameWithDescription(numCurr.info),
             });
             plotCounter += 1;
         }
@@ -134,8 +134,8 @@ export async function createStripTraces(columns, config, selected, scales) {
                         },
                     ],
                 },
-                xLabel: catCurr.info.name,
-                yLabel: numCurr.info.name,
+                xLabel: columnNameWithDescription(catCurr.info),
+                yLabel: columnNameWithDescription(numCurr.info),
             });
             plotCounter += 1;
         }
