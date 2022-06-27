@@ -32,8 +32,7 @@
     "node": ">= 12.13"
   },
   "scripts": {
-    "build-storybook": "build-storybook",
-    "build": "npm run clean && npm run compile && npm run build-storybook",
+    "build": "npm run clean && npm run compile && npm run storybook:build",
     "clean": "rimraf build dist lib",
     "compile:watch": "visyn_scripts compile --watch",
     "compile": "visyn_scripts compile",
@@ -54,6 +53,7 @@
     "release:minor": "npm version minor && npm publish && git push --follow-tags",
     "release:patch": "npm version patch && npm publish && git push --follow-tags",
     "storybook": "start-storybook -p 6006",
+    "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
     "test:watch": "visyn_scripts test --watch",
     "test": "visyn_scripts test"
   },
