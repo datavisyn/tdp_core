@@ -19,7 +19,7 @@ import {
   VisNumericalColumn,
   VisNumericalValue,
 } from '../interfaces';
-import { resolveSingleColumn, truncateText } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveSingleColumn, truncateText } from '../general/layoutUtils';
 import { getCol } from '../sidebar';
 
 export function isBar(s: IVisConfig): s is IBarConfig {
@@ -60,7 +60,7 @@ export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig):
 }
 
 function createAxisLabel(aggregateType: EAggregateTypes, aggregateColumn: VisColumn) {
-  return aggregateType === EAggregateTypes.COUNT ? aggregateType : `${aggregateType} of ${aggregateColumn.info.name}`;
+  return aggregateType === EAggregateTypes.COUNT ? aggregateType : `${aggregateType} of ${columnNameWithDescription(aggregateColumn.info)}`;
 }
 
 /**
@@ -211,8 +211,8 @@ async function setPlotsWithGroupsAndMultiples(
             },
           },
         },
-        xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
-        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
+        xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : columnNameWithDescription(catColValues.info),
         xTicks: vertFlag ? uniqueColVals : null,
         xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
         yTicks: !vertFlag ? uniqueColVals : null,
@@ -307,8 +307,8 @@ async function setPlotsWithGroups(
           },
         },
       },
-      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
-      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
+      xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : columnNameWithDescription(catColValues.info),
       xTicks: vertFlag ? uniqueColVals : null,
       xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
@@ -385,8 +385,8 @@ async function setPlotsWithMultiples(
           },
         },
       },
-      xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
-      yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
+      xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : plotAggregateAxisName,
+      yLabel: vertFlag ? plotAggregateAxisName : columnNameWithDescription(catColValues.info),
       xTicks: vertFlag ? uniqueColVals : null,
       xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
@@ -453,11 +453,11 @@ async function setPlotsBasic(
       orientation: vertFlag ? 'v' : 'h',
       xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
       yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-      name: catColValues.info.name,
+      name: columnNameWithDescription(catColValues.info),
       showlegend: false,
     },
-    xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
-    yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
+    xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : plotAggregateAxisName,
+    yLabel: vertFlag ? plotAggregateAxisName : columnNameWithDescription(catColValues.info),
     xTicks: vertFlag ? valArr : null,
     xTickLabels: vertFlag ? valArr.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
     yTicks: !vertFlag ? valArr : null,

@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import { EColumnTypes, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
-import { resolveColumnValues } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveColumnValues } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
 export function isViolin(s) {
     return s.type === ESupportedPlotlyVis.VIOLIN;
@@ -56,13 +56,13 @@ export async function createViolinTraces(columns, config, scales) {
                     meanline: {
                         visible: true,
                     },
-                    name: `${numCurr.info.name}`,
+                    name: `${columnNameWithDescription(numCurr.info)}`,
                     hoverinfo: 'y',
                     scalemode: 'width',
                     showlegend: false,
                 },
-                xLabel: numCurr.info.name,
-                yLabel: numCurr.info.name,
+                xLabel: columnNameWithDescription(numCurr.info),
+                yLabel: columnNameWithDescription(numCurr.info),
             });
             plotCounter += 1;
         }
@@ -82,7 +82,7 @@ export async function createViolinTraces(columns, config, scales) {
                     meanline: {
                         visible: true,
                     },
-                    name: `${catCurr.info.name} + ${numCurr.info.name}`,
+                    name: `${columnNameWithDescription(catCurr.info)} + ${columnNameWithDescription(numCurr.info)}`,
                     scalemode: 'width',
                     pointpos: 0,
                     jitter: 0.3,
@@ -101,8 +101,8 @@ export async function createViolinTraces(columns, config, scales) {
                         },
                     ],
                 },
-                xLabel: catCurr.info.name,
-                yLabel: numCurr.info.name,
+                xLabel: columnNameWithDescription(catCurr.info),
+                yLabel: columnNameWithDescription(numCurr.info),
             });
             plotCounter += 1;
         }
