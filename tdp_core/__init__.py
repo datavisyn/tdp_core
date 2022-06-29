@@ -1,3 +1,5 @@
+from importlib.util import find_spec
+
 from .plugin.model import AVisynPlugin, RegHelper
 
 
@@ -16,6 +18,11 @@ class VisynPlugin(AVisynPlugin):
             "tdp_core.id_mapping.idtype_api",
             {"namespace": "/api/idtype", "factory": "create_idtype"},
         )
+        if find_spec("rdkit") is not None:
+            registry.append_router("rdkit-image",
+                                   "tdp_core.mol_img.img_api",
+                                   {"namespace": "/api/image", "factory": "create_api"})
+
         registry.append("json-encoder", "numpy", "tdp_core.encoder.json_encoder")
         registry.append("json-encoder", "set-encoder", "tdp_core.encoder.set_encoder", {})
 

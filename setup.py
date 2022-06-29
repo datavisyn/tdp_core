@@ -51,6 +51,7 @@ setup(
     install_requires=requirements("requirements.txt"),
     extras_require={
         "develop": requirements("requirements_dev.txt"),
+        "rdkit": ["rdkit-pypi"]
     },
     # Include all files from the MANIFEST.in file.
     include_package_data=True,
