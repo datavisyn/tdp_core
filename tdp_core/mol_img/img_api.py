@@ -1,6 +1,6 @@
 from typing import List, Optional, Set
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter
 
 from .models import SmilesMolecule, SmilesSmartsMolecule, SubstructuresResponse, SvgResponse
 from .util.draw import draw, draw_similarity
@@ -10,7 +10,9 @@ app = APIRouter()
 
 
 @app.get("/{structure}", response_class=SvgResponse)
-def draw_smiles(structure: SmilesMolecule, substructure: Optional[SmilesMolecule] = None, align: Optional[SmilesMolecule] = None):
+def draw_smiles(
+    structure: SmilesMolecule, substructure: Optional[SmilesMolecule] = None, align: Optional[SmilesMolecule] = None
+):  # noqa: E1127
     return draw(structure.mol, aligned(structure.mol, align and align.mol) or substructure and substructure.mol)
 
 

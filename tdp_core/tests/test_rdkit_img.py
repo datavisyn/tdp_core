@@ -38,12 +38,12 @@ def test_valid(client, mol, expected):
 
 
 def test_align(client):
-    res = client.get(f"/api/image/C?align=C")
+    res = client.get("/api/image/C?align=C")
     hash_compare(res.content, "6d435ada2a36f00980347aef78f309de71544180a293f5970d7e257dd88f9270")
 
 
 def test_substructure(client):
-    res = client.get(f"/api/image/C?substructure=C")
+    res = client.get("/api/image/C?substructure=C")
     hash_compare(res.content, "7b22e41b1fdf3385454b6ae2655e13e49436ce9812e7392bbc389f4f149b055c")
 
 
@@ -65,7 +65,7 @@ def test_similarity(client, mol, ref, expected):
 
 
 def test_maximum_common_substructure(client):
-    res = client.post(f"/api/image/mcs", json=["C#CCP", "C=CCO"])
+    res = client.post("/api/image/mcs", json=["C#CCP", "C=CCO"])
     assert res.status_code == 200
     hash_compare(res.content, "97d425b6bbe74b15f2b72e2fde973b0780f301281b1a7b2ee154bb0f3dd86c20")
 
