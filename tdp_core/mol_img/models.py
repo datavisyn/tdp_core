@@ -1,12 +1,13 @@
-from typing import Optional, Dict
+from typing import Dict, Optional
 
 from pydantic import BaseModel
-from rdkit.Chem import Mol, MolFromSmiles, MolFromSmarts
+from rdkit.Chem import Mol, MolFromSmarts, MolFromSmiles
 from starlette.responses import Response
 
 
 class SmilesMolecule(str):
-    """ We can't directly extend mol, as this would break swagger """
+    """We can't directly extend mol, as this would break swagger"""
+
     parsers = [MolFromSmiles]
     _mol: Mol
 
@@ -19,7 +20,7 @@ class SmilesMolecule(str):
         yield cls.validate
 
     @classmethod
-    def validate(cls, value: Optional[str]) -> 'SmilesMolecule':
+    def validate(cls, value: Optional[str]) -> "SmilesMolecule":
         for parser in cls.parsers:
             mol = parser(value)
             if mol:
@@ -31,7 +32,8 @@ class SmilesMolecule(str):
 
 
 class SmilesSmartsMolecule(SmilesMolecule):
-    """ Try parings smiles first, then smarts """
+    """Try parings smiles first, then smarts"""
+
     parsers = [MolFromSmiles, MolFromSmarts]
 
 
