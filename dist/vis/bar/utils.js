@@ -2,7 +2,7 @@ import { merge, sum, mean, min, max } from 'lodash';
 import { median } from 'd3';
 import { I18nextManager } from '../../i18n';
 import { EColumnTypes, ESupportedPlotlyVis, EBarGroupingType, EBarDisplayType, EBarDirection, EAggregateTypes, } from '../interfaces';
-import { resolveSingleColumn, truncateText } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveSingleColumn, truncateText } from '../general/layoutUtils';
 import { getCol } from '../sidebar';
 export function isBar(s) {
     return s.type === ESupportedPlotlyVis.BAR;
@@ -34,7 +34,7 @@ export function barMergeDefaultConfig(columns, config) {
     return merged;
 }
 function createAxisLabel(aggregateType, aggregateColumn) {
-    return aggregateType === EAggregateTypes.COUNT ? aggregateType : `${aggregateType} of ${aggregateColumn.info.name}`;
+    return aggregateType === EAggregateTypes.COUNT ? aggregateType : `${aggregateType} of ${columnNameWithDescription(aggregateColumn.info)}`;
 }
 /**
  * This function finds the faceted values of a given categorical column based on an aggregation type.
@@ -134,8 +134,8 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, ag
                         },
                     },
                 },
-                xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
-                yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
+                xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+                yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : columnNameWithDescription(catColValues.info),
                 xTicks: vertFlag ? uniqueColVals : null,
                 xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
                 yTicks: !vertFlag ? uniqueColVals : null,
@@ -201,8 +201,8 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggregateColum
                     },
                 },
             },
-            xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
-            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
+            xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+            yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : columnNameWithDescription(catColValues.info),
             xTicks: vertFlag ? uniqueColVals : null,
             xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
             yTicks: !vertFlag ? uniqueColVals : null,
@@ -260,8 +260,8 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateCo
                     },
                 },
             },
-            xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
-            yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
+            xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : plotAggregateAxisName,
+            yLabel: vertFlag ? plotAggregateAxisName : columnNameWithDescription(catColValues.info),
             xTicks: vertFlag ? uniqueColVals : null,
             xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
             yTicks: !vertFlag ? uniqueColVals : null,
@@ -306,11 +306,11 @@ async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, co
             orientation: vertFlag ? 'v' : 'h',
             xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
             yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-            name: catColValues.info.name,
+            name: columnNameWithDescription(catColValues.info),
             showlegend: false,
         },
-        xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
-        yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
+        xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : plotAggregateAxisName,
+        yLabel: vertFlag ? plotAggregateAxisName : columnNameWithDescription(catColValues.info),
         xTicks: vertFlag ? valArr : null,
         xTickLabels: vertFlag ? valArr.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
         yTicks: !vertFlag ? valArr : null,

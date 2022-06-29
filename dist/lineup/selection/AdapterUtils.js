@@ -1,29 +1,26 @@
 import { SingleSelectionAdapter } from './internal/SingleSelectionAdapter';
 import { MultiSelectionAdapter } from './internal/MultiSelectionAdapter';
-import { ReprovisynMultiSelectionAdapter } from './internal/ReprovisynMultiSelectionAdapter';
 export class AdapterUtils {
     /**
-     * create a single selection adapter, i.e. that one selected item results in one additional column in LineUp
-     * @param {ISingleSelectionAdapter} adapter for loading and creating of those columns
-     * @returns {ISelectionAdapter}
+     * Create a single selection adapter, i.e. that one selected item results in one additional column in LineUp
+     * @param adapter Adapter for loading and creating of those columns
+     * @returns Returns the selection adapter
      */
     static single(adapter) {
         return new SingleSelectionAdapter(adapter);
     }
     /**
-     * create a multi selection adapter, i.e that one selected item results in N additional columsn in LineUp
-     * @param {IMultiSelectionAdapter} adapter adapter for loading and creating of those columns
-     * @returns {ISelectionAdapter}
+     * Create a multi selection adapter, i.e that one selected item results in N additional columms in LineUp
+     * The generic `T` is typing the _selected subtypes_ which is by default a list of strings.
+     * @param adapter Adapter adapter for loading and creating of those columns
+     * @returns Returns the selection adapter
      */
     static multi(adapter) {
         return new MultiSelectionAdapter(adapter);
     }
-    static reprovisynMulti(adapter) {
-        return new ReprovisynMultiSelectionAdapter(adapter);
-    }
     /**
-     * no columns for selected items
-     * @returns {ISelectionAdapter}
+     * No columns for selected items
+     * @returns Returns a no-op selection adapter
      */
     static none() {
         return {
