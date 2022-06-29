@@ -56,8 +56,8 @@
     "test:watch": "jest --watch",
     "test": "test ! $(find tests -name \"*.ts\") || jest -w=1",
     "make": "make --",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
+    "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
