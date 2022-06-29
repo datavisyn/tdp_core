@@ -3,6 +3,8 @@ from urllib.parse import quote
 
 import pytest
 
+pytest.importorskip("rdkit")
+
 mol_expected = {
     "C": "6d435ada2a36f00980347aef78f309de71544180a293f5970d7e257dd88f9270",
     "O": "0db87f49c83caba8c7f7ca36f3128f929590537d92678ced396afb4c6201ba2d",
