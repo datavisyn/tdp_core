@@ -23,6 +23,7 @@ class ALBSecurityStore(BaseStore):
                 encoded = req.headers["X-Amzn-Oidc-Data"]
                 # Try to decode the oidc data jwt
                 user = jwt.decode(encoded, options={"verify_signature": False})
+                _log.debug(f"user: {user}")
                 # Create new user from given attributes
                 email = user["email"]
                 if "roles" in user:
