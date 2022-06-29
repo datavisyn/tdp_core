@@ -32,7 +32,7 @@
     "node": ">= 12.13"
   },
   "scripts": {
-    "build": "npm run clean && npm run compile && npm run build-storybook",
+    "build": "npm run clean && npm run compile && npm run storybook:build",
     "clean": "rimraf build dist lib",
     "compile:watch": "tsc -w",
     "compile": "tsc",
