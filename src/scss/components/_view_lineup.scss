@@ -317,10 +317,6 @@ $lu_assets: "~lineupjs/src/assets";
             display: flex;
             align-items: center;
             text-align-last: auto;
-
-            & > i {
-              align-self: flex-start;
-            }
           }
         }
       }
