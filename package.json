@@ -32,7 +32,7 @@
     "node": ">= 12.13"
   },
   "scripts": {
-    "build": "npm run clean && npm run compile && npm run storybook:build",
+    "build": "npm run clean && npm run compile",
     "clean": "rimraf build dist lib",
     "compile:watch": "tsc -w",
     "compile": "tsc",
@@ -101,7 +101,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.17.7",
-    "@babel/plugin-transform-typescript": "7.17.12",
     "@storybook/addon-actions": "^6.5.9",
     "@storybook/addon-essentials": "^6.5.9",
     "@storybook/addon-interactions": "^6.5.9",
