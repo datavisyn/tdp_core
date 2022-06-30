@@ -12,7 +12,7 @@ import {
   VisColumn,
   IStripConfig,
 } from '../interfaces';
-import { resolveColumnValues } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveColumnValues } from '../general/layoutUtils';
 import { DEFAULT_COLOR, SELECT_COLOR } from '../general/constants';
 
 export function isStrip(s: IVisConfig): s is IStripConfig {
@@ -100,8 +100,8 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
             color: 'rgba(255, 255, 255, 0)',
           },
         },
-        xLabel: numCurr.info.name,
-        yLabel: numCurr.info.name,
+        xLabel: columnNameWithDescription(numCurr.info),
+        yLabel: columnNameWithDescription(numCurr.info),
       });
       plotCounter += 1;
     }
@@ -157,8 +157,8 @@ export async function createStripTraces(columns: VisColumn[], config: IStripConf
             },
           ],
         },
-        xLabel: catCurr.info.name,
-        yLabel: numCurr.info.name,
+        xLabel: columnNameWithDescription(catCurr.info),
+        yLabel: columnNameWithDescription(numCurr.info),
       });
       plotCounter += 1;
     }

@@ -133,7 +133,7 @@ export class LoginMenu extends EventHandler {
       'beforeend',
       `
       <!--login dialog-->
-      <div class="modal fade" id="loginDialog" tabindex="-1" role="dialog" aria-labelledby="loginDialog" data-keyboard="false" data-bs-backdrop="static">
+      <div class="modal fade" id="loginDialog" tabindex="-1" role="dialog" aria-labelledby="loginDialog" data-bs-keyboard="false" data-bs-backdrop="static">
         <div class="modal-dialog modal-sm">
           <div class="modal-content">
             <div class="modal-header">
