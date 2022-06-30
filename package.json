@@ -32,7 +32,7 @@
     "node": ">= 12.13"
   },
   "scripts": {
-    "build": "npm run clean && npm run compile && npm run build-storybook",
+    "build": "npm run clean && npm run compile",
     "clean": "rimraf build dist lib",
     "compile:watch": "tsc -w",
     "compile": "tsc",
@@ -56,8 +56,8 @@
     "test:watch": "jest --watch",
     "test": "test ! $(find tests -name \"*.ts\") || jest -w=1",
     "make": "make --",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
+    "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
@@ -101,7 +101,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.17.7",
-    "@babel/plugin-transform-typescript": "7.17.12",
     "@storybook/addon-actions": "^6.5.9",
     "@storybook/addon-essentials": "^6.5.9",
     "@storybook/addon-interactions": "^6.5.9",
