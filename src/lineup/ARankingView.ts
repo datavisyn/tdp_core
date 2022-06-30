@@ -75,13 +75,13 @@ export abstract class ARankingView extends AView {
 
   /**
    * clears and rebuilds this lineup instance from scratch
-   * @returns {Promise<any[]>} promise when done
+   * @returns {Promise<void>} promise when done
    */
   protected rebuild: () => Promise<void> = debounceAsync(() => this.rebuildImpl(), 100);
 
   /**
    * similar to rebuild but just loads new data and keep the columns
-   * @returns {Promise<any[]>} promise when done
+   * @returns {Promise<void>} promise when done
    */
   protected reloadData: () => Promise<void> = debounceAsync(() => this.reloadDataImpl(), 100);
 
@@ -742,14 +742,14 @@ export abstract class ARankingView extends AView {
     this.selectionHelper.setItemSelection(this.getItemSelection());
   }
 
-  private reloadDataImpl() {
+  private reloadDataImpl(): Promise<void> {
     return (this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
       const rows: IRow[] = r[1];
       this.setLineUpData(rows);
     }));
   }
 
-  private rebuildImpl() {
+  private rebuildImpl(): Promise<void> {
     return (this.built = this.built.then(() => this.clear().then(() => this.build())));
   }
 

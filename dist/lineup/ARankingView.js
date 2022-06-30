@@ -46,12 +46,12 @@ export class ARankingView extends AView {
         this.naturalSize = [800, 500];
         /**
          * clears and rebuilds this lineup instance from scratch
-         * @returns {Promise<any[]>} promise when done
+         * @returns {Promise<void>} promise when done
          */
         this.rebuild = debounceAsync(() => this.rebuildImpl(), 100);
         /**
          * similar to rebuild but just loads new data and keep the columns
-         * @returns {Promise<any[]>} promise when done
+         * @returns {Promise<void>} promise when done
          */
         this.reloadData = debounceAsync(() => this.reloadDataImpl(), 100);
         /**
