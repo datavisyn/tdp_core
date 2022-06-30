@@ -77,13 +77,13 @@ export abstract class ARankingView extends AView {
    * clears and rebuilds this lineup instance from scratch
    * @returns {Promise<any[]>} promise when done
    */
-  protected rebuild = debounceAsync(() => this.rebuildImpl(), 100);
+  protected rebuild: () => Promise<void> = debounceAsync(() => this.rebuildImpl(), 100);
 
   /**
    * similar to rebuild but just loads new data and keep the columns
    * @returns {Promise<any[]>} promise when done
    */
-  protected reloadData = debounceAsync(() => this.reloadDataImpl(), 100);
+  protected reloadData: () => Promise<void> = debounceAsync(() => this.reloadDataImpl(), 100);
 
   /**
    * updates the list of available columns in the side panel
