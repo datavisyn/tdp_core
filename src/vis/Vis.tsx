@@ -166,8 +166,9 @@ export function Vis({
     }
   }, [externalConfig, setVisConfig]);
 
-  const selectedMap = useMemo(() => {
-    const currMap = {};
+  // Converting the selected list into a map, since searching through the list to find an item is common in the vis components.
+  const selectedMap: { [key: string]: boolean } = useMemo(() => {
+    const currMap: { [key: string]: boolean } = {};
 
     selected.forEach((s) => {
       currMap[s] = true;
@@ -259,6 +260,9 @@ export function Vis({
         <BarVis
           config={visConfig}
           setConfig={setVisConfig}
+          selectionCallback={selectionCallback}
+          selectedMap={selectedMap}
+          selectedList={selected}
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}
