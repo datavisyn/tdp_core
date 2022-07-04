@@ -1,3 +1,7 @@
+/// <reference types="jquery" />
+/// <reference types="select2" />
+/// <reference types="cypress" />
+/// <reference types="bootstrap" />
 /**
  * Check if typing text in form input element has been completed
  * @param {string} input - input string that should be inserted
@@ -14,7 +18,7 @@ export declare function fillInForm(selector: string, text: string): void;
  * Clear all text in a form input element
  * @param {string} selector - the selector of the element as returned by cypress studio
  */
-export declare function clearInputForm(selector: string): any;
+export declare function clearInputForm(selector: string): Cypress.Chainable<JQuery<HTMLElement>>;
 /**
  * This function must be used to select elements from selet2 multi select form elements.
  * @param {string} id - data-testid of wrapping div (can be deducted from the title by making it lowercase and replacing space by -). For select2 search filds in the form map it must be given as: row-[row number starting from 1] (no brackets)
@@ -32,21 +36,21 @@ export declare function select2SingleSelect(id: string, searchString: string): v
  * @param {string} rowId - In a form select multiple rows can be added. This input must be given as: row-[row number starting from 1] (no brackets)
  * @param {string} selectOption - either a single string or an array of strings if multiselect is possible
  */
-export declare function formSelect(rowId: string, selectOption: string): any;
+export declare function formSelect(rowId: string, selectOption: string): Cypress.Chainable<JQuery<HTMLElement>>;
 /**
  * Wait until phovea-busy and loading icon are hidden
  */
-export declare function waitPhoveaNotBusy(): any;
+export declare function waitPhoveaNotBusy(): Cypress.Chainable<JQuery<HTMLElement>>;
 /**
  * Wait until phovea-busy and loading icon are hidden
  */
-export declare function waitTdpNotBusy(): any;
+export declare function waitTdpNotBusy(): Cypress.Chainable<JQuery<HTMLElement>>;
 /**
  * Scroll an Element into the center of the viewport (mainly for presentation purposes)
  * @param {string} selector - the selector of the element as returned by cypress studio
  * @param  {number} waitAfterScroll - specifies how long to wait after scrolling to an element
  */
-export declare function scrollElementIntoCenter(selector?: string, waitAfterScroll?: number): any;
+export declare function scrollElementIntoCenter(selector?: string, waitAfterScroll?: number): Cypress.Chainable<JQuery<HTMLElement>>;
 /**
  * Submit Login Form of Ordino Public
  */

@@ -6,6 +6,9 @@
 export function truncateText(text, maxLength = 50) {
     return text.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
 }
+export function columnNameWithDescription(col) {
+    return col.description ? `${col.name}: ${col.description}` : col.name;
+}
 /**
  * Cleans up the layout of a given trace, primarily by positioning potential small multiple plots in a reasonable way
  * @param traces the traces associated with the layout

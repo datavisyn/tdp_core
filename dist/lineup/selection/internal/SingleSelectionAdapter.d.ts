@@ -1,5 +1,5 @@
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
-import { IContext } from '../ISelectionAdapter';
+import { IContext, ISelectionColumn } from '../ISelectionAdapter';
 import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
 export interface ISingleSelectionAdapter {
     /**
@@ -19,10 +19,13 @@ export declare class SingleSelectionAdapter extends ABaseSelectionAdapter {
     private readonly adapter;
     constructor(adapter: ISingleSelectionAdapter);
     protected parameterChangedImpl(context: IContext): Promise<void>;
-    protected createColumnsFor(context: IContext, id: string): Promise<{
-        desc: IAdditionalColumnDesc;
-        data: Promise<IScoreRow<any>[]>;
-        id: string;
-    }[]>;
+    /**
+     * Creates a single column desc with additional metadata for a given selected id.
+     *
+     * @param context selection adapter context
+     * @param id id of the selected item
+     * @returns A promise with a list containing a single columns + additional metadata
+     */
+    protected createColumnsFor(_context: IContext, id: string): Promise<ISelectionColumn[]>;
 }
 //# sourceMappingURL=SingleSelectionAdapter.d.ts.map
