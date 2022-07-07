@@ -1,6 +1,3 @@
-/**
- * Created by sam on 19.12.2016.
- */
 import { Scatterplot } from './Scatterplot';
 import { EScaleAxes } from './AScatterplot';
 export interface IMiniMapOptions {

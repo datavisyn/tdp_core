@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { AFormElement } from './AFormElement';
 import { IFormSelectOption } from './FormSelect';
@@ -26,7 +26,7 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
    * Build the label and input element
    * @param $formNode The parent node this element will be attached to
    */
-  build($formNode: d3.Selection<any>) {
+  build($formNode: d3v3.Selection<any>) {
     this.addChangeListener();
     this.$rootNode = $formNode.append('div').classed(this.elementDesc.options.inlineForm ? 'col-sm-auto' : 'col-sm-12 mt-1 mb-1', true);
     this.setVisible(this.elementDesc.visible);

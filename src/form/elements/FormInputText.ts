@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { IPluginDesc } from '../../base';
@@ -41,7 +41,7 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
    * Build the label and input element
    * @param $formNode The parent node this element will be attached to
    */
-  build($formNode: d3.Selection<any>) {
+  build($formNode: d3v3.Selection<any>) {
     this.addChangeListener();
 
     this.$rootNode = $formNode.append('div');

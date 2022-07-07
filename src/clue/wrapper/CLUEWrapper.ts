@@ -4,8 +4,8 @@
 /// <amd-dependency path='font-awesome' />
 /// <amd-dependency path='bootstrap' />
 import { merge } from 'lodash';
-import { select } from 'd3';
-import * as d3 from 'd3';
+import { select } from 'd3v3';
+import * as d3v3 from 'd3v3';
 import { MixedStorageProvenanceGraphManager, IObjectRef, ProvenanceGraph } from '../provenance';
 import { SelectionRecorder } from '../../base/Selection';
 import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
@@ -76,9 +76,9 @@ export class CLUEWrapper extends ACLUEWrapper {
 
   header: AppHeader;
 
-  $main: d3.Selection<any>;
+  $main: d3v3.Selection<any>;
 
-  $mainRef: IObjectRef<d3.Selection<any>>;
+  $mainRef: IObjectRef<d3v3.Selection<any>>;
 
   constructor(body: HTMLElement, options: ICLUEWrapperOptions = {}) {
     super();
@@ -188,7 +188,7 @@ export class CLUEWrapper extends ACLUEWrapper {
       appLink: new AppHeaderLink(options.app || 'Caleydo'),
       inverse: true,
     });
-    const $main = d3.select(body).append('main').style('height', '92vh');
+    const $main = d3v3.select(body).append('main').style('height', '92vh');
     const graph = ProvenanceGraph.createDummy();
     return {
       on: (...args: any[]) => 0,

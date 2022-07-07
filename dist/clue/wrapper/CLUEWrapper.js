@@ -4,8 +4,8 @@
 /// <amd-dependency path='font-awesome' />
 /// <amd-dependency path='bootstrap' />
 import { merge } from 'lodash';
-import { select } from 'd3';
-import * as d3 from 'd3';
+import { select } from 'd3v3';
+import * as d3v3 from 'd3v3';
 import { MixedStorageProvenanceGraphManager, ProvenanceGraph } from '../provenance';
 import { SelectionRecorder } from '../../base/Selection';
 import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
@@ -120,7 +120,7 @@ export class CLUEWrapper extends ACLUEWrapper {
             appLink: new AppHeaderLink(options.app || 'Caleydo'),
             inverse: true,
         });
-        const $main = d3.select(body).append('main').style('height', '92vh');
+        const $main = d3v3.select(body).append('main').style('height', '92vh');
         const graph = ProvenanceGraph.createDummy();
         return {
             on: (...args) => 0,

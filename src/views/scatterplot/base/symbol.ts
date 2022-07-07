@@ -1,7 +1,5 @@
 import {
   line as d3line,
-  CurveFactory,
-  symbolCircle,
   symbolCross,
   symbolDiamond,
   symbolSquare,
@@ -9,8 +7,10 @@ import {
   symbolTriangle,
   symbolWye,
   SymbolType,
-} from 'd3-shape';
-import { bisector as d3bisector } from 'd3-array';
+  bisector as d3bisector,
+  CurveFactory,
+  symbolCircle,
+} from 'd3v7';
 
 /**
  * a symbol renderer renderes a bunch of data points using `render` at the end `done` will be called

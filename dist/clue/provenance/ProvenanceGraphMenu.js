@@ -1,4 +1,4 @@
-import { event as d3event, select, time } from 'd3';
+import { event as d3event, select, time } from 'd3v3';
 import * as $ from 'jquery';
 import { Dialog, PHOVEA_UI_FormDialog } from '../../components';
 import { UserSession } from '../../app/UserSession';

@@ -247,7 +247,7 @@ export class ButtonModeSelector {
 //     });
 //   }
 //
-//   private build($parent:d3.Selection<any>) {
+//   private build($parent:d3.Selection<any, any, any, any>) {
 //     const $root = $parent.append('div').classed('clue_slidermodeselector', true);
 //     const $modes = $root.selectAll('label').data([modes.Exploration, modes.Authoring, modes.Presentation]);
 //
@@ -346,7 +346,7 @@ export class ButtonModeSelector {
 //     return mode(e, a, p);
 //   }
 //
-//   private build($parent:d3.Selection<any>) {
+//   private build($parent:d3.Selection<any, any, any, any>) {
 //     const $root = $parent.append('svg').classed('clue_trianglemodeselector', true).attr({
 //       width: this.p[0] + this.options.offset,
 //       height: this.p[1] + this.options.offset

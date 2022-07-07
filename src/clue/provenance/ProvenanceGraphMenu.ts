@@ -1,4 +1,5 @@
-import { event as d3event, select, time } from 'd3';
+import { event as d3event, select, time } from 'd3v3';
+import * as d3v3 from 'd3v3';
 import * as $ from 'jquery';
 import { Dialog, PHOVEA_UI_FormDialog } from '../../components';
 import type { CLUEGraphManager } from '../base/CLUEGraphManager';
@@ -8,7 +9,7 @@ import type { ProvenanceGraph } from './ProvenanceGraph';
 import type { IProvenanceGraphDataDescription } from './ICmd';
 
 export class ProvenanceGraphMenu {
-  private readonly $node: d3.Selection<any>;
+  private readonly $node: d3v3.Selection<any>;
 
   private graph: ProvenanceGraph;
 

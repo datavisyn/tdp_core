@@ -1,6 +1,6 @@
 /// <amd-dependency path="font-awesome" />
 /// <amd-dependency path="bootstrap" />
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { IObjectRef, ProvenanceGraph } from '../provenance';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';
@@ -50,8 +50,8 @@ export interface ICLUEWrapperOptions extends IACLUEWrapperOptions {
 export declare class CLUEWrapper extends ACLUEWrapper {
     private options;
     header: AppHeader;
-    $main: d3.Selection<any>;
-    $mainRef: IObjectRef<d3.Selection<any>>;
+    $main: d3v3.Selection<any>;
+    $mainRef: IObjectRef<d3v3.Selection<any>>;
     constructor(body: HTMLElement, options?: ICLUEWrapperOptions);
     protected buildImpl(body: HTMLElement): {
         graph: Promise<ProvenanceGraph>;
@@ -75,7 +75,7 @@ export declare class CLUEWrapper extends ACLUEWrapper {
      */
     static createWrapperFactory(body: HTMLElement, options?: any): {
         on: (...args: any[]) => number;
-        $main: d3.Selection<any>;
+        $main: d3v3.Selection<any>;
         graph: Promise<ProvenanceGraph>;
         jumpToStored: () => number;
     };

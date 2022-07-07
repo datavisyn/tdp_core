@@ -1,4 +1,4 @@
-import d3 from 'd3';
+import d3 from 'd3v7';
 import { merge } from 'lodash';
 import { I18nextManager } from '../../i18n';
 import { PlotlyInfo, PlotlyData, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisColumn, IPCPConfig } from '../interfaces';

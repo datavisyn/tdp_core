@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { AFormElement } from './AFormElement';
 import { IFormSelectOption } from './FormSelect';
@@ -22,7 +22,7 @@ export declare class FormRadio extends AFormElement<IRadioElementDesc> {
      * Build the label and input element
      * @param $formNode The parent node this element will be attached to
      */
-    build($formNode: d3.Selection<any>): void;
+    build($formNode: d3v3.Selection<any>): void;
     /**
      * Bind the change listener and propagate the selection by firing a change event
      */

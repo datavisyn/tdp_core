@@ -1,10 +1,4 @@
-import { extent } from 'd3-array';
-import { format } from 'd3-format';
-import { select, mouse, event as d3event } from 'd3-selection';
-import { zoom as d3zoom, zoomIdentity } from 'd3-zoom';
-import { drag as d3drag } from 'd3-drag';
-import { scaleLinear } from 'd3-scale';
-import { quadtree } from 'd3-quadtree';
+import { drag as d3drag, quadtree, scaleLinear, extent, format, select, zoom as d3zoom, zoomIdentity, pointer, } from 'd3v7';
 import { EventEmitter } from 'eventemitter3';
 import { ObjectUtils } from './ObjectUtils';
 import { QuadtreeUtils } from './quadtree';
@@ -115,7 +109,7 @@ export class AScatterplot extends EventEmitter {
                 [0, 0],
                 [+Infinity, +Infinity],
             ])
-                .filter(() => d3event.button === 0 && (typeof this.props.isSelectEvent !== 'function' || !this.props.isSelectEvent(d3event)));
+                .filter((e) => e.button === 0 && (typeof this.props.isSelectEvent !== 'function' || !this.props.isSelectEvent(e)));
             if (this.props.zoomWindow != null) {
                 this.window = this.props.zoomWindow;
             }
@@ -135,11 +129,11 @@ export class AScatterplot extends EventEmitter {
                 .on('start', this.onDragStart.bind(this))
                 .on('drag', this.onDrag.bind(this))
                 .on('end', this.onDragEnd.bind(this))
-                .filter(() => d3event.button === 0 && typeof this.props.isSelectEvent === 'function' && this.props.isSelectEvent(d3event));
-            $parent.call(drag).on('click', () => this.onClick(d3event));
+                .filter((e) => e.button === 0 && typeof this.props.isSelectEvent === 'function' && this.props.isSelectEvent(e));
+            $parent.call(drag).on('click', (e) => this.onClick(e));
         }
         if (this.hasTooltips()) {
-            $parent.on('mouseleave', () => this.onMouseLeave(d3event)).on('mousemove', () => this.onMouseMove(d3event));
+            $parent.on('mouseleave', (e) => this.onMouseLeave(e)).on('mousemove', (e) => this.onMouseMove(e));
         }
         this.parent.classList.add(TDP_SCATTERPLOT_CSS_PREFIX);
     }
@@ -168,7 +162,7 @@ export class AScatterplot extends EventEmitter {
         select(this.parent)
             .select(`.${TDP_SCATTERPLOT_CSS_PREFIX}-draw-area`)
             .call(this.zoomBehavior)
-            .on('wheel', () => d3event.preventDefault());
+            .on('wheel', (e) => e.preventDefault());
     }
     setDataImpl(data) {
         // generate a quad tree out of the data
@@ -379,7 +373,7 @@ export class AScatterplot extends EventEmitter {
         throw new Error('Not Implemented');
     }
     mousePosAtCanvas() {
-        const pos = mouse(this.parent);
+        const pos = pointer(this.parent);
         // shift by the margin since the scales doesn't include them for better scaling experience
         return [pos[0] - this.props.marginLeft, pos[1] - this.props.marginTop];
     }
@@ -456,8 +450,7 @@ export class AScatterplot extends EventEmitter {
         // zoom transform is over the whole canvas an not just the center part in which the scales are defined
         return t;
     }
-    onZoom() {
-        const evt = d3event;
+    onZoom(evt) {
         const newValue = this.shiftTransform(evt.transform);
         const oldValue = this.currentTransform;
         this.currentTransform = newValue;
@@ -483,7 +476,7 @@ export class AScatterplot extends EventEmitter {
             this.render(ERenderReason.PERFORM_TRANSLATE, delta);
         }
         // nothing if no change
-        this.emit(AScatterplot.EVENT_ZOOM_CHANGED, d3event);
+        this.emit(AScatterplot.EVENT_ZOOM_CHANGED, evt);
     }
     onZoomEnd() {
         const start = this.zoomStartTransform;
@@ -501,29 +494,29 @@ export class AScatterplot extends EventEmitter {
             this.render(ERenderReason.AFTER_TRANSLATE);
         }
     }
-    onDragStart() {
-        this.lasso.start(d3event.x, d3event.y);
+    onDragStart(e) {
+        this.lasso.start(e.x, e.y);
         if (!this.clearSelectionImpl(true)) {
             this.render(ERenderReason.SELECTION_CHANGED);
         }
     }
-    onDrag() {
+    onDrag(e) {
         if (this.dragHandle < 0) {
             this.dragHandle = window.setInterval(this.updateDrag.bind(this), this.props.lasso.interval);
         }
-        this.lasso.setCurrent(d3event.x, d3event.y);
+        this.lasso.setCurrent(e.x, e.y);
         this.render(ERenderReason.SELECTION_CHANGED);
-        this.emit(AScatterplot.EVENT_DRAGGED, d3event);
+        this.emit(AScatterplot.EVENT_DRAGGED, e);
     }
     updateDrag() {
         if (this.lasso.pushCurrent()) {
             this.retestLasso();
         }
     }
-    onDragEnd() {
+    onDragEnd(e) {
         clearInterval(this.dragHandle);
         this.dragHandle = -1;
-        this.lasso.end(d3event.x, d3event.y);
+        this.lasso.end(e.x, e.y);
         if (!this.retestLasso()) {
             this.render(ERenderReason.SELECTION_CHANGED);
         }

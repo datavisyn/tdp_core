@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { EventHandler } from '../../base';
 export class FormButton extends EventHandler {
     /**
@@ -44,8 +44,8 @@ export class FormButton extends EventHandler {
         this.$button.on('click', () => {
             this.value = true;
             this.elementDesc.onClick();
-            d3.event.preventDefault();
-            d3.event.stopPropagation();
+            d3v3.event.preventDefault();
+            d3v3.event.stopPropagation();
         });
         // TODO doesn't support show if
     }

@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { BaseUtils } from '../../base';
 import { IFormElement, IForm, IFormElementDesc } from '../interfaces';
 
@@ -9,7 +9,7 @@ export class Form implements IForm {
   /**
    * DOM node for the form itself
    */
-  private readonly $node: d3.Selection<any>;
+  private readonly $node: d3v3.Selection<any>;
 
   /**
    * Map of all appended form elements with the element id as key
@@ -21,7 +21,7 @@ export class Form implements IForm {
    * @param $parent Node that the form should be attached to
    * @param formId unique form id
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId()) {
+  constructor($parent: d3v3.Selection<any>, private readonly formId = BaseUtils.randomId()) {
     this.$node = $parent.append('form').attr('class', `row align-items-center`).attr('id', this.formId);
   }
 

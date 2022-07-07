@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { IFormElementDesc, IForm } from './interfaces';
 /**
  * Builds a form from a given collection of form elements
@@ -20,7 +20,7 @@ export declare class FormBuilder {
      * @param formId unique form id
      * @param formInline whether the form is in inline mode or not
      */
-    constructor($parent: d3.Selection<any>, formId?: string, formInline?: boolean);
+    constructor($parent: d3v3.Selection<any>, formId?: string, formInline?: boolean);
     /**
      * Creates a form element instance from a form element description and
      * appends it to the form

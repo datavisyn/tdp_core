@@ -1,4 +1,4 @@
-import { select, Selection } from 'd3';
+import { select, Selection } from 'd3v3';
 import { ISelection, IViewContext } from '../base/interfaces';
 import { AView } from './AView';
 
@@ -7,7 +7,7 @@ import { AView } from './AView';
  * @deprecated
  */
 export abstract class AD3View extends AView {
-  protected readonly $node: Selection<this>;
+  protected readonly $node: Selection<any>;
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement) {
     super(context, selection, parent);

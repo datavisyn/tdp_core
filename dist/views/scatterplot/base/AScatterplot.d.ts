@@ -1,6 +1,4 @@
-import { AxisScale, Axis } from 'd3-axis';
-import { ZoomScale, ZoomTransform, ZoomBehavior } from 'd3-zoom';
-import { Quadtree } from 'd3-quadtree';
+import { Quadtree, AxisScale, Axis, ZoomScale, ZoomTransform, ZoomBehavior } from 'd3v7';
 import { EventEmitter } from 'eventemitter3';
 import { ISymbol, ISymbolRenderer } from './symbol';
 import { IBoundsPredicate, ITester } from './quadtree';

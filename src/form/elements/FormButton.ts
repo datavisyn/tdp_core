@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { FormElementType, IFormElement, IFormElementDesc, IForm } from '../interfaces';
 import { EventHandler, IPluginDesc } from '../../base';
 
@@ -9,9 +9,9 @@ export interface IButtonElementDesc extends IFormElementDesc {
 }
 
 export class FormButton extends EventHandler implements IFormElement {
-  private $button: d3.Selection<HTMLButtonElement>;
+  private $button: d3v3.Selection<HTMLButtonElement>;
 
-  private $node: d3.Selection<any>;
+  private $node: d3v3.Selection<any>;
 
   private clicked = false;
 
@@ -64,8 +64,8 @@ export class FormButton extends EventHandler implements IFormElement {
     this.$button.on('click', () => {
       this.value = true;
       this.elementDesc.onClick();
-      (<Event>d3.event).preventDefault();
-      (<Event>d3.event).stopPropagation();
+      (<Event>d3v3.event).preventDefault();
+      (<Event>d3v3.event).stopPropagation();
     });
     // TODO doesn't support show if
   }

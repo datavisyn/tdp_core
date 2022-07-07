@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3';
+import d3 from 'd3v7';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
