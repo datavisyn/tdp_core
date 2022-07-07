@@ -3,8 +3,6 @@ from urllib.parse import quote
 
 import pytest
 
-pytest.importorskip("rdkit")
-
 mol_expected = {
     "C": "6d435ada2a36f00980347aef78f309de71544180a293f5970d7e257dd88f9270",
     "O": "0db87f49c83caba8c7f7ca36f3128f929590537d92678ced396afb4c6201ba2d",
@@ -82,4 +80,3 @@ def test_draw_multi(client):
     assert set(mol_expected.keys()) == set(res.json().keys())
     for mol, svg in res.json().items():
         hash_compare(svg.encode(), mol_expected[mol])
-    print(res.json())

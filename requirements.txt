@@ -25,3 +25,4 @@ sqlmodel==0.0.6
 urllib3==1.26.9
 uvicorn[standard]==0.17.6
 yamlreader==3.0.4
+rdkit==2022.3.3
