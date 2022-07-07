@@ -6,7 +6,7 @@ from .models import SmilesMolecule, SmilesSmartsMolecule, SubstructuresResponse,
 from .util.draw import draw, draw_similarity
 from .util.molecule import aligned, maximum_common_substructure_query_mol, murcko
 
-app = APIRouter()
+app = APIRouter(prefix="/api/image", tags=["images"])
 
 
 @app.get("/{structure}", response_class=SvgResponse)
@@ -42,7 +42,7 @@ def draw_maximum_common_substructure_molecule(structures: List[SmilesMolecule]):
 
 @app.post("/substructures/{substructure}")
 def substructures_count(structures: Set[SmilesMolecule], substructure: SmilesSmartsMolecule) -> SubstructuresResponse:
-    """TODO: maybe put to another file"""
+    """Check and return number of possible substructures in a set of structures"""
     ssr = SubstructuresResponse()
     for smiles in set(structures):
         ssr.valid[smiles] = smiles.mol.HasSubstructMatch(substructure.mol)
