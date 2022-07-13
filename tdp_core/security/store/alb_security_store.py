@@ -21,6 +21,9 @@ class ALBSecurityStore(BaseStore):
                 roles = []
                 # Get token data from header
                 encoded = req.headers["X-Amzn-Oidc-Data"]
+                _log.debug(f"X-Amzn-Oidc-Data: {encoded}")
+                _log.debug(f"X-Amzn-Oidc-Accesstoken: {req.headers["X-Amzn-Oidc-Accesstoken"]}")
+                _log.debug(f"X-Amzn-Oidc-Identity: {req.headers["X-Amzn-Oidc-Identity"]}")
                 # Try to decode the oidc data jwt
                 user = jwt.decode(encoded, options={"verify_signature": False})
                 _log.debug(f"user: {user}")
