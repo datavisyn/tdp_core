@@ -20,6 +20,7 @@ class ALBSecurityStore(BaseStore):
             try:
                 roles = []
                 # Get token data from header
+                _log.debug(f"headers: {req.headers}")
                 encoded = req.headers["X-Amzn-Oidc-Data"]
                 _log.debug(f"X-Amzn-Oidc-Data: {encoded}")
                 _log.debug(f"X-Amzn-Oidc-Accesstoken: {req.headers['X-Amzn-Oidc-Accesstoken']}")
