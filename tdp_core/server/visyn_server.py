@@ -121,8 +121,8 @@ def create_visyn_server(
     # Load all namespace plugins as WSGIMiddleware plugins
     for p in router_plugins:
         _log.info(f"Registering router: {p.id}")
-        prefix = getattr(p, "namespace", "")  # consistent behaviour with flask plugins
-        app.include_router(p.load().factory(), prefix=prefix)
+        assert not hasattr(p, "namespace"), "Use APIRouter(prefix=...) instead of legacy flask namespace style"
+        app.include_router(p.load().factory())
 
     # load `after_server_started` extension points which are run immediately after server started,
     # so all plugins should have been loaded at this point of time

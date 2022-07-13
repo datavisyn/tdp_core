@@ -1,10 +1,11 @@
 from typing import List, Optional, Set
 
 from fastapi import APIRouter
+from rdkit.Chem.Scaffolds import MurckoScaffold
 
 from .models import SmilesMolecule, SmilesSmartsMolecule, SubstructuresResponse, SvgResponse
 from .util.draw import draw, draw_similarity
-from .util.molecule import aligned, maximum_common_substructure_query_mol, murcko
+from .util.molecule import aligned, maximum_common_substructure_query_mol
 
 app = APIRouter(prefix="/api/image", tags=["images"])
 
@@ -19,7 +20,8 @@ def draw_smiles(
 @app.get("/murcko/{structure}", response_class=SvgResponse)
 def draw_murcko(structure: SmilesMolecule):
     """https://www.rdkit.org/docs/GettingStartedInPython.html#murcko-decomposition"""
-    return draw(murcko(structure.mol))
+    murcko = MurckoScaffold.GetScaffoldForMol(structure.mol)
+    return draw(murcko)
 
 
 @app.get("/similarity/{probe}/{reference}", response_class=SvgResponse)
@@ -54,7 +56,3 @@ def substructures_count(structures: Set[SmilesMolecule], substructure: SmilesSma
 @app.post("/")
 def multiple_images(structures: Set[SmilesMolecule]):
     return {m: draw(m.mol) for m in structures}
-
-
-def create_api():
-    return app
