@@ -32,7 +32,9 @@
     "node": ">= 12.13"
   },
   "scripts": {
-    "build": "npm run clean && npm run compile",
+    "all": "npm run lint:fix && npm run test && npm run build && npm run dist",
+    "build": "npm run clean && npm run compile && npm run copy",
+    "ci": "npm run lint && npm run test && npm run build && npm run dist",
     "clean": "rimraf build dist lib",
     "compile:watch": "visyn_scripts compile --watch",
     "compile": "visyn_scripts compile",
@@ -44,21 +46,12 @@
     "docs": "visyn_scripts docs",
     "lint:fix": "visyn_scripts lint --fix",
     "lint": "visyn_scripts lint",
-    "make": "make --",
-    "postcompile": "npm run copy",
-    "posttest": "npm run lint",
-    "prebuild": "npm run test",
-    "predist": "npm run build && npm run docs",
-    "prepare": "echo 'dummy prepare since prepack has no dev dependencies'",
     "prepack": "npm run build",
-    "release:major": "npm version major && npm publish && git push --follow-tags",
-    "release:minor": "npm version minor && npm publish && git push --follow-tags",
-    "release:patch": "npm version patch && npm publish && git push --follow-tags",
-    "test:watch": "jest --watch",
-    "test": "test ! $(find tests -name \"*.ts\") || jest -w=1",
+    "prepare": "echo 'dummy prepare since prepack has no dev dependencies'",
     "start": "visyn_scripts start --env workspace_mode=single",
-    "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
     "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
+    "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
+    "test": "visyn_scripts test",
     "webpack:dev": "visyn_scripts build --mode development --env workspace_mode=single",
     "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
   },
@@ -101,7 +94,7 @@
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "use-deep-compare-effect": "^1.8.0",
-    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts.git#webpack5"
+    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts.git#develop"
   },
   "devDependencies": {
     "@babel/core": "^7.17.7",
