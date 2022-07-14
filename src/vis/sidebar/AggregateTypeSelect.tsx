@@ -40,7 +40,7 @@ export function AggregateTypeSelect({
         closeMenuOnSelect
         getOptionLabel={(option) => option.label}
         getOptionValue={(option) => option.value}
-        onChange={(e) => aggregateTypeSelectCallback(e.value)}
+        onChange={(option) => aggregateTypeSelectCallback(option.value as EAggregateTypes)}
         name="numColumns"
         options={selectOptions || []}
         isOptionDisabled={(option) => (option.value === EAggregateTypes.COUNT ? false : !hasNumCols)}

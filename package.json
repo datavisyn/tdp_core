@@ -1,7 +1,7 @@
 {
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
-  "version": "15.0.1-SNAPSHOT",
+  "version": "15.0.2-SNAPSHOT",
   "author": {
     "name": "datavisyn GmbH",
     "email": "contact@datavisyn.io",
@@ -32,7 +32,7 @@
     "node": ">= 12.13"
   },
   "scripts": {
-    "build": "npm run clean && npm run compile && npm run storybook:build",
+    "build": "npm run clean && npm run compile",
     "clean": "rimraf build dist lib",
     "compile:watch": "visyn_scripts compile --watch",
     "compile": "visyn_scripts compile",
@@ -52,10 +52,10 @@
     "release:major": "npm version major && npm publish && git push --follow-tags",
     "release:minor": "npm version minor && npm publish && git push --follow-tags",
     "release:patch": "npm version patch && npm publish && git push --follow-tags",
-    "storybook": "start-storybook -p 6006",
-    "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
-    "test:watch": "visyn_scripts test --watch",
-    "test": "visyn_scripts test"
+    "test:watch": "jest --watch",
+    "test": "test ! $(find tests -name \"*.ts\") || jest -w=1",
+    "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
+    "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
@@ -100,6 +100,13 @@
   "devDependencies": {
     "@babel/core": "^7.17.7",
     "@babel/plugin-transform-typescript": "7.17.12",
+    "@storybook/addon-actions": "^6.5.9",
+    "@storybook/addon-essentials": "^6.5.9",
+    "@storybook/addon-interactions": "^6.5.9",
+    "@storybook/addon-links": "^6.5.9",
+    "@storybook/preset-scss": "^1.0.3",
+    "@storybook/react": "^6.5.9",
+    "@storybook/testing-library": "0.0.9",
     "@types/bootstrap": "~5.0.15",
     "@types/d3": "~3.5.36",
     "@types/jquery": "~3.5.5",

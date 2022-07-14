@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable import/no-cycle */
-/* eslint-disable @typescript-eslint/no-shadow */
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { isEqual } from 'lodash';
+// eslint-disable-next-line import/no-cycle
 import { Ranking } from './Ranking';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
 import { TDPTokenManager, TokenManager } from '../auth/TokenManager';
@@ -9,14 +8,16 @@ import { I18nextManager } from '../i18n/I18nextManager';
 import { AView } from '../views/AView';
 import { useAsync } from '../hooks/useAsync';
 import { ViewUtils } from '../views/ViewUtils';
-export function RankingViewComponent({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = false, selectionAdapter = null, options = {}, authorization = null, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, onUpdateEntryPoint, 
+export function RankingViewComponent({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = null, selectionAdapter = null, options = {}, authorization = null, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, onUpdateEntryPoint, 
 /**
  * Maybe refactor this when using the native lineup implementation of scores
  */
 onAddScoreColumn, }) {
-    const isMounted = useRef(false);
-    const selections = new Map();
-    const [context, setContext] = React.useState(null);
+    const selections = useMemo(() => {
+        return new Map();
+    }, []);
+    const [prevParameters, setPrevParameters] = useState(null);
+    const [selectionAdapterContext, setSelectionAdapterContext] = React.useState(null);
     const viewRef = React.useRef(null);
     const runAuthorizations = useCallback(async () => {
         await TDPTokenManager.runAuthorizations(authorization, {
@@ -53,6 +54,7 @@ onAddScoreColumn, }) {
     React.useEffect(() => {
         // set input and item selections
         selections.set(AView.DEFAULT_SELECTION_NAME, inputSelection);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     const init = useCallback(async () => {
         TDPTokenManager.on(TokenManager.EVENT_AUTHORIZATION_REMOVED, async () => {
@@ -68,6 +70,9 @@ onAddScoreColumn, }) {
         });
     }, [runAuthorizations]);
     const { status } = useAsync(init, []);
+    const onContextChangedCallback = useCallback((newContext) => {
+        setSelectionAdapterContext(newContext);
+    }, []);
     /**
      * onInputSelectionChanged
      */
@@ -81,24 +86,26 @@ onAddScoreColumn, }) {
             selections.set(name, inputSelection);
             if (name === AView.DEFAULT_SELECTION_NAME) {
                 if (selectionAdapter) {
-                    selectionAdapter.selectionChanged(null, () => context);
+                    selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
                 }
             }
         }
-    }, [status, inputSelection, context]);
+    }, [status, inputSelection, selectionAdapterContext, selections, selectionAdapter, onContextChangedCallback]);
     /**
      * onParametersChanged
      */
     React.useEffect(() => {
-        // ignore first time parameter are passed since there is no change
-        if (status === 'success' && parameters && isMounted.current) {
+        if (isEqual(parameters, prevParameters)) {
+            return;
+        }
+        if (status === 'success') {
             if (selectionAdapter) {
-                selectionAdapter.parameterChanged(null, () => context);
+                selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
+                setPrevParameters(parameters);
             }
         }
-        isMounted.current = true;
-    }, [status, parameters, context]);
+    }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters, onContextChangedCallback]);
     return (React.createElement("div", { ref: viewRef, className: `tdp-view lineup lu-taggle lu ${status !== 'success' && 'tdp-busy'}` },
-        React.createElement(Ranking, { data: data, columnDesc: columnDesc, itemSelection: itemSelection, options: options, onItemSelect: onItemSelect, onContextChanged: (context) => setContext({ ...context, selection: inputSelection }), onAddScoreColumn: onAddScoreColumn, onBuiltLineUp: onBuiltLineUp, onItemSelectionChanged: onItemSelectionChanged, onCustomizeRanking: onCustomizeRanking, onUpdateEntryPoint: onUpdateEntryPoint })));
+        React.createElement(Ranking, { data: data, columnDesc: columnDesc, itemSelection: itemSelection, options: options, onItemSelect: onItemSelect, onContextChanged: onContextChangedCallback, onAddScoreColumn: onAddScoreColumn, onBuiltLineUp: onBuiltLineUp, onItemSelectionChanged: onItemSelectionChanged, onCustomizeRanking: onCustomizeRanking, onUpdateEntryPoint: onUpdateEntryPoint })));
 }
 //# sourceMappingURL=RankingViewComponent.js.map

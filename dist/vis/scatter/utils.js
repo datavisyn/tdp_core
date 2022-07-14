@@ -3,7 +3,7 @@ import d3 from 'd3';
 import { EColumnTypes, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
-import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
 import { DEFAULT_COLOR, SELECT_COLOR } from '../general/constants';
 export function isScatter(s) {
@@ -107,7 +107,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                 hoverlabel: {
                     bgcolor: 'black',
                 },
-                hovertext: validCols[0].resolvedValues.map((v, i) => `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''}`),
+                hovertext: validCols[0].resolvedValues.map((v, i) => `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${colorCol ? `${columnNameWithDescription(colorCol.info)}: ${colorCol.resolvedValues[i].val}` : ''}`),
                 hoverinfo: 'text',
                 text: validCols[0].resolvedValues.map((v) => v.id.toString()),
                 marker: {
@@ -124,8 +124,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     size: 8,
                 },
             },
-            xLabel: validCols[0].info.name,
-            yLabel: validCols[1].info.name,
+            xLabel: columnNameWithDescription(validCols[0].info),
+            yLabel: columnNameWithDescription(validCols[1].info),
         });
     }
     else {
@@ -148,8 +148,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                             },
                             opacity: config.alphaSliderVal,
                         },
-                        xLabel: xCurr.info.name,
-                        yLabel: yCurr.info.name,
+                        xLabel: columnNameWithDescription(xCurr.info),
+                        yLabel: columnNameWithDescription(yCurr.info),
                     });
                     // otherwise, make a scatterplot
                 }
@@ -163,7 +163,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                             yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
                             type: 'scattergl',
                             mode: 'markers',
-                            hovertext: xCurr.resolvedValues.map((v, i) => `${v.id}<br>x: ${v.val}<br>y: ${yCurr.resolvedValues[i].val}<br>${colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''}`),
+                            hovertext: xCurr.resolvedValues.map((v, i) => `${v.id}<br>x: ${v.val}<br>y: ${yCurr.resolvedValues[i].val}<br>${colorCol ? `${columnNameWithDescription(colorCol.info)}: ${colorCol.resolvedValues[i].val}` : ''}`),
                             hoverinfo: 'text',
                             hoverlabel: {
                                 bgcolor: 'black',
@@ -188,8 +188,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                                 size: 8,
                             },
                         },
-                        xLabel: xCurr.info.name,
-                        yLabel: yCurr.info.name,
+                        xLabel: columnNameWithDescription(xCurr.info),
+                        yLabel: columnNameWithDescription(yCurr.info),
                     });
                 }
                 plotCounter += 1;
@@ -211,7 +211,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                 legendgroup: 'color',
                 // @ts-ignore
                 legendgrouptitle: {
-                    text: colorCol.info.name,
+                    text: columnNameWithDescription(colorCol.info),
                 },
                 marker: {
                     line: {
@@ -234,8 +234,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     },
                 ],
             },
-            xLabel: validCols[0].info.name,
-            yLabel: validCols[0].info.name,
+            xLabel: columnNameWithDescription(validCols[0].info),
+            yLabel: columnNameWithDescription(validCols[0].info),
         });
     }
     // if we have a column for the shape, add a legendPlot that creates a legend.
@@ -254,7 +254,7 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                 legendgroup: 'shape',
                 // @ts-ignore
                 legendgrouptitle: {
-                    text: shapeCol.info.name,
+                    text: columnNameWithDescription(shapeCol.info),
                 },
                 marker: {
                     line: {
@@ -277,8 +277,8 @@ export async function createScatterTraces(columns, selected, config, scales, sha
                     },
                 ],
             },
-            xLabel: validCols[0].info.name,
-            yLabel: validCols[0].info.name,
+            xLabel: columnNameWithDescription(validCols[0].info),
+            yLabel: columnNameWithDescription(validCols[0].info),
         });
     }
     return {
