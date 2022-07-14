@@ -31,7 +31,10 @@ class ALBSecurityStore(BaseStore):
                 user = jwt.decode(encoded, options={"verify_signature": False})
                 _log.debug(f"user: {user}")
                 # Create new user from given attributes
-                email = user["email"]
+                if "email" in user:
+                    email = user["email"]
+                elif "upn" in user:
+                    email = user["upn"]
                 if "roles" in user:
                     roles.extend(user["roles"])
                 if "groups" in user:
