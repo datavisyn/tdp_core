@@ -25,6 +25,8 @@ import { ViewUtils } from '../views/ViewUtils';
 import { SelectionUtils } from '../idtype/SelectionUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
+import { StructureImageColumn } from './renderer/StructureImageColumn';
+import { StructureImageRenderer } from './renderer/StructureImageRenderer';
 const defaults = {
     itemName: 'item',
     itemNamePlural: 'items',
@@ -223,11 +225,16 @@ onAddScoreColumn, }) {
     React.useEffect(() => {
         const initialized = taggleRef.current != null;
         if (!initialized) {
+            // register custom column types
+            options.customProviderOptions.columnTypes = { ...options.customProviderOptions.columnTypes, smiles: StructureImageColumn };
             providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
             providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
             const taggleOptions = merge(defaultOptions(), options.customOptions, {
                 summaryHeader: options.enableHeaderSummary,
                 labelRotation: options.enableHeaderRotation ? 45 : 0,
+                renderers: {
+                    smiles: new StructureImageRenderer(),
+                },
             }, options.customOptions);
             if (typeof options.itemRowHeight === 'number' && options.itemRowHeight > 0) {
                 taggleOptions.rowHeight = options.itemRowHeight;

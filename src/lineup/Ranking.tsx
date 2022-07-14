@@ -50,6 +50,8 @@ import { ViewUtils } from '../views/ViewUtils';
 import { SelectionUtils } from '../idtype/SelectionUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
+import { StructureImageColumn } from './renderer/StructureImageColumn';
+import { StructureImageRenderer } from './renderer/StructureImageRenderer';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;
@@ -309,6 +311,9 @@ export function Ranking({
   React.useEffect(() => {
     const initialized = taggleRef.current != null;
     if (!initialized) {
+      // register custom column types
+      options.customProviderOptions.columnTypes = { ...options.customProviderOptions.columnTypes, smiles: StructureImageColumn };
+
       providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
       providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
 
@@ -318,6 +323,9 @@ export function Ranking({
         {
           summaryHeader: options.enableHeaderSummary,
           labelRotation: options.enableHeaderRotation ? 45 : 0,
+          renderers: {
+            smiles: new StructureImageRenderer(),
+          },
         } as Partial<ITaggleOptions>,
         options.customOptions,
       );
@@ -480,7 +488,9 @@ export function Ranking({
       providerRef.current.setData(data);
       selectionHelperRef.current.rows = data;
       selectionHelperRef.current.setItemSelection(itemSelections.get(AView.DEFAULT_SELECTION_NAME));
+
       ColumnDescUtils.createInitialRanking(providerRef.current, {});
+
       const ranking = providerRef.current.getLastRanking();
       const columns = ranking ? ranking.flatColumns : [];
       const selectionAdapterContext: Omit<IContext, 'selection'> = {
