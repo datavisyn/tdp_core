@@ -5,7 +5,7 @@ import jwt
 from fastapi import FastAPI
 
 from ... import manager
-from ..middleware.request_context_middleware import get_request
+from ...middleware.request_context_middleware import get_request
 from ..model import User
 from .base_store import BaseStore
 
