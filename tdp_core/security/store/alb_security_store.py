@@ -2,6 +2,7 @@ import logging
 from typing import Optional
 
 import jwt
+from fastapi import FastAPI
 
 from ... import manager
 from ..model import User
@@ -53,6 +54,12 @@ class ALBSecurityStore(BaseStore):
             payload["alb_security_store"] = {"redirect": self.signout_url}
 
         return {"data": payload, "cookies": cookies}
+
+    def _get_user_info_from_token(self, token: str):
+        return jwt.decode(token, options={"verify_signature": False})
+
+    def init_app(self, app: FastAPI):
+        app.add_api_route("/userinfo", self.get_user_info)
 
 
 def create():
