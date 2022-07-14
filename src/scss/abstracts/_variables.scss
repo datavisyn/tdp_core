@@ -76,14 +76,14 @@ $anchor_color_hover: darkred !default;
 /* phovea_ui */
 $fa-font-path: '~@fortawesome/fontawesome-free/webfonts' !default;
 
-$phovea-loading-icon-url: url('~tdp_core/dist/assets/caleydo_c_anim.svg') !default;
+$phovea-loading-icon-url: url('../../assets/caleydo_c_anim.svg') !default;
 $phovea-loading-icon-size: auto !default;
 
-$phovea-navbar-icon-url: url('~tdp_core/dist/assets/caleydo_c.svg') !default;
+$phovea-navbar-icon-url: url('../../assets/caleydo_c.svg') !default;
 $phovea-navbar-icon-width: 20px !default;
 $phovea-navbar-icon-top: center !default;
 
-$phovea-about-dialog-icon-url: url('~tdp_core/dist/assets/caleydo_c.svg') !default;
+$phovea-about-dialog-icon-url: url('../../assets/caleydo_c.svg') !default;
 $phovea-about-dialog-icon-height: unset !default;
 
 $select-color: orange !default;

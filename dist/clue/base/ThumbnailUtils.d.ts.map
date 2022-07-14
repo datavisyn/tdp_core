@@ -1,1 +1,0 @@
-{"version":3,"file":"ThumbnailUtils.d.ts","sourceRoot":"","sources":["../../../src/clue/base/ThumbnailUtils.ts"],"names":[],"mappings":"AAEA,OAAO,EAAE,eAAe,EAAE,SAAS,EAAE,MAAM,eAAe,CAAC;AAE3D,qBAAa,cAAc;IACzB,MAAM,CAAC,aAAa,CAAC,KAAK,EAAE,eAAe,EAAE,KAAK,EAAE,SAAS,EAAE,OAAO,KAAK;IAoB3E,MAAM,CAAC,sBAAsB,CAAC,KAAK,EAAE,eAAe;CAIrD"}

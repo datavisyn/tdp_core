@@ -1,6 +1,3 @@
-
-$phovea_ui_assset_dir: '~tdp_core/dist/assets' !default;
-
 @mixin font-face($family, $style, $weight, $path, $local_weight) {
 	/* #{$family}-#{$local-weight} - latin */
 	@font-face {

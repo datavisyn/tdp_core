@@ -13,8 +13,8 @@ and select your target font and weights.
 @import './font';
 
 // define font face (family, style, weight, path, local weight name)
-@include font-face(Yantramanav, normal, 400, '#{$phovea_ui_assset_dir}/fonts/yantramanav-v2-latin-regular', regular);
-@include font-face(Yantramanav, normal, 500, '#{$phovea_ui_assset_dir}/fonts/yantramanav-v2-latin-500', medium);
-@include font-face(Yantramanav, normal, 700, '#{$phovea_ui_assset_dir}/fonts/yantramanav-v2-latin-700', bold);
+@include font-face(Yantramanav, normal, 400, '../../assets/fonts/yantramanav-v2-latin-regular', regular);
+@include font-face(Yantramanav, normal, 500, '../../assets/fonts/yantramanav-v2-latin-500', medium);
+@include font-face(Yantramanav, normal, 700, '../../assets/fonts/yantramanav-v2-latin-700', bold);
 ```
 

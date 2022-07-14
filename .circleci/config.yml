@@ -8,7 +8,7 @@ executors:
   node-executor:
     working_directory: ~/phovea-web
     docker:
-      - image: circleci/node:14.17-buster
+      - image: circleci/node:16-buster
 
 jobs:
   python-build:
@@ -26,7 +26,7 @@ jobs:
       - save_cache:
           key: deps-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum "requirements_dev.txt" }}
           paths:
-          - ~/venv
+            - ~/venv
       - run:
           name: Force an update of pip dependencies from git repositories # not sure if this is working ?
           command: |
@@ -72,7 +72,7 @@ jobs:
             pip install twine
       - run:
           name: Authentication
-          command:  |
+          command: |
             echo -e "[pypi]" >> ~/.pypirc
             echo -e "repository = $PYPI_REPOSITORY" >> ~/.pypirc
             echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
@@ -126,24 +126,24 @@ jobs:
       - run: ls -a
       - run:
           name: Authentication
-          command:  |
+          command: |
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
       - run:
           name: Publish package
           command: npm publish
 workflows:
   version: 2.1
-#  build-nightly:
-#    triggers:
-#      - schedule:
-#          cron: "15 1 * * 1-5" # "At 01:15 on every day-of-week from Monday through Friday.”, see: https://crontab.guru/#15_1_*_*_1-5
-#          filters:
-#            branches:
-#              only:
-#                - develop
-#    jobs:
-#      - python-build
-#      - web-build
+  #  build-nightly:
+  #    triggers:
+  #      - schedule:
+  #          cron: "15 1 * * 1-5" # "At 01:15 on every day-of-week from Monday through Friday.”, see: https://crontab.guru/#15_1_*_*_1-5
+  #          filters:
+  #            branches:
+  #              only:
+  #                - develop
+  #    jobs:
+  #      - python-build
+  #      - web-build
   build-branches-only:
     jobs:
       - python-build:
@@ -170,23 +170,23 @@ workflows:
               only: /^v.*/
       - python-publish:
           context:
-              - org-public
+            - org-public
           requires:
-              - python-build
-              - web-build
+            - python-build
+            - web-build
           filters:
-              branches:
-                ignore: /.*/
-              tags:
-                only: /^v.*/
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/
       - web-publish:
           context:
-              - org-public
+            - org-public
           requires:
-              - python-build
-              - web-build
+            - python-build
+            - web-build
           filters:
-              branches:
-                ignore: /.*/
-              tags:
-                only: /^v.*/
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v.*/

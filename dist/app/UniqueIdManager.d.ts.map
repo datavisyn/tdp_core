@@ -1,1 +1,0 @@
-{"version":3,"file":"UniqueIdManager.d.ts","sourceRoot":"","sources":["../../src/app/UniqueIdManager.ts"],"names":[],"mappings":"AAAA,qBAAa,eAAe;IAC1B;;;OAGG;IACH,OAAO,CAAC,SAAS,CAA6B;IAE9C;;;;OAIG;IACI,QAAQ,CAAC,MAAM,SAAa;IAS5B,MAAM,CAAC,MAAM,EAAE,MAAM,EAAE,EAAE,EAAE,MAAM;IAYxC;;;;OAIG;IACI,YAAY,CAAC,MAAM,SAAa;IAIvC,OAAO,CAAC,MAAM,CAAC,QAAQ,CAAkB;WAE3B,WAAW,IAAI,eAAe;CAM7C"}
