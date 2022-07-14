@@ -1,24 +1,49 @@
 import { ERenderMode, renderMissingDOM } from 'lineupjs';
 import { abortAble } from 'lineupengine';
 import { StructureImageColumn } from './StructureImageColumn';
-import { AppContext } from '../../app';
 const template = '<a target="_blank" rel="noopener" style="background-size: contain; background-position: center; background-repeat: no-repeat;"></a>';
-export function getImageURL(structure, substructure = null, align = null) {
-    return `/api/image/?structure=${encodeURIComponent(structure)}${substructure ? `&substructure=${encodeURIComponent(substructure)}` : ''}${align ? `&align=${encodeURIComponent(align)}` : ''}`;
+function getImageURL(structure, substructure = null, align = null) {
+    return `/api/image/${encodeURIComponent(structure)}${substructure ? `?substructure=${encodeURIComponent(substructure)}` : ''}${align ? `&align=${encodeURIComponent(align)}` : ''}`;
 }
-export function getReducedImages(structures, method = 'auto') {
-    //   return fetchText('/api/image/', {
-    //     structures,
-    //     method,
-    //   }).catch(() => null);
-    return AppContext.getInstance()
-        .getAPIData('/image', { structures, method })
-        .catch(() => null);
+async function fetchImage({ url, data, method }) {
+    var _a;
+    const response = await fetch(url, {
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        // @ts-ignore
+        // mode: '*cors', // no-cors, *cors, same-origin
+        method,
+        redirect: 'follow',
+        ...(data
+            ? {
+                body: JSON.stringify(data),
+            }
+            : {}),
+    });
+    if (!response.ok) {
+        throw Error(((_a = (await response.json().catch(() => null))) === null || _a === void 0 ? void 0 : _a.message) || response.statusText);
+    }
+    return response.text();
 }
-export function svgToImageSrc(svg) {
+async function getReducedImages(structures) {
+    // maximum common substructure
+    if (structures.length > 2) {
+        return fetchImage({ url: '/api/image/mcs', data: structures, method: 'POST' });
+    }
+    // similarity
+    if (structures.length === 2) {
+        const reference = structures[0];
+        const probe = structures.length > 1 ? structures[1] : structures[0];
+        return fetchImage({ url: `/api/image/similarity/${encodeURIComponent(probe)}/${encodeURIComponent(reference)}`, method: 'GET' });
+    }
+    // single = first structure
+    return fetchImage({ url: `/api/image/${encodeURIComponent(structures[0])}`, method: 'GET' });
+}
+function svgToImageSrc(svg) {
     return `data:image/svg+xml;base64,${btoa(svg)}`;
 }
-export function svgToCSSBackground(svg) {
+function svgToCSSBackground(svg) {
     return `url('${svgToImageSrc(svg)}')`;
 }
 export class StructureImageRenderer {

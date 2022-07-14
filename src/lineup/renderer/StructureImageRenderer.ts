@@ -1,31 +1,58 @@
 import { ICellRendererFactory, ERenderMode, ICellRenderer, IDataRow, IRenderContext, IGroupCellRenderer, IOrderedGroup, renderMissingDOM } from 'lineupjs';
 import { abortAble } from 'lineupengine';
 import { StructureImageColumn } from './StructureImageColumn';
-import { AppContext } from '../../app';
 
 const template = '<a target="_blank" rel="noopener" style="background-size: contain; background-position: center; background-repeat: no-repeat;"></a>';
 
-export function getImageURL(structure: string, substructure: string | null = null, align: string | null = null): string {
-  return `/api/image/?structure=${encodeURIComponent(structure)}${substructure ? `&substructure=${encodeURIComponent(substructure)}` : ''}${
+function getImageURL(structure: string, substructure: string | null = null, align: string | null = null): string {
+  return `/api/image/${encodeURIComponent(structure)}${substructure ? `?substructure=${encodeURIComponent(substructure)}` : ''}${
     align ? `&align=${encodeURIComponent(align)}` : ''
   }`;
 }
 
-export function getReducedImages(structures: string[], method: 'single' | 'murcko' | 'mcs' | 'similarity' | 'auto' = 'auto'): Promise<string | null> {
-  //   return fetchText('/api/image/', {
-  //     structures,
-  //     method,
-  //   }).catch(() => null);
-  return AppContext.getInstance()
-    .getAPIData('/image', { structures, method })
-    .catch(() => null);
+async function fetchImage({ url, data, method }: { url: string; data?: any; method?: string }): Promise<string> {
+  const response = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    // @ts-ignore
+    // mode: '*cors', // no-cors, *cors, same-origin
+    method,
+    redirect: 'follow',
+    ...(data
+      ? {
+          body: JSON.stringify(data),
+        }
+      : {}),
+  });
+  if (!response.ok) {
+    throw Error((await response.json().catch(() => null))?.message || response.statusText);
+  }
+  return response.text();
 }
 
-export function svgToImageSrc(svg: string): string {
+async function getReducedImages(structures: string[]): Promise<string | null> {
+  // maximum common substructure
+  if (structures.length > 2) {
+    return fetchImage({ url: '/api/image/mcs', data: structures, method: 'POST' });
+  }
+
+  // similarity
+  if (structures.length === 2) {
+    const reference = structures[0];
+    const probe = structures.length > 1 ? structures[1] : structures[0];
+    return fetchImage({ url: `/api/image/similarity/${encodeURIComponent(probe)}/${encodeURIComponent(reference)}`, method: 'GET' });
+  }
+
+  // single = first structure
+  return fetchImage({ url: `/api/image/${encodeURIComponent(structures[0])}`, method: 'GET' });
+}
+
+function svgToImageSrc(svg: string): string {
   return `data:image/svg+xml;base64,${btoa(svg)}`;
 }
 
-export function svgToCSSBackground(svg: string): string {
+function svgToCSSBackground(svg: string): string {
   return `url('${svgToImageSrc(svg)}')`;
 }
 
