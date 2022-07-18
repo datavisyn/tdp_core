@@ -39,16 +39,9 @@ export class Dialog {
    * @param title Dialog title
    * @param primaryBtnText Label for primary button
    * @param additionalCSSClasses additional css classes for the dialog
-   * @param backdrop sets backdrop option for bootstrap modal
-   *
-   * false: show no backdrop;
-   *
-   * true: show backdrop, dialog closes on click outside;
-   *
-   * static: show backdrop, dialog does not close on click outside;
-   * @default backdrop true
+   * @param modalOptions set options like backdrop, keyboard, focus for the Bootstrap modal dialog
    */
-  constructor(title: string, primaryBtnText = 'OK', additionalCSSClasses = '', backdrop: boolean | 'static' = true) {
+  constructor(title: string, primaryBtnText = 'OK', additionalCSSClasses = '', modalOptions?: Modal.Options) {
     this.modalElement = document.createElement('div');
     this.modalElement.setAttribute('role', 'dialog');
     this.modalElement.classList.add('modal', 'fade');
@@ -75,16 +68,7 @@ export class Dialog {
       </div>`;
     document.body.appendChild(this.modalElement);
 
-    this.bsModal = new Modal(this.modalElement, {
-      // Closes the modal when escape key is pressed
-      keyboard: true,
-
-      // Puts the focus on the modal when initialized and keeps the focus inside modal with a focus trap.
-      focus: false,
-
-      // Includes a modal-backdrop element. Alternatively, specify static for a backdrop which doesn't close the modal on click.
-      backdrop,
-    });
+    this.bsModal = new Modal(this.modalElement, modalOptions);
   }
 
   show() {
