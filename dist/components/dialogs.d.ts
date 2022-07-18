@@ -25,9 +25,16 @@ export declare class Dialog {
      * @param title Dialog title
      * @param primaryBtnText Label for primary button
      * @param additionalCSSClasses additional css classes for the dialog
-     * @param modalOptions set options like backdrop, keyboard, focus for the Bootstrap modal dialog
+     * @param backdrop sets backdrop option for bootstrap modal
+     *
+     * false: show no backdrop;
+     *
+     * true: show backdrop, dialog closes on click outside;
+     *
+     * static: show backdrop, dialog does not close on click outside;
+     * @default backdrop true
      */
-    constructor(title: string, primaryBtnText?: string, additionalCSSClasses?: string, modalOptions?: Modal.Options);
+    constructor(title: string, primaryBtnText?: string, additionalCSSClasses?: string, backdrop?: boolean | 'static');
     show(): void;
     hide(): void;
     get body(): Element;

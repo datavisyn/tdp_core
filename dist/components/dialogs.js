@@ -3,15 +3,23 @@ import $ from 'jquery';
 import { merge } from 'lodash';
 import { Modal } from 'bootstrap';
 import { I18nextManager } from '../i18n';
+import { TourUtils } from '../tour/TourUtils';
 import { BaseUtils } from '../base/BaseUtils';
 export class Dialog {
     /**
      * @param title Dialog title
      * @param primaryBtnText Label for primary button
      * @param additionalCSSClasses additional css classes for the dialog
-     * @param modalOptions set options like backdrop, keyboard, focus for the Bootstrap modal dialog
+     * @param backdrop sets backdrop option for bootstrap modal
+     *
+     * false: show no backdrop;
+     *
+     * true: show backdrop, dialog closes on click outside;
+     *
+     * static: show backdrop, dialog does not close on click outside;
+     * @default backdrop true
      */
-    constructor(title, primaryBtnText = 'OK', additionalCSSClasses = '', modalOptions) {
+    constructor(title, primaryBtnText = 'OK', additionalCSSClasses = '', backdrop = true) {
         this.bakKeyDownListener = null; // temporal for restoring an old keydown listener
         this.modalElement = document.createElement('div');
         this.modalElement.setAttribute('role', 'dialog');
@@ -36,7 +44,16 @@ export class Dialog {
         </div>
       </div>`;
         document.body.appendChild(this.modalElement);
-        this.bsModal = new Modal(this.modalElement, modalOptions);
+        this.bsModal = new Modal(this.modalElement, {
+            // Closes the modal when escape key is pressed
+            keyboard: true,
+            // Puts the focus on the modal when initialized and keeps the focus inside modal with a focus trap.
+            // Set focus to `false` if a tour has been started to avoid focus conflicts between this modal and the tour dialog that automatically focus on the next button.
+            // Otherwise the flag is set to `true` and keep the focus on this dialog.
+            focus: TourUtils.isTourVisible() !== true,
+            // Includes a modal-backdrop element. Alternatively, specify static for a backdrop which doesn't close the modal on click.
+            backdrop,
+        });
     }
     show() {
         this.bakKeyDownListener = document.onkeydown;
