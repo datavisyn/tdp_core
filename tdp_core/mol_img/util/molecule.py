@@ -1,10 +1,10 @@
-from typing import List
+from typing import List, Optional
 
 from rdkit.Chem import Mol, TemplateAlign, rdFMCS
 from rdkit.Chem.Scaffolds import MurckoScaffold
 
 
-def maximum_common_substructure_query_mol(mols: List[Mol]):
+def maximum_common_substructure_query_mol(mols: List[Mol]) -> Optional[Mol]:
     """https://www.rdkit.org/docs/GettingStartedInPython.html#maximum-common-substructure"""
     return rdFMCS.FindMCS(mols, matchValences=True, ringMatchesRingOnly=True, completeRingsOnly=True).queryMol
 
