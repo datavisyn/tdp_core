@@ -75,8 +75,7 @@ export class Dialog {
     this.bakKeyDownListener = document.onkeydown;
     document.onkeydown = (evt) => {
       evt = evt || <KeyboardEvent>window.event;
-      if (evt.keyCode === 27) {
-        // 27 === ESC key
+      if (evt.key === 'Escape') {
         this.hide();
       }
     };
