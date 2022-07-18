@@ -72,13 +72,15 @@ export class FormDialog extends PHOVEA_UI_FormDialog {
           resolve(data);
         }
       });
-      this.show();
-      setTimeout(() => {
+      const focusOnFirstFormElement = () => {
+        this.modalElement.removeEventListener('shown.bs.modal', focusOnFirstFormElement);
         const first = <HTMLElement>this.body.querySelector('input, select, textarea');
         if (first) {
           first.focus();
         }
-      }, 250); // till dialog is visible
+      };
+      this.modalElement.addEventListener('shown.bs.modal', focusOnFirstFormElement);
+      this.show();
     });
   }
 }
