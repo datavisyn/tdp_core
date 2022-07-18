@@ -1,4 +1,5 @@
-import { GlobalEventHandler, BaseUtils } from '../base';
+import { GlobalEventHandler } from '../base/event';
+import { BaseUtils } from '../base/BaseUtils';
 export class TourUtils {
     /**
      * start a view help tour

@@ -1,4 +1,4 @@
-import { IViewTourContext } from './extensions';
+import type { IViewTourContext } from './extensions';
 export declare class TourUtils {
     static readonly GLOBAL_EVENT_START_TOUR = "tdpStartTour";
     static readonly GLOBAL_EVENT_END_TOUR = "tdpEndTour";

@@ -48,7 +48,7 @@ export class Dialog {
             // Closes the modal when escape key is pressed
             keyboard: true,
             // Puts the focus on the modal when initialized and keeps the focus inside modal with a focus trap.
-            // Set focus to `false` if a tour has been started to avoid focus conflicts between this modal and the tour dialog that automatically focus on the next button.
+            // Set focus to `false` if a tour is visible to avoid focus conflicts between this modal and the tour dialog that automatically focus on the next button.
             // Otherwise the flag is set to `true` and keep the focus on this dialog.
             focus: TourUtils.isTourVisible() !== true,
             // Includes a modal-backdrop element. Alternatively, specify static for a backdrop which doesn't close the modal on click.

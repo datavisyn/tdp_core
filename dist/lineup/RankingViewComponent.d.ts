@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import type { IRankingProps } from './Ranking';
 import { ISelection } from '../base/interfaces';
 import { ISelectionAdapter } from './selection/ISelectionAdapter';

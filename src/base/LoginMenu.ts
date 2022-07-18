@@ -2,10 +2,11 @@ import { merge } from 'lodash';
 import { EventHandler } from './event';
 import { PluginRegistry } from '../app';
 import { I18nextManager } from '../i18n';
-import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM, ICustomizedLoginFormPluginDesc, ICustomizedLoginFormPlugin } from './extensions';
+import type { ICustomizedLoginFormPluginDesc, ICustomizedLoginFormPlugin } from './extensions';
+import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM } from './extensions';
 import { LoginUtils } from './LoginUtils';
 import { SessionWatcher } from './watcher';
-import { AppHeader } from '../components';
+import { AppHeader } from '../components/header';
 
 // const DEFAULT_SESSION_TIMEOUT = 60 * 1000; // 10 min
 

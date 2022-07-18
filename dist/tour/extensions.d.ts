@@ -1,7 +1,7 @@
 import { Placement, PopperOptions } from 'popper.js';
-import { IPlugin } from '../base';
-import { AppHeader } from '../components';
-import { IViewPluginDesc, IView, ISelection } from '../base/interfaces';
+import type { IPlugin } from '../base';
+import { AppHeader } from '../components/header';
+import type { IViewPluginDesc, IView, ISelection } from '../base/interfaces';
 export interface ITDPTourExtensionDesc {
     /**
      * The id of the tour.

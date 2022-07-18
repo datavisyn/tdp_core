@@ -1,5 +1,5 @@
-import { ITDPTourExtensionDesc, IStep } from './extensions';
-import { AppHeader } from '../components';
+import type { ITDPTourExtensionDesc, IStep } from './extensions';
+import { AppHeader } from '../components/header';
 export interface ITourContext {
     /**
      * The TDP application

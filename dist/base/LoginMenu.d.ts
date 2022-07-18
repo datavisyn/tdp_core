@@ -1,5 +1,5 @@
 import { EventHandler } from './event';
-import { AppHeader } from '../components';
+import { AppHeader } from '../components/header';
 export interface ILoginMenuOptions {
     /**
      * formular used for the login dialog

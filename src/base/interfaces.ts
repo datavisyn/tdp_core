@@ -1,12 +1,12 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
-import { IAuthorizationConfiguration } from '../auth';
+import type { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
 import { IDType } from '../idtype/IDType';
-import { IUser } from '../security';
+import type { IUser } from '../security';
 import type { IPlugin, IPluginDesc } from './plugin';
-import { IEventHandler } from './event';
+import type { IEventHandler } from './event';
 import { ProvenanceGraph } from '../clue/provenance/ProvenanceGraph';
-import { IObjectRef } from '../clue/provenance/ObjectNode';
+import type { IObjectRef } from '../clue/provenance/ObjectNode';
 import { AppHeader } from '../components/header';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
