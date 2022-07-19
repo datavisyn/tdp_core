@@ -3,7 +3,7 @@ import { abortAble } from 'lineupengine';
 import { StructureImageColumn } from './StructureImageColumn';
 const template = '<a target="_blank" rel="noopener" style="background-size: contain; background-position: center; background-repeat: no-repeat;"></a>';
 function getImageURL(structure, substructure = null, align = null) {
-    return `/api/image/${encodeURIComponent(structure)}${substructure ? `?substructure=${encodeURIComponent(substructure)}` : ''}${align ? `&align=${encodeURIComponent(align)}` : ''}`;
+    return `/api/rdkit/?structure=${encodeURIComponent(structure)}${substructure ? `&substructure=${encodeURIComponent(substructure)}` : ''}${align ? `&align=${encodeURIComponent(align)}` : ''}`;
 }
 async function fetchImage({ url, data, method }) {
     var _a;
@@ -29,16 +29,16 @@ async function fetchImage({ url, data, method }) {
 async function getReducedImages(structures) {
     // maximum common substructure
     if (structures.length > 2) {
-        return fetchImage({ url: '/api/image/mcs', data: structures, method: 'POST' });
+        return fetchImage({ url: '/api/rdkit/mcs/', data: structures, method: 'POST' });
     }
     // similarity
     if (structures.length === 2) {
         const reference = structures[0];
         const probe = structures.length > 1 ? structures[1] : structures[0];
-        return fetchImage({ url: `/api/image/similarity/${encodeURIComponent(probe)}/${encodeURIComponent(reference)}`, method: 'GET' });
+        return fetchImage({ url: `/api/rdkit/similarity/?structure=${encodeURIComponent(probe)}&reference=${encodeURIComponent(reference)}`, method: 'GET' });
     }
     // single = first structure
-    return fetchImage({ url: `/api/image/${encodeURIComponent(structures[0])}`, method: 'GET' });
+    return fetchImage({ url: `/api/rdkit/?structure=${encodeURIComponent(structures[0])}`, method: 'GET' });
 }
 function svgToImageSrc(svg) {
     return `data:image/svg+xml;base64,${btoa(svg)}`;
