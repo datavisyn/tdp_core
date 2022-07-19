@@ -43,4 +43,4 @@ class SvgResponse(Response):
 
 class SubstructuresResponse(BaseModel):
     count: Dict[str, int] = dict()
-    valid: Dict[str, int] = dict()
+    valid: Dict[str, bool] = dict()

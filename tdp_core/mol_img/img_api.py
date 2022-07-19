@@ -1,30 +1,38 @@
 from typing import List, Optional, Set
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
+from rdkit.Chem import Mol
+from rdkit.Chem.Scaffolds import MurckoScaffold
 
 from .models import SmilesMolecule, SmilesSmartsMolecule, SubstructuresResponse, SvgResponse
 from .util.draw import draw, draw_similarity
-from .util.molecule import aligned, maximum_common_substructure_query_mol, murcko
+from .util.molecule import aligned, maximum_common_substructure_query_mol
 
-app = APIRouter(prefix="/api/image", tags=["images"])
+app = APIRouter(prefix="/api/rdkit", tags=["images"])
 
 
-@app.get("/{structure}", response_class=SvgResponse)
+@app.get("/", response_class=SvgResponse)
 def draw_smiles(
     structure: SmilesMolecule, substructure: Optional[SmilesMolecule] = None, align: Optional[SmilesMolecule] = None
 ):  # noqa: E1127
     return draw(structure.mol, aligned(structure.mol, align and align.mol) or substructure and substructure.mol)
 
 
-@app.get("/murcko/{structure}", response_class=SvgResponse)
+@app.post("/")
+def multiple_images(structures: Set[SmilesMolecule]):
+    return {m: draw(m.mol) for m in structures}
+
+
+@app.get("/murcko/", response_class=SvgResponse)
 def draw_murcko(structure: SmilesMolecule):
     """https://www.rdkit.org/docs/GettingStartedInPython.html#murcko-decomposition"""
-    return draw(murcko(structure.mol))
+    murcko = MurckoScaffold.GetScaffoldForMol(structure.mol)
+    return draw(murcko)
 
 
-@app.get("/similarity/{probe}/{reference}", response_class=SvgResponse)
-def draw_molecule_similarity(probe: SmilesMolecule, reference: SmilesMolecule):
-    return draw_similarity(probe.mol, reference.mol)
+@app.get("/similarity/", response_class=SvgResponse)
+def draw_molecule_similarity(structure: SmilesMolecule, reference: SmilesMolecule):
+    return draw_similarity(structure.mol, reference.mol)
 
 
 #######################
@@ -32,15 +40,16 @@ def draw_molecule_similarity(probe: SmilesMolecule, reference: SmilesMolecule):
 #######################
 
 
-@app.post("/mcs", response_class=SvgResponse)
+@app.post("/mcs/", response_class=SvgResponse)
 def draw_maximum_common_substructure_molecule(structures: List[SmilesMolecule]):
     unique = [m.mol for m in set(structures)]
     mcs = maximum_common_substructure_query_mol(unique)
-    print(mcs)
+    if not mcs or not isinstance(mcs, Mol):
+        raise HTTPException(500, "No MCS")
     return draw(mcs)
 
 
-@app.post("/substructures/{substructure}")
+@app.post("/substructures/")
 def substructures_count(structures: Set[SmilesMolecule], substructure: SmilesSmartsMolecule) -> SubstructuresResponse:
     """Check and return number of possible substructures in a set of structures"""
     ssr = SubstructuresResponse()
@@ -49,12 +58,3 @@ def substructures_count(structures: Set[SmilesMolecule], substructure: SmilesSma
         # returns the indices of molecules matching
         ssr.count[smiles] = len(smiles.mol.GetSubstructMatch(substructure.mol))
     return ssr
-
-
-@app.post("/")
-def multiple_images(structures: Set[SmilesMolecule]):
-    return {m: draw(m.mol) for m in structures}
-
-
-def create_api():
-    return app

@@ -1,7 +1,15 @@
+from fastapi import FastAPI
+
+from .mol_img import img_api
 from .plugin.model import AVisynPlugin, RegHelper
 
 
 class VisynPlugin(AVisynPlugin):
+    def init_app(self, app: FastAPI):
+        app.include_router(img_api.app)
+        # apps using tdp_core should register their endpoints in register via
+        # registry.append_router("rdkit-image", "tdp_core.mol_img.img_api", {"factory": "create_api"})
+
     def register(self, registry: RegHelper):
         # phovea_server
         registry.append(
@@ -16,7 +24,6 @@ class VisynPlugin(AVisynPlugin):
             "tdp_core.id_mapping.idtype_api",
             {"namespace": "/api/idtype", "factory": "create_idtype"},
         )
-        registry.append_router("rdkit-image", "tdp_core.mol_img.img_api", {"factory": "create_api"})
         registry.append("json-encoder", "numpy", "tdp_core.encoder.json_encoder")
         registry.append("json-encoder", "set-encoder", "tdp_core.encoder.set_encoder", {})
 
