@@ -76,10 +76,11 @@ def test_maximum_common_substructure(client: TestClient):
 def test_maximum_common_substructure_inconsistent(client: TestClient):
     """This method sometimes returns None -> 500 and sometimes a questionmark"""
     res = client.post("/api/rdkit/mcs/", json=["C1COCCO1", "CC(COC)OC", "CC1(OCCO1)C", "CCCCCCCO", "CCCCCCO"])
+    print(res.content)
     if res.status_code == 200:
         hash_compare(res.content, "73e4c61270b280938b647dbad15552167f8cef259f5fc0c6f30a291c787d3b31")
     else:
-        assert res.status_code == 500
+        assert res.status_code == 204 and res.content == b"null"
 
 
 def test_substructures(client: TestClient):
