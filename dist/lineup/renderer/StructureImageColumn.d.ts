@@ -1,15 +1,16 @@
-import { StringColumn, IDataRow, IStringFilter } from 'lineupjs';
-export interface IStructureFilter extends IStringFilter {
+import { StringColumn, IDataRow } from 'lineupjs';
+export interface IStructureImageFilter {
     filter: string;
+    filterMissing: boolean;
     valid: Set<string>;
 }
 export declare class StructureImageColumn extends StringColumn {
-    protected structureFilter: IStructureFilter | null;
+    protected structureFilter: IStructureImageFilter | null;
     protected align: string | null;
     filter(row: IDataRow): boolean;
     isFiltered(): boolean;
-    getFilter(): IStructureFilter;
-    setFilter(filter: IStructureFilter | null): void;
+    getFilter(): IStructureImageFilter;
+    setFilter(filter: IStructureImageFilter | null): void;
     getAlign(): string | null;
     setAlign(structure: string | null): void;
 }

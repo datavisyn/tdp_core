@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
+import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, toolbar, dialogContext, } from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
 import { LazyColumn } from './internal/column';
@@ -27,6 +27,7 @@ import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn } from './renderer/StructureImageColumn';
 import { StructureImageRenderer } from './renderer/StructureImageRenderer';
+import { StructureImageFilterDialog } from './renderer/StructureImageFilterDialog';
 const defaults = {
     itemName: 'item',
     itemNamePlural: 'items',
@@ -227,6 +228,8 @@ onAddScoreColumn, }) {
         if (!initialized) {
             // register custom column types
             options.customProviderOptions.columnTypes = { ...options.customProviderOptions.columnTypes, smiles: StructureImageColumn };
+            // register custom filter dialogs for custom column types
+            toolbar('filterStructureImage')(StructureImageColumn);
             providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
             providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
             const taggleOptions = merge(defaultOptions(), options.customOptions, {
@@ -234,6 +237,21 @@ onAddScoreColumn, }) {
                 labelRotation: options.enableHeaderRotation ? 45 : 0,
                 renderers: {
                     smiles: new StructureImageRenderer(),
+                },
+                toolbarActions: {
+                    // TODO remove default string filter; use `filterString` as key would override the default string filter, but also for string columns
+                    filterStructureImage: {
+                        title: 'Filter …',
+                        onClick: (col, evt, ctx, level, viaShortcut) => {
+                            const dialog = new StructureImageFilterDialog(col, dialogContext(ctx, level, evt), ctx);
+                            dialog.open();
+                        },
+                        options: {
+                            mode: 'menu+shortcut',
+                            featureCategory: 'ranking',
+                            featureLevel: 'basic',
+                        },
+                    },
                 },
             }, options.customOptions);
             if (typeof options.itemRowHeight === 'number' && options.itemRowHeight > 0) {

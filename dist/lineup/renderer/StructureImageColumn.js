@@ -7,10 +7,12 @@ export class StructureImageColumn extends StringColumn {
         this.align = null;
     }
     filter(row) {
+        var _a;
         if (!this.isFiltered()) {
             return true;
         }
-        return this.structureFilter.valid.has(this.getLabel(row));
+        console.log(row, this.getLabel(row), this.structureFilter.valid.has(this.getLabel(row)));
+        return (_a = this.structureFilter.valid.has(this.getLabel(row))) !== null && _a !== void 0 ? _a : false;
     }
     isFiltered() {
         var _a;

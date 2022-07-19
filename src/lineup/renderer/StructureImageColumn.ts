@@ -1,13 +1,14 @@
 import { StringColumn, IDataRow, IStringFilter, Column } from 'lineupjs';
 import { isEqual } from 'lodash';
 
-export interface IStructureFilter extends IStringFilter {
+export interface IStructureImageFilter {
   filter: string;
+  filterMissing: boolean;
   valid: Set<string>;
 }
 
 export class StructureImageColumn extends StringColumn {
-  protected structureFilter: IStructureFilter | null = null;
+  protected structureFilter: IStructureImageFilter | null = null;
 
   protected align: string | null = null;
 
@@ -15,7 +16,8 @@ export class StructureImageColumn extends StringColumn {
     if (!this.isFiltered()) {
       return true;
     }
-    return this.structureFilter!.valid.has(this.getLabel(row));
+    console.log(row, this.getLabel(row), this.structureFilter!.valid.has(this.getLabel(row)));
+    return this.structureFilter.valid.has(this.getLabel(row)) ?? false;
   }
 
   isFiltered(): boolean {
@@ -26,7 +28,7 @@ export class StructureImageColumn extends StringColumn {
     return this.structureFilter!;
   }
 
-  setFilter(filter: IStructureFilter | null) {
+  setFilter(filter: IStructureImageFilter | null) {
     if (isEqual(filter, this.structureFilter)) {
       return;
     }

@@ -17,8 +17,10 @@ import {
   spaceFillingRule,
   updateLodRules,
   IColumnDesc,
-  Ranking as LineUpRanking,
   UIntTypedArray,
+  toolbar,
+  IRankingHeaderContext,
+  dialogContext,
 } from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
@@ -35,7 +37,6 @@ import { IARankingViewOptions } from './IARankingViewOptions';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils } from '../base/BaseUtils';
 import { IDTypeManager } from '../idtype/IDTypeManager';
-import { useSyncedRef } from '../hooks/useSyncedRef';
 import { AView } from '../views/AView';
 import { InvalidTokenError, TDPTokenManager } from '../auth/TokenManager';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
@@ -52,6 +53,7 @@ import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn } from './renderer/StructureImageColumn';
 import { StructureImageRenderer } from './renderer/StructureImageRenderer';
+import { StructureImageFilterDialog } from './renderer/StructureImageFilterDialog';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;
@@ -314,6 +316,9 @@ export function Ranking({
       // register custom column types
       options.customProviderOptions.columnTypes = { ...options.customProviderOptions.columnTypes, smiles: StructureImageColumn };
 
+      // register custom filter dialogs for custom column types
+      toolbar('filterStructureImage')(StructureImageColumn);
+
       providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
       providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
 
@@ -325,6 +330,21 @@ export function Ranking({
           labelRotation: options.enableHeaderRotation ? 45 : 0,
           renderers: {
             smiles: new StructureImageRenderer(),
+          },
+          toolbarActions: {
+            // TODO remove default string filter; use `filterString` as key would override the default string filter, but also for string columns
+            filterStructureImage: {
+              title: 'Filter …', // the toolbar icon is derived from this string! (= transformed to `lu-action-filter`)
+              onClick: (col: StructureImageColumn, evt: MouseEvent, ctx: IRankingHeaderContext, level: number, viaShortcut: boolean) => {
+                const dialog = new StructureImageFilterDialog(col, dialogContext(ctx, level, evt), ctx);
+                dialog.open();
+              },
+              options: {
+                mode: 'menu+shortcut',
+                featureCategory: 'ranking',
+                featureLevel: 'basic',
+              },
+            },
           },
         } as Partial<ITaggleOptions>,
         options.customOptions,
