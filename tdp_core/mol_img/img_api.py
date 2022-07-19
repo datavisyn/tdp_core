@@ -3,6 +3,8 @@ from typing import List, Optional, Set
 from fastapi import APIRouter, HTTPException
 from rdkit.Chem import Mol
 from rdkit.Chem.Scaffolds import MurckoScaffold
+from starlette.responses import Response
+from starlette.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 
 from .models import SmilesMolecule, SmilesSmartsMolecule, SubstructuresResponse, SvgResponse
 from .util.draw import draw, draw_similarity
@@ -45,7 +47,7 @@ def draw_maximum_common_substructure_molecule(structures: List[SmilesMolecule]):
     unique = [m.mol for m in set(structures)]
     mcs = maximum_common_substructure_query_mol(unique)
     if not mcs or not isinstance(mcs, Mol):
-        raise HTTPException(500, "No MCS")
+        return Response("null", status_code=HTTP_204_NO_CONTENT)
     return draw(mcs)
 
 
