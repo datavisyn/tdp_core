@@ -1,10 +1,10 @@
 from typing import List, Optional, Set
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from rdkit.Chem import Mol
 from rdkit.Chem.Scaffolds import MurckoScaffold
 from starlette.responses import Response
-from starlette.status import HTTP_200_OK, HTTP_204_NO_CONTENT
+from starlette.status import HTTP_204_NO_CONTENT
 
 from .models import SmilesMolecule, SmilesSmartsMolecule, SubstructuresResponse, SvgResponse
 from .util.draw import draw, draw_similarity
