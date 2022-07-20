@@ -1,4 +1,4 @@
-import { StringColumn, IDataRow, IStringFilter, Column } from 'lineupjs';
+import { StringColumn, IDataRow, Column } from 'lineupjs';
 import { isEqual } from 'lodash';
 
 export interface IStructureImageFilter {
