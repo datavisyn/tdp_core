@@ -1,6 +1,7 @@
-import { ICellRendererFactory, ERenderMode, ICellRenderer, IDataRow, IRenderContext, IGroupCellRenderer, IOrderedGroup, renderMissingDOM } from 'lineupjs';
+import { ICellRendererFactory, ERenderMode, ICellRenderer, IDataRow, IRenderContext, IGroupCellRenderer, IOrderedGroup, renderMissingDOM, Column, IImposer, ISummaryRenderer } from 'lineupjs';
 import { abortAble } from 'lineupengine';
 import { StructureImageColumn } from './StructureImageColumn';
+import { I18nextManager } from '../../i18n';
 
 const template = '<a target="_blank" rel="noopener" style="background-size: contain; background-position: center; background-repeat: no-repeat;"></a>';
 
@@ -56,7 +57,7 @@ function svgToCSSBackground(svg: string): string {
 }
 
 export class StructureImageRenderer implements ICellRendererFactory {
-  readonly title: string = 'Chemical Structure';
+  readonly title: string = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structureImageRendererTitle');
 
   canRender(col: StructureImageColumn, mode: ERenderMode): boolean {
     return col instanceof StructureImageColumn && (mode === ERenderMode.CELL || mode === ERenderMode.GROUP);
@@ -101,6 +102,14 @@ export class StructureImageRenderer implements ICellRendererFactory {
           });
         });
       },
+    };
+  }
+
+  createSummary(): ISummaryRenderer {
+    // no renderer
+    return {
+      template: `<div></div>`,
+      update: () => {},
     };
   }
 }

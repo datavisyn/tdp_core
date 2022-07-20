@@ -1,6 +1,7 @@
 import { ERenderMode, renderMissingDOM } from 'lineupjs';
 import { abortAble } from 'lineupengine';
 import { StructureImageColumn } from './StructureImageColumn';
+import { I18nextManager } from '../../i18n';
 const template = '<a target="_blank" rel="noopener" style="background-size: contain; background-position: center; background-repeat: no-repeat;"></a>';
 function getImageURL(structure, substructure = null, align = null) {
     return `/api/rdkit/?structure=${encodeURIComponent(structure)}${substructure ? `&substructure=${encodeURIComponent(substructure)}` : ''}${align ? `&align=${encodeURIComponent(align)}` : ''}`;
@@ -47,7 +48,7 @@ function svgToCSSBackground(svg) {
 }
 export class StructureImageRenderer {
     constructor() {
-        this.title = 'Chemical Structure';
+        this.title = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structureImageRendererTitle');
     }
     canRender(col, mode) {
         return col instanceof StructureImageColumn && (mode === ERenderMode.CELL || mode === ERenderMode.GROUP);
@@ -90,6 +91,13 @@ export class StructureImageRenderer {
                     });
                 });
             },
+        };
+    }
+    createSummary() {
+        // no renderer
+        return {
+            template: `<div></div>`,
+            update: () => { },
         };
     }
 }
