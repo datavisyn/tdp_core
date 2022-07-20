@@ -1,4 +1,14 @@
-import { ICellRendererFactory, ERenderMode, ICellRenderer, IDataRow, IRenderContext, IGroupCellRenderer, IOrderedGroup, renderMissingDOM, Column, IImposer, ISummaryRenderer } from 'lineupjs';
+import {
+  ICellRendererFactory,
+  ERenderMode,
+  ICellRenderer,
+  IDataRow,
+  IRenderContext,
+  IGroupCellRenderer,
+  IOrderedGroup,
+  renderMissingDOM,
+  ISummaryRenderer,
+} from 'lineupjs';
 import { abortAble } from 'lineupengine';
 import { StructureImageColumn } from './StructureImageColumn';
 import { I18nextManager } from '../../i18n';

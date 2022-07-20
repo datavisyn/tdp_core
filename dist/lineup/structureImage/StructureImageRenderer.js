@@ -1,4 +1,4 @@
-import { ERenderMode, renderMissingDOM } from 'lineupjs';
+import { ERenderMode, renderMissingDOM, } from 'lineupjs';
 import { abortAble } from 'lineupengine';
 import { StructureImageColumn } from './StructureImageColumn';
 import { I18nextManager } from '../../i18n';
