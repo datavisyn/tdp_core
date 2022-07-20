@@ -50,7 +50,7 @@ export class StructureImageFilterDialog extends ADialog {
             return;
         }
         const columnType = Object.entries(this.ctx.provider.columnTypes).find(([key, value]) => value === StructureImageColumn)[0];
-        // FIXME find a better way to get all data for the structured image column from the data provider?
+        // FIXME find a better way to get all data for the structured image column from the data provider
         const structures = this.ctx.provider.data.map((row) => row[columnType]) || [];
         // empty input field, but missing values checkbox is checked
         if (filter == null && filterMissing) {
@@ -63,7 +63,7 @@ export class StructureImageFilterDialog extends ADialog {
         fetchSubstructure(structures, filter)
             .then(({ count }) => {
             const matching = new Set(Object.entries(count)
-                .filter(([_structure, cnt]) => cnt > 0)
+                .filter(([, cnt]) => cnt > 0)
                 .map(([structure]) => structure));
             this.column.setFilter({ filter, filterMissing, matching });
             this.findLoadingNode(this.node).setAttribute('hidden', null);
