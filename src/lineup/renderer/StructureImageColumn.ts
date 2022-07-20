@@ -56,6 +56,12 @@ export class StructureImageColumn extends StringColumn {
       return;
     }
 
+    // ensure that no filter of the string column is used beyond this point
+    // TODO remove once the string filter is removed from the UI
+    if (!filter.matching) {
+      return;
+    }
+
     this.fire([StringColumn.EVENT_FILTER_CHANGED, Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.structureFilter, (this.structureFilter = filter));
   }
 
