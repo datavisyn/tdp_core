@@ -4,7 +4,11 @@ import { isEqual } from 'lodash';
 export interface IStructureImageFilter {
   filter: string;
   filterMissing: boolean;
-  valid: Set<string>;
+
+  /**
+   * the set contains matching results that should be visible
+   */
+  matching: Set<string>;
 }
 
 export class StructureImageColumn extends StringColumn {
@@ -16,12 +20,24 @@ export class StructureImageColumn extends StringColumn {
     if (!this.isFiltered()) {
       return true;
     }
-    console.log(row, this.getLabel(row), this.structureFilter!.valid.has(this.getLabel(row)));
-    return this.structureFilter.valid.has(this.getLabel(row)) ?? false;
+
+    // filter out row if no valid results found
+    if (this.structureFilter.matching === null) {
+      return false;
+    }
+
+    const rowLabel = this.getLabel(row);
+
+    // filter missing values
+    if (rowLabel == null || rowLabel.trim() === '') {
+      return !this.structureFilter.filterMissing;
+    }
+
+    return this.structureFilter.matching.has(rowLabel) ?? false;
   }
 
   isFiltered(): boolean {
-    return this.structureFilter != null && this.structureFilter.valid?.size > 0;
+    return this.structureFilter != null;
   }
 
   getFilter() {

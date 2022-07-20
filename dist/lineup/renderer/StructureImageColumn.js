@@ -11,12 +11,19 @@ export class StructureImageColumn extends StringColumn {
         if (!this.isFiltered()) {
             return true;
         }
-        console.log(row, this.getLabel(row), this.structureFilter.valid.has(this.getLabel(row)));
-        return (_a = this.structureFilter.valid.has(this.getLabel(row))) !== null && _a !== void 0 ? _a : false;
+        // filter out row if no valid results found
+        if (this.structureFilter.matching === null) {
+            return false;
+        }
+        const rowLabel = this.getLabel(row);
+        // filter missing values
+        if (rowLabel == null || rowLabel.trim() === '') {
+            return !this.structureFilter.filterMissing;
+        }
+        return (_a = this.structureFilter.matching.has(rowLabel)) !== null && _a !== void 0 ? _a : false;
     }
     isFiltered() {
-        var _a;
-        return this.structureFilter != null && ((_a = this.structureFilter.valid) === null || _a === void 0 ? void 0 : _a.size) > 0;
+        return this.structureFilter != null;
     }
     getFilter() {
         return this.structureFilter;

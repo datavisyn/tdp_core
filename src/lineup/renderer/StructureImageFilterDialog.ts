@@ -1,5 +1,6 @@
-import { ADialog, IDialogContext, IRankingHeaderContext, IStringFilter, LocalDataProvider, StringColumn } from 'lineupjs';
+import { ADialog, IDialogContext, IRankingHeaderContext, LocalDataProvider } from 'lineupjs';
 import { debounce } from 'lodash';
+import { I18nextManager } from '../../i18n';
 import { IStructureImageFilter, StructureImageColumn } from './StructureImageColumn';
 
 // copied from lineupjs
@@ -13,44 +14,6 @@ function filterMissingMarkup(bakMissing: boolean) {
       <input type="checkbox" ${bakMissing ? 'checked="checked"' : ''}>
       <span class="lu-filter-missing">Filter rows containing missing values</span>
     </label>`;
-}
-
-// copied from lineupjs
-function setText<T extends Node>(node: T, text?: string): T {
-  if (text === undefined) {
-    return node;
-  }
-  // no performance boost if setting the text node directly
-  // const textNode = <Text>node.firstChild;
-  // if (textNode == null) {
-  //  node.appendChild(node.ownerDocument!.createTextNode(text));
-  // } else {
-  //  textNode.data = text;
-  // }
-  if (node.textContent !== text) {
-    node.textContent = text;
-  }
-  return node;
-}
-
-// copied from lineupjs
-function matchDataList(node: HTMLDataListElement, matches: readonly { value: string; count: number }[]) {
-  const children = Array.from(node.options);
-  // update existing
-  for (let i = 0; i < matches.length; i++) {
-    const m = matches[i];
-    let child = children[i];
-    if (!child) {
-      child = node.ownerDocument.createElement('option');
-      node.appendChild(child);
-    }
-    child.value = m.value;
-    setText(child, m.count > 1 ? `${m.value} (${m.count.toLocaleString()})` : m.value);
-  }
-  // remove extra
-  for (let i = children.length - 1; i >= matches.length; i--) {
-    children[i].remove();
-  }
 }
 
 async function fetchSubstructure(structures: string[], substructure: string): Promise<{ count: { [key: string]: number }; valid: { [key: string]: boolean } }> {
@@ -69,7 +32,8 @@ async function fetchSubstructure(structures: string[], substructure: string): Pr
       : {}),
   });
   if (!response.ok) {
-    throw Error((await response.json().catch(() => null))?.message || response.statusText);
+    const json = await response.json().catch(() => null);
+    throw Error(json.detail[0].msg || response.statusText);
   }
   return response.json();
 }
@@ -86,24 +50,49 @@ export class StructureImageFilterDialog extends ADialog {
   }
 
   private updateFilter(filter: string | null, filterMissing: boolean) {
+    this.node.querySelector(`#${this.dialog.idPrefix}_loading`).setAttribute('hidden', null);
+    this.node.querySelector(`#${this.dialog.idPrefix}_error`).setAttribute('hidden', null);
+
+    // empty input field + missing values checkbox is unchecked
+    if (filter == null && !filterMissing) {
+      this.column.setFilter(null);
+      return;
+    }
+
     const columnType = Object.entries(this.ctx.provider.columnTypes).find(([key, value]) => value === StructureImageColumn)[0];
     // FIXME find a better way to get all data for the structured image column from the data provider?
     const structures = (this.ctx.provider as LocalDataProvider).data.map((row) => row[columnType]) || [];
 
-    // TODO handle error case
-    fetchSubstructure(structures, filter).then(({ count }) => {
-      const valid = new Set(
-        Object.entries(count)
-          .filter(([_structure, cnt]) => cnt > 0)
-          .map(([structure]) => structure),
-      );
-      console.log(count, valid, filter);
-      if (filter == null && !filterMissing) {
-        this.column.setFilter(null);
-      } else {
-        this.column.setFilter({ filter, filterMissing, valid });
-      }
-    });
+    // empty input field, but missing values checkbox is checked
+    if (filter == null && filterMissing) {
+      this.column.setFilter({ filter, filterMissing, matching: new Set(structures) }); // pass all structures as set and filter missing values in column.filter()
+      return;
+    }
+
+    this.node.querySelector(`#${this.dialog.idPrefix}_loading`).removeAttribute('hidden');
+    this.node.querySelector(`#${this.dialog.idPrefix}_error`).setAttribute('hidden', null);
+
+    // input field is not empty -> search matching structures on server
+    fetchSubstructure(structures, filter)
+      .then(({ count }) => {
+        const matching = new Set(
+          Object.entries(count)
+            .filter(([_structure, cnt]) => cnt > 0)
+            .map(([structure]) => structure),
+        );
+
+        this.column.setFilter({ filter, filterMissing, matching });
+        this.node.querySelector(`#${this.dialog.idPrefix}_loading`).setAttribute('hidden', null);
+      })
+      .catch((error: Error) => {
+        this.node.querySelector(`#${this.dialog.idPrefix}_loading`).setAttribute('hidden', null);
+
+        const errorNode = this.node.querySelector(`#${this.dialog.idPrefix}_error`);
+        errorNode.removeAttribute('hidden');
+        errorNode.textContent = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.errorMessage', { message: error.message });
+
+        this.column.setFilter({ filter, filterMissing, matching: null }); // no matching structures due to server error
+      });
   }
 
   protected reset() {
@@ -121,8 +110,8 @@ export class StructureImageFilterDialog extends ADialog {
 
   protected submit() {
     const filterMissing = findFilterMissing(this.node).checked;
-    const input = this.findInput('input[type="text"]').value;
-    this.updateFilter(input, filterMissing);
+    const input = this.findInput('input[type="text"]').value.trim();
+    this.updateFilter(input === '' ? null : input, filterMissing);
     return true;
   }
 
@@ -131,26 +120,17 @@ export class StructureImageFilterDialog extends ADialog {
     const bak = this.column.getFilter() || { filter: '', filterMissing: false };
     node.insertAdjacentHTML(
       'beforeend',
-      `<input type="text" placeholder="Filter ${s(this.column.desc.label)} …" autofocus
-         value="${bak.filter}" list="${this.dialog.idPrefix}_sdl">
-    ${filterMissingMarkup(bak.filterMissing)}
-    <datalist id="${this.dialog.idPrefix}_sdl"></datalist>`,
+      `<span style="position: relative;">
+         <input type="text" placeholder="Filter ${s(this.column.desc.label)} …" autofocus
+         value="${bak.filter}" style="width: 100%">
+         <i id="${this.dialog.idPrefix}_loading" hidden class="fas fa-circle-notch fa-spin text-muted" style="position: absolute;right: 6px;top: 6px;"></i>
+         </span>
+      <span id="${this.dialog.idPrefix}_error" class="text-danger" hidden></span>
+      ${filterMissingMarkup(bak.filterMissing)}`,
     );
 
     const filterMissing = findFilterMissing(node);
     const input = node.querySelector<HTMLInputElement>('input[type="text"]');
-
-    const dl = node.querySelector('datalist')!;
-    this.ctx.provider
-      .getTaskExecutor()
-      .summaryStringStats(this.column)
-      .then((r) => {
-        if (typeof r === 'symbol') {
-          return;
-        }
-        const { summary } = r;
-        matchDataList(dl, summary.topN);
-      });
 
     this.enableLivePreviews([filterMissing, input]);
 

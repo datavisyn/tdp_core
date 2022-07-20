@@ -2,7 +2,10 @@ import { StringColumn, IDataRow } from 'lineupjs';
 export interface IStructureImageFilter {
     filter: string;
     filterMissing: boolean;
-    valid: Set<string>;
+    /**
+     * the set contains matching results that should be visible
+     */
+    matching: Set<string>;
 }
 export declare class StructureImageColumn extends StringColumn {
     protected structureFilter: IStructureImageFilter | null;

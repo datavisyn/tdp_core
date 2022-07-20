@@ -261,7 +261,8 @@
                 "of": "of",
                 "selected": "selected",
                 "scoreAuthorizationRequired": "Authorization required",
-                "scoreAuthorizationRequiredTitle": "{{name}} authorization is required for this score. Click here to authorize."
+                "scoreAuthorizationRequiredTitle": "{{name}} authorization is required for this score. Click here to authorize.",
+                "errorMessage": "Error: {{message}}"
             }
         },
         "views": {
