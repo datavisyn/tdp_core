@@ -58,7 +58,7 @@ export class StructureImageColumn extends StringColumn {
 
     // ensure that no filter of the string column is used beyond this point
     // TODO remove once the string filter is removed from the UI
-    if (!filter.matching) {
+    if (filter && !filter.matching) {
       return;
     }
 
