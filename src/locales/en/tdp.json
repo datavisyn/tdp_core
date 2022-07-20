@@ -285,7 +285,8 @@
         "selected": "selected",
         "scoreAuthorizationRequired": "Authorization required",
         "scoreAuthorizationRequiredTitle": "{{name}} authorization is required for this score. Click here to authorize.",
-        "errorMessage": "Error: {{message}}"
+        "errorMessage": "Error: {{message}}",
+        "filterMissingValues": "Filter rows containing missing values"
       }
     },
 

@@ -1,9 +1,15 @@
 import { StringColumn, IDataRow } from 'lineupjs';
 export interface IStructureImageFilter {
+    /**
+     * Search string which is used to filter the column data
+     */
     filter: string;
+    /**
+     * Filter out rows with missing values
+     */
     filterMissing: boolean;
     /**
-     * the set contains matching results that should be visible
+     * The set contains matching results that should be visible
      */
     matching: Set<string>;
 }

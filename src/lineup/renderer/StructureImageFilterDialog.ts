@@ -5,15 +5,7 @@ import { IStructureImageFilter, StructureImageColumn } from './StructureImageCol
 
 // copied from lineupjs
 function findFilterMissing(node: HTMLElement) {
-  return (node.getElementsByClassName('lu-filter-missing')[0]! as HTMLElement).previousElementSibling! as HTMLInputElement;
-}
-
-// copied from lineupjs
-function filterMissingMarkup(bakMissing: boolean) {
-  return `<label class="lu-checkbox">
-      <input type="checkbox" ${bakMissing ? 'checked="checked"' : ''}>
-      <span class="lu-filter-missing">Filter rows containing missing values</span>
-    </label>`;
+  return (node.getElementsByClassName('lu-filter-missing')[0] as HTMLElement).previousElementSibling as HTMLInputElement;
 }
 
 async function fetchSubstructure(structures: string[], substructure: string): Promise<{ count: { [key: string]: number }; valid: { [key: string]: boolean } }> {
@@ -21,7 +13,6 @@ async function fetchSubstructure(structures: string[], substructure: string): Pr
     headers: {
       'Content-Type': 'application/json',
     },
-    // @ts-ignore
     // mode: '*cors', // no-cors, *cors, same-origin
     method: 'POST',
     redirect: 'follow',
@@ -49,9 +40,17 @@ export class StructureImageFilterDialog extends ADialog {
     this.before = this.column.getFilter();
   }
 
+  private findLoadingNode(node: HTMLElement) {
+    return node.querySelector(`#${this.dialog.idPrefix}_loading`);
+  }
+
+  private findErrorNode(node: HTMLElement) {
+    return node.querySelector(`#${this.dialog.idPrefix}_error`);
+  }
+
   private updateFilter(filter: string | null, filterMissing: boolean) {
-    this.node.querySelector(`#${this.dialog.idPrefix}_loading`).setAttribute('hidden', null);
-    this.node.querySelector(`#${this.dialog.idPrefix}_error`).setAttribute('hidden', null);
+    this.findLoadingNode(this.node).setAttribute('hidden', null);
+    this.findErrorNode(this.node).setAttribute('hidden', null);
 
     // empty input field + missing values checkbox is unchecked
     if (filter == null && !filterMissing) {
@@ -69,8 +68,8 @@ export class StructureImageFilterDialog extends ADialog {
       return;
     }
 
-    this.node.querySelector(`#${this.dialog.idPrefix}_loading`).removeAttribute('hidden');
-    this.node.querySelector(`#${this.dialog.idPrefix}_error`).setAttribute('hidden', null);
+    this.findLoadingNode(this.node).removeAttribute('hidden');
+    this.findErrorNode(this.node).setAttribute('hidden', null);
 
     // input field is not empty -> search matching structures on server
     fetchSubstructure(structures, filter)
@@ -82,12 +81,12 @@ export class StructureImageFilterDialog extends ADialog {
         );
 
         this.column.setFilter({ filter, filterMissing, matching });
-        this.node.querySelector(`#${this.dialog.idPrefix}_loading`).setAttribute('hidden', null);
+        this.findLoadingNode(this.node).setAttribute('hidden', null);
       })
       .catch((error: Error) => {
-        this.node.querySelector(`#${this.dialog.idPrefix}_loading`).setAttribute('hidden', null);
+        this.findLoadingNode(this.node).setAttribute('hidden', null);
 
-        const errorNode = this.node.querySelector(`#${this.dialog.idPrefix}_error`);
+        const errorNode = this.findErrorNode(this.node);
         errorNode.removeAttribute('hidden');
         errorNode.textContent = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.errorMessage', { message: error.message });
 
@@ -97,7 +96,10 @@ export class StructureImageFilterDialog extends ADialog {
 
   protected reset() {
     this.findInput('input[type="text"]').value = '';
-    this.forEach('input[type=checkbox]', (n: HTMLInputElement) => (n.checked = false));
+    this.forEach('input[type=checkbox]', (n: HTMLInputElement) => {
+      // eslint-disable-next-line no-param-reassign
+      n.checked = false;
+    });
   }
 
   protected cancel() {
@@ -126,7 +128,10 @@ export class StructureImageFilterDialog extends ADialog {
          <i id="${this.dialog.idPrefix}_loading" hidden class="fas fa-circle-notch fa-spin text-muted" style="position: absolute;right: 6px;top: 6px;"></i>
          </span>
       <span id="${this.dialog.idPrefix}_error" class="text-danger" hidden></span>
-      ${filterMissingMarkup(bak.filterMissing)}`,
+      <label class="lu-checkbox">
+        <input type="checkbox" ${bak.filterMissing ? 'checked="checked"' : ''}>
+        <span class="lu-filter-missing">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.filterMissingValues')}</span>
+      </label>`,
     );
 
     const filterMissing = findFilterMissing(node);

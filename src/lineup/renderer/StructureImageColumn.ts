@@ -2,11 +2,18 @@ import { StringColumn, IDataRow, Column } from 'lineupjs';
 import { isEqual } from 'lodash';
 
 export interface IStructureImageFilter {
+  /**
+   * Search string which is used to filter the column data
+   */
   filter: string;
+
+  /**
+   * Filter out rows with missing values
+   */
   filterMissing: boolean;
 
   /**
-   * the set contains matching results that should be visible
+   * The set contains matching results that should be visible
    */
   matching: Set<string>;
 }
@@ -41,7 +48,7 @@ export class StructureImageColumn extends StringColumn {
   }
 
   getFilter() {
-    return this.structureFilter!;
+    return this.structureFilter;
   }
 
   setFilter(filter: IStructureImageFilter | null) {

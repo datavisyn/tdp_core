@@ -11,7 +11,6 @@ async function fetchImage({ url, data, method }) {
         headers: {
             'Content-Type': 'application/json',
         },
-        // @ts-ignore
         // mode: '*cors', // no-cors, *cors, same-origin
         method,
         redirect: 'follow',
@@ -63,7 +62,7 @@ export class StructureImageRenderer {
                         n.style.backgroundImage = svgToCSSBackground(d.v.images[0]);
                         return null;
                     }
-                    const value = col.getValue(d);
+                    const value = col === null || col === void 0 ? void 0 : col.getValue(d);
                     // Load aysnc to avoid triggering
                     return abortAble(new Promise((resolve) => {
                         window.setTimeout(() => resolve(value), 500);
