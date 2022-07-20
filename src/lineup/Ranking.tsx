@@ -51,9 +51,7 @@ import { ViewUtils } from '../views/ViewUtils';
 import { SelectionUtils } from '../idtype/SelectionUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
-import { StructureImageColumn } from './renderer/StructureImageColumn';
-import { StructureImageRenderer } from './renderer/StructureImageRenderer';
-import { StructureImageFilterDialog } from './renderer/StructureImageFilterDialog';
+import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;
