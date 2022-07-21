@@ -4,6 +4,7 @@ from fastapi.testclient import TestClient
 
 from tdp_core import manager
 from tdp_core.security.model import User
+from tdp_core.security.store.alb_security_store import create as create_alb_security_store
 
 
 def test_api_key(client: TestClient):
@@ -110,3 +111,33 @@ def test_jwt_token_location(client: TestClient):
     # Does work even without header
     response = client.get("/loggedinas")
     assert response.json() != '"not_yet_logged_in"'
+
+
+def test_alb_security_store(client: TestClient):
+    # Add some basic configuration
+    manager.settings.tdp_core.security.store.alb_security_store.enable = True
+    manager.settings.tdp_core.security.store.alb_security_store.cookie_name = "TestCookie"
+    manager.settings.tdp_core.security.store.alb_security_store.signout_url = "http://localhost/logout"
+
+    store = create_alb_security_store()
+    assert store is not None
+
+    manager.security.user_stores = [store]
+
+    # Header created with a random token containing "email"
+    headers = {
+        "X-Amzn-Oidc-Identity": "",
+        "X-Amzn-Oidc-Accesstoken": "",
+        "X-Amzn-Oidc-Data": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6ImFkbWluQGxvY2FsaG9zdCIsInN1YiI6ImFkbWluIiwicm9sZXMiOlsiYWRtaW4iXSwiZXhwIjoxNjU3MTg4MTM4LjQ5NDU4Nn0.-Ye9j9z37gJdoKgrbeYbI8buSw_c6bLBShXt4XxwQHI",
+    }
+
+    # Check loggedinas with a JWT
+    response = client.get("/loggedinas", headers=headers)
+    assert response.status_code == 200
+    assert response.json() != '"not_yet_logged_in"'
+    assert response.json()["name"] == "admin@localhost"
+
+    # Logout and check if we get the correct redirect url
+    response = client.post("/logout", headers=headers)
+    assert response.status_code == 200
+    assert response.json()["alb_security_store"]["redirect"] == "http://localhost/logout"
