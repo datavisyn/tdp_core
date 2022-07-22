@@ -1,5 +1,16 @@
-import { StringColumn, IDataRow, Column } from 'lineupjs';
+import { StringColumn, IDataRow, Column, IStringColumnDesc } from 'lineupjs';
 import { isEqual } from 'lodash';
+
+// internal function copied from lineupjs
+function integrateDefaults<T>(desc: T, defaults: Partial<T> = {}) {
+  Object.keys(defaults).forEach((key) => {
+    const typed = key as keyof T;
+    if (typeof desc[typed] === 'undefined') {
+      (desc as any)[typed] = defaults[typed];
+    }
+  });
+  return desc;
+}
 
 export interface IStructureImageFilter {
   /**
@@ -22,6 +33,15 @@ export class StructureImageColumn extends StringColumn {
   protected structureFilter: IStructureImageFilter | null = null;
 
   protected align: string | null = null;
+
+  constructor(id: string, desc: Readonly<IStringColumnDesc>) {
+    super(
+      id,
+      integrateDefaults(desc, {
+        summaryRenderer: 'default',
+      }),
+    );
+  }
 
   filter(row: IDataRow): boolean {
     if (!this.isFiltered()) {

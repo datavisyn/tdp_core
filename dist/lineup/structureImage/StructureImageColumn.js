@@ -1,8 +1,20 @@
 import { StringColumn, Column } from 'lineupjs';
 import { isEqual } from 'lodash';
+// internal function copied from lineupjs
+function integrateDefaults(desc, defaults = {}) {
+    Object.keys(defaults).forEach((key) => {
+        const typed = key;
+        if (typeof desc[typed] === 'undefined') {
+            desc[typed] = defaults[typed];
+        }
+    });
+    return desc;
+}
 export class StructureImageColumn extends StringColumn {
-    constructor() {
-        super(...arguments);
+    constructor(id, desc) {
+        super(id, integrateDefaults(desc, {
+            summaryRenderer: 'default',
+        }));
         this.structureFilter = null;
         this.align = null;
     }
