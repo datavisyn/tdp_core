@@ -67,7 +67,7 @@ function svgToCSSBackground(svg: string): string {
 }
 
 export class StructureImageRenderer implements ICellRendererFactory {
-  readonly title: string = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structureImageRendererTitle');
+  readonly title: string = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structuredImage.rendererTitle');
 
   canRender(col: StructureImageColumn, mode: ERenderMode): boolean {
     return col instanceof StructureImageColumn && (mode === ERenderMode.CELL || mode === ERenderMode.GROUP);
