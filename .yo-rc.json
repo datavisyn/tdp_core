@@ -27,15 +27,6 @@
       "redhatPackages": []
     },
     "app": "",
-    "entries": {
-      "app": {
-        "js": "src/demo/index.initialize.tsx",
-        "html": "index.html",
-        "template": "src/demo/index.template.ejs",
-        "chunkName": "app",
-        "excludeChunks": []
-      }
-    },
     "libraryAliases": {
       "d3": "d3/d3"
     },

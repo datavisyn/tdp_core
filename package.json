@@ -117,5 +117,16 @@
     "@types/select2": "4.0.44",
     "cypress": "^9.5.2",
     "local-cypress": "^1.2.5"
+  },
+  "visyn": {
+    "entries": {
+      "app": {
+        "js": "src/demo/index.initialize.tsx",
+        "html": "index.html",
+        "template": "src/demo/index.template.ejs",
+        "chunkName": "app",
+        "excludeChunks": []
+      }
+    }
   }
 }
