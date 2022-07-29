@@ -1,4 +1,4 @@
-import { StringColumn, IDataRow, IStringColumnDesc } from 'lineupjs';
+import { IDataRow, ValueColumn, IValueColumnDesc } from 'lineupjs';
 export interface IStructureImageFilter {
     /**
      * Search string which is used to filter the column data
@@ -13,10 +13,10 @@ export interface IStructureImageFilter {
      */
     matching: Set<string>;
 }
-export declare class StructureImageColumn extends StringColumn {
+export declare class StructureImageColumn extends ValueColumn<string> {
     protected structureFilter: IStructureImageFilter | null;
     protected align: string | null;
-    constructor(id: string, desc: Readonly<IStringColumnDesc>);
+    constructor(id: string, desc: Readonly<IValueColumnDesc<string>>);
     filter(row: IDataRow): boolean;
     isFiltered(): boolean;
     getFilter(): IStructureImageFilter;

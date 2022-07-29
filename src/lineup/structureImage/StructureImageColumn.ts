@@ -1,4 +1,4 @@
-import { StringColumn, IDataRow, Column, IStringColumnDesc } from 'lineupjs';
+import { StringColumn, IDataRow, Column, ValueColumn, IValueColumnDesc } from 'lineupjs';
 import { isEqual } from 'lodash';
 
 // internal function copied from lineupjs
@@ -29,12 +29,12 @@ export interface IStructureImageFilter {
   matching: Set<string>;
 }
 
-export class StructureImageColumn extends StringColumn {
+export class StructureImageColumn extends ValueColumn<string> {
   protected structureFilter: IStructureImageFilter | null = null;
 
   protected align: string | null = null;
 
-  constructor(id: string, desc: Readonly<IStringColumnDesc>) {
+  constructor(id: string, desc: Readonly<IValueColumnDesc<string>>) {
     super(
       id,
       integrateDefaults(desc, {

@@ -232,7 +232,7 @@ onAddScoreColumn, }) {
             // register custom column types
             options.customProviderOptions.columnTypes = { ...options.customProviderOptions.columnTypes, smiles: StructureImageColumn };
             // register custom filter dialogs for custom column types
-            toolbar('filterStructureImage')(StructureImageColumn);
+            toolbar('filterStructureImage', 'rename')(StructureImageColumn);
             providerRef.current = new TDPLocalDataProvider([], [], options.customProviderOptions);
             providerRef.current.on(suffix(LocalDataProvider.EVENT_ORDER_CHANGED), () => null);
             // add width changed listener for smiles columns in ranking
@@ -264,7 +264,6 @@ onAddScoreColumn, }) {
                             dialog.open();
                         },
                         options: {
-                            order: -1,
                             mode: 'menu+shortcut',
                             featureCategory: 'ranking',
                             featureLevel: 'basic',

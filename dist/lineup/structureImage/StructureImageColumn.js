@@ -1,4 +1,4 @@
-import { StringColumn, Column } from 'lineupjs';
+import { StringColumn, Column, ValueColumn } from 'lineupjs';
 import { isEqual } from 'lodash';
 // internal function copied from lineupjs
 function integrateDefaults(desc, defaults = {}) {
@@ -10,7 +10,7 @@ function integrateDefaults(desc, defaults = {}) {
     });
     return desc;
 }
-export class StructureImageColumn extends StringColumn {
+export class StructureImageColumn extends ValueColumn {
     constructor(id, desc) {
         super(id, integrateDefaults(desc, {
             summaryRenderer: 'default',

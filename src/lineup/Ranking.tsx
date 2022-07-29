@@ -323,7 +323,7 @@ export function Ranking({
       options.customProviderOptions.columnTypes = { ...options.customProviderOptions.columnTypes, smiles: StructureImageColumn };
 
       // register custom filter dialogs for custom column types
-      toolbar('filterStructureImage')(StructureImageColumn);
+      toolbar('filterStructureImage', 'rename')(StructureImageColumn);
 
       providerRef.current = new TDPLocalDataProvider([], [], options.customProviderOptions);
       providerRef.current.on(suffix(LocalDataProvider.EVENT_ORDER_CHANGED), () => null);
@@ -362,7 +362,6 @@ export function Ranking({
                 dialog.open();
               },
               options: {
-                order: -1, // the lower the order the more left the shortcut icon is in the toolbar (default = 50, sortBy = 1)
                 mode: 'menu+shortcut',
                 featureCategory: 'ranking',
                 featureLevel: 'basic',
