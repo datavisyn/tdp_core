@@ -255,7 +255,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     this.cleanUpOld(manager);
 
-    const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);
+    const clueManager = new CLUEGraphManager(manager, { isReadOnly: !this.options.enableProvenanceUrlTracking });
 
     this.header.wait();
 

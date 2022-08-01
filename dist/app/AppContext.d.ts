@@ -1,4 +1,5 @@
 import { PropertyHandler } from '../base/url/PropertyHandler';
+import { HashPropertyHandler } from '../base/url';
 declare type OfflineGenerator = ((data: any, url: string) => Promise<any>) | Promise<any> | any;
 export declare class AppContext {
     /**
@@ -47,7 +48,7 @@ export declare class AppContext {
      * access to hash parameters and set them, too
      * @type {HashProperties}
      */
-    hash: any;
+    hash: HashPropertyHandler;
     /**
      * access to get parameters
      * @type {PropertyHandler}

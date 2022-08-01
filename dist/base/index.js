@@ -15,6 +15,6 @@ export * from './plugin';
 export * from './BaseUtils';
 export * from './Session';
 export * from './url/PropertyHandler';
-export * from './HashProperties';
+export * from './url/HashPropertyHandler';
 export * from './WebpackEnv';
 //# sourceMappingURL=index.js.map

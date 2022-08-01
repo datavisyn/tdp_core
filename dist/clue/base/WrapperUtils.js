@@ -75,9 +75,6 @@ export class WrapperUtils {
             body.classList.add('headless');
         }
     }
-    static useInMemoryGraph() {
-        return AppContext.getInstance().hash.has('clue_headless') || AppContext.getInstance().hash.getProp('clue_graph', '') === 'memory';
-    }
     static triggeredByInputField(evt) {
         const src = evt.srcElement;
         const elem = evt.target;

@@ -8,16 +8,26 @@ export interface IClueState {
 }
 export declare class CLUEGraphManager extends EventHandler {
     private manager;
-    private readonly isReadonly;
     static readonly EVENT_EXTERNAL_STATE_CHANGE = "externalStateChanged";
     /**
      * update hash in 100ms to prevent to frequent updates
      * @type {number}
      */
-    static readonly DEBOUNCE_UPDATE_DELAY = 100;
+    private static readonly DEBOUNCE_UPDATE_DELAY;
+    /**
+     * Property handler to manipulate the hash or search query of the URL
+     */
+    private readonly propertyHandler;
+    /**
+     * Is this graph manager read-only mode?
+     */
+    private isReadOnly;
     private onHashChanged;
-    constructor(manager: MixedStorageProvenanceGraphManager, isReadonly?: boolean);
-    private static setGraphInUrl;
+    constructor(manager: MixedStorageProvenanceGraphManager, { isReadOnly, propertyHandler }?: {
+        isReadOnly?: boolean;
+        propertyHandler?: 'query' | 'hash';
+    });
+    private setGraphInUrl;
     static reloadPage(): void;
     private onHashChangedImpl;
     newRemoteGraph(): void;
@@ -43,7 +53,8 @@ export declare class CLUEGraphManager extends EventHandler {
     chooseLazy(rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     choose(list: IProvenanceGraphDataDescription[], rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     loadOrClone(graph: IProvenanceGraphDataDescription, isSelect: boolean): void;
-    cloneLocal(graph: IProvenanceGraphDataDescription): Promise<void> | PromiseLike<ProvenanceGraph>;
+    cloneLocal(graph: IProvenanceGraphDataDescription): PromiseLike<ProvenanceGraph> | Promise<void>;
+    private useInMemoryGraph;
     /**
      * create the provenance graph selection dropdown and handles the graph selection
      * @param manager

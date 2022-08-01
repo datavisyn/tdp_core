@@ -128,7 +128,7 @@ export class ATDPApplication extends ACLUEWrapper {
             ...(this.options.provenanceManagerOptions || {}),
         });
         this.cleanUpOld(manager);
-        const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);
+        const clueManager = new CLUEGraphManager(manager, { isReadOnly: !this.options.enableProvenanceUrlTracking });
         this.header.wait();
         // trigger bootstrap loading
         import('jquery');
