@@ -3,24 +3,62 @@ import { UserSession } from '../../app';
 import { I18nextManager } from '../../i18n';
 import { CommonPropertyHandler, HashPropertyHandler, QueryPropertyHandler } from '../../base/url';
 export class CLUEGraphManager extends EventHandler {
-    constructor(manager, { isReadOnly = false, propertyHandler = 'hash' } = {
+    constructor(manager, { isReadOnly = false, propertyHandler = 'hash', rewriteOtherProperty = false } = {
         isReadOnly: false,
         propertyHandler: 'hash',
+        rewriteOtherProperty: false,
     }) {
         super();
         this.manager = manager;
-        /**
-         * Property handler to manipulate the hash or search query of the URL
-         */
-        this.propertyHandler = null;
         /**
          * Is this graph manager read-only mode?
          */
         this.isReadOnly = false;
         this.onHashChanged = () => this.onHashChangedImpl();
         this.isReadOnly = isReadOnly;
+        // rewrite before initializing the property handler
+        if (rewriteOtherProperty) {
+            this.rewriteURLOtherProperty(propertyHandler);
+        }
         this.propertyHandler = propertyHandler === 'query' ? new QueryPropertyHandler() : new HashPropertyHandler();
-        // selected by url
+    }
+    /**
+     * Based on the selected property the other property handler is checked for CLUE parameter.
+     * Found parameters are then moved to the selected property.
+     *
+     * - With `selectedProperty = 'hash'` it rewrites URLs from `?clue_graph=...` to `#clue_graph=...`
+     * - With `selectedProperty = 'query'` it rewrites URLs from `#clue_graph=...` to `?clue_graph=...`
+     *
+     * If no CLUE parameters are found in the other property, no action is done.
+     *
+     * The remaining parameters in hash and query are untouched.
+     *
+     * @param selectedProperty Selected property handler ('hash' or 'query')
+     * @returns void
+     */
+    rewriteURLOtherProperty(selectedProperty) {
+        const fromHandler = selectedProperty === 'query' ? new HashPropertyHandler() : new QueryPropertyHandler();
+        const toHandler = selectedProperty === 'query' ? new QueryPropertyHandler() : new HashPropertyHandler();
+        const rewriteProperties = ['clue_graph', 'clue_state', 'clue_slide'];
+        const foundProperties = rewriteProperties.some((property) => fromHandler.has(property));
+        // no properties found to rewrite -> exit
+        if (!foundProperties) {
+            fromHandler.destroy();
+            toHandler.destroy();
+            return;
+        }
+        rewriteProperties
+            .filter((property) => fromHandler.has(property))
+            .forEach((property) => {
+            toHandler.setProp(property, fromHandler.getProp(property), false); // false = disable immediate update -> update once at the end
+            fromHandler.removeProp(property, false); // false = disable immediate update -> update once at the end
+        });
+        // get URL before destroying the handler + order handler so that query is always before hash
+        const url = selectedProperty === 'query' ? toHandler.toURLString() + fromHandler.toURLString() : fromHandler.toURLString() + toHandler.toURLString();
+        // remove possible event listener before pushing the new history state
+        fromHandler.destroy();
+        toHandler.destroy();
+        window.history.pushState(null, `State ${Date.now()}`, url);
     }
     setGraphInUrl(value) {
         this.propertyHandler.removeProp('clue_slide', false);
