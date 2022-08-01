@@ -21,9 +21,20 @@ export abstract class CommonPropertyHandler extends PropertyHandler {
     }
   }
 
+  /**
+   * Remove event listener, ...
+   */
+  destroy() {
+    // hook
+  }
+
   abstract get propertySource(): string;
 
   abstract get propertySymbol(): string;
+
+  toURLString(): string {
+    return this.propertySymbol + this.toString();
+  }
 
   setInt(name: string, value: number, update: boolean | number = true) {
     this.setProp(name, String(value), update);

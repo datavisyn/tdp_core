@@ -14,8 +14,8 @@ export class QueryPropertyHandler extends CommonPropertyHandler {
         if (this.isSameHistoryState()) {
             return;
         }
-        window.history.pushState(this.toObject(), `State ${Date.now()}`, `${this.propertySymbol}${this.toString()}`);
-        this.fire(CommonPropertyHandler.EVENT_STATE_PUSHED, `State ${Date.now()}`, `${this.propertySymbol}${this.toString()}`);
+        window.history.pushState(this.toObject(), `State ${Date.now()}`, this.toURLString());
+        this.fire(CommonPropertyHandler.EVENT_STATE_PUSHED, `State ${Date.now()}`, this.toURLString());
     }
 }
 //# sourceMappingURL=QueryPropertyHandler.js.map

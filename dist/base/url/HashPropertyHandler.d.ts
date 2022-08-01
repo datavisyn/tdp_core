@@ -7,5 +7,6 @@ export declare class HashPropertyHandler extends CommonPropertyHandler {
     get propertySource(): string;
     get propertySymbol(): string;
     protected updateImpl(): void;
+    destroy(): void;
 }
 //# sourceMappingURL=HashPropertyHandler.d.ts.map

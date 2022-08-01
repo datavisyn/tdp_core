@@ -17,6 +17,15 @@ export class CommonPropertyHandler extends PropertyHandler {
             this.parse(this.propertySource);
         }
     }
+    /**
+     * Remove event listener, ...
+     */
+    destroy() {
+        // hook
+    }
+    toURLString() {
+        return this.propertySymbol + this.toString();
+    }
     setInt(name, value, update = true) {
         this.setProp(name, String(value), update);
     }

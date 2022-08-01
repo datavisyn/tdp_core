@@ -24,8 +24,12 @@ export class HashPropertyHandler extends CommonPropertyHandler {
     }
     // remove event listner before changing the hash to avoid an infinite loop
     window.removeEventListener('hashchange', this.updated, false);
-    window.history.pushState(this.toObject(), `State ${Date.now()}`, `${this.propertySymbol}${this.toString()}`);
+    window.history.pushState(this.toObject(), `State ${Date.now()}`, this.toURLString());
     window.addEventListener('hashchange', this.updated, false);
-    this.fire(CommonPropertyHandler.EVENT_STATE_PUSHED, `State ${Date.now()}`, `${this.propertySymbol}${this.toString()}`);
+    this.fire(CommonPropertyHandler.EVENT_STATE_PUSHED, `State ${Date.now()}`, this.toURLString());
+  }
+
+  destroy(): void {
+    window.removeEventListener('hashchange', this.updated, false);
   }
 }
