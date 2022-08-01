@@ -68,6 +68,10 @@ export declare class CLUEGraphManager extends EventHandler {
     private setGraphInUrl;
     static reloadPage(): void;
     private onHashChangedImpl;
+    /**
+     * Returns the URL only with `clue_graph` and `clue_state` in the hash or query.
+     */
+    getCLUEGraphURL(): string;
     newRemoteGraph(): void;
     newGraph(): void;
     loadGraph(desc: any): void;

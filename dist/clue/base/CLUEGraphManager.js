@@ -75,6 +75,12 @@ export class CLUEGraphManager extends EventHandler {
         const state = this.propertyHandler.getInt('clue_state', null);
         this.fire(CLUEGraphManager.EVENT_EXTERNAL_STATE_CHANGE, { graph, slide, state });
     }
+    /**
+     * Returns the URL only with `clue_graph` and `clue_state` in the hash or query.
+     */
+    getCLUEGraphURL() {
+        return window.location.href.replace(this.propertyHandler.propertySource, this.propertyHandler.toURLString());
+    }
     newRemoteGraph() {
         if (UserSession.getInstance().isLoggedIn()) {
             this.propertyHandler.off(CommonPropertyHandler.EVENT_HASH_CHANGED, this.onHashChanged);

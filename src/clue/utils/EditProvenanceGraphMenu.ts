@@ -165,14 +165,9 @@ export class EditProvenanceGraphMenu {
             .catch(ErrorAlertHandler.getInstance().errorAlert)
             .then(() => {
               this.updateGraphMetaData(this.graph);
-              const p = new PropertyHandler(window.location.hash);
-              const hash = new Map<string, string>();
-              p.forEach((key, value) => {
-                hash.set(key, `${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
-              });
-              hash.set('clue_graph', `clue_graph=${encodeURIComponent(this.graph.desc.id)}`);
-              hash.set('clue_state', `clue_state=${this.graph.act.id}`);
-              const url = `${window.location.href.replace(window.location.hash, '')}#${Array.from(hash.values()).join('&')}`;
+
+              const url = manager.getCLUEGraphURL();
+
               NotificationHandler.pushNotification(
                 'success',
                 `${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.successNotification', { name: this.graph.desc.name })}
