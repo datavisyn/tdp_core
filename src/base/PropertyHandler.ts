@@ -107,7 +107,7 @@ export class PropertyHandler extends EventHandler {
     }
     // http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript/21152762#21152762
     code
-      .substr(1)
+      .substring(1)
       .split('&')
       .forEach((item) => {
         const s = item.split('=');
