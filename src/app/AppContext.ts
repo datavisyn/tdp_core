@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
 import { RemoveNodeObserver } from '../components/RemoveNodeObserver';
-import { HashProperties } from '../base/HashProperties';
-import { PropertyHandler } from '../base/PropertyHandler';
+import { HashProperties } from '../base/url/HashProperties';
+import { PropertyHandler } from '../base/url/PropertyHandler';
 import { Ajax } from '../base/ajax';
 import { WebpackEnv } from '../base/WebpackEnv';
 
