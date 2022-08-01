@@ -31,6 +31,22 @@ interface ICLUEGraphManagerOptions {
      */
     rewriteOtherProperty?: false;
 }
+/**
+ * Based on the selected property the other property handler is checked for CLUE parameter.
+ * Found parameters are then moved to the selected property.
+ *
+ * - With `selectedProperty = 'hash'` it rewrites URLs from `?clue_graph=...` to `#clue_graph=...`
+ * - With `selectedProperty = 'query'` it rewrites URLs from `#clue_graph=...` to `?clue_graph=...`
+ *
+ * If no CLUE parameters are found in the other property, no action is done.
+ *
+ * The remaining parameters in hash and query are untouched.
+ *
+ * @internal
+ * @param selectedProperty Selected property handler ('hash' or 'query')
+ * @returns void
+ */
+export declare function rewriteURLOtherProperty(selectedProperty: 'hash' | 'query'): void;
 export declare class CLUEGraphManager extends EventHandler {
     private manager;
     static readonly EVENT_EXTERNAL_STATE_CHANGE = "externalStateChanged";
@@ -49,21 +65,6 @@ export declare class CLUEGraphManager extends EventHandler {
     private isReadOnly;
     private onHashChanged;
     constructor(manager: MixedStorageProvenanceGraphManager, { isReadOnly, propertyHandler, rewriteOtherProperty }?: ICLUEGraphManagerOptions);
-    /**
-     * Based on the selected property the other property handler is checked for CLUE parameter.
-     * Found parameters are then moved to the selected property.
-     *
-     * - With `selectedProperty = 'hash'` it rewrites URLs from `?clue_graph=...` to `#clue_graph=...`
-     * - With `selectedProperty = 'query'` it rewrites URLs from `#clue_graph=...` to `?clue_graph=...`
-     *
-     * If no CLUE parameters are found in the other property, no action is done.
-     *
-     * The remaining parameters in hash and query are untouched.
-     *
-     * @param selectedProperty Selected property handler ('hash' or 'query')
-     * @returns void
-     */
-    private rewriteURLOtherProperty;
     private setGraphInUrl;
     static reloadPage(): void;
     private onHashChangedImpl;
@@ -90,7 +91,7 @@ export declare class CLUEGraphManager extends EventHandler {
     chooseLazy(rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     choose(list: IProvenanceGraphDataDescription[], rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     loadOrClone(graph: IProvenanceGraphDataDescription, isSelect: boolean): void;
-    cloneLocal(graph: IProvenanceGraphDataDescription): Promise<void> | PromiseLike<ProvenanceGraph>;
+    cloneLocal(graph: IProvenanceGraphDataDescription): PromiseLike<ProvenanceGraph> | Promise<void>;
     private useInMemoryGraph;
     /**
      * create the provenance graph selection dropdown and handles the graph selection
