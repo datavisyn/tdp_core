@@ -144,6 +144,6 @@ def create_visyn_server(
 
     # TODO: Move up?
     app.add_api_route("/health", health)
-    app.add_api_route("/buildInfo.json", build_info)
+    app.add_api_route("/api/buildInfo.json", build_info)
 
     return app

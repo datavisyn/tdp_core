@@ -7,7 +7,7 @@
   .custom-named-sets header::before,
   .other-named-sets header::before {
     @extend .fas;
-    width: (18em / 14);
+    width: calc(18em / 14);
     text-align: center;
   }
 
