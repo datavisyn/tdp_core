@@ -13,13 +13,11 @@ header.clue-modeselector {
 
 // overrides caleydo_clue/styles/base
 aside {
-  border: 0;
-  border-left: 2px solid $core_colour_selected;
-  border-radius: 0;
-  margin: 0;
-
   &.provenance-layout-vis {
-    border-color: $core_colour_selected;
+    border: 0;
+    border-left: 2px solid $core_colour_selected;
+    border-radius: 0;
+    margin: 0;
 
     &.collapsed {
       border-left: 0; // hide border when panel is collapsed
@@ -27,11 +25,17 @@ aside {
   }
 
   &.provenance-story-vis {
-    border-color: $core_colour_selected;
+    border: 0;
+    border-left: 2px solid $core_colour_selected;
+    border-radius: 0;
+    margin: 0;
   }
 
   &.annotations {
+    border-radius: 0;
+    margin: 0;
     border: 2px solid $core_colour_selected;
+
     > div:first-of-type {
       background-color: $presentation-stage;
     }
