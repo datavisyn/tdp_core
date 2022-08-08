@@ -85,7 +85,7 @@ export interface ITDPOptions {
    * @related clueRewriteOtherProperty
    * @default hash
    */
-  cluePropertyHandler?: 'hash';
+  cluePropertyHandler?: 'hash' | 'query';
 
   /**
    * If set to `true` it will rewrite incoming URLs of the property handler that is not selected.
@@ -98,7 +98,7 @@ export interface ITDPOptions {
    * @related cluePropertyHandler
    * @default false
    */
-  clueRewriteOtherProperty?: false;
+  clueRewriteOtherProperty?: boolean;
 
   /**
    * options passed to the IProvenanceGraphManager

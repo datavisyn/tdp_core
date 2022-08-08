@@ -29,7 +29,7 @@ interface ICLUEGraphManagerOptions {
      *
      * @default false
      */
-    rewriteOtherProperty?: false;
+    rewriteOtherProperty?: boolean;
 }
 /**
  * Based on the selected property the other property handler is checked for CLUE parameter.

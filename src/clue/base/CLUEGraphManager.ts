@@ -36,7 +36,7 @@ interface ICLUEGraphManagerOptions {
    *
    * @default false
    */
-  rewriteOtherProperty?: false;
+  rewriteOtherProperty?: boolean;
 }
 
 /**
