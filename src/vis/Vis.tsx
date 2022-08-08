@@ -1,27 +1,28 @@
-import * as React from 'react';
 import d3 from 'd3';
-import { useMemo, useEffect } from 'react';
+import * as React from 'react';
+import { useEffect, useMemo } from 'react';
+
+import { useSyncedRef } from '../hooks/useSyncedRef';
+import { getCssValue } from '../utils';
+import { barMergeDefaultConfig, BarVis, isBar } from './bar';
 import {
+  EAggregateTypes,
+  EBarDirection,
+  EBarDisplayType,
+  EBarGroupingType,
+  EColumnTypes,
+  EFilterOptions,
+  ENumericalColorScaleType,
+  EScatterSelectSettings,
   ESupportedPlotlyVis,
   IVisConfig,
   Scales,
   VisColumn,
-  EFilterOptions,
-  ENumericalColorScaleType,
-  EColumnTypes,
-  EBarDirection,
-  EBarDisplayType,
-  EBarGroupingType,
-  EScatterSelectSettings,
-  EAggregateTypes,
 } from './interfaces';
-import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
-import { barMergeDefaultConfig, isBar, BarVis } from './bar';
-import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
-import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
-import { getCssValue } from '../utils';
-import { useSyncedRef } from '../hooks/useSyncedRef';
+import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
+import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
+import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 
 const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
@@ -37,6 +38,18 @@ const DEFAULT_COLORS = [
 ];
 
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
+
+export function getDefaultVisParameters(): IVisConfig {
+  return {
+    type: ESupportedPlotlyVis.SCATTER,
+    numColumnsSelected: [],
+    color: null,
+    numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+    shape: null,
+    dragMode: EScatterSelectSettings.RECTANGLE,
+    alphaSliderVal: 0.5,
+  };
+}
 
 export function Vis({
   columns,
