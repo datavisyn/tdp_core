@@ -33,7 +33,7 @@ export abstract class CommonPropertyHandler extends PropertyHandler {
   abstract get propertySymbol(): string;
 
   toURLString(): string {
-    return this.propertySymbol + this.toString();
+    return this.toString() === '' ? '' : this.propertySymbol + this.toString();
   }
 
   setInt(name: string, value: number, update: boolean | number = true) {

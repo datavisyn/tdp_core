@@ -24,7 +24,7 @@ export class CommonPropertyHandler extends PropertyHandler {
         // hook
     }
     toURLString() {
-        return this.propertySymbol + this.toString();
+        return this.toString() === '' ? '' : this.propertySymbol + this.toString();
     }
     setInt(name, value, update = true) {
         this.setProp(name, String(value), update);
