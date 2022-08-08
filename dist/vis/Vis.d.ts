@@ -1,5 +1,4 @@
-/// <reference types="react" />
-import { IVisConfig, VisColumn, EFilterOptions } from './interfaces';
+import { EFilterOptions, IVisConfig, VisColumn } from './interfaces';
 export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, setExternalConfig, closeCallback, showCloseButton, externalConfig, hideSidebar, }: {
     /**
      * Required data columns which are displayed.

@@ -39,17 +39,6 @@ const DEFAULT_COLORS = [
 
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
 
-export function getDefaultVisParameters(): IVisConfig {
-  return {
-    type: ESupportedPlotlyVis.SCATTER,
-    numColumnsSelected: [],
-    color: null,
-    numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
-    shape: null,
-    dragMode: EScatterSelectSettings.RECTANGLE,
-    alphaSliderVal: 0.5,
-  };
-}
 
 export function Vis({
   columns,
