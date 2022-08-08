@@ -14,6 +14,9 @@ export class HashPropertyHandler extends CommonPropertyHandler {
     get propertySymbol() {
         return '#';
     }
+    toURLString() {
+        return this.toString() === '' ? '' : this.propertySymbol + this.toString();
+    }
     updateImpl() {
         if (this.isSameHistoryState()) {
             return;

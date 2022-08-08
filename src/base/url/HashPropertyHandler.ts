@@ -18,6 +18,10 @@ export class HashPropertyHandler extends CommonPropertyHandler {
     return '#';
   }
 
+  toURLString(): string {
+    return this.toString() === '' ? '' : this.propertySymbol + this.toString();
+  }
+
   protected updateImpl() {
     if (this.isSameHistoryState()) {
       return;
