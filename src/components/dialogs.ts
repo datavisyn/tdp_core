@@ -109,15 +109,15 @@ export class Dialog {
   }
 
   get body() {
-    return this.modalElement.querySelector('.modal-body');
+    return this.modalElement.querySelector<HTMLDivElement>('.modal-body');
   }
 
   get footer() {
-    return this.modalElement.querySelector('.modal-footer');
+    return this.modalElement.querySelector<HTMLDivElement>('.modal-footer');
   }
 
   get header() {
-    return this.modalElement.querySelector('.modal-header');
+    return this.modalElement.querySelector<HTMLDivElement>('.modal-header');
   }
 
   onHide(callback: () => void) {
