@@ -21,15 +21,15 @@
   "types": "dist/index.d.ts",
   "files": [
     "src",
-    "phovea_registry.js",
     "dist",
+    "phovea_registry.js",
     "tdp_core",
     "requirements.txt",
     "requirements_dev.txt"
   ],
   "engines": {
-    "npm": ">= 6.12",
-    "node": ">= 12.13"
+    "npm": ">=8",
+    "node": ">=16"
   },
   "scripts": {
     "all": "npm run lint:fix && npm run test && npm run build && npm run dist",
@@ -46,8 +46,7 @@
     "docs": "visyn_scripts docs",
     "lint:fix": "visyn_scripts lint --fix",
     "lint": "visyn_scripts lint",
-    "prepack": "npm run build",
-    "prepare": "echo 'dummy prepare since prepack has no dev dependencies'",
+    "prepare": "npm run build",
     "start": "visyn_scripts start --env workspace_mode=single",
     "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
     "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
