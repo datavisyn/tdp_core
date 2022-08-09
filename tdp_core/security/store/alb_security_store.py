@@ -2,11 +2,9 @@ import logging
 from typing import Optional
 
 import jwt
-from fastapi import FastAPI
 
 from ... import manager
 from ..model import User
-from ...middleware.request_context_middleware import get_request
 from .base_store import BaseStore
 
 _log = logging.getLogger(__name__)
