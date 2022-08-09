@@ -1,9 +1,10 @@
 import Popper, { PopperOptions, ReferenceObject } from 'popper.js';
 import { ITourContext, Tour } from './Tour';
-import { IStep } from './extensions';
-import { AppHeader } from '../components';
+import type { IStep } from './extensions';
+import { AppHeader } from '../components/header';
 import { TourUtils } from './TourUtils';
-import { BaseUtils, GlobalEventHandler } from '../base';
+import { GlobalEventHandler } from '../base/event';
+import { BaseUtils } from '../base/BaseUtils';
 import { I18nextManager } from '../i18n';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
