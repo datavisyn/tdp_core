@@ -22,7 +22,6 @@
   "files": [
     "src",
     "dist",
-    "phovea_registry.js",
     "tdp_core",
     "requirements.txt",
     "requirements_dev.txt"
