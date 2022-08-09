@@ -5,8 +5,8 @@ import jwt
 from fastapi import FastAPI
 
 from ... import manager
+from ..model import LogoutReturnValue, User
 from ...middleware.request_context_middleware import get_request
-from ..model import User
 from .base_store import BaseStore
 
 _log = logging.getLogger(__name__)
@@ -58,25 +58,6 @@ class ALBSecurityStore(BaseStore):
             payload["alb_security_store"] = {"redirect": self.signout_url}
 
         return {"data": payload, "cookies": cookies}
-
-    def _get_user_info_from_token(self, token: str):
-        return jwt.decode(token, options={"verify_signature": False})
-
-    def get_user_info(self):
-        req = get_request()
-        if "Authorization" in req.headers:
-            try:
-                access_token = req.headers["Authorization"]
-                return self._get_user_info_from_token(access_token[7:])
-            except Exception as e:
-                _log.exception("Error in get_user_info: %s", e)
-                return None
-        else:
-            result = {}
-        return result
-
-    def init_app(self, app: FastAPI):
-        app.add_api_route("/userinfo", self.get_user_info)
 
 
 def create():

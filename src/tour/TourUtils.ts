@@ -1,5 +1,6 @@
-import { GlobalEventHandler, BaseUtils } from '../base';
-import { IViewTourContext } from './extensions';
+import { GlobalEventHandler } from '../base/event';
+import { BaseUtils } from '../base/BaseUtils';
+import type { IViewTourContext } from './extensions';
 
 export class TourUtils {
   public static readonly GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
