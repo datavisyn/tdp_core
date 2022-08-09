@@ -59,7 +59,7 @@
 .lineup-engine {
   position: absolute;
   top: 0;
-  right: 4px; // leave some space for the LineUp selection indicator next to the scroll bar
+  right: 0;
   bottom: 0;
   left: 0;
   overflow: auto;
@@ -317,10 +317,6 @@ $lu_assets: "~lineupjs/src/assets";
             display: flex;
             align-items: center;
             text-align-last: auto;
-
-            & > i {
-              align-self: flex-start;
-            }
           }
         }
       }
