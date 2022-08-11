@@ -1,5 +1,5 @@
 import { LocalDataProvider } from 'lineupjs';
-import { IPanelButton } from './PanelButton';
+import type { IPanelButton } from './PanelButton';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 /**
  * A button dropdown to download selected/all rows of the ranking
