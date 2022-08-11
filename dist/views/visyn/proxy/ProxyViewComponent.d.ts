@@ -1,3 +1,4 @@
+/// <reference types="react" />
 export interface IProxyViewProps {
     /**
      * Site that you want to view
