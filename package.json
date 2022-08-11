@@ -60,7 +60,7 @@
     "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.1",
+    "@fortawesome/fontawesome-free": "^6.1.1",
     "@popperjs/core": "^2.9.3",
     "bootstrap": "~5.1.0",
     "crypto-js": "^4.0.0",
@@ -79,7 +79,7 @@
     "eventemitter3": "^4.0.7",
     "i18next": "^19.8.4",
     "jquery": "~3.5.1",
-    "lineupjs": "4.6.0",
+    "lineupjs": "4.6.2",
     "lodash": "~4.17.20",
     "marked": "~3.0.2",
     "md5": "^2.3.0",

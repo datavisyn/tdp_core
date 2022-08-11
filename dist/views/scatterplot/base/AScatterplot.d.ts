@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 import { AxisScale, Axis } from 'd3-axis';
 import { ZoomScale, ZoomTransform, ZoomBehavior } from 'd3-zoom';
 import { Quadtree } from 'd3-quadtree';
@@ -304,7 +303,7 @@ export declare abstract class AScatterplot<T, C extends IScatterplotOptions<T>> 
      * adapt the current translation (is absolute in pixels) and consider if the dimensions of the canvas element have changed
      */
     private adaptMaxTranslation;
-    protected rescale(axis: EScaleAxes, scale: IScale): any;
+    protected rescale(axis: EScaleAxes, scale: IScale): IScale;
     protected mousePosAtCanvas(): number[];
     private setTransform;
     private window2transform;
