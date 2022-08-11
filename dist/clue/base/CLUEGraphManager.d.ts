@@ -6,20 +6,72 @@ export interface IClueState {
     slide: number;
     state: number;
 }
+interface ICLUEGraphManagerOptions {
+    /**
+     * Is this graph manager read-only mode?
+     * @default false
+     */
+    isReadOnly?: boolean;
+    /**
+     * The CLUE parameters can be encoded in the hash '#clue_graph=...' (value: 'hash')
+     * or as query parameters `?clue_graph=...` (value: 'query') in the URL.
+     *
+     * @default hash
+     */
+    propertyHandler?: 'query' | 'hash';
+    /**
+     * If set to `true` it will rewrite incoming URLs of the property handler that is not selected.
+     *
+     * - With `cluePropertyHandler: 'hash'` it rewrites URLs with `?clue_graph=...` to `#clue_graph=...`
+     * - With `cluePropertyHandler: 'query'` it rewrites URLs with `#clue_graph=...` to `?clue_graph=...`
+     *
+     * If this flag is set to `false` the rewrite is disabled.
+     *
+     * @default false
+     */
+    rewriteOtherProperty?: boolean;
+}
+/**
+ * Based on the selected property the other property handler is checked for CLUE parameter.
+ * Found parameters are then moved to the selected property.
+ *
+ * - With `selectedProperty = 'hash'` it rewrites URLs from `?clue_graph=...` to `#clue_graph=...`
+ * - With `selectedProperty = 'query'` it rewrites URLs from `#clue_graph=...` to `?clue_graph=...`
+ *
+ * If no CLUE parameters are found in the other property, no action is done.
+ *
+ * The remaining parameters in hash and query are untouched.
+ *
+ * @internal
+ * @param selectedProperty Selected property handler ('hash' or 'query')
+ * @returns void
+ */
+export declare function rewriteURLOtherProperty(selectedProperty: 'hash' | 'query'): void;
 export declare class CLUEGraphManager extends EventHandler {
     private manager;
-    private readonly isReadonly;
     static readonly EVENT_EXTERNAL_STATE_CHANGE = "externalStateChanged";
     /**
      * update hash in 100ms to prevent to frequent updates
      * @type {number}
      */
-    static readonly DEBOUNCE_UPDATE_DELAY = 100;
+    private static readonly DEBOUNCE_UPDATE_DELAY;
+    /**
+     * Property handler to manipulate the hash or search query of the URL
+     */
+    private readonly propertyHandler;
+    /**
+     * Is this graph manager read-only mode?
+     */
+    private isReadOnly;
     private onHashChanged;
-    constructor(manager: MixedStorageProvenanceGraphManager, isReadonly?: boolean);
-    private static setGraphInUrl;
+    constructor(manager: MixedStorageProvenanceGraphManager, { isReadOnly, propertyHandler, rewriteOtherProperty }?: ICLUEGraphManagerOptions);
+    private setGraphInUrl;
     static reloadPage(): void;
     private onHashChangedImpl;
+    /**
+     * Returns the URL only with `clue_graph` and `clue_state` in the hash or query.
+     */
+    getCLUEGraphURL(): string;
     newRemoteGraph(): void;
     newGraph(): void;
     loadGraph(desc: any): void;
@@ -43,7 +95,8 @@ export declare class CLUEGraphManager extends EventHandler {
     chooseLazy(rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     choose(list: IProvenanceGraphDataDescription[], rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     loadOrClone(graph: IProvenanceGraphDataDescription, isSelect: boolean): void;
-    cloneLocal(graph: IProvenanceGraphDataDescription): Promise<void> | PromiseLike<ProvenanceGraph>;
+    cloneLocal(graph: IProvenanceGraphDataDescription): PromiseLike<ProvenanceGraph> | Promise<void>;
+    private useInMemoryGraph;
     /**
      * create the provenance graph selection dropdown and handles the graph selection
      * @param manager
@@ -51,4 +104,5 @@ export declare class CLUEGraphManager extends EventHandler {
      */
     static choose(manager: CLUEGraphManager): Promise<ProvenanceGraph>;
 }
+export {};
 //# sourceMappingURL=CLUEGraphManager.d.ts.map

@@ -2,7 +2,7 @@ import { NotificationHandler } from '../../base/NotificationHandler';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
 import { TemporarySessionList, PersistentSessionList } from './SessionList';
 import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
-import { GlobalEventHandler, PropertyHandler } from '../../base';
+import { GlobalEventHandler } from '../../base';
 import { I18nextManager } from '../../i18n';
 import { Dialog, PHOVEA_UI_FormDialog } from '../../components';
 export class EditProvenanceGraphMenu {
@@ -132,14 +132,7 @@ export class EditProvenanceGraphMenu {
                         .catch(ErrorAlertHandler.getInstance().errorAlert)
                         .then(() => {
                         this.updateGraphMetaData(this.graph);
-                        const p = new PropertyHandler(window.location.hash);
-                        const hash = new Map();
-                        p.forEach((key, value) => {
-                            hash.set(key, `${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
-                        });
-                        hash.set('clue_graph', `clue_graph=${encodeURIComponent(this.graph.desc.id)}`);
-                        hash.set('clue_state', `clue_state=${this.graph.act.id}`);
-                        const url = `${window.location.href.replace(window.location.hash, '')}#${Array.from(hash.values()).join('&')}`;
+                        const url = manager.getCLUEGraphURL();
                         NotificationHandler.pushNotification('success', `${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.successNotification', { name: this.graph.desc.name })}
             <br>${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.urlToShare')} <br>
             <a href="${url}" title="${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.currentLink')}">${url}</a>`, -1);

@@ -1,28 +1,39 @@
 import { PropertyHandler } from './PropertyHandler';
-/**
- * manages the hash location property helper
- */
-export class HashProperties extends PropertyHandler {
+
+export abstract class CommonPropertyHandler extends PropertyHandler {
   public static readonly EVENT_STATE_PUSHED = 'pushedState';
 
   public static readonly EVENT_HASH_CHANGED = 'hashChanged';
 
-  private updated = () => {
-    this.parse(window.location.hash);
-    this.fire(HashProperties.EVENT_HASH_CHANGED);
-  };
-
   private debounceTimer = -1;
 
-  constructor() {
-    super();
+  protected updated = () => {
+    this.parse(this.propertySource);
+    this.fire(CommonPropertyHandler.EVENT_HASH_CHANGED);
+  };
+
+  protected init() {
     const bak = window.history.state;
     if (bak) {
       Object.keys(bak).forEach((k) => this.map.set(k, bak[k]));
     } else {
-      this.parse(window.location.hash);
+      this.parse(this.propertySource);
     }
-    window.addEventListener('hashchange', this.updated, false);
+  }
+
+  /**
+   * Remove event listener, ...
+   */
+  destroy() {
+    // hook
+  }
+
+  abstract get propertySource(): string;
+
+  abstract get propertySymbol(): string;
+
+  toURLString(): string {
+    return this.propertySymbol + this.toString();
   }
 
   setInt(name: string, value: number, update: boolean | number = true) {
@@ -50,7 +61,7 @@ export class HashProperties extends PropertyHandler {
     return false;
   }
 
-  private toObject() {
+  protected toObject() {
     const r: any = {};
     this.map.forEach((v, k) => (r[k] = v));
     return r;
@@ -58,33 +69,37 @@ export class HashProperties extends PropertyHandler {
 
   private update(updateInMs = 0) {
     if (updateInMs <= 0) {
-      return this.updateImpl();
+      this.clearDebounceTimer();
+      this.updateImpl();
     }
 
-    if (this.debounceTimer >= 0) {
-      window.clearTimeout(this.debounceTimer);
-      this.debounceTimer = -1;
-    }
-    this.debounceTimer = window.setTimeout(() => this.updateImpl(), updateInMs);
-    return undefined;
+    this.clearDebounceTimer();
+
+    this.debounceTimer = window.setTimeout(() => {
+      this.clearDebounceTimer();
+      this.updateImpl();
+    }, updateInMs);
   }
 
-  private updateImpl() {
-    if (this.debounceTimer >= 0) {
-      window.clearTimeout(this.debounceTimer);
-      this.debounceTimer = -1;
+  private clearDebounceTimer() {
+    if (this.debounceTimer <= 0) {
+      return;
     }
+    window.clearTimeout(this.debounceTimer);
+    this.debounceTimer = -1;
+  }
+
+  protected abstract updateImpl(): void;
+
+  protected isSameHistoryState(): boolean {
     // check if same state
     if (window.history.state) {
       const current = window.history.state;
       const keys = Object.keys(current);
       if (keys.length === this.map.size && keys.every((k) => this.map.get(k) === current[k])) {
-        return;
+        return true;
       }
     }
-    window.removeEventListener('hashchange', this.updated, false);
-    window.history.pushState(this.toObject(), `State ${Date.now()}`, `#${this.toString()}`);
-    window.addEventListener('hashchange', this.updated, false);
-    this.fire(HashProperties.EVENT_STATE_PUSHED, `State ${Date.now()}`, `#${this.toString()}`);
+    return false;
   }
 }
