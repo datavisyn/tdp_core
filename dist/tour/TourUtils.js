@@ -228,7 +228,7 @@ export class TourUtils {
      */
     static isTourVisible() {
         const counter = document.querySelector('.tdp-tour-step-count');
-        return counter.style.display === 'flex'; // visible -> active
+        return counter && counter.style.display === 'flex'; // visible -> active
     }
 }
 TourUtils.GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
