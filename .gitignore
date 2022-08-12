@@ -29,3 +29,4 @@ node_modules/
 /src/**/*.map
 /tests/**/*.map 
 *.css
+/package-lock.json

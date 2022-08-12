@@ -12,10 +12,9 @@
 @import "./vendors/bootstrap/2_components";
 
 @import "./abstracts/variables";
-@import "~@fortawesome/fontawesome-free/scss/variables";
+@import "./fontawesome.scss";
 
 // import mixins
-@import "~@fortawesome/fontawesome-free/scss/mixins";
 @import "./abstracts/mixins";
 
 @import "./main";
