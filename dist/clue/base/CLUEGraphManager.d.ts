@@ -95,7 +95,7 @@ export declare class CLUEGraphManager extends EventHandler {
     chooseLazy(rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     choose(list: IProvenanceGraphDataDescription[], rejectOnNotFound?: boolean): PromiseLike<ProvenanceGraph>;
     loadOrClone(graph: IProvenanceGraphDataDescription, isSelect: boolean): void;
-    cloneLocal(graph: IProvenanceGraphDataDescription): PromiseLike<ProvenanceGraph> | Promise<void>;
+    cloneLocal(graph: IProvenanceGraphDataDescription): Promise<void> | PromiseLike<ProvenanceGraph>;
     private useInMemoryGraph;
     /**
      * create the provenance graph selection dropdown and handles the graph selection
