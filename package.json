@@ -105,6 +105,18 @@
     "cypress": "^9.5.2",
     "local-cypress": "^1.2.5"
   },
+  "resolutions": {
+    "@types/react": "^16.9.23",
+    "@types/react-dom": "^16.9.5",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
+  },
+  "overrides": {
+    "@types/react": "^16.9.23",
+    "@types/react-dom": "^16.9.5",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
+  },
   "visyn": {
     "entries": {
       "app": {
