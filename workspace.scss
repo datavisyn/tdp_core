@@ -1,9 +1,3 @@
-// TODO: Without this, we get "Can't resolve './node_modules/lineupengine/src/styles/lineupengine/src/assets/loading.svg' in '.../workspaces/aelixir'"
-// Why do I need to do this? Probably because lineupjs defines $engine_assets and it is resolving it relatively?
-$engine_assets: '../../../lineupengine/src/assets';
-$engine_loading_image: url('#{$engine_assets}/loading.svg') !default;
-$engine_loading_static_image: url('#{$engine_assets}/loading_s.svg') !default;
-
 // Use the storybook entrypoint to load variables etc.
 @import './src/scss/storybook.scss';
 @import './src/scss/main.scss';
