@@ -90,7 +90,7 @@
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "use-deep-compare-effect": "^1.8.0",
-    "visyn_scripts": "git+ssh://git@github.com:datavisyn/visyn_scripts.git#develop"
+    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#develop"
   },
   "devDependencies": {
     "@babel/core": "^7.17.7",
