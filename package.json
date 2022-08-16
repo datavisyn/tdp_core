@@ -31,9 +31,8 @@
     "node": ">=16"
   },
   "scripts": {
-    "all": "npm run lint:fix && npm run test && npm run build && npm run dist",
-    "build": "npm run clean && npm run compile && npm run copy",
-    "ci": "npm run lint && npm run test && npm run build && npm run dist",
+    "all": "yarn run lint:fix && yarn run test && yarn run build && yarn run dist",
+    "build": "yarn run clean && yarn run compile && yarn run copy",
     "clean": "rimraf build dist lib",
     "compile:watch": "visyn_scripts compile --watch",
     "compile": "visyn_scripts compile",
@@ -45,8 +44,8 @@
     "docs": "visyn_scripts docs",
     "lint:fix": "visyn_scripts lint --fix",
     "lint": "visyn_scripts lint",
-    "predist": "npm run lint && npm run test && npm run build",
-    "prepack": "npm run build",
+    "predist": "yarn run lint && yarn run test && yarn run build",
+    "prepack": "yarn run build",
     "start": "visyn_scripts start --env workspace_mode=single",
     "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
     "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
