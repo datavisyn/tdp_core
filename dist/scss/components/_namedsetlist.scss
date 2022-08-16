@@ -1,0 +1,31 @@
+.named-sets-wrapper {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+
+  .predefined-named-sets header::before,
+  .custom-named-sets header::before,
+  .other-named-sets header::before {
+    @extend .fas;
+    width: calc(18em / 14);
+    text-align: center;
+  }
+
+  .predefined-named-sets header::before {
+    content: fa-content($fa-var-database);
+  }
+
+  .custom-named-sets header::before {
+    content: fa-content($fa-var-user);
+  }
+
+  .other-named-sets header::before {
+    content: fa-content($fa-var-users);
+  }
+
+  ul.loading::before {
+    @extend .fas;
+    content: fa-content($fa-var-spinner);
+    animation: fa-spin 2s infinite linear;
+  }
+}

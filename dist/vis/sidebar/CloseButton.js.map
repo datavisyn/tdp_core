@@ -1,0 +1,1 @@
+{"version":3,"file":"CloseButton.js","sourceRoot":"","sources":["../../../src/vis/sidebar/CloseButton.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,KAAK,MAAM,OAAO,CAAC;AAE/B,MAAM,UAAU,WAAW,CAAC,EAAE,aAAa,EAAiC;IAC1E,OAAO,CACL,6BAAK,SAAS,EAAC,+BAA+B;QAC5C,gCAAQ,OAAO,EAAE,GAAG,EAAE,CAAC,aAAa,EAAE,EAAE,IAAI,EAAC,QAAQ,EAAC,SAAS,EAAC,eAAe,gBAAY,OAAO,GAAG,CACjG,CACP,CAAC;AACJ,CAAC"}

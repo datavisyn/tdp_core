@@ -1,0 +1,24 @@
+&.composite-view {
+  div.parameters:empty {
+    display: none;
+  }
+
+  [data-layout=split] {
+    > section > header {
+      background: none;
+    }
+
+    [data-layout=view] {
+      overflow: auto;
+      position: relative;
+
+      > * {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 1px;
+        bottom: 1px;
+      }
+    }
+  }
+}

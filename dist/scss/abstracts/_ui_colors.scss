@@ -1,0 +1,15 @@
+// selection / hover colors
+$visyn-selection-colors: (
+  'selection-color-light': '#ffcf76',
+  'selection-color-dark': '#e29609',
+  'selection-color-light-hovered': '#ffe8be',
+  'selection-color-dark-hovered': '#ffcf76'
+);
+
+// create css variables and inject them in :root
+:root {
+  @each $key, $value in map-collect($visyn-selection-colors) {
+    // injecting without white-space as the value will be read with a leading white-space otherwise
+    --visyn-#{$key}:#{$value};
+  }
+}

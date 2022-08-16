@@ -1,0 +1,153 @@
+// This file contains all colors for visualizations to use in scss and js.
+
+// categorical color map
+$visyn-categorical-colors: (
+  'c1': '#337AB7',
+  'c2': '#ec6836',
+  'c3': '#75c4c2',
+  'c4': '#e9d36c',
+  'c5': '#24b466',
+  'c6': '#e891ae',
+  'c7': '#db933c',
+  'c8': '#b08aa6',
+  'c9': '#8a6044',
+  'c10': '#7b7b7b',
+);
+
+// sequential color map blue
+$visyn-sequential-colors-blue: (
+  's1-blue': '#cff6ff',
+  's2-blue': '#b0d6fe',
+  's3-blue': '#93b9e8',
+  's4-blue': '#779ecb',
+  's5-blue': '#5c84af',
+  's6-blue': '#406a94',
+  's7-blue': '#23527a',
+  's8-blue': '#023a60',
+  's9-blue': '#002245'
+);
+
+// sequential color map red
+$visyn-sequential-colors-red: (
+  's1-red': '#ffd7a9',
+  's2-red': '#ffb286',
+  's3-red': '#f69066',
+  's4-red': '#de754d',
+  's5-red': '#c25d37',
+  's6-red': '#a64621',
+  's7-red': '#8b2f0c',
+  's8-red': '#701601',
+  's9-red': '#520000'
+);
+
+// sequential color map green
+$visyn-sequential-colors-green: (
+  's1-green': '#95f4b3',
+  's2-green': '#79d798',
+  's3-green': '#5dbc7f',
+  's4-green': '#41a065',
+  's5-green': '#20864d',
+  's6-green': '#066b35',
+  's7-green': '#00511e',
+  's8-green': '#003806',
+  's9-green': '#002100'
+);
+
+// sequential color map yellow
+$visyn-sequential-colors-yellow: (
+  's1-yellow': '#fff188',
+  's2-yellow': '#e7d26b',
+  's3-yellow': '#cab650',
+  's4-yellow': '#ac9a35',
+  's5-yellow': '#8f8018',
+  's6-yellow': '#736601',
+  's7-yellow': '#584e00',
+  's8-yellow': '#3f3600',
+  's9-yellow': '#2d1e00'
+);
+
+// diverging color map blue-red
+$visyn-diverging-colors-blue-red: (
+  'd1-blue-red': '#003367',
+  'd2-blue-red': '#16518a',
+  'd3-blue-red': '#2e72ae',
+  'd4-blue-red': '#5093cd',
+  'd5-blue-red': '#77b5ea',
+  'd6-blue-red': '#aad7fd',
+  'd7-blue-red': '#f5f5f5',
+  'd8-blue-red': '#fac7a9',
+  'd9-blue-red': '#f99761',
+  'd10-blue-red': '#e06d3b',
+  'd11-blue-red': '#c2451a',
+  'd12-blue-red': '#99230d',
+  'd13-blue-red': '#6f0000'
+);
+
+// diverging color map red-turquois
+$visyn-diverging-colors-red-turquois: (
+  'd1-red-turquois': '#6f0000',
+  'd2-red-turquois': '#99230d',
+  'd3-red-turquois': '#c2451a',
+  'd4-red-turquois': '#e06d3b',
+  'd5-red-turquois': '#f99761',
+  'd6-red-turquois': '#fac7a9',
+  'd7-red-turquois': '#f5f5f5',
+  'd8-red-turquois': '#9ddddb',
+  'd9-red-turquois': '#6bbbba',
+  'd10-red-turquois': '#489997',
+  'd11-red-turquois': '#297776',
+  'd12-red-turquois': '#145656',
+  'd13-red-turquois': '#003838'
+);
+
+// diverging color map blue-yellow
+$visyn-diverging-colors-blue-yellow: (
+  'd1-blue-yellow': '#003367',
+  'd2-blue-yellow': '#16518a',
+  'd3-blue-yellow': '#2e72ae',
+  'd4-blue-yellow': '#5093cd',
+  'd5-blue-yellow': '#77b5ea',
+  'd6-blue-yellow': '#aad7fd',
+  'd7-blue-yellow': '#f5f5f5',
+  'd8-blue-yellow': '#e3d17f',
+  'd9-blue-yellow': '#c1ae46',
+  'd10-blue-yellow': '#9d8c22',
+  'd11-blue-yellow': '#7a6c0a',
+  'd12-blue-yellow': '#584c05',
+  'd13-blue-yellow': '#392f00'
+);
+
+// diverging color map blue-pink
+$visyn-diverging-colors-blue-pink: (
+  'd1-blue-pink': '#003367',
+  'd2-blue-pink': '#16518a',
+  'd3-blue-pink': '#2e72ae',
+  'd4-blue-pink': '#5093cd',
+  'd5-blue-pink': '#77b5ea',
+  'd6-blue-pink': '#aad7fd',
+  'd7-blue-pink': '#f5f5f5',
+  'd8-blue-pink': '#fdc0d6',
+  'd9-blue-pink': '#e696b3',
+  'd10-blue-pink': '#c4728f',
+  'd11-blue-pink': '#a1506e',
+  'd12-blue-pink': '#7e2f50',
+  'd13-blue-pink': '#5b0e31'
+);
+
+// create css variables and inject them in :root
+:root {
+  @each $key, $value in map-collect(
+    $visyn-categorical-colors,
+    $visyn-sequential-colors-blue,
+    $visyn-sequential-colors-red,
+    $visyn-sequential-colors-green,
+    $visyn-sequential-colors-yellow,
+    $visyn-diverging-colors-blue-red,
+    $visyn-diverging-colors-red-turquois,
+    $visyn-diverging-colors-blue-yellow,
+    $visyn-diverging-colors-blue-pink)
+  {
+    // injecting without white-space as the value will be read with a leading white-space otherwise
+    --visyn-#{$key}:#{$value};
+  }
+}

@@ -1,0 +1,117 @@
+@import './vars';
+
+&[data-layout=tabbing] {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: row;
+
+  > section {
+    flex: 1 1 0;
+    display: inline-flex;
+    flex-direction: column;
+    position: relative;
+
+    > header {
+      flex: 0 0 auto;
+    }
+
+    > main,
+    > article {
+      flex: 1 1 auto;
+      position: relative;
+    }
+  }
+
+  > *:not(.active) {
+    display: none;
+  }
+}
+
+header[data-layout=tabbing] {
+  flex: 0 0 auto;
+  border-bottom: 1px solid $phovea_layout_active_tab_header;
+
+  &.fixed {
+
+    &.floating-header {
+      position: absolute;
+      width: 100%;
+      z-index: 10;
+      height: 3px;
+
+      &.show-header {
+        height: auto;
+      }
+
+      &:not(.show-header) {
+        > * { // hide all buttons inside the  header unless it should be shown with the show-header class
+          display: none;
+        }
+      }
+    }
+
+    > span {
+      display: none;
+    }
+  }
+
+  > :nth-child(2) {
+    display: inline-block;
+    margin: 0 2px;
+    padding: 3px 1em;
+  }
+
+  > [data-layout=tab-reorder] {
+    display: inline-block;
+    width: 3px;
+    opacity: 0;
+    padding: 3px 0;
+    border: 0 solid transparent;
+    border-bottom: none;
+    border-top-color: black;
+    transition: all 0.5s ease;
+
+    &.phovea-dragover {
+      opacity: 1;
+      padding-top: 0;
+      border-top-width: 5px;
+      border-left-width: 5px;
+      border-right-width: 5px;
+    }
+  }
+
+  > header {
+    display: inline-block;
+    margin: 0;
+    padding: 3px 3px 3px 1em;
+    border-radius: 5px 5px 0 0;
+    background-color: $phovea_layout_tab_header;
+    border-top: 1px solid $phovea_layout_active_tab_header;
+    border-left: 1px solid $phovea_layout_active_tab_header;
+    border-right: 1px solid $phovea_layout_active_tab_header;
+    transition: background-color ease 0.5s;
+    cursor: pointer;
+
+    &[draggable] {
+      cursor: pointer;
+      cursor: -moz-grab;
+      cursor: -webkit-grab; // indicate grab able
+    }
+
+    > button.btn-close {
+      margin-left: 6px;
+      font-size: 140%;
+    }
+
+    &.active:not([draggable]) {
+      cursor: not-allowed;
+    }
+
+    &.active,
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: $phovea_layout_active_tab_header;
+    }
+  }
+}

@@ -1,0 +1,33 @@
+.tdp-permissions {
+  display: none;
+}
+
+.tdp-permissions-open > .tdp-permissions {
+  display: block;
+}
+
+.tdp-permissions-entry {
+  display: flex;
+  align-items: center;
+  margin-top: 2em;
+
+  > label {
+    min-width: 6em;
+    padding-left: 0;
+  }
+
+  > span,
+  > input,
+  > select {
+    flex: 1 1 0;
+    margin: 0 0.5em;
+  }
+
+  > div.btn-group {
+    padding-top: 8px;
+  }
+
+  > div.btn-group label input[name*=permission_] {
+    display: none;
+  }
+}

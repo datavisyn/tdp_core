@@ -1,0 +1,10 @@
+// takes a list of maps
+// spreads all maps into one
+@function map-collect($maps...) {
+  $collection: ();
+
+  @each $map in $maps {
+    $collection: map-merge($collection, $map);
+  }
+  @return $collection;
+}

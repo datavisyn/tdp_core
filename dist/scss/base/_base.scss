@@ -1,0 +1,529 @@
+body,
+html {
+  font-family: Roboto, sans-serif;
+  font-weight: 400;
+}
+
+th,
+label,
+strong,
+b,
+.label {
+  font-weight: 500 !important;
+}
+
+/**
+ * Hide options menu
+ */
+
+li[data-header=optionsLink] {
+  display: none;
+}
+
+.sync-indicator {
+  color: inherit;
+  transition: color ease .2s;
+
+  &.active {
+    color: blue;
+  }
+}
+
+.dropdown-label {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.42857;
+  color: #777777;
+  white-space: nowrap;
+}
+
+.toast-container-custom {
+  $move_animation: 0.5s !default;
+
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2000;
+  transition: top $move_animation ease-out;
+
+  &:empty {
+    display: none;
+  }
+
+  &.push {
+    transition: none;
+
+    > .alert:first-of-type {
+      opacity: 0;
+    }
+  }
+
+  > .alert {
+    transition: opacity 0.5s linear $move_animation;
+    min-width: 40%;
+    margin-bottom: 2px;
+  }
+}
+
+.#{$tdp-css-prefix}-busy,
+.#{$tdp-css-prefix}-busy-overlay,
+.#{$tdp-css-prefix}-busy-partial-overlay {
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    content: '';
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.26) $phovea-loading-icon-url center center / $phovea-loading-icon-size no-repeat;
+    z-index: 9;
+  }
+
+  &[data-busy]::after {
+    position: absolute;
+    top: 1em;
+    left: 1em;
+    right: 1em;
+    text-align: center;
+    content: attr(data-busy);
+    z-index: 10;
+  }
+}
+
+.#{$tdp-css-prefix}-busy > * {
+  display: none !important;
+}
+
+.#{$tdp-css-prefix}-busy-overlay > * {
+  visibility: hidden !important;
+}
+
+/**
+ * Style for the authorization overlay in views and score headers.
+ */
+.#{$tdp-css-prefix}-authorization-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255,255,255,0.95);
+}
+
+/* phovea_clue */
+
+body, html {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+
+* {
+  //print precisely
+  -webkit-print-color-adjust: exact;
+}
+
+
+label {
+
+  &.clue-E, &.clue-A, &.clue-P {
+    font-size: 17px;
+    padding: 0 10px;
+
+    border-radius: 5px !important;
+    margin: 3px 3px 2px 3px;
+    background-color: $header-menu-bg-color;
+    color: $header-menu-color;
+
+    &.active, &:hover, &:active {
+      font-weight: bold;
+      box-shadow: none;
+      background-color: white;
+    }
+  }
+}
+
+aside.provenance-sidepanel:not(.collapsed) {
+  border: 2px solid $core_colour;
+  border-radius: 5px;
+  margin: 2px;
+
+  * {
+    border: none;
+  }
+
+  div h2 {
+    margin-top: 0;
+    padding: 0.2em .5em;
+    font-size: 18px;
+    margin-bottom: 0.1em;
+
+    color: $core_colour_text;
+    vertical-align: middle;
+
+    i.fas {
+      font-size: 80%;
+      line-height: 1;
+    }
+  }
+  &.provenance-layout-vis {
+    border-color: $core_border;
+    //border-color: $authoring-stage;
+    > div:first-of-type {
+      background-color: $authoring-stage;
+    }
+
+  }
+  &.provenance-story-vis, &.annotations {
+    border-color: $core_border;
+    > div:first-of-type {
+      background-color: $presentation-stage;
+    }
+  }
+}
+
+aside.annotations {
+  display: none;
+  position: absolute;
+  top: 0.2em;
+  left: 0.2em;
+  text-align: center;
+  padding-bottom: 0.1em;
+  background-color: $presentation-stage;
+
+  > div:first-of-type {
+    cursor: move;
+  }
+  h2 {
+    font-size: 13px;
+    margin-bottom: 0.1em;
+  }
+}
+
+
+//main content
+body > div.box {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: stretch;
+  align-items: stretch;
+  -webkit-flex-flow: column;
+  flex-flow: column;
+  height: 100%;
+}
+
+body > div.box > div.content {
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: stretch;
+  align-items: stretch;
+  -webkit-flex: 1 1 0; /* Chrome */
+  flex: 1 1 0;
+
+  position: relative;
+}
+
+aside {
+  -webkit-print-color-adjust: exact;
+
+  position: relative;
+}
+
+header.clue-modeselector {
+  position: absolute;
+  left: 50%;
+  width: 40em;
+  margin-left: -20em;
+  transition: top 1s;
+  top: 2px;
+  text-align: center;
+
+  label {
+    //padding: 1em 5px;
+    width: 10em;
+  }
+}
+
+[data-clue=E] header.clue-modeselector.collapsed {
+  top: -40px;
+}
+
+.phovea-navbar.navbar-dark .clue-modeselector {
+  label.clue-E,
+  label.clue-A,
+  label.clue-P {
+    color: $white;
+
+    &.active {
+      background-color: $gray-700;
+
+      &:hover,
+      &.focus {
+        background-color: $gray-600;
+        color: $white;
+      }
+    }
+
+    &:hover,
+    &.focus {
+      background-color: $gray-600;
+      color: $white;
+    }
+  }
+}
+
+// #player_duration{
+// put to the left of aside provenance
+
+//}
+
+.selectioninfo {
+  .no-selection-selected.no-selection-hovered {
+    display: none;
+  }
+}
+
+main {
+  position: relative;
+
+  -webkit-flex: 1 1 auto; /* Chrome */
+  flex: 1 1 auto;
+}
+
+aside.left {
+  border: 0;
+
+  display: -webkit-flex;
+  display: flex;
+
+  -webkit-align-items: stretch;
+  align-items: stretch;
+  -webkit-flex-flow: column;
+  flex-flow: column;
+
+  section {
+    -webkit-flex: 1 1 10vh; /* Chrome */
+    flex: 1 1 10vh;
+    overflow:auto;
+    position: relative;
+    text-overflow: ellipsis;
+    &:first-of-type {
+      -webkit-flex: 1 1 10vh; /* Chrome */
+      flex: 1 1 10vh;
+    }
+    border: 2px solid $exploration-stage;
+    border-radius: 5px;
+    > div:first-of-type {
+      background-color: $exploration-stage;
+    }
+  }
+}
+
+$clue_triangle_width: 30px;
+
+#modeselector {
+  color: white;
+  min-width: 30em;
+
+  > div {
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .clue_slidermodeselector {
+    label {
+      margin: 0 5px;
+    }
+  }
+
+  button {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+    height: auto !important;
+  }
+
+  .clue_trianglemodeselector {
+    circle.point {
+      fill: red;
+      stroke: tint-color(red, 0.3);
+      stroke-width: 2;
+      cursor: crosshair;
+    }
+    path {
+      fill: lightgray;
+      cursor: crosshair;
+    }
+  }
+}
+
+/*.phovea-select-selected {
+  //svg variant
+  stroke: $select-color !important;
+  stroke-width: 1px;
+  fill: $select-color !important;
+  vector-effect : non-scaling-stroke;
+
+  //html variant
+  border: 1px solid $select-color !important;
+  background-color: $select-color !important;
+}*/
+
+//super script fontawesome icon
+.fas.super {
+  vertical-align: super;
+  font-size: 50%;
+  margin-left: -.1em;
+}
+
+//if we render in headless mode
+body.headless {
+  main {
+    width: 100vw !important;
+    height: 100vh !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+  nav, aside, footer, header {
+    display: none !important;
+  }
+}
+
+#provenancegraph_list div.popover {
+  width: 30em;
+  max-width: 30em;
+}
+
+div.shortcuts {
+  position: absolute;
+  bottom: 0;
+  margin-left: -20px;
+}
+
+body {
+
+  div.content {
+    //margin-top: 7px;
+  }
+
+  &[data-clue='E'] {
+    main {
+      div.annotation, div.add-text-annotation, div.subtitle-annotation {
+        display: none !important;
+      }
+    }
+    footer {
+      display: none;
+    }
+
+    aside.annotations {
+      display: none;
+    }
+  }
+
+  &[data-clue='A'] {
+    aside.annotations {
+      display: block;
+    }
+
+    aside.provenance-story-vis {
+      div.current {
+        div {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &[data-clue='P'] {
+
+    main {
+      div.annotation {
+        pointer-events: none;
+      }
+      div.add-text-annotation, div.annotation button {
+        display: none !important;
+      }
+      svg circle.anchor {
+        display: none !important;
+      }
+    }
+
+    aside.annotations {
+      display: none;
+    }
+
+    aside.provenance-story-vis {
+      width: 17em;
+      > div div.toolbar {
+        display: none !important;
+      }
+      div.current {
+        textarea, input {
+          display: none;
+        }
+      }
+      div.stories {
+        max-height: 88vh;
+      }
+      div.story {
+        margin-left: 2px;
+        &:not(.placeholder) {
+          transition: height 100ms;
+          height: 17pt !important;
+          margin-top: 1px !important;
+
+          .slabel {
+            word-break: break-all;
+          }
+        }
+      }
+      div.placeholder, div.dragger, div.dragger-transition {
+        visibility: hidden;
+      }
+      h2 > i:last-of-type, form, div.line, div.duration,div.placeholder:last-of-type, div.time_marker {
+        display: none;
+      }
+    }
+  }
+}
+
+/* phovea_ui */
+body, html {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+
+* {
+  //print precisely
+  -webkit-print-color-adjust: exact;
+}
+
+// busy indicator over the whole application
+.phovea-busy {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.26) $phovea-loading-icon-url no-repeat fixed center / $phovea-loading-icon-size;
+  z-index: 999;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}

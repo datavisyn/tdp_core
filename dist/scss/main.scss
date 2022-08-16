@@ -1,0 +1,53 @@
+@import "./abstracts/functions";
+@import './abstracts/variables';
+@import './abstracts/mixins';
+@import "./abstracts/vis_colors";
+@import "./abstracts/ui_colors";
+
+@import "./fonts/roboto";
+
+
+@import './base/base';
+
+@import './clue_override';
+
+@import "./vendors/font-awesome";
+@import './vendors/select2';
+@import './vendors/select3';
+@import './vendors/lineup';
+
+@import './components/form_builder';
+@import './components/button_group';
+@import './components/namedsetlist';
+@import './components/dialogs';
+@import './components/tooltip';
+@import './components/tour';
+@import './components/permissions';
+@import './components/view';
+@import './components/view_wrapper';
+// phovea_clue
+@import "./components/annotation";
+@import "./components/provvis";
+@import "./components/storyvis";
+// phovea_ui
+// TODO: Check if imported here or in .box
+// @import "./components/header_navbar";
+@import "./components/btn_text";
+@import "./layout/layout";
+// phovea_security_flask
+@import "./components/login_dialog";
+// tdp_react
+@import './components/view_tdp';
+@import './components/view_react';
+// tdp_ui
+@import './components/table';
+@import './components/tree';
+// phovea_importer
+@import './components/importer';
+// tdp_scatterplot
+@import './components/tdp_scatterplot';
+
+// import the header navbar with a more specific CSS selector again, to style it with the CLUE colors
+.box {
+  @import "./components/header_navbar";
+}

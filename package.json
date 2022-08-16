@@ -22,6 +22,7 @@
   "files": [
     "src",
     "dist",
+    "cypress",
     "tdp_core",
     "requirements.txt",
     "requirements_dev.txt"
@@ -45,7 +46,6 @@
     "lint:fix": "visyn_scripts lint --fix",
     "lint": "visyn_scripts lint",
     "predist": "yarn run lint && yarn run test && yarn run build",
-    "prepack": "yarn run build",
     "start": "visyn_scripts start --env workspace_mode=single",
     "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
     "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",

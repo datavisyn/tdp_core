@@ -1,0 +1,1 @@
+{"version":3,"file":"BrushOptionButtons.d.ts","sourceRoot":"","sources":["../../../src/vis/sidebar/BrushOptionButtons.tsx"],"names":[],"mappings":";AACA,OAAO,EAAE,sBAAsB,EAAE,MAAM,eAAe,CAAC;AAEvD,UAAU,gBAAgB;IACxB,QAAQ,EAAE,CAAC,QAAQ,EAAE,sBAAsB,KAAK,IAAI,CAAC;IACrD,QAAQ,EAAE,sBAAsB,CAAC;CAClC;AAED,wBAAgB,kBAAkB,CAAC,EAAE,QAAQ,EAAE,QAAQ,EAAE,EAAE,gBAAgB,eAkD1E"}

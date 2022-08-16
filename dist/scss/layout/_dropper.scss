@@ -1,0 +1,195 @@
+@import './vars';
+
+[data-drop] {
+  position: relative;
+
+  &.phovea-dragover {
+
+    &::before {
+      display: block;
+      opacity: 1;
+    }
+    &::after {
+      display: block;
+      opacity: 1;
+      background-color: $phovea_layout_dropper_background;
+    }
+
+    > .phovea-drop-locations-overlay {
+      display: block;
+    }
+
+    > * {
+      pointer-events: none;
+    }
+  }
+
+  &::after {
+    pointer-events: none;
+    user-select: none;
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+
+    display: none;
+    transition: opacity ease 1s, left ease .5s, top ease .5s, width ease .5s, height ease .5s;
+
+    border-radius: 5px;
+    opacity: 0;
+    box-shadow: 2px 2px 2px 2px #ccc;
+
+  }
+  &[data-drop=left] {
+    &::after {
+      width: 20%;
+    }
+  }
+  &[data-drop=right] {
+    &::after {
+      left: 80%;
+      width: 20%;
+    }
+  }
+  &[data-drop=top] {
+    &::after {
+      height: 30%;
+    }
+  }
+  &[data-drop=bottom] {
+    &::after {
+      top: 70%;
+      height: 30%;
+    }
+  }
+
+  &[data-drop=horizontal-scroll] {
+    &::after {
+      top: 30%;
+      left: 20%;
+      height: 40%;
+      width: 20%;
+    }
+  }
+
+  &[data-drop=vertical-scroll] {
+    &::after {
+      top: 30%;
+      left: 60%;
+      height: 40%;
+      width: 20%;
+    }
+  }
+
+  &[data-drop=center] {
+    &::after {
+      top: 30%;
+      left: 40%;
+      height: 40%;
+      width: 20%;
+    }
+  }
+
+  > .phovea-drop-locations-overlay {
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: rgba(255, 255, 255, .8);
+
+    div {
+      position: absolute;
+
+      &::before,
+      &::after {
+        content: '';
+        display: block;
+        background-repeat: no-repeat;
+        background-position: 50%;
+        background-size: 5em;
+      }
+    }
+
+    div:first-child,
+    div:last-child {
+      &::before,
+      &::after {
+        background-image: url('../../assets/dnd/space_filling.svg');
+      }
+    }
+
+    div:first-child {
+      left: 33%;
+      width: 33%;
+      height: 100%;
+
+      &::before,
+      &::after {
+        width: 100%;
+        height: 50%;
+        background-position: 70%;
+      }
+
+      &::before {
+        transform: rotate(270deg);
+      }
+
+      &::after {
+        transform: rotate(90deg);
+      }
+    }
+
+    div:last-child {
+      top: 33%;
+      width: 100%;
+      height: 33%;
+      display: flex;
+
+      &::before,
+      &::after {
+        width: 50%;
+        height: 100%;
+        background-position-x: 70%;
+      }
+
+      &::before {
+        transform: rotate(180deg);
+      }
+    }
+
+    div:nth-child(2) {
+      background-image: url('../../assets/dnd/tabbing.svg');
+      width: 60%;
+      height: 33%;
+      top: 33%;
+      left: 20%;
+      background-repeat: no-repeat;
+      background-position: 50%;
+      background-size: 5em;
+      display: flex;
+
+
+      &::before,
+      &::after {
+        width: 33%;
+        height: 100%;
+        background-image: url('../../assets/dnd/overflowing.svg');
+        background-position: 50%;
+      }
+
+      &::before {
+        transform: rotate(90deg);
+      }
+
+      &::after {
+        position: absolute;
+        left: 66%;
+      }
+    }
+  }
+}

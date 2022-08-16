@@ -1,0 +1,1 @@
+{"version":3,"file":"I18nextManager.d.ts","sourceRoot":"","sources":["../../src/i18n/I18nextManager.ts"],"names":[],"mappings":"AAKA,qBAAa,cAAc;IACzB,OAAc,gBAAgB,SAAQ;IAEtC,OAAc,iBAAiB,SAAuB;IAEtD;;;;OAIG;IACI,IAAI,yBAA4B;IAEvC;;;OAGG;IACU,QAAQ;IAwDrB,OAAO,CAAC,MAAM,CAAC,QAAQ,CAAiB;WAE1B,WAAW,IAAI,cAAc;CAO5C;AAED,eAAO,MAAM,IAAI,gBAA+B,CAAC"}
