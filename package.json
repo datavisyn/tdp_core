@@ -66,6 +66,7 @@
     "@types/react-plotly.js": "^2.5.0",
     "@types/select2": "4.0.44",
     "bootstrap": "~5.1.0",
+    "core-js": "2.6.5",
     "crypto-js": "^4.0.0",
     "d3": "~3.5.17",
     "i18next": "^19.8.4",
