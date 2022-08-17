@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3';
+import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
 import { useMemo, useEffect } from 'react';
 import { PlotlyComponent, Plotly } from '../Plot';
@@ -72,8 +72,8 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
                 // plotly redraws everything on updates, so you need to reappend title and
                 onUpdate: () => {
                     for (const p of traces.plots) {
-                        d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
-                        d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+                        d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+                        d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces === null || traces === void 0 ? void 0 : traces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (traces === null || traces === void 0 ? void 0 : traces.errorMessage) })) : null,
             mergedExtensions.postPlot,

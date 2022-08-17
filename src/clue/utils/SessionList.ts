@@ -1,4 +1,4 @@
-import { select, Selection, event } from 'd3';
+import { select, Selection, event } from 'd3v3';
 import $ from 'jquery';
 import { PHOVEA_UI_FormDialog } from '../../components';
 import { I18nextManager } from '../../i18n';

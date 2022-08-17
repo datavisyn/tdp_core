@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3';
+import d3v3 from 'd3v3';
 import { useMemo, useEffect } from 'react';
 import {
   ESupportedPlotlyVis,
@@ -178,7 +178,7 @@ export function Vis({
   }, [selected]);
 
   const scales: Scales = useMemo(() => {
-    const colorScale = d3.scale.ordinal().range(colors);
+    const colorScale = d3v3.scale.ordinal().range(colors);
 
     return {
       color: colorScale,

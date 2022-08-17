@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { ITypeDefinition, ValueTypeEditor } from './valuetype/valuetypes';
 import { IDataDescription } from '../data';
 export interface IColumnDefinition {
@@ -8,11 +8,11 @@ export interface IColumnDefinition {
 }
 export declare class ImportUtils {
     static commonFields(name: string): string;
-    static extractCommonFields($root: d3.Selection<any>): {
+    static extractCommonFields($root: d3v3.Selection<any>): {
         name: any;
         description: any;
     };
-    static importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string): Promise<() => {
+    static importTable(editors: ValueTypeEditor[], $root: d3v3.Selection<any>, header: string[], data: string[][], name: string): Promise<() => {
         data: string[][];
         desc: IDataDescription;
     }>;
@@ -20,7 +20,7 @@ export declare class ImportUtils {
         name: string;
         description: string;
     }): IDataDescription;
-    static importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string): Promise<() => {
+    static importMatrix(editors: ValueTypeEditor[], $root: d3v3.Selection<any>, header: string[], data: string[][], name: string): Promise<() => {
         rows: string[];
         cols: string[];
         data: string[][];

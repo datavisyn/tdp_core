@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3';
+import d3v3 from 'd3v3';
 import { useMemo, useEffect } from 'react';
 import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, EAggregateTypes, } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
@@ -108,7 +108,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         return currMap;
     }, [selected]);
     const scales = useMemo(() => {
-        const colorScale = d3.scale.ordinal().range(colors);
+        const colorScale = d3v3.scale.ordinal().range(colors);
         return {
             color: colorScale,
         };

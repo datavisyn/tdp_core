@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import marked from 'marked';
 import { merge } from 'lodash';
 import { ModeWrapper } from './mode';
@@ -437,7 +437,7 @@ export class Renderer {
             .append('button')
             .attr('tabindex', -1)
             .attr('class', 'btn btn-light btn-sm fas fa-arrows-alt')
-            .call(d3.behavior
+            .call(d3v3.behavior
             .drag()
             // .origin((d:prov.IStateAnnotation) => ({x: d.pos[0], y: d.pos[1]}))
             .on('dragstart', function (d, i) {
@@ -445,10 +445,10 @@ export class Renderer {
         })
             .on('dragend', that.removeAnchors.bind(that))
             .on('drag', function (d, i) {
-            const mouse = d3.mouse(this.parentNode.parentNode);
+            const mouse = d3v3.mouse(this.parentNode.parentNode);
             d.pos = that.updateAnchor(mouse, bounds);
             state.updateAnnotation(d);
-            d3.select(this.parentNode).each(updatePos);
+            d3v3.select(this.parentNode).each(updatePos);
         }));
         // remove
         $annsEnter
@@ -456,17 +456,17 @@ export class Renderer {
             .attr('tabindex', -1)
             .attr('class', 'btn btn-light btn-sm fas fa-times')
             .on('click', function (d, i) {
-            d3.select(this.parentNode).remove();
+            d3v3.select(this.parentNode).remove();
             state.removeAnnotationElem(d);
-            d3.event.preventDefault();
+            d3v3.event.preventDefault();
         });
         // Text
         $anns
             .filter((d) => d.type === 'text' || !d.hasOwnProperty('type'))
             .call(($texts, $textsEnter) => {
             const onEdit = function (d, i) {
-                const $elem = d3.select(this);
-                if (!d3.select(this.parentNode).classed('editable')) {
+                const $elem = d3v3.select(this);
+                if (!d3v3.select(this.parentNode).classed('editable')) {
                     return;
                 }
                 $elem.on('click', null);
@@ -490,7 +490,7 @@ export class Renderer {
             })
                 .each(function (d) {
                 if (d.styles) {
-                    d3.select(this).style(d.styles);
+                    d3v3.select(this).style(d.styles);
                 }
             });
         }, $annsEnter.filter((d) => d.type === 'text' || !d.hasOwnProperty('type')));
@@ -550,11 +550,11 @@ export class Renderer {
                 cx: (d) => d.at[0],
                 cy: (d) => d.at[1],
             })
-                .call(d3.behavior.drag().on('drag', function (d, i) {
-                const e = d3.event;
+                .call(d3v3.behavior.drag().on('drag', function (d, i) {
+                const e = d3v3.event;
                 d.at = [e.x, e.y];
                 state.updateAnnotation(d);
-                d3.select(this).style({
+                d3v3.select(this).style({
                     cx: d.at[0],
                     cy: d.at[1],
                 });
@@ -574,7 +574,7 @@ export class Renderer {
             })
                 .each(function (d) {
                 if (d.styles) {
-                    d3.select(this).style(d.styles);
+                    d3v3.select(this).style(d.styles);
                 }
             });
         }, $annsEnter.filter((d) => d.type === 'arrow'));
@@ -586,7 +586,7 @@ export class Renderer {
                 updateSize.call(this, d);
                 watchSizeAnchor.call(this, d);
                 if (d.styles) {
-                    d3.select(this).style(d.styles);
+                    d3v3.select(this).style(d.styles);
                 }
             });
             // resize
@@ -594,17 +594,17 @@ export class Renderer {
                 .append('button')
                 .attr('tabindex', -1)
                 .attr('class', 'btn btn-light btn-sm fas fa-expand fa-flip-horizontal')
-                .call(d3.behavior
+                .call(d3v3.behavior
                 .drag()
                 .on('dragstart', function (d, i) {
                 that.renderAnchors(bounds);
             })
                 .on('dragend', that.removeAnchors.bind(that))
                 .on('drag', function (d, i) {
-                const mouse = d3.mouse(this.parentNode.parentNode);
+                const mouse = d3v3.mouse(this.parentNode.parentNode);
                 d.pos2 = that.updateAnchor(mouse, bounds);
                 state.updateAnnotation(d);
-                d3.select(this.parentNode).each(updateSize);
+                d3v3.select(this.parentNode).each(updateSize);
             }));
         }, $annsEnter.filter((d) => d.type === 'frame'));
         $anns.each(updatePos).each(watchAnchor).classed('editable', editable);
@@ -654,7 +654,7 @@ export class Renderer {
         });
     }
     static createAnnotation(main, graph) {
-        const instance = new Renderer(d3.select(main), graph);
+        const instance = new Renderer(d3v3.select(main), graph);
         return {
             render: instance.render.bind(instance),
         };
