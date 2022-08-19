@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { BaseUtils } from '../base';
 import { IFormElement, IFormElementDesc, IForm } from './interfaces';
 import { AFormElement } from './elements/AFormElement';
@@ -24,7 +24,7 @@ export class FormBuilder {
    * @param formId unique form id
    * @param formInline whether the form is in inline mode or not
    */
-  constructor($parent: d3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formInline: boolean = false) {
+  constructor($parent: d3v3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formInline: boolean = false) {
     this.form = new Form($parent, formId);
   }
 

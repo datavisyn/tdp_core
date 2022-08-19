@@ -74,14 +74,37 @@ export interface ITDPOptions {
   showClueModeButtons: boolean;
 
   /**
-   * default: true
+   * @default true
    */
   enableProvenanceUrlTracking?: boolean;
+
+  /**
+   * The CLUE parameters can be encoded in the hash '#clue_graph=...' (value: 'hash')
+   * or as query parameters `?clue_graph=...` (value: 'query') in the URL.
+   *
+   * @related clueRewriteOtherProperty
+   * @default hash
+   */
+  cluePropertyHandler?: 'hash' | 'query';
+
+  /**
+   * If set to `true` it will rewrite incoming URLs of the property handler that is not selected.
+   *
+   * - With `cluePropertyHandler: 'hash'` it rewrites URLs with `?clue_graph=...` to `#clue_graph=...`
+   * - With `cluePropertyHandler: 'query'` it rewrites URLs with `#clue_graph=...` to `?clue_graph=...`
+   *
+   * If this flag is set to `false` the rewrite is disabled.
+   *
+   * @related cluePropertyHandler
+   * @default false
+   */
+  clueRewriteOtherProperty?: boolean;
 
   /**
    * options passed to the IProvenanceGraphManager
    */
   provenanceManagerOptions?: IMixedStorageProvenanceGraphManagerOptions;
+
   /**
    * Client configuration which is automatically populated by the '/clientConfig.json' on initialize.
    * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
@@ -126,6 +149,8 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     showProvenanceMenu: true,
     showClueModeButtons: true,
     enableProvenanceUrlTracking: true,
+    cluePropertyHandler: 'hash',
+    clueRewriteOtherProperty: false,
     clientConfig: null,
   };
 
@@ -255,7 +280,11 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
 
     this.cleanUpOld(manager);
 
-    const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);
+    const clueManager = new CLUEGraphManager(manager, {
+      isReadOnly: !this.options.enableProvenanceUrlTracking,
+      propertyHandler: this.options.cluePropertyHandler,
+      rewriteOtherProperty: this.options.clueRewriteOtherProperty,
+    });
 
     this.header.wait();
 

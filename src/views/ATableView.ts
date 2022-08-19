@@ -88,7 +88,7 @@ export abstract class ATableView<T extends IRow> extends AView {
     const keys = <(keyof T)[]>Object.keys(rows[0])
       .filter((d) => d !== 'id' && d !== '_id')
       .sort();
-    tr.innerHTML = keys.map((key) => `<th>${key}</th>`).join('');
+    tr.innerHTML = keys.map((key) => `<th>${String(key)}</th>`).join('');
     return keys;
   }
 

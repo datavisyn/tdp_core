@@ -1,5 +1,5 @@
 import { Tour } from './Tour';
-import { AppHeader } from '../components';
+import { AppHeader } from '../components/header';
 export interface ITourManagerContext {
     doc: Document;
     app(): Promise<any>;
