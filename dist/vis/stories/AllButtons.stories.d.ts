@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { ComponentStory } from '@storybook/react';
 declare function AllButtons(): JSX.Element;
 declare const _default: {

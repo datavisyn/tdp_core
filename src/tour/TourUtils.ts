@@ -259,6 +259,6 @@ export class TourUtils {
    */
   static isTourVisible(): boolean {
     const counter = document.querySelector<HTMLElement>('.tdp-tour-step-count')!;
-    return counter.style.display === 'flex'; // visible -> active
+    return counter && counter.style.display === 'flex'; // visible -> active
   }
 }

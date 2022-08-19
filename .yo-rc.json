@@ -27,9 +27,6 @@
       "redhatPackages": []
     },
     "app": "",
-    "entries": {
-      "app": "./src/index.ts"
-    },
     "libraryAliases": {
       "d3": "d3/d3"
     },

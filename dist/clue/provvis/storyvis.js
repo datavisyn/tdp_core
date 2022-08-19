@@ -1,5 +1,5 @@
-import { behavior, mouse as d3mouse, select, selectAll } from 'd3';
-import * as d3 from 'd3';
+import { behavior, mouse as d3mouse, select, selectAll } from 'd3v3';
+import * as d3v3 from 'd3v3';
 import marked from 'marked';
 import * as $ from 'jquery';
 import { merge } from 'lodash';
@@ -8,7 +8,7 @@ import { ModeWrapper } from '../base/mode';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { StoryTransition, Player } from '../base/Player';
-import * as textPNG from '../../assets/text.png';
+import textPNG from '../../assets/text.png';
 import { Dialog } from '../../components';
 import { SlideNode } from '../provenance';
 import { AVisInstance } from './visInstance';
@@ -60,7 +60,7 @@ export class VerticalStoryVis extends AVisInstance {
             topleft: 'top',
             thumbnails: true,
         };
-        this.duration2pixel = d3.scale.linear().domain([0, 10000]).range([VerticalStoryVis.MIN_HEIGHT, 200]);
+        this.duration2pixel = d3v3.scale.linear().domain([0, 10000]).range([VerticalStoryVis.MIN_HEIGHT, 200]);
         this.story = null;
         this.player = null;
         this.options = merge(this.options, options);
@@ -69,7 +69,7 @@ export class VerticalStoryVis extends AVisInstance {
             this.options.wh = 'width';
             this.options.topleft = 'left';
         }
-        this.$node = this.build(d3.select(parent));
+        this.$node = this.build(d3v3.select(parent));
         AppContext.getInstance().onDOMNodeRemoved(this.node, this.destroy, this);
         this.player = new Player(data, this.node.querySelector('#player_controls'));
         this.bind();
@@ -278,30 +278,30 @@ export class VerticalStoryVis extends AVisInstance {
         const that = this;
         elem
             .on('dragenter', function (d) {
-            if (DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-state') ||
-                DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story') ||
-                DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story-text')) {
-                d3.select(this).classed('hover', true);
+            if (DnDUtils.getInstance().hasDnDType(d3v3.event, 'application/phovea-prov-state') ||
+                DnDUtils.getInstance().hasDnDType(d3v3.event, 'application/phovea-prov-story') ||
+                DnDUtils.getInstance().hasDnDType(d3v3.event, 'application/phovea-prov-story-text')) {
+                d3v3.select(this).classed('hover', true);
                 return false;
             }
             return undefined;
         })
             .on('dragover', (d) => {
-            if (DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-state') ||
-                DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story') ||
-                DnDUtils.getInstance().hasDnDType(d3.event, 'application/phovea-prov-story-text')) {
-                d3.event.preventDefault();
-                DnDUtils.getInstance().updateDropEffect(d3.event);
+            if (DnDUtils.getInstance().hasDnDType(d3v3.event, 'application/phovea-prov-state') ||
+                DnDUtils.getInstance().hasDnDType(d3v3.event, 'application/phovea-prov-story') ||
+                DnDUtils.getInstance().hasDnDType(d3v3.event, 'application/phovea-prov-story-text')) {
+                d3v3.event.preventDefault();
+                DnDUtils.getInstance().updateDropEffect(d3v3.event);
                 return false;
             }
             return undefined;
         })
             .on('dragleave', function (d) {
-            d3.select(this).classed('hover', false);
+            d3v3.select(this).classed('hover', false);
         })
             .on('drop', function (d) {
-            d3.select(this).classed('hover', false);
-            const e = d3.event;
+            d3v3.select(this).classed('hover', false);
+            const e = d3v3.event;
             e.preventDefault();
             const fullStory = SlideNode.toSlidePath(that.story);
             const dStory = d.isPlaceholder ? d.to : d;
@@ -362,13 +362,13 @@ export class VerticalStoryVis extends AVisInstance {
     changeDuration($element) {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
-        $element.call(d3.behavior
+        $element.call(d3v3.behavior
             .drag()
             .origin(() => ({ x: 0, y: 0 }))
             .on('drag', function (d, i) {
             // update the height of the slide node
-            const e = d3.event;
-            const $elem = d3.select(this.parentElement);
+            const e = d3v3.event;
+            const $elem = d3v3.select(this.parentElement);
             const height = Math.max(that.duration2pixel.range()[0], that.duration2pixel(d.duration) + e[that.options.xy]);
             $elem.style(that.options.wh, `${height}px`);
             const change = that.duration2pixel.invert(height) - d.duration;
@@ -384,20 +384,20 @@ export class VerticalStoryVis extends AVisInstance {
         })
             .on('dragend', function (d) {
             // update the stored duration just once
-            const h = parseInt(d3.select(this.parentElement).style(that.options.wh), 10);
+            const h = parseInt(d3v3.select(this.parentElement).style(that.options.wh), 10);
             d.duration = that.duration2pixel.invert(h);
         }));
     }
     changeTransition($element) {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const that = this;
-        $element.call(d3.behavior
+        $element.call(d3v3.behavior
             .drag()
             .origin(() => ({ x: 0, y: 0 }))
             .on('drag', function (d, i) {
             // update the height of the slide node
-            const e = d3.event;
-            const $elem = d3.select(this.parentElement);
+            const e = d3v3.event;
+            const $elem = d3v3.select(this.parentElement);
             const offset = Math.max(0, that.duration2pixel(d.transition) - VerticalStoryVis.MIN_HEIGHT + e[that.options.xy]);
             $elem.style(`margin-${that.options.topleft}`, `${offset}px`);
             const change = that.duration2pixel.invert(offset + VerticalStoryVis.MIN_HEIGHT) - d.transition;
@@ -413,7 +413,7 @@ export class VerticalStoryVis extends AVisInstance {
         })
             .on('dragend', function (d) {
             // update the stored duration just once
-            const h = parseInt(d3.select(this.parentElement).style(`margin-${that.options.topleft}`), 10);
+            const h = parseInt(d3v3.select(this.parentElement).style(`margin-${that.options.topleft}`), 10);
             d.transition = that.duration2pixel.invert(h + VerticalStoryVis.MIN_HEIGHT);
         }));
     }
@@ -423,10 +423,10 @@ export class VerticalStoryVis extends AVisInstance {
             .attr('draggable', true)
             .on('dragstart', (d) => {
             if (!DetailUtils.isEditAble()) {
-                d3.event.preventDefault();
+                d3v3.event.preventDefault();
                 return;
             }
-            const e = d3.event;
+            const e = d3v3.event;
             e.dataTransfer.effectAllowed = 'copyMove'; // none, copy, copyLink, copyMove, link, linkMove, move, all
             e.dataTransfer.setData('text/plain', d.name);
             e.dataTransfer.setData('application/phovea-prov-story', String(d.id));
@@ -451,7 +451,7 @@ export class VerticalStoryVis extends AVisInstance {
             .append('i')
             .attr('class', 'fas fa-edit')
             .on('click', (d) => {
-            const e = d3.event;
+            const e = d3v3.event;
             // remove me
             e.stopPropagation();
             e.preventDefault();
@@ -474,7 +474,7 @@ export class VerticalStoryVis extends AVisInstance {
             .attr('class', 'fas fa-copy')
             .attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.cloneSlide'))
             .on('click', (d) => {
-            const e = d3.event;
+            const e = d3v3.event;
             // remove me
             e.stopPropagation();
             e.preventDefault();
@@ -496,7 +496,7 @@ export class VerticalStoryVis extends AVisInstance {
             .attr('class', 'fas fa-times')
             .attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.removeSlide'))
             .on('click', (d) => {
-            const e = d3.event;
+            const e = d3v3.event;
             // remove me
             e.stopPropagation();
             e.preventDefault();
@@ -573,7 +573,7 @@ export class VerticalStoryVis extends AVisInstance {
             .attr('href', '#')
             .on('click', (d) => {
             this.switchTo(d);
-            d3.event.preventDefault();
+            d3v3.event.preventDefault();
         });
         $stories.select('a').text((d) => d.name);
         $stories.exit().remove();
@@ -722,12 +722,12 @@ export class VerticalStoryVis extends AVisInstance {
         return storyvis;
     }
     static to_duration(d) {
-        const minutesSeconds = d3.time.format('%M:%S');
+        const minutesSeconds = d3v3.time.format('%M:%S');
         return minutesSeconds(new Date(d));
     }
     static to_starting_time(d, story) {
         if (!d) {
-            return d3.sum(story, (a) => a.duration + a.transition);
+            return d3v3.sum(story, (a) => a.duration + a.transition);
         }
         const i = story.indexOf(d);
         return story.slice(0, i).reduce((a, b) => a + b.duration + b.transition, d.transition);

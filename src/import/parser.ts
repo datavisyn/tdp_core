@@ -9,7 +9,7 @@ export interface IParseResult {
 export interface ICSVParsingOptions {
   header?: boolean;
   delimiter?: string;
-  newline?: string;
+  newline?: '\r' | '\n' | '\r\n' | undefined;
 }
 
 const defaultOptions = {

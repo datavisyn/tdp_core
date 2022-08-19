@@ -1,18 +1,7 @@
-import {
-  LocalDataProvider,
-  createSelectionDesc,
-  createAggregateDesc,
-  DEFAULT_COLOR,
-  IColumnDesc,
-  ICategory,
-  ICategoryNode,
-  Column,
-  createRankDesc,
-} from 'lineupjs';
-import { extent } from 'd3';
+import { LocalDataProvider, createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, IColumnDesc, ICategory, ICategoryNode, createRankDesc } from 'lineupjs';
+import { extent } from 'd3v3';
 import { IServerColumn } from '../base/rest';
 import { IAdditionalColumnDesc } from '../base/interfaces';
-import { ValueTypeUtils } from '../data';
 
 export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'chooserGroup'> {
   /**

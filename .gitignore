@@ -2,9 +2,10 @@
 /.tscache
 /.eslintcache
 /.idea
+/bundles/
 /build/
 /storybook-static/
-/dist/tsBuildInfoFile
+/dist/tsconfig.tsbuildinfo
 /dist_python/
 /lib/
 *.egg-info/
@@ -27,4 +28,13 @@ node_modules/
 /src/**/*.map
 /tests/**/*.map 
 *.css
-package-lock.json
+/package-lock.json
+/yarn.lock
+# yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

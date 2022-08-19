@@ -14,6 +14,6 @@ export * from './ArrayUtils';
 export * from './plugin';
 export * from './BaseUtils';
 export * from './Session';
-export * from './PropertyHandler';
-export * from './HashProperties';
+export * from './url/PropertyHandler';
+export * from './url/HashPropertyHandler';
 export * from './WebpackEnv';

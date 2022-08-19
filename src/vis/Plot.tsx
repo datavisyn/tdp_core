@@ -7,11 +7,13 @@ if (typeof window.URL.createObjectURL === 'undefined') {
 }
 
 // Use minified bundle: https://github.com/plotly/react-plotly.js#customizing-the-plotlyjs-bundle
+import * as React from 'react';
 import Plotly from 'plotly.js-dist-min';
 import createPlotlyComponent from 'react-plotly.js/factory';
+import { PlotParams } from 'react-plotly.js';
 
 // Use the minified version for our own `Plotly` object
-export const PlotlyComponent = createPlotlyComponent(Plotly);
+export const PlotlyComponent: React.ComponentType<PlotParams> = createPlotlyComponent(Plotly);
 
 // Reexport the minified plotly with proper typings
 export { Plotly };
