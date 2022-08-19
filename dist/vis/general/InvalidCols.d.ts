@@ -1,3 +1,4 @@
+/// <reference types="react" />
 export declare function InvalidCols({ headerMessage, bodyMessage }: {
     headerMessage: string;
     bodyMessage: string;

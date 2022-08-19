@@ -1,4 +1,4 @@
-import { Selection } from 'd3';
+import { Selection } from 'd3v3';
 import { CLUEGraphManager } from '../base';
 import { IProvenanceGraphDataDescription } from '../provenance';
 declare abstract class ASessionList {

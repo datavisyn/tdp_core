@@ -37,9 +37,9 @@ export declare class Dialog {
     constructor(title: string, primaryBtnText?: string, additionalCSSClasses?: string, backdrop?: boolean | 'static');
     show(): void;
     hide(): void;
-    get body(): Element;
-    get footer(): Element;
-    get header(): Element;
+    get body(): HTMLDivElement;
+    get footer(): HTMLDivElement;
+    get header(): HTMLDivElement;
     onHide(callback: () => void): void;
     onSubmit(callback: () => any): void;
     hideOnSubmit(): void;

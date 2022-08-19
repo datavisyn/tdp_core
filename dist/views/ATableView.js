@@ -54,7 +54,7 @@ export class ATableView extends AView {
         const keys = Object.keys(rows[0])
             .filter((d) => d !== 'id' && d !== '_id')
             .sort();
-        tr.innerHTML = keys.map((key) => `<th>${key}</th>`).join('');
+        tr.innerHTML = keys.map((key) => `<th>${String(key)}</th>`).join('');
         return keys;
     }
     renderRow(tr, row, index, keys) {

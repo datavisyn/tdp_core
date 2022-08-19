@@ -1,4 +1,4 @@
-import { scale } from 'd3';
+import { scale } from 'd3v3';
 import { difference } from 'lodash';
 
 export class LineUpColors {

@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
 import { ParserUtils } from './parser';
 import { ValueTypeEditor } from './valuetype/valuetypes';
@@ -18,14 +18,14 @@ export class Importer extends EventHandler {
     type: 'table',
   };
 
-  private $parent: d3.Selection<any>;
+  private $parent: d3v3.Selection<any>;
 
   private builder: () => { data: any; desc: IDataDescription };
 
   constructor(parent: Element, options: IImporterOptions = {}) {
     super();
     merge(this.options, options);
-    this.$parent = d3.select(parent).append('div').classed('caleydo-importer', true);
+    this.$parent = d3v3.select(parent).append('div').classed('caleydo-importer', true);
 
     this.build(this.$parent);
   }
@@ -54,7 +54,7 @@ export class Importer extends EventHandler {
     });
   }
 
-  private build($root: d3.Selection<any>) {
+  private build($root: d3v3.Selection<any>) {
     $root.html(`
       <div class="drop-zone">
         <input type="file" id="importer-file" />
@@ -72,9 +72,9 @@ export class Importer extends EventHandler {
     return new Importer(parent, options);
   }
 
-  static selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File) => any, overCssClass = 'over') {
+  static selectFileLogic($dropZone: d3v3.Selection<any>, $files: d3v3.Selection<any>, onFileSelected: (file: File) => any, overCssClass = 'over') {
     function over() {
-      const e = <Event>(<any>d3.event);
+      const e = <Event>(<any>d3v3.event);
       e.stopPropagation();
       e.preventDefault();
       const s = (<HTMLElement>e.target).classList;
@@ -87,7 +87,7 @@ export class Importer extends EventHandler {
 
     function select() {
       over();
-      const e: any = d3.event;
+      const e: any = d3v3.event;
       // either drop or file select
       const files = e.dataTransfer ? e.dataTransfer.files : e.target.files;
       if (files.length > 0) {

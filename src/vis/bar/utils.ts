@@ -1,5 +1,5 @@
 import { merge, sum, mean, min, max } from 'lodash';
-import { median } from 'd3';
+import { median } from 'd3v3';
 import { I18nextManager } from '../../i18n';
 import {
   PlotlyInfo,
