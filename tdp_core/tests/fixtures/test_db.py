@@ -22,4 +22,3 @@ def db_url(postgresql_proc):
 
     yield url
     janitor.drop()
-
