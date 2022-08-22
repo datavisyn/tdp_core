@@ -34,6 +34,8 @@ export class ATDPApplication extends ACLUEWrapper {
             showProvenanceMenu: true,
             showClueModeButtons: true,
             enableProvenanceUrlTracking: true,
+            cluePropertyHandler: 'hash',
+            clueRewriteOtherProperty: false,
             clientConfig: null,
         };
         this.app = null;
@@ -128,7 +130,11 @@ export class ATDPApplication extends ACLUEWrapper {
             ...(this.options.provenanceManagerOptions || {}),
         });
         this.cleanUpOld(manager);
-        const clueManager = new CLUEGraphManager(manager, !this.options.enableProvenanceUrlTracking);
+        const clueManager = new CLUEGraphManager(manager, {
+            isReadOnly: !this.options.enableProvenanceUrlTracking,
+            propertyHandler: this.options.cluePropertyHandler,
+            rewriteOtherProperty: this.options.clueRewriteOtherProperty,
+        });
         this.header.wait();
         // trigger bootstrap loading
         import('jquery');

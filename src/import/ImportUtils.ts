@@ -1,5 +1,5 @@
 import { merge, identity } from 'lodash';
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { ITypeDefinition, ValueTypeEditor, PHOVEA_IMPORTER_ValueTypeUtils } from './valuetype/valuetypes';
 import { I18nextManager } from '../i18n';
 import { BaseUtils } from '../base';
@@ -26,14 +26,14 @@ export class ImportUtils {
       </div>`;
   }
 
-  static extractCommonFields($root: d3.Selection<any>) {
+  static extractCommonFields($root: d3v3.Selection<any>) {
     return {
       name: $root.select('input[name="name"]').property('value'),
       description: $root.select('textarea[name="desc"]').property('value'),
     };
   }
 
-  static async importTable(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string) {
+  static async importTable(editors: ValueTypeEditor[], $root: d3v3.Selection<any>, header: string[], data: string[][], name: string) {
     $root.html(`${ImportUtils.commonFields(name)}
         <table class="table table-striped table-sm">
           <thead>
@@ -135,13 +135,13 @@ export class ImportUtils {
     return desc;
   }
 
-  static async importMatrix(editors: ValueTypeEditor[], $root: d3.Selection<any>, header: string[], data: string[][], name: string) {
+  static async importMatrix(editors: ValueTypeEditor[], $root: d3v3.Selection<any>, header: string[], data: string[][], name: string) {
     const prefix = `a${BaseUtils.randomId(3)}`;
 
     const rows = header.slice(1);
     const cols = data.map((d) => d.shift());
 
-    const dataRange = d3.range(rows.length * cols.length);
+    const dataRange = d3v3.range(rows.length * cols.length);
 
     function byIndex(i, v?) {
       const m = i % cols.length;

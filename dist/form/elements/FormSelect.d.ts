@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
 import { IPluginDesc } from '../../base';
@@ -57,7 +57,7 @@ export declare class FormSelect extends AFormElement<IFormSelectDesc> implements
      * Build the label and select element
      * @param $formNode The parent node this element will be attached to
      */
-    build($formNode: d3.Selection<any>): void;
+    build($formNode: d3v3.Selection<any>): void;
     /**
      * Bind the change listener and propagate the selection by firing a change event
      */

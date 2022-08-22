@@ -1,4 +1,4 @@
-import { select } from 'd3';
+import { select } from 'd3v3';
 import { AView } from './AView';
 /**
  * utiltity view to work with the node using d3
