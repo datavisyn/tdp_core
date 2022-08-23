@@ -81,6 +81,12 @@ class VisynPlugin(AVisynPlugin):
             "tdp_core.security.store.alb_security_store",
             {},
         )
+        registry.append(
+            "user_stores",
+            "auth0_security_store",
+            "tdp_core.security.store.auth0_security_store",
+            {},
+        )
 
         # tdp_matomo
         registry.append("tdp-config-safe-keys", "matomo", "", {"configKey": "tdp_core.matomo"})

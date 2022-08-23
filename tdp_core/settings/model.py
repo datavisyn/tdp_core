@@ -33,9 +33,16 @@ class AlbSecurityStoreSettings(BaseModel):
     signout_url: Optional[str] = None
 
 
+class Auth0SecurityStoreSettings(BaseModel):
+    enable: bool = False
+    url: Optional[str] = None
+
+
 class SecurityStoreSettings(BaseModel):
     alb_security_store: AlbSecurityStoreSettings = AlbSecurityStoreSettings()
     """Settings for the ALB security store"""
+    auth0_store: Auth0SecurityStoreSettings = Auth0SecurityStoreSettings()
+    """Settings for the Auth0 security store"""
 
 
 class SecuritySettings(BaseModel):
