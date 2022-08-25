@@ -3,6 +3,7 @@ import pytest
 
 def test_health(database):
     from sqlalchemy import create_engine
+
     engine = create_engine(database.url)
     engine.connect()
 

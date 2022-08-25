@@ -2,6 +2,7 @@ import pytest
 from pytest_postgresql.executor import PostgreSQLExecutor
 from pytest_postgresql.factories import postgresql_proc
 from pytest_postgresql.janitor import DatabaseJanitor
+
 assert postgresql_proc
 
 
