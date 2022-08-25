@@ -1,6 +1,7 @@
 import pytest
 
 
+@pytest.mark.xfail(raises=FileNotFoundError, reason="Fails if `pg_config --bindir` is not found or fails")
 def test_health(database):
     from sqlalchemy import create_engine
 
