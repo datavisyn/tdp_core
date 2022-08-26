@@ -9,14 +9,14 @@ Installation
 ------------
 
 ```bash
-git clone https://github.com/datavisyn/tdp_core.git
+git clone -b develop https://github.com/datavisyn/tdp_core.git  # or any other branch you want to develop in
+cd tdp_core
 
 # Frontend
-cd tdp_core
 yarn install
 
 # Backend
-python3 -m venv env  # create a new virutal environmen
+python3 -m venv env  # create a new virutal environment
 source env/bin/activate  # active it
 make develop  # install all dependencies
 ```
