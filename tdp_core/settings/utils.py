@@ -1,8 +1,11 @@
 import codecs
+import logging
 import os
 from typing import Any, Dict
 
 import jsoncfg
+
+_log = logging.getLogger(__name__)
 
 
 def load_workspace_config() -> Dict[str, Any]:
@@ -10,7 +13,13 @@ def load_workspace_config() -> Dict[str, Any]:
     Loads the global config.json placed at `PHOVEA_CONFIG_PATH` (defaults to `config.json`).
     """
     global_ = os.path.abspath(os.environ.get("PHOVEA_CONFIG_PATH", "/phovea/config.json"))
-    return load_config_file(global_) if os.path.exists(global_) else {}
+
+    if os.path.exists(global_):
+        _log.info(f"Loading workspace config.json from {global_}")
+        return load_config_file(global_)
+    else:
+        _log.info(f"No workspace config.json found at {global_}, using empty dict as default")
+        return {}
 
 
 def load_config_file(path: str) -> Dict[str, Any]:

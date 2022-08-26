@@ -2,7 +2,7 @@
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
 import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
-import React from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
 import { LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
@@ -13,7 +13,6 @@ import { EViewMode } from '../base/interfaces';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils } from '../base/BaseUtils';
 import { IDTypeManager } from '../idtype/IDTypeManager';
-import { useSyncedRef } from '../hooks/useSyncedRef';
 import { AView } from '../views/AView';
 import { InvalidTokenError, TDPTokenManager } from '../auth/TokenManager';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
@@ -92,6 +91,7 @@ export function Ranking({ data = [], itemSelection = { idtype: null, ids: [] }, 
  * Maybe refactor this when using the native lineup implementation of scores
  */
 onAddScoreColumn, }) {
+    var _a, _b;
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
     const options = merge({}, defaults, opts);
@@ -100,7 +100,7 @@ onAddScoreColumn, }) {
     const lineupContainerRef = React.useRef(null);
     // Stores the ranking data when collapsing columns when mode changes
     const dump = React.useRef(null);
-    const colorsRef = useSyncedRef(new LineUpColors());
+    const colorsRef = React.useRef(new LineUpColors());
     const providerRef = React.useRef(null);
     const taggleRef = React.useRef(null);
     const selectionHelperRef = React.useRef(null);
@@ -110,13 +110,13 @@ onAddScoreColumn, }) {
         itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const addColumn = (colDesc, d, id = null, position) => {
+    const addColumn = useCallback((colDesc, d, id = null, position) => {
         // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
         colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : colorsRef.current.getColumnColor(id);
         return LazyColumn.addLazyColumn(colDesc, d, providerRef.current, position, () => {
             taggleRef.current.update();
         });
-    };
+    }, [colorsRef]);
     const addScoreColumn = (score) => {
         const args = typeof options.additionalComputeScoreParameter === 'function' ? options.additionalComputeScoreParameter() : options.additionalComputeScoreParameter;
         const colDesc = score.createDesc(args);
@@ -341,6 +341,23 @@ onAddScoreColumn, }) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+    const stringCols = (_b = (_a = providerRef.current) === null || _a === void 0 ? void 0 : _a.getLastRanking()) === null || _b === void 0 ? void 0 : _b.flatColumns.toString();
+    const columns = useMemo(() => {
+        var _a;
+        const ranking = (_a = providerRef.current) === null || _a === void 0 ? void 0 : _a.getLastRanking();
+        return ranking ? ranking.flatColumns : [];
+        // This dep is needed because the columns are not part of a normal variable, only part of a ref. Probably should think of a better way.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [stringCols]);
+    useEffect(() => {
+        const context = {
+            columns,
+            freeColor: (id) => colorsRef.current.freeColumnColor(id),
+            add: (columns) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
+            remove: (columns) => Promise.resolve(columns.forEach((c) => c.removeMe())),
+        };
+        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
+    }, [addColumn, columns, onContextChanged, colorsRef]);
     const build = React.useMemo(() => async () => {
         setBusy(true);
         columnDesc.forEach((c) => providerRef.current.pushDesc({ ...c }));
@@ -350,18 +367,20 @@ onAddScoreColumn, }) {
         ColumnDescUtils.createInitialRanking(providerRef.current, {});
         const ranking = providerRef.current.getLastRanking();
         const columns = ranking ? ranking.flatColumns : [];
-        const context = {
+        const selectionAdapterContext = {
             columns,
             freeColor: (id) => colorsRef.current.freeColumnColor(id),
-            add: (columns) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
-            remove: (columns) => columns.forEach((c) => c.removeMe()),
+            // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
+            add: (columns) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
+            // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
+            remove: (columns) => Promise.resolve(columns.forEach((c) => c.removeMe())),
         };
-        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
+        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(selectionAdapterContext);
         onCustomizeRanking === null || onCustomizeRanking === void 0 ? void 0 : onCustomizeRanking(LineupUtils.wrapRanking(providerRef.current, ranking));
         return (Promise.resolve()
             // TODO: check if this is needed
             // .then(async () => {
-            //   return selectionAdapter?.selectionChanged(null, () => createContext(selection));
+            //   return selectionAdapter?.selectionChanged(createContext(selection));
             // })
             .then(() => {
             onBuiltLineUp === null || onBuiltLineUp === void 0 ? void 0 : onBuiltLineUp(providerRef.current);

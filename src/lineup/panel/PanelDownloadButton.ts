@@ -1,6 +1,6 @@
 import { Column, LocalDataProvider, isSupportType } from 'lineupjs';
 import { ExportUtils, IExportFormat } from '../internal/ExportUtils';
-import { IPanelButton } from './PanelButton';
+import type { IPanelButton } from './PanelButton';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 import { BaseUtils } from '../../base/BaseUtils';
 import { I18nextManager } from '../../i18n';

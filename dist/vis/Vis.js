@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3';
+import d3v3 from 'd3v3';
 import { useMemo, useEffect } from 'react';
 import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, EAggregateTypes, } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
@@ -99,6 +99,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
             setVisConfig(externalConfig);
         }
     }, [externalConfig, setVisConfig]);
+    // Converting the selected list into a map, since searching through the list to find an item is common in the vis components.
     const selectedMap = useMemo(() => {
         const currMap = {};
         selected.forEach((s) => {
@@ -107,7 +108,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         return currMap;
     }, [selected]);
     const scales = useMemo(() => {
-        const colorScale = d3.scale.ordinal().range(colors);
+        const colorScale = d3v3.scale.ordinal().range(colors);
         return {
             color: colorScale,
         };
@@ -128,6 +129,6 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
             }, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
         isStrip(visConfig) ? (React.createElement(StripVis, { config: visConfig, selectionCallback: selectionCallback, setConfig: setVisConfig, selected: selectedMap, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
         isPCP(visConfig) ? (React.createElement(PCPVis, { config: visConfig, selected: selectedMap, setConfig: setVisConfig, columns: columns, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
-        isBar(visConfig) ? (React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null));
+        isBar(visConfig) ? (React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, selectionCallback: selectionCallback, selectedMap: selectedMap, selectedList: selected, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null));
 }
 //# sourceMappingURL=Vis.js.map

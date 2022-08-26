@@ -1,5 +1,5 @@
 import { merge, sum, mean, min, max } from 'lodash';
-import { median } from 'd3';
+import { median } from 'd3v3';
 import { I18nextManager } from '../../i18n';
 import {
   PlotlyInfo,
@@ -19,13 +19,14 @@ import {
   VisNumericalColumn,
   VisNumericalValue,
 } from '../interfaces';
-import { resolveSingleColumn, truncateText } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveSingleColumn, truncateText } from '../general/layoutUtils';
 import { getCol } from '../sidebar';
 
 export function isBar(s: IVisConfig): s is IBarConfig {
   return s.type === ESupportedPlotlyVis.BAR;
 }
 
+const UNSELECTED_OPACITY = '0.2';
 const defaultConfig: IBarConfig = {
   type: ESupportedPlotlyVis.BAR,
   numColumnsSelected: [],
@@ -59,7 +60,7 @@ export function barMergeDefaultConfig(columns: VisColumn[], config: IBarConfig):
 }
 
 function createAxisLabel(aggregateType: EAggregateTypes, aggregateColumn: VisColumn) {
-  return aggregateType === EAggregateTypes.COUNT ? aggregateType : `${aggregateType} of ${aggregateColumn.info.name}`;
+  return aggregateType === EAggregateTypes.COUNT ? aggregateType : `${aggregateType} of ${columnNameWithDescription(aggregateColumn.info)}`;
 }
 
 /**
@@ -172,11 +173,21 @@ async function setPlotsWithGroupsAndMultiples(
 
       const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
+      let valIdArr: string[][] = uniqueColVals.map((val) => []);
+
+      catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val as string)].push(row.id));
+
+      // stores the actual points of each bar/section of bar in the custom data.
+      valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val) && allMultiplesObjsIds.has(val)));
+
       plots.push({
         data: {
           x: vertFlag ? uniqueColVals : aggregateVals,
           y: !vertFlag ? uniqueColVals : aggregateVals,
           text: uniqueColVals,
+          ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueMultiples}, ${uniqueGroup}`),
+          customdata: valIdArr,
+
           textposition: 'none',
           hoverinfo: vertFlag ? 'y+text' : 'x+text',
           orientation: vertFlag ? 'v' : 'h',
@@ -188,9 +199,20 @@ async function setPlotsWithGroupsAndMultiples(
           marker: {
             color: scales.color(uniqueGroup),
           },
+          // @ts-ignore
+          selected: {
+            marker: {
+              opacity: '1',
+            },
+          },
+          unselected: {
+            marker: {
+              opacity: UNSELECTED_OPACITY,
+            },
+          },
         },
-        xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
-        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
+        xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+        yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : columnNameWithDescription(catColValues.info),
         xTicks: vertFlag ? uniqueColVals : null,
         xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
         yTicks: !vertFlag ? uniqueColVals : null,
@@ -247,11 +269,21 @@ async function setPlotsWithGroups(
 
     const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
+    let valIdArr: string[][] = uniqueColVals.map((val) => []);
+
+    catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val as string)].push(row.id));
+
+    // stores the actual points of each bar/section of bar in the custom data.
+    valIdArr = valIdArr.map((arr) => arr.filter((val) => allGroupObjsIds.has(val)));
+
     plots.push({
       data: {
         x: vertFlag ? uniqueColVals : finalAggregateValues,
         y: !vertFlag ? uniqueColVals : finalAggregateValues,
         text: uniqueColVals,
+        ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueVal}`),
+        customdata: valIdArr,
+
         textposition: 'none',
         hoverinfo: vertFlag ? 'y+text' : 'x+text',
         orientation: vertFlag ? 'v' : 'h',
@@ -263,9 +295,20 @@ async function setPlotsWithGroups(
         marker: {
           color: scales.color(uniqueVal),
         },
+        // @ts-ignore
+        selected: {
+          marker: {
+            opacity: '1',
+          },
+        },
+        unselected: {
+          marker: {
+            opacity: UNSELECTED_OPACITY,
+          },
+        },
       },
-      xLabel: vertFlag ? catColValues.info.name : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
-      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : catColValues.info.name,
+      xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : normalizedFlag ? 'Percent of Total' : plotAggregateAxisName,
+      yLabel: vertFlag ? (normalizedFlag ? 'Percent of Total' : plotAggregateAxisName) : columnNameWithDescription(catColValues.info),
       xTicks: vertFlag ? uniqueColVals : null,
       xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
@@ -308,12 +351,21 @@ async function setPlotsWithMultiples(
       .flat();
     const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
+    let valIdArr: string[][] = uniqueColVals.map((val) => []);
+
+    catColValues.resolvedValues.forEach((row) => valIdArr[uniqueColVals.indexOf(row.val as string)].push(row.id));
+
+    // stores the actual points of each bar/section of bar in the custom data.
+    valIdArr = valIdArr.map((arr) => arr.filter((val) => allMultiplesObjsIds.has(val)));
+
     plots.push({
       data: {
         x: vertFlag ? uniqueColVals : finalAggregateValues,
         y: !vertFlag ? uniqueColVals : finalAggregateValues,
+        ids: uniqueColVals.map((colVal) => `${colVal}, ${uniqueVal}`),
         text: uniqueColVals,
         textposition: 'none',
+        customdata: valIdArr,
         hoverinfo: vertFlag ? 'y+text' : 'x+text',
         orientation: vertFlag ? 'v' : 'h',
         xaxis: plotCounterEdit === 1 ? 'x' : `x${plotCounterEdit}`,
@@ -321,9 +373,20 @@ async function setPlotsWithMultiples(
         showlegend: false,
         type: 'bar',
         name: uniqueVal,
+        // @ts-ignore
+        selected: {
+          marker: {
+            opacity: '1',
+          },
+        },
+        unselected: {
+          marker: {
+            opacity: UNSELECTED_OPACITY,
+          },
+        },
       },
-      xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
-      yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
+      xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : plotAggregateAxisName,
+      yLabel: vertFlag ? plotAggregateAxisName : columnNameWithDescription(catColValues.info),
       xTicks: vertFlag ? uniqueColVals : null,
       xTickLabels: vertFlag ? uniqueColVals.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
       yTicks: !vertFlag ? uniqueColVals : null,
@@ -358,25 +421,43 @@ async function setPlotsBasic(
   ) as any[];
 
   const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val as string))];
+
+  // stores the actual points of each bar/section of bar in the custom data.
+  const valIdArr: string[][] = valArr.map((val) => []);
+
+  catColValues.resolvedValues.forEach((row) => valIdArr[valArr.indexOf(row.val as string)].push(row.id));
+
   const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
 
   plots.push({
     data: {
+      type: 'bar',
       x: vertFlag ? valArr : aggValues,
       y: !vertFlag ? valArr : aggValues,
       text: valArr,
       textposition: 'none',
       hoverinfo: vertFlag ? 'y+text' : 'x+text',
       ids: valArr,
+      // @ts-ignore
+      selected: {
+        marker: {
+          opacity: '1',
+        },
+      },
+      unselected: {
+        marker: {
+          opacity: UNSELECTED_OPACITY,
+        },
+      },
+      customdata: valIdArr,
       orientation: vertFlag ? 'v' : 'h',
       xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
       yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-      type: 'bar',
-      name: catColValues.info.name,
+      name: columnNameWithDescription(catColValues.info),
       showlegend: false,
     },
-    xLabel: vertFlag ? catColValues.info.name : plotAggregateAxisName,
-    yLabel: vertFlag ? plotAggregateAxisName : catColValues.info.name,
+    xLabel: vertFlag ? columnNameWithDescription(catColValues.info) : plotAggregateAxisName,
+    yLabel: vertFlag ? plotAggregateAxisName : columnNameWithDescription(catColValues.info),
     xTicks: vertFlag ? valArr : null,
     xTickLabels: vertFlag ? valArr.map((v) => truncateText(v, TICK_LABEL_LENGTH)) : null,
     yTicks: !vertFlag ? valArr : null,

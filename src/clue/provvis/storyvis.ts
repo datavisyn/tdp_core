@@ -1,5 +1,5 @@
-import { behavior, mouse as d3mouse, select, selectAll } from 'd3';
-import * as d3 from 'd3';
+import { behavior, mouse as d3mouse, select, selectAll } from 'd3v3';
+import * as d3v3 from 'd3v3';
 import marked from 'marked';
 import * as $ from 'jquery';
 import { merge } from 'lodash';
@@ -8,7 +8,7 @@ import { ModeWrapper } from '../base/mode';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { StoryTransition, Player } from '../base/Player';
-import * as textPNG from '../../assets/text.png';
+import textPNG from '../../assets/text.png';
 import { Dialog } from '../../components';
 import { IStateAnnotation, ProvenanceGraph, SlideNode, StateNode } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
@@ -28,7 +28,7 @@ interface ISlideNodeRepr {
 }
 
 export class VerticalStoryVis extends AVisInstance implements IVisInstance {
-  private $node: d3.Selection<any>;
+  private $node: d3v3.Selection<any>;
 
   private trigger = this.update.bind(this);
 
@@ -77,7 +77,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
 
   static MIN_HEIGHT = 20;
 
-  private duration2pixel = d3.scale.linear().domain([0, 10000]).range([VerticalStoryVis.MIN_HEIGHT, 200]);
+  private duration2pixel = d3v3.scale.linear().domain([0, 10000]).range([VerticalStoryVis.MIN_HEIGHT, 200]);
 
   story: SlideNode = null;
 
@@ -91,7 +91,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
       this.options.wh = 'width';
       this.options.topleft = 'left';
     }
-    this.$node = this.build(d3.select(parent));
+    this.$node = this.build(d3v3.select(parent));
     AppContext.getInstance().onDOMNodeRemoved(this.node, this.destroy, this);
 
     this.player = new Player(data, this.node.querySelector('#player_controls'));
@@ -181,7 +181,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
     this.update();
   }
 
-  private build($parent: d3.Selection<any>) {
+  private build($parent: d3v3.Selection<any>) {
     let $node = $parent.select('aside.provenance-story-vis');
     if ($node.empty()) {
       $node = $parent.append('aside').classed('provenance-story-vis', true).classed('provenance-sidepanel', true);
@@ -331,39 +331,39 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
     }
   }
 
-  private dndSupport(elem: d3.Selection<ISlideNodeRepr>) {
+  private dndSupport(elem: d3v3.Selection<ISlideNodeRepr>) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     elem
       .on('dragenter', function (d) {
         if (
-          DnDUtils.getInstance().hasDnDType(<DragEvent>d3.event, 'application/phovea-prov-state') ||
-          DnDUtils.getInstance().hasDnDType(<DragEvent>d3.event, 'application/phovea-prov-story') ||
-          DnDUtils.getInstance().hasDnDType(<DragEvent>d3.event, 'application/phovea-prov-story-text')
+          DnDUtils.getInstance().hasDnDType(<DragEvent>d3v3.event, 'application/phovea-prov-state') ||
+          DnDUtils.getInstance().hasDnDType(<DragEvent>d3v3.event, 'application/phovea-prov-story') ||
+          DnDUtils.getInstance().hasDnDType(<DragEvent>d3v3.event, 'application/phovea-prov-story-text')
         ) {
-          d3.select(this).classed('hover', true);
+          d3v3.select(this).classed('hover', true);
           return false;
         }
         return undefined;
       })
       .on('dragover', (d) => {
         if (
-          DnDUtils.getInstance().hasDnDType(<DragEvent>d3.event, 'application/phovea-prov-state') ||
-          DnDUtils.getInstance().hasDnDType(<DragEvent>d3.event, 'application/phovea-prov-story') ||
-          DnDUtils.getInstance().hasDnDType(<DragEvent>d3.event, 'application/phovea-prov-story-text')
+          DnDUtils.getInstance().hasDnDType(<DragEvent>d3v3.event, 'application/phovea-prov-state') ||
+          DnDUtils.getInstance().hasDnDType(<DragEvent>d3v3.event, 'application/phovea-prov-story') ||
+          DnDUtils.getInstance().hasDnDType(<DragEvent>d3v3.event, 'application/phovea-prov-story-text')
         ) {
-          (<Event>d3.event).preventDefault();
-          DnDUtils.getInstance().updateDropEffect(<DragEvent>d3.event);
+          (<Event>d3v3.event).preventDefault();
+          DnDUtils.getInstance().updateDropEffect(<DragEvent>d3v3.event);
           return false;
         }
         return undefined;
       })
       .on('dragleave', function (d) {
-        d3.select(this).classed('hover', false);
+        d3v3.select(this).classed('hover', false);
       })
       .on('drop', function (d) {
-        d3.select(this).classed('hover', false);
-        const e = <DragEvent>(<any>d3.event);
+        d3v3.select(this).classed('hover', false);
+        const e = <DragEvent>(<any>d3v3.event);
         e.preventDefault();
         const fullStory = SlideNode.toSlidePath(that.story);
         const dStory = d.isPlaceholder ? d.to : <SlideNode>(<any>d);
@@ -417,17 +417,17 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
       });
   }
 
-  private changeDuration($element: d3.Selection<SlideNode>) {
+  private changeDuration($element: d3v3.Selection<SlideNode>) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     $element.call(
-      d3.behavior
+      d3v3.behavior
         .drag()
         .origin(() => ({ x: 0, y: 0 }))
         .on('drag', function (d: SlideNode, i) {
           // update the height of the slide node
-          const e: any = d3.event;
-          const $elem = d3.select((<Element>this).parentElement);
+          const e: any = d3v3.event;
+          const $elem = d3v3.select((<Element>this).parentElement);
           const height = Math.max(that.duration2pixel.range()[0], that.duration2pixel(d.duration) + e[that.options.xy]);
           $elem.style(that.options.wh, `${height}px`);
           const change = that.duration2pixel.invert(height) - d.duration;
@@ -443,23 +443,23 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
         })
         .on('dragend', function (d: SlideNode) {
           // update the stored duration just once
-          const h = parseInt(d3.select((<Element>this).parentElement).style(that.options.wh), 10);
+          const h = parseInt(d3v3.select((<Element>this).parentElement).style(that.options.wh), 10);
           d.duration = that.duration2pixel.invert(h);
         }),
     );
   }
 
-  private changeTransition($element: d3.Selection<SlideNode>) {
+  private changeTransition($element: d3v3.Selection<SlideNode>) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     $element.call(
-      d3.behavior
+      d3v3.behavior
         .drag()
         .origin(() => ({ x: 0, y: 0 }))
         .on('drag', function (d: SlideNode, i) {
           // update the height of the slide node
-          const e: any = d3.event;
-          const $elem = d3.select((<Element>this).parentElement);
+          const e: any = d3v3.event;
+          const $elem = d3v3.select((<Element>this).parentElement);
           const offset = Math.max(0, that.duration2pixel(d.transition) - VerticalStoryVis.MIN_HEIGHT + e[that.options.xy]);
           $elem.style(`margin-${that.options.topleft}`, `${offset}px`);
           const change = that.duration2pixel.invert(offset + VerticalStoryVis.MIN_HEIGHT) - d.transition;
@@ -475,23 +475,23 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
         })
         .on('dragend', function (d: SlideNode) {
           // update the stored duration just once
-          const h = parseInt(d3.select((<Element>this).parentElement).style(`margin-${that.options.topleft}`), 10);
+          const h = parseInt(d3v3.select((<Element>this).parentElement).style(`margin-${that.options.topleft}`), 10);
           d.transition = that.duration2pixel.invert(h + VerticalStoryVis.MIN_HEIGHT);
         }),
     );
   }
 
-  private storyInteraction(elem: d3.Selection<ISlideNodeRepr>) {
+  private storyInteraction(elem: d3v3.Selection<ISlideNodeRepr>) {
     const graph = this.data;
 
     elem
       .attr('draggable', true)
       .on('dragstart', (d) => {
         if (!DetailUtils.isEditAble()) {
-          (<Event>d3.event).preventDefault();
+          (<Event>d3v3.event).preventDefault();
           return;
         }
-        const e = <DragEvent>(<any>d3.event);
+        const e = <DragEvent>(<any>d3v3.event);
         e.dataTransfer.effectAllowed = 'copyMove'; // none, copy, copyLink, copyMove, link, linkMove, move, all
         e.dataTransfer.setData('text/plain', d.name);
         e.dataTransfer.setData('application/phovea-prov-story', String(d.id));
@@ -511,13 +511,13 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
       });
   }
 
-  private createToolbar($elem: d3.Selection<SlideNode>) {
+  private createToolbar($elem: d3v3.Selection<SlideNode>) {
     const $toolbarEnter = $elem.append('div').classed('toolbar', true);
     $toolbarEnter
       .append('i')
       .attr('class', 'fas fa-edit')
       .on('click', (d) => {
-        const e = <Event>d3.event;
+        const e = <Event>d3v3.event;
         // remove me
         e.stopPropagation();
         e.preventDefault();
@@ -541,7 +541,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
       .attr('class', 'fas fa-copy')
       .attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.cloneSlide') as string)
       .on('click', (d) => {
-        const e = <Event>d3.event;
+        const e = <Event>d3v3.event;
         // remove me
         e.stopPropagation();
         e.preventDefault();
@@ -564,7 +564,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
       .attr('class', 'fas fa-times')
       .attr('title', I18nextManager.getInstance().i18n.t('phovea:clue.storyvis.removeSlide') as string)
       .on('click', (d) => {
-        const e = <Event>d3.event;
+        const e = <Event>d3v3.event;
         // remove me
         e.stopPropagation();
         e.preventDefault();
@@ -580,7 +580,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
       });
   }
 
-  private createLastPlaceholder($p: d3.Selection<ISlideNodeRepr>) {
+  private createLastPlaceholder($p: d3v3.Selection<ISlideNodeRepr>) {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
     $p.html(`<div>
@@ -646,7 +646,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
       .attr('href', '#')
       .on('click', (d) => {
         this.switchTo(d);
-        (<Event>d3.event).preventDefault();
+        (<Event>d3v3.event).preventDefault();
       });
     $stories.select('a').text((d) => d.name);
 
@@ -829,13 +829,13 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
   }
 
   static to_duration(d: number) {
-    const minutesSeconds = d3.time.format('%M:%S');
+    const minutesSeconds = d3v3.time.format('%M:%S');
     return minutesSeconds(new Date(d));
   }
 
   static to_starting_time(d: SlideNode, story: SlideNode[]) {
     if (!d) {
-      return d3.sum(story, (a) => a.duration + a.transition);
+      return d3v3.sum(story, (a) => a.duration + a.transition);
     }
     const i = story.indexOf(d);
     return story.slice(0, i).reduce((a, b) => a + b.duration + b.transition, d.transition);

@@ -1,4 +1,4 @@
-import { Selection } from 'd3';
+import { Selection } from 'd3v3';
 import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
 import { UserSession, PluginRegistry } from '../../app';

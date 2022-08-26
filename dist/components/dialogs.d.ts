@@ -1,9 +1,5 @@
-/// <reference types="jquery" />
-/// <reference types="select2" />
-/// <reference types="cypress" />
-/// <reference types="jquery.scrollto" />
-/// <reference types="bootstrap" />
 import '../webpack/_bootstrap';
+import { Modal } from 'bootstrap';
 export interface IDialogOptions {
     title?: string;
     placeholder?: string;
@@ -21,7 +17,8 @@ export interface IAreYouSureOptions extends Pick<IDialogOptions, 'title' | 'addi
     cancelButton?: string;
 }
 export declare class Dialog {
-    protected readonly $dialog: JQuery;
+    protected readonly bsModal: Modal;
+    protected readonly modalElement: Element;
     private bakKeyDownListener;
     static openDialogs: number;
     /**
@@ -40,13 +37,13 @@ export declare class Dialog {
     constructor(title: string, primaryBtnText?: string, additionalCSSClasses?: string, backdrop?: boolean | 'static');
     show(): void;
     hide(): void;
-    get body(): HTMLElement;
-    get footer(): HTMLElement;
-    get header(): HTMLElement;
+    get body(): HTMLDivElement;
+    get footer(): HTMLDivElement;
+    get header(): HTMLDivElement;
     onHide(callback: () => void): void;
-    onSubmit(callback: () => any): JQuery<HTMLElement>;
+    onSubmit(callback: () => any): void;
     hideOnSubmit(): void;
-    destroy(): JQuery<HTMLElement>;
+    destroy(): void;
     static generateDialog(title: string, primaryBtnText?: string, additionalCSSClasses?: string): Dialog;
     static msg(text: string, category?: string): Promise<void>;
     /**
@@ -61,7 +58,7 @@ export declare class PHOVEA_UI_FormDialog extends Dialog {
     constructor(title: string, primaryBtnText?: string, formId?: string, additionalCSSClasses?: string);
     get form(): HTMLFormElement;
     getFormData(): FormData;
-    onSubmit(callback: () => boolean): JQuery<HTMLElement>;
+    onSubmit(callback: () => boolean): void;
     /**
      * simple choose dialog
      * @param items

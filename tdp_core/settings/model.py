@@ -2,6 +2,8 @@ from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, BaseSettings, Extra, Field
 
+from .constants import default_logging_dict
+
 
 class DBMigrationSettings(BaseModel):
     autoUpgrade: bool = True  # NOQA
@@ -45,26 +47,7 @@ class TDPCoreSettings(BaseModel):
     enabled_plugins: List[str] = []
 
     # TODO: Proper typing. This is 1:1 passed to the logging.config.dictConfig(...).
-    logging: Dict = Field(
-        {
-            "version": 1,
-            "formatters": {
-                "simple": {
-                    "format": "%(asctime)s %(levelname)s %(name)s: %(message)s",
-                    "datefmt": "%H:%M:%S",
-                },
-                "line": {"format": "%(asctime)s %(levelname)s %(name)s(%(pathname)s:%(lineno)s): %(message)s"},
-            },
-            "handlers": {
-                "console": {
-                    "class": "logging.StreamHandler",
-                    "formatter": "simple",
-                    "stream": "ext://sys.stdout",
-                }
-            },
-            "root": {"level": "INFO", "handlers": ["console"]},
-        }
-    )
+    logging: Dict = Field(default_logging_dict)
 
     # tdp_core
     migrations: DBMigrationSettings = DBMigrationSettings()

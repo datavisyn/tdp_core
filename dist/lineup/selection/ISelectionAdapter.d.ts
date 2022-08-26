@@ -1,8 +1,8 @@
-import { Column, IColumnDesc } from 'lineupjs';
-import { ISelection, IScoreRow } from '../../base/interfaces';
+import { Column } from 'lineupjs';
+import { ISelection, IScoreRow, IAdditionalColumnDesc } from '../../base/interfaces';
 export interface ISelectionColumn {
     readonly id: string;
-    readonly desc: IColumnDesc;
+    readonly desc: IAdditionalColumnDesc;
     readonly data: Promise<IScoreRow<any>[]>;
     readonly position?: number;
 }
@@ -22,12 +22,12 @@ export interface IContext {
      * add multiple columns to LineUp
      * @param {ISelectionColumn[]} columns
      */
-    add(columns: ISelectionColumn[]): void;
+    add(columns: ISelectionColumn[]): Promise<void>;
     /**
-     * remove columsn from LineUp
+     * remove multiple columns from LineUp
      * @param {Column[]} columns
      */
-    remove(columns: Column[]): any;
+    remove(columns: Column[]): Promise<void>;
     /**
      * free the color from the color management
      * @param {string} id
@@ -42,11 +42,11 @@ export interface ISelectionAdapter {
      * called when a parameter has changed
      * @param {IContext} context
      */
-    parameterChanged(waitForIt: Promise<any> | null, context: () => IContext): PromiseLike<any>;
+    parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
     /**
      * called when the input selection has changed
      * @param {IContext} context
      */
-    selectionChanged(waitForIt: Promise<any> | null, context: () => IContext): PromiseLike<any>;
+    selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
 }
 //# sourceMappingURL=ISelectionAdapter.d.ts.map

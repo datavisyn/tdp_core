@@ -33,10 +33,15 @@ interface BarVisProps {
     columns: VisColumn[];
     closeButtonCallback?: () => void;
     showCloseButton?: boolean;
+    selectionCallback?: (ids: string[]) => void;
+    selectedMap?: {
+        [key: string]: boolean;
+    };
+    selectedList: string[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
     hideSidebar?: boolean;
 }
-export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar, showCloseButton, closeButtonCallback, }: BarVisProps): JSX.Element;
+export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, selectionCallback, selectedMap, selectedList, hideSidebar, showCloseButton, closeButtonCallback, }: BarVisProps): JSX.Element;
 export {};
 //# sourceMappingURL=BarVis.d.ts.map

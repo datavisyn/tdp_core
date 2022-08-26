@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import d3 from 'd3';
+import d3v3 from 'd3v3';
 import {
   PlotlyInfo,
   PlotlyData,
@@ -17,7 +17,7 @@ import {
 } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
-import { resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveColumnValues, resolveSingleColumn } from '../general/layoutUtils';
 import { I18nextManager } from '../../i18n';
 import { DEFAULT_COLOR, SELECT_COLOR } from '../general/constants';
 
@@ -108,7 +108,7 @@ export async function createScatterTraces(
   }
 
   const shapeScale = config.shape
-    ? d3.scale
+    ? d3v3.scale
         .ordinal<string>()
         .domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))] as string[])
         .range(shapes)
@@ -118,12 +118,12 @@ export async function createScatterTraces(
   let max = 0;
 
   if (config.color) {
-    min = d3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
-    max = d3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+    min = d3v3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
+    max = d3v3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
   }
 
   const numericalColorScale = config.color
-    ? d3.scale
+    ? d3v3.scale
         .linear<string, number>()
         .domain([max, (max + min) / 2, min])
         .range(
@@ -158,7 +158,7 @@ export async function createScatterTraces(
         hovertext: validCols[0].resolvedValues.map(
           (v, i) =>
             `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${
-              colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
+              colorCol ? `${columnNameWithDescription(colorCol.info)}: ${colorCol.resolvedValues[i].val}` : ''
             }`,
         ),
         hoverinfo: 'text',
@@ -179,8 +179,8 @@ export async function createScatterTraces(
           size: 8,
         },
       },
-      xLabel: validCols[0].info.name,
-      yLabel: validCols[1].info.name,
+      xLabel: columnNameWithDescription(validCols[0].info),
+      yLabel: columnNameWithDescription(validCols[1].info),
     });
   } else {
     for (const yCurr of validCols) {
@@ -202,8 +202,8 @@ export async function createScatterTraces(
               },
               opacity: config.alphaSliderVal,
             },
-            xLabel: xCurr.info.name,
-            yLabel: yCurr.info.name,
+            xLabel: columnNameWithDescription(xCurr.info),
+            yLabel: columnNameWithDescription(yCurr.info),
           });
           // otherwise, make a scatterplot
         } else {
@@ -219,7 +219,7 @@ export async function createScatterTraces(
               hovertext: xCurr.resolvedValues.map(
                 (v, i) =>
                   `${v.id}<br>x: ${v.val}<br>y: ${yCurr.resolvedValues[i].val}<br>${
-                    colorCol ? `${colorCol.info.name}: ${colorCol.resolvedValues[i].val}` : ''
+                    colorCol ? `${columnNameWithDescription(colorCol.info)}: ${colorCol.resolvedValues[i].val}` : ''
                   }`,
               ),
               hoverinfo: 'text',
@@ -250,8 +250,8 @@ export async function createScatterTraces(
                 size: 8,
               },
             },
-            xLabel: xCurr.info.name,
-            yLabel: yCurr.info.name,
+            xLabel: columnNameWithDescription(xCurr.info),
+            yLabel: columnNameWithDescription(yCurr.info),
           });
         }
 
@@ -275,7 +275,7 @@ export async function createScatterTraces(
         legendgroup: 'color',
         // @ts-ignore
         legendgrouptitle: {
-          text: colorCol.info.name,
+          text: columnNameWithDescription(colorCol.info),
         },
         marker: {
           line: {
@@ -298,8 +298,8 @@ export async function createScatterTraces(
           },
         ],
       },
-      xLabel: validCols[0].info.name,
-      yLabel: validCols[0].info.name,
+      xLabel: columnNameWithDescription(validCols[0].info),
+      yLabel: columnNameWithDescription(validCols[0].info),
     });
   }
 
@@ -319,7 +319,7 @@ export async function createScatterTraces(
         legendgroup: 'shape',
         // @ts-ignore
         legendgrouptitle: {
-          text: shapeCol.info.name,
+          text: columnNameWithDescription(shapeCol.info),
         },
         marker: {
           line: {
@@ -342,8 +342,8 @@ export async function createScatterTraces(
           },
         ],
       },
-      xLabel: validCols[0].info.name,
-      yLabel: validCols[0].info.name,
+      xLabel: columnNameWithDescription(validCols[0].info),
+      yLabel: columnNameWithDescription(validCols[0].info),
     });
   }
 

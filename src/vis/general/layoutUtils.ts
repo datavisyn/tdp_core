@@ -1,4 +1,4 @@
-import { PlotlyInfo, VisColumn } from '../interfaces';
+import { ColumnInfo, PlotlyInfo, VisColumn } from '../interfaces';
 import { Plotly } from '../Plot';
 
 /**
@@ -8,6 +8,10 @@ import { Plotly } from '../Plot';
  */
 export function truncateText(text: string, maxLength = 50) {
   return text.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
+}
+
+export function columnNameWithDescription(col: ColumnInfo) {
+  return col.description ? `${col.name}: ${col.description}` : col.name;
 }
 
 /**
