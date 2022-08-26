@@ -72,7 +72,7 @@ export class StructureImageFilterDialog extends ADialog {
             this.findLoadingNode(this.node).setAttribute('hidden', null);
             const errorNode = this.findErrorNode(this.node);
             errorNode.removeAttribute('hidden');
-            errorNode.textContent = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structuredImage.errorMessage', { message: error.message });
+            errorNode.textContent = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structureImage.errorMessage', { message: error.message });
             this.column.setFilter({ filter, filterMissing, matching: null }); // no matching structures due to server error
         });
     }
@@ -108,7 +108,7 @@ export class StructureImageFilterDialog extends ADialog {
       <span id="${this.dialog.idPrefix}_error" class="text-danger" hidden></span>
       <label class="lu-checkbox">
         <input type="checkbox" ${bak.filterMissing ? 'checked="checked"' : ''}>
-        <span class="lu-filter-missing">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structuredImage.filterMissingValues')}</span>
+        <span class="lu-filter-missing">${I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structureImage.filterMissingValues')}</span>
       </label>`);
         const filterMissing = findFilterMissing(node);
         const input = node.querySelector('input[type="text"]');

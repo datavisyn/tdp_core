@@ -1,7 +1,6 @@
 from typing import List, Optional
 
 from rdkit.Chem import Mol, TemplateAlign, rdFMCS
-from rdkit.Chem.Scaffolds import MurckoScaffold
 
 
 def maximum_common_substructure_query_mol(mols: List[Mol]) -> Optional[Mol]:
@@ -21,7 +20,3 @@ def aligned(structure, align):
         TemplateAlign.AlignMolToTemplate2D(structure, mcs, clearConfs=True)
         # Enable this to show substructore highlights of alignment
         # return mcs
-
-
-def murcko(structure):
-    return MurckoScaffold.GetScaffoldForMol(structure)

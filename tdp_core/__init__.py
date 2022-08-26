@@ -1,14 +1,13 @@
 from fastapi import FastAPI
 
-from .mol_img import img_api
 from .plugin.model import AVisynPlugin, RegHelper
 
 
 class VisynPlugin(AVisynPlugin):
     def init_app(self, app: FastAPI):
+        from .mol_img import img_api
+
         app.include_router(img_api.app)
-        # apps using tdp_core should register their endpoints in register via
-        # registry.append_router("rdkit-image", "tdp_core.mol_img.img_api", {"factory": "create_api"})
 
     def register(self, registry: RegHelper):
         # phovea_server

@@ -48,7 +48,7 @@ function svgToCSSBackground(svg) {
 }
 export class StructureImageRenderer {
     constructor() {
-        this.title = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structuredImage.rendererTitle');
+        this.title = I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.structureImage.rendererTitle');
     }
     canRender(col, mode) {
         return col instanceof StructureImageColumn && (mode === ERenderMode.CELL || mode === ERenderMode.GROUP);
