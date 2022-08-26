@@ -6,6 +6,9 @@
 export function truncateText(text, maxLength = 50) {
     return text.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
 }
+export function columnNameWithDescription(col) {
+    return col.description ? `${col.name}: ${col.description}` : col.name;
+}
 /**
  * Cleans up the layout of a given trace, primarily by positioning potential small multiple plots in a reasonable way
  * @param traces the traces associated with the layout
@@ -26,7 +29,6 @@ export function beautifyLayout(traces, layout) {
             spikecolor: 'black',
             spikethickness: 2,
             spikedash: 'dash',
-            fixedrange: true,
             ticks: 'outside',
             title: {
                 standoff: 10,
@@ -49,7 +51,6 @@ export function beautifyLayout(traces, layout) {
             spikethickness: 2,
             spikedash: 'dash',
             ticks: 'outside',
-            fixedrange: true,
             title: {
                 standoff: 10,
                 text: traces.plots.length > 1 ? truncateText(t.yLabel, 15) : truncateText(t.yLabel, 50),

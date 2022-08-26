@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3';
+import d3v3 from 'd3v3';
 import { useMemo, useEffect } from 'react';
 import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EScatterSelectSettings, EAggregateTypes, } from './interfaces';
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
@@ -8,6 +8,7 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
+import { useSyncedRef } from '../hooks/useSyncedRef';
 const DEFAULT_COLORS = [
     getCssValue('visyn-c1'),
     getCssValue('visyn-c2'),
@@ -21,7 +22,7 @@ const DEFAULT_COLORS = [
     getCssValue('visyn-c10'),
 ];
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
-export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, hideSidebar = false, }) {
+export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, hideSidebar = false, }) {
     // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
     // To ensure that we never render an incosistent config, keep a consistent and a current in the config. Always render the consistent.
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -55,6 +56,12 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
                     aggregateType: EAggregateTypes.COUNT,
                 },
             });
+    const setExternalConfigRef = useSyncedRef(setExternalConfig);
+    useEffect(() => {
+        var _a;
+        (_a = setExternalConfigRef.current) === null || _a === void 0 ? void 0 : _a.call(setExternalConfigRef, visConfig);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [visConfig, setExternalConfigRef]);
     const setVisConfig = React.useCallback((newConfig) => {
         _setVisConfig((oldConfig) => {
             return {
@@ -86,12 +93,13 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         }
         // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [inconsistentVisConfig.type, columns]);
+    }, [inconsistentVisConfig.type]);
     useEffect(() => {
         if (externalConfig) {
             setVisConfig(externalConfig);
         }
     }, [externalConfig, setVisConfig]);
+    // Converting the selected list into a map, since searching through the list to find an item is common in the vis components.
     const selectedMap = useMemo(() => {
         const currMap = {};
         selected.forEach((s) => {
@@ -100,7 +108,7 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         return currMap;
     }, [selected]);
     const scales = useMemo(() => {
-        const colorScale = d3.scale.ordinal().range(colors);
+        const colorScale = d3v3.scale.ordinal().range(colors);
         return {
             color: colorScale,
         };
@@ -121,6 +129,6 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
             }, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
         isStrip(visConfig) ? (React.createElement(StripVis, { config: visConfig, selectionCallback: selectionCallback, setConfig: setVisConfig, selected: selectedMap, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
         isPCP(visConfig) ? (React.createElement(PCPVis, { config: visConfig, selected: selectedMap, setConfig: setVisConfig, columns: columns, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
-        isBar(visConfig) ? (React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null));
+        isBar(visConfig) ? (React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, selectionCallback: selectionCallback, selectedMap: selectedMap, selectedList: selected, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null));
 }
 //# sourceMappingURL=Vis.js.map

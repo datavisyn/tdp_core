@@ -20,7 +20,7 @@ import {
   Ranking as LineUpRanking,
   UIntTypedArray,
 } from 'lineupjs';
-import React from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
 import { ILazyLoadedColumn, LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
@@ -121,20 +121,22 @@ const defaults = {
     function hasColumnDesc(i: ISearchOption | IGroupSearchItem<ISearchOption>): i is ISearchOption {
       return (i as ISearchOption).desc != null;
     }
+
     if (node.parentElement && hasColumnDesc(item)) {
       node.dataset.type = item.desc.type;
       const summary = item.desc.summary || item.desc.description;
       node.classList.toggle('lu-searchbox-summary-entry', Boolean(summary));
       if (summary) {
         const label = node.ownerDocument.createElement('span');
-        label.textContent = item.desc.label;
+        label.innerHTML = item.desc.label;
         node.appendChild(label);
         const desc = node.ownerDocument.createElement('span');
-        desc.textContent = summary;
+        desc.innerHTML = summary;
         node.appendChild(desc);
         return undefined;
       }
     }
+    node.innerHTML = item.text;
     return item.text;
   },
   panelAddColumnBtnOptions: {},
@@ -170,7 +172,7 @@ export function Ranking({
 
   // Stores the ranking data when collapsing columns when mode changes
   const dump = React.useRef<Set<string>>(null);
-  const colorsRef = useSyncedRef(new LineUpColors());
+  const colorsRef = React.useRef(new LineUpColors());
   const providerRef = React.useRef<LocalDataProvider>(null);
   const taggleRef = React.useRef<EngineRenderer | TaggleRenderer>(null);
   const selectionHelperRef = React.useRef<LineUpSelectionHelper>(null);
@@ -182,13 +184,16 @@ export function Ranking({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const addColumn = (colDesc: any, d: Promise<IScoreRow<any>[]>, id: string = null, position?: number) => {
-    // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
-    colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : colorsRef.current.getColumnColor(id);
-    return LazyColumn.addLazyColumn(colDesc, d, providerRef.current, position, () => {
-      taggleRef.current.update();
-    });
-  };
+  const addColumn = useCallback(
+    (colDesc: any, d: Promise<IScoreRow<any>[]>, id: string = null, position?: number) => {
+      // use `colorMapping` as default; otherwise use `color`, which is deprecated; else get a new color
+      colDesc.colorMapping = colDesc.colorMapping ? colDesc.colorMapping : colDesc.color ? colDesc.color : colorsRef.current.getColumnColor(id);
+      return LazyColumn.addLazyColumn(colDesc, d, providerRef.current, position, () => {
+        taggleRef.current.update();
+      });
+    },
+    [colorsRef],
+  );
 
   const addScoreColumn = (score: IScore<any>) => {
     const args =
@@ -380,6 +385,7 @@ export function Ranking({
             return { ...r, ...{ data: await r.data } };
           }),
         );
+
         onAddScoreColumn?.(loadedResults);
       });
 
@@ -448,6 +454,25 @@ export function Ranking({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const stringCols = providerRef.current?.getLastRanking()?.flatColumns.toString();
+
+  const columns = useMemo(() => {
+    const ranking = providerRef.current?.getLastRanking();
+    return ranking ? ranking.flatColumns : [];
+    // This dep is needed because the columns are not part of a normal variable, only part of a ref. Probably should think of a better way.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stringCols]);
+
+  useEffect(() => {
+    const context = {
+      columns,
+      freeColor: (id: string) => colorsRef.current.freeColumnColor(id),
+      add: (columns: ISelectionColumn[]) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
+      remove: (columns: Column[]) => Promise.resolve(columns.forEach((c) => c.removeMe())),
+    };
+    onContextChanged?.(context);
+  }, [addColumn, columns, onContextChanged, colorsRef]);
+
   const build = React.useMemo(
     () => async () => {
       setBusy(true);
@@ -458,20 +483,22 @@ export function Ranking({
       ColumnDescUtils.createInitialRanking(providerRef.current, {});
       const ranking = providerRef.current.getLastRanking();
       const columns = ranking ? ranking.flatColumns : [];
-      const context = {
+      const selectionAdapterContext: Omit<IContext, 'selection'> = {
         columns,
         freeColor: (id: string) => colorsRef.current.freeColumnColor(id),
-        add: (columns: ISelectionColumn[]) => columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position)),
-        remove: (columns: Column[]) => columns.forEach((c) => c.removeMe()),
+        // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
+        add: (columns: ISelectionColumn[]) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
+        // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
+        remove: (columns: Column[]) => Promise.resolve(columns.forEach((c) => c.removeMe())),
       };
-      onContextChanged?.(context);
+      onContextChanged?.(selectionAdapterContext);
       onCustomizeRanking?.(LineupUtils.wrapRanking(providerRef.current, ranking));
 
       return (
         Promise.resolve()
           // TODO: check if this is needed
           // .then(async () => {
-          //   return selectionAdapter?.selectionChanged(null, () => createContext(selection));
+          //   return selectionAdapter?.selectionChanged(createContext(selection));
           // })
           .then(() => {
             onBuiltLineUp?.(providerRef.current);

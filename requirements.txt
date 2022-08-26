@@ -8,7 +8,6 @@ json-cfg==0.4.2
 marshmallow-sqlalchemy==0.28.0
 marshmallow==3.15.0
 numba==0.55.1
-# numba 0.55.1 does not support numpy >= 1.22 yet
 numpy==1.21.6
 openpyxl==3.0.9
 pandas==1.4.1

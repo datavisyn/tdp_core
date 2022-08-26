@@ -1,7 +1,7 @@
 import React from 'react';
 import { Vis } from '../Vis';
 import { EAggregateTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, EScatterSelectSettings, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
-function fetchIrisData() {
+export function fetchIrisData() {
     const dataPromise = import('./irisData').then((m) => m.iris);
     return [
         {

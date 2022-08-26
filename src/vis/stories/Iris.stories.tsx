@@ -14,7 +14,7 @@ import {
   VisColumn,
 } from '../interfaces';
 
-function fetchIrisData(): VisColumn[] {
+export function fetchIrisData(): VisColumn[] {
   const dataPromise = import('./irisData').then((m) => m.iris);
 
   return [

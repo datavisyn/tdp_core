@@ -1,9 +1,12 @@
-// TODO override the following SCSS variables once SCSS import is working again
 $lu_dialog_font_size: 0.9rem !default;
 $lu_toolbar_font_size: 0.9rem !default;
 
-// use css because importing sass file from src requires font awesome v4 dependency
-@import '~lineupjs/build/LineUpJS.css';
+$lu_assets: '~lineupjs/src/assets' !default;
+$lu_use_font_awesome: true !default;
+// do not include Font Awesome files from LineUp, but use ours instead
+$lu_include_font_awesome: false !default;
+
+@import '~lineupjs/src/style.scss';
 
 .lu {
   // use a fixed font-size for the ranking + side panel with the Roboto font family.
@@ -19,8 +22,6 @@ $lu_toolbar_font_size: 0.9rem !default;
 // override the font-size manually (since the SCSS variables above does not work)
 .lu-tooltip,
 .lu-dialog {
-  font-size: $lu_dialog_font_size;
-
   // adapt LineUp dialogs to Bootstrap v4 dialog style
   padding: 1rem 1rem 0.5rem;
   gap: 10px;
@@ -54,15 +55,6 @@ $lu_toolbar_font_size: 0.9rem !default;
 
 .lu-dialog-button {
   margin: unset;
-}
-
-.lu-hierarchy-entry,
-.lu-hierarchy-adder,
-.lu-toolbar,
-.lu-more-options,
-.lu-side-panel-rankings > i,
-.lu-side-panel-ranking-label > i {
-  font-size: $lu_toolbar_font_size;
 }
 
 .lu-summary {
@@ -206,4 +198,10 @@ span.lu-mapping-hint {
 
 .lu-dialog-rename {
   width: 20rem;
+}
+
+.lu-dialog-mapper-warning {
+  @extend .alert; // apply base styles of Bootstrap alert
+  @extend .alert-warning;
+  margin-bottom: 0; // override margin
 }

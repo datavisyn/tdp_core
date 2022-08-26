@@ -1,4 +1,4 @@
-import { select } from 'd3';
+import { select } from 'd3v3';
 import { PHOVEA_UI_FormDialog } from '../components';
 import { FormBuilder } from './FormBuilder';
 import { IFormElementDesc, IForm } from './interfaces';
@@ -72,13 +72,15 @@ export class FormDialog extends PHOVEA_UI_FormDialog {
           resolve(data);
         }
       });
-      this.show();
-      setTimeout(() => {
+      const focusOnFirstFormElement = () => {
+        this.modalElement.removeEventListener('shown.bs.modal', focusOnFirstFormElement);
         const first = <HTMLElement>this.body.querySelector('input, select, textarea');
         if (first) {
           first.focus();
         }
-      }, 250); // till dialog is visible
+      };
+      this.modalElement.addEventListener('shown.bs.modal', focusOnFirstFormElement);
+      this.show();
     });
   }
 }

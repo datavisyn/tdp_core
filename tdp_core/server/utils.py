@@ -1,9 +1,10 @@
+import http
 import logging
 import time
+import traceback
 
 import werkzeug
-from fastapi import HTTPException
-from flask import Flask
+from flask import Flask, jsonify
 
 from .. import manager
 
@@ -21,19 +22,22 @@ def init_legacy_app(app: Flask):
         return
 
     if hasattr(app, "debug"):
-        app.debug = manager.settings.is_development_mode
+        # TODO: Evaluate if this should be set to manager.settings.is_development_mode
+        app.debug = False
 
     if manager.settings.tdp_core:
         app.config["SECRET_KEY"] = manager.settings.secret_key
 
     @app.errorhandler(werkzeug.exceptions.HTTPException)
     @app.errorhandler(Exception)
-    def handle_exception(e):
-        """Raises a proper fastapi#HTTPException instead of HTML for HTTP errors and exceptions."""
-        _log.exception("An exception in a Flask app", exc_info=e)
-        if isinstance(e, werkzeug.exceptions.HTTPException):
-            raise HTTPException(status_code=e.code, detail=e.description)
-        raise HTTPException(status_code=500, detail=str(e) if manager.settings.is_development_mode else "Internal server error")
+    async def handle_exception(e):
+        """Handles Flask exceptions by returning the same JSON response as FastAPI#HTTPException would."""
+        _log.exception("An error occurred in Flask")
+        # Extract status information if a Flask#HTTPException is given, otherwise return 500 with exception information
+        status_code = e.code if isinstance(e, werkzeug.exceptions.HTTPException) else 500
+        detail = detail_from_exception(e)
+        # Exact same response as the one from FastAPI#HTTPException.
+        return jsonify({"detail": detail or http.HTTPStatus(status_code).phrase}), status_code
 
     return app
 
@@ -57,3 +61,17 @@ def load_after_server_started_hooks():
         hook()
 
     _log.info("Elapsed time for server startup hooks: %d seconds", time.time() - start)
+
+
+def detail_from_exception(e: Exception) -> str:
+    """Returns the full stacktrace in development mode and just the error message in production mode."""
+    # Always return full stacktrace in development mode
+    if manager.settings.is_development_mode:
+        return "THIS STACKTRACE IS SHOWN IN DEVELOPMENT MODE ONLY. IN PRODUCTION, ONLY THE SPECIFIC ERROR MESSAGE IS SHOWN!" + "".join(
+            traceback.format_exception(None, e, e.__traceback__)
+        )
+    # Exception specific returns
+    if isinstance(e, werkzeug.exceptions.HTTPException):
+        return e.description
+    # Fallback to the string representation of the exception
+    return str(e)

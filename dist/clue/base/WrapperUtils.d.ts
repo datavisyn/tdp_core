@@ -14,7 +14,6 @@ export declare class WrapperUtils {
     static injectHeadlessSupport(wrapper: ICLUEWrapper): void;
     static injectParentWindowSupport(wrapper: ICLUEWrapper): void;
     static handleMagicHashElements(body: HTMLElement, manager: ICLUEWrapper): void;
-    static useInMemoryGraph(): boolean;
     static triggeredByInputField(evt: KeyboardEvent): boolean;
     /**
      * enables keyboard shortcuts to undo and change mode

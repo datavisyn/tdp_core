@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import * as not_available from '../../assets/not_available.png';
+import not_available from '../../assets/not_available.png';
 export class ThumbnailUtils {
     static thumbnail_url(graph, state, options = {}) {
         const o = {

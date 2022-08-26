@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import 'select2';
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import $ from 'jquery';
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
@@ -77,7 +77,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
     ...FormSelect2.DEFAULT_OPTIONS,
   };
 
-  private $select: d3.Selection<any>;
+  private $select: d3v3.Selection<any>;
 
   private $jqSelect: JQuery;
 
@@ -103,10 +103,10 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
    * Build the label and select element
    * @param $formNode The parent node this element will be attached to
    */
-  build($formNode: d3.Selection<any>) {
+  build($formNode: d3v3.Selection<any>) {
     this.addChangeListener();
 
-    const testId = this.elementDesc.label
+    const testId = (this.elementDesc.label || this.elementDesc.id)
       .replace(/<\/?[^>]+(>|$)/g, '')
       .trim()
       .replace(/\s+/g, '-')
@@ -145,7 +145,7 @@ export class FormSelect2 extends AFormElement<IFormSelect2> {
   /**
    * Builds the jQuery select2
    */
-  private buildSelect2($select: d3.Selection<any>, options: IFormSelect2Options, data?: ISelect2Option[]) {
+  private buildSelect2($select: d3v3.Selection<any>, options: IFormSelect2Options, data?: ISelect2Option[]) {
     const select2Options: Select2Options = {};
 
     let initialValue: string[] = [];

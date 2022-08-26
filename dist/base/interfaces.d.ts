@@ -1,12 +1,12 @@
-import { IColumnDesc, Column, LocalDataProvider } from 'lineupjs';
-import { IAuthorizationConfiguration } from '../auth';
+import { IColumnDesc, LocalDataProvider } from 'lineupjs';
+import type { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
 import { IDType } from '../idtype/IDType';
-import { IUser } from '../security';
+import type { IUser } from '../security';
 import type { IPlugin, IPluginDesc } from './plugin';
-import { IEventHandler } from './event';
+import type { IEventHandler } from './event';
 import { ProvenanceGraph } from '../clue/provenance/ProvenanceGraph';
-import { IObjectRef } from '../clue/provenance/ObjectNode';
+import type { IObjectRef } from '../clue/provenance/ObjectNode';
 import { AppHeader } from '../components/header';
 export interface IAdditionalColumnDesc extends IColumnDesc {
     /**
@@ -135,22 +135,6 @@ export interface IScoreLoaderExtensionDesc extends IPluginDesc {
         order: number;
     };
     load(): Promise<IPlugin & IScoreLoaderExtension>;
-}
-/**
- * Extension to patch a LineUp column generated as score.
- */
-export interface IScoreColumnPatcherExtension {
-    /**
-     * Patcher function called for every column to patch.
-     * @param pluginDesc Description of the plugin.
-     * @param colDesc Description of the column.
-     * @param rows Rows from the score.
-     * @param col Column to patch.
-     */
-    factory(pluginDesc: IPluginDesc, colDesc: IAdditionalColumnDesc, rows: IScoreRow<any>[], col: Column): Promise<void>;
-}
-export interface IScoreColumnPatcherExtensionDesc extends IPluginDesc {
-    load(): Promise<IPlugin & IScoreColumnPatcherExtension>;
 }
 export interface IRankingButtonExtension {
     desc: IRankingButtonExtensionDesc;

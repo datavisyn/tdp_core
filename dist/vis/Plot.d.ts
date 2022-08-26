@@ -1,5 +1,6 @@
-/// <reference types="react" />
+import * as React from 'react';
 import Plotly from 'plotly.js-dist-min';
-export declare const PlotlyComponent: import("react").ComponentType<import("react-plotly.js").PlotParams>;
+import { PlotParams } from 'react-plotly.js';
+export declare const PlotlyComponent: React.ComponentType<PlotParams>;
 export { Plotly };
 //# sourceMappingURL=Plot.d.ts.map

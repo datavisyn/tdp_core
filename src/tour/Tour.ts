@@ -1,6 +1,6 @@
 import { PluginRegistry } from '../app';
-import { ITDPTourExtensionDesc, IStep } from './extensions';
-import { AppHeader } from '../components';
+import type { ITDPTourExtensionDesc, IStep } from './extensions';
+import { AppHeader } from '../components/header';
 import { TourUtils } from './TourUtils';
 
 export interface ITourContext {

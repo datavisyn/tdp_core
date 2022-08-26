@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { AFormElement } from './AFormElement';
 import { UserSession } from '../../app';
 /**
@@ -60,7 +60,7 @@ export class FormSelect extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        const testId = this.elementDesc.label
+        const testId = (this.elementDesc.label || this.elementDesc.id)
             .replace(/<\/?[^>]+(>|$)/g, '')
             .trim()
             .replace(/\s+/g, '-')
@@ -156,7 +156,7 @@ export class FormSelect extends AFormElement {
      * @returns {string|{name: string, value: string, data: any}|null}
      */
     get value() {
-        const option = d3.select(this.$inputNode.node().selectedOptions[0]);
+        const option = d3v3.select(this.$inputNode.node().selectedOptions[0]);
         return option.size() > 0 ? option.datum() : null;
     }
     /**

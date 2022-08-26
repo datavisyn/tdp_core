@@ -1,4 +1,4 @@
-import { IPluginDesc, IPlugin } from './plugin';
+import type { IPluginDesc, IPlugin } from './plugin';
 import type { ProvenanceGraph } from '../clue/provenance';
 export declare const EXTENSION_POINT_TDP_SCORE = "tdpScore";
 export declare const EXTENSION_POINT_TDP_SCORE_IMPL = "tdpScoreImpl";
@@ -26,7 +26,6 @@ export declare const EP_TDP_CORE_LINEUP_PANEL_TAB = "epTdpCoreLineupPanelTab";
  * @factoryReturns {IFormElement} An instance of the form element
  */
 export declare const EP_TDP_CORE_FORM_ELEMENT = "epTdpCoreFormElement";
-export declare const EP_TDP_CORE_SCORE_COLUMN_PATCHER = "epTdpCoreScoreColumnPatcher";
 /**
  * Provides the loaded provenance graph
  *

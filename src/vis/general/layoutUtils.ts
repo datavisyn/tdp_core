@@ -1,4 +1,4 @@
-import { PlotlyInfo, VisColumn } from '../interfaces';
+import { ColumnInfo, PlotlyInfo, VisColumn } from '../interfaces';
 import { Plotly } from '../Plot';
 
 /**
@@ -8,6 +8,10 @@ import { Plotly } from '../Plot';
  */
 export function truncateText(text: string, maxLength = 50) {
   return text.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
+}
+
+export function columnNameWithDescription(col: ColumnInfo) {
+  return col.description ? `${col.name}: ${col.description}` : col.name;
 }
 
 /**
@@ -30,7 +34,6 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
       spikecolor: 'black',
       spikethickness: 2,
       spikedash: 'dash',
-      fixedrange: true,
       ticks: 'outside',
       title: {
         standoff: 10,
@@ -54,7 +57,6 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
       spikethickness: 2,
       spikedash: 'dash',
       ticks: 'outside',
-      fixedrange: true,
       title: {
         standoff: 10,
         text: traces.plots.length > 1 ? truncateText(t.yLabel, 15) : truncateText(t.yLabel, 50),

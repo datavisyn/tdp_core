@@ -1,59 +1,42 @@
 import { difference } from 'lodash';
 export class ABaseSelectionAdapter {
-    constructor() {
-        this.waitingForSelection = null;
-        this.waitingForParameter = null;
-    }
-    addDynamicColumns(context, ids) {
-        return Promise.all(ids.map((id) => this.createColumnsFor(context, id))).then((columns) => {
-            // sort new columns to insert them in the correct order
-            const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
-            flattenedColumns.sort(({ d: a, i: ai }, { d: b, i: bi }) => {
-                if (a.position === b.position) {
-                    // equal position, sort latter element of original array to lower position in sorted array
-                    return bi - ai; // the latter in the array the better
-                }
-                return b.position - a.position; // sort descending by default
-            });
-            context.add(flattenedColumns.map((d) => d.d));
+    async addDynamicColumns(context, ids) {
+        const columns = await Promise.all(ids.map((id) => this.createColumnsFor(context, id)));
+        // sort new columns to insert them in the correct order
+        const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
+        flattenedColumns.sort(({ d: a, i: ai }, { d: b, i: bi }) => {
+            if (a.position === b.position) {
+                // equal position, sort latter element of original array to lower position in sorted array
+                return bi - ai; // the latter in the array the better
+            }
+            return b.position - a.position; // sort descending by default
         });
+        return context.add(flattenedColumns.map((d) => d.d));
     }
     removeDynamicColumns(context, ids) {
         const { columns } = context;
-        context.remove([].concat(...ids.map((id) => {
+        return context.remove([].concat(...ids.map((id) => {
             context.freeColor(id);
             return columns.filter((d) => d.desc.selectedId === id);
         })));
     }
-    selectionChanged(waitForIt, context) {
-        if (this.waitingForSelection) {
-            return this.waitingForSelection;
-        }
-        return (this.waitingForSelection = Promise.resolve(waitForIt)
-            .then(() => this.selectionChangedImpl(context()))
-            .then(() => {
-            this.waitingForSelection = null;
-        }));
+    /**
+     * Add or remove columns in LineUp ranking when the selected items in the selection adapter context change
+     * @param context selection adapter context
+     * @returns A promise that can waited for until the columns have been changed.
+     */
+    selectionChanged(context, onContextChanged) {
+        return this.selectionChangedImpl(context, onContextChanged);
     }
-    parameterChanged(waitForIt, context) {
-        if (this.waitingForSelection) {
-            return this.waitingForSelection;
-        }
-        if (this.waitingForParameter) {
-            return this.waitingForParameter;
-        }
-        return (this.waitingForParameter = Promise.resolve(waitForIt)
-            .then(() => {
-            if (this.waitingForSelection) {
-                return undefined; // abort selection more important
-            }
-            return this.parameterChangedImpl(context());
-        })
-            .then(() => {
-            this.waitingForParameter = null;
-        }));
+    /**
+     * Add or remove columns in LineUp ranking when the parametrs in the selection adapter context change
+     * @param context selection adapter context
+     * @returns A promise that can waited for until the columns have been changed.
+     */
+    parameterChanged(context, onContextChanged) {
+        return this.parameterChangedImpl(context, onContextChanged);
     }
-    selectionChangedImpl(context) {
+    async selectionChangedImpl(context, onContextChanged) {
         const selectedIds = context.selection.ids;
         const usedCols = context.columns.filter((d) => d.desc.selectedId != null);
         const lineupColIds = usedCols.map((d) => d.desc.selectedId);
@@ -63,15 +46,17 @@ export class ABaseSelectionAdapter {
         // remove deselected columns
         if (diffRemoved.length > 0) {
             // console.log('remove columns', diffRemoved);
-            this.removeDynamicColumns(context, diffRemoved);
+            await this.removeDynamicColumns(context, diffRemoved);
         }
         // add new columns to the end
-        if (diffAdded.length <= 0) {
-            return null;
+        if (diffAdded.length) {
+            await this.addDynamicColumns(context, diffAdded);
         }
-        return this.addDynamicColumns(context, diffAdded);
+        return onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
     }
+    // TODO this function is currently useless, because it requires an `IAdditionalColumnDesc` where `selectedId` is mandatory and then assigns it again
     static patchDesc(desc, selectedId) {
+        // FIXME avoid mutation of original desc
         desc.selectedId = selectedId;
         return desc;
     }

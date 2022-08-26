@@ -1,9 +1,9 @@
 import { merge } from 'lodash';
 import { RemoveNodeObserver } from '../components/RemoveNodeObserver';
-import { HashProperties } from '../base/HashProperties';
-import { PropertyHandler } from '../base/PropertyHandler';
+import { PropertyHandler } from '../base/url/PropertyHandler';
 import { Ajax } from '../base/ajax';
 import { WebpackEnv } from '../base/WebpackEnv';
+import { HashPropertyHandler } from '../base/url';
 
 type OfflineGenerator = ((data: any, url: string) => Promise<any>) | Promise<any> | any;
 
@@ -106,7 +106,7 @@ export class AppContext {
    * access to hash parameters and set them, too
    * @type {HashProperties}
    */
-  public hash = new HashProperties();
+  public hash = new HashPropertyHandler();
 
   /**
    * access to get parameters

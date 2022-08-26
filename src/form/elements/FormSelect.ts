@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
 import { UserSession } from '../../app';
@@ -83,7 +83,7 @@ class ResolveNow<T> implements PromiseLike<T> {
  * Propagates the changes from the DOM select element using the internal `change` event
  */
 export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSelectElement {
-  private $select: d3.Selection<any>;
+  private $select: d3v3.Selection<any>;
 
   /**
    * Constructor
@@ -113,10 +113,10 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
    * Build the label and select element
    * @param $formNode The parent node this element will be attached to
    */
-  build($formNode: d3.Selection<any>) {
+  build($formNode: d3v3.Selection<any>) {
     this.addChangeListener();
 
-    const testId = this.elementDesc.label
+    const testId = (this.elementDesc.label || this.elementDesc.id)
       .replace(/<\/?[^>]+(>|$)/g, '')
       .trim()
       .replace(/\s+/g, '-')
@@ -230,7 +230,7 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
    * @returns {string|{name: string, value: string, data: any}|null}
    */
   get value() {
-    const option = d3.select((<HTMLSelectElement>this.$inputNode.node()).selectedOptions[0]);
+    const option = d3v3.select((<HTMLSelectElement>this.$inputNode.node()).selectedOptions[0]);
     return option.size() > 0 ? option.datum() : null;
   }
 

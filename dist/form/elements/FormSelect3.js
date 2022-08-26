@@ -22,7 +22,7 @@ export class FormSelect3 extends AFormElement {
      */
     build($formNode) {
         this.addChangeListener();
-        const testId = this.elementDesc.label
+        const testId = (this.elementDesc.label || this.elementDesc.id)
             .replace(/<\/?[^>]+(>|$)/g, '')
             .trim()
             .replace(/\s+/g, '-')

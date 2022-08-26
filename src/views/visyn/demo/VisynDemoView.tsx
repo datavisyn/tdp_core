@@ -78,7 +78,19 @@ export function VisynDemoView({ desc, parameters, onParametersChanged }: DemoVis
   return (
     <>
       {desc.helpText}
-      {parameters.columns ? <Vis columns={parameters.columns} externalConfig={parameters.config} hideSidebar /> : null}
+      {parameters.columns ? (
+        <Vis
+          columns={parameters.columns}
+          externalConfig={parameters.config}
+          hideSidebar
+          setExternalConfig={(config) => {
+            onParametersChanged((p) => ({
+              ...p,
+              config,
+            }));
+          }}
+        />
+      ) : null}
     </>
   );
 }

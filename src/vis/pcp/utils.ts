@@ -1,8 +1,8 @@
-import d3 from 'd3';
+import d3v3 from 'd3v3';
 import { merge } from 'lodash';
 import { I18nextManager } from '../../i18n';
 import { PlotlyInfo, PlotlyData, EColumnTypes, ESupportedPlotlyVis, IVisConfig, VisColumn, IPCPConfig } from '../interfaces';
-import { resolveColumnValues } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveColumnValues } from '../general/layoutUtils';
 
 export function isPCP(s: IVisConfig): s is IPCPConfig {
   return s.type === ESupportedPlotlyVis.PCP;
@@ -76,8 +76,8 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig, 
       dimensions: allColValues.map((c) => {
         if (c.type === EColumnTypes.NUMERICAL) {
           return {
-            range: [d3.min(c.resolvedValues.map((v) => v.val) as number[]), d3.max(c.resolvedValues.map((v) => v.val) as number[])],
-            label: c.info.name,
+            range: [d3v3.min(c.resolvedValues.map((v) => v.val) as number[]), d3v3.max(c.resolvedValues.map((v) => v.val) as number[])],
+            label: columnNameWithDescription(c.info),
             values: c.resolvedValues.map((v) => v.val),
           };
         }
@@ -85,7 +85,7 @@ export async function createPCPTraces(columns: VisColumn[], config: IPCPConfig, 
 
         return {
           range: [0, uniqueList.length - 1],
-          label: c.info.name,
+          label: columnNameWithDescription(c.info),
           values: c.resolvedValues.map((curr) => uniqueList.indexOf(curr.val as string)),
           tickvals: [...uniqueList.keys()],
           ticktext: uniqueList,

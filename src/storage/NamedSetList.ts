@@ -1,4 +1,4 @@
-import { Selection, select, event as d3event } from 'd3';
+import { Selection, select, event as d3event } from 'd3v3';
 import { PHOVEA_UI_FormDialog } from '../components';
 import { StoreUtils } from './StoreUtils';
 import { RestStorageUtils } from './rest';

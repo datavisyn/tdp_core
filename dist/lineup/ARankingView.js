@@ -46,12 +46,12 @@ export class ARankingView extends AView {
         this.naturalSize = [800, 500];
         /**
          * clears and rebuilds this lineup instance from scratch
-         * @returns {Promise<any[]>} promise when done
+         * @returns {Promise<void>} promise when done
          */
         this.rebuild = debounceAsync(() => this.rebuildImpl(), 100);
         /**
          * similar to rebuild but just loads new data and keep the columns
-         * @returns {Promise<any[]>} promise when done
+         * @returns {Promise<void>} promise when done
          */
         this.reloadData = debounceAsync(() => this.reloadDataImpl(), 100);
         /**
@@ -98,6 +98,11 @@ export class ARankingView extends AView {
                 maxGroupColumns: Infinity,
                 filterGlobally: true,
                 propagateAggregationState: false,
+                /**
+                 * Specify the task executor to use `direct` = no delay, `scheduled` = run when idle
+                 * `scheduled` also improve scalability and performance by using web workers
+                 */
+                taskExecutor: 'scheduled',
             },
             showInContextMode: (col) => col.desc.column === 'id',
             formatSearchBoxItem: (item, node) => {
@@ -111,14 +116,15 @@ export class ARankingView extends AView {
                     node.classList.toggle('lu-searchbox-summary-entry', Boolean(summary));
                     if (summary) {
                         const label = node.ownerDocument.createElement('span');
-                        label.textContent = item.desc.label;
+                        label.innerHTML = item.desc.label;
                         node.appendChild(label);
                         const desc = node.ownerDocument.createElement('span');
-                        desc.textContent = summary;
+                        desc.innerHTML = summary;
                         node.appendChild(desc);
                         return undefined;
                     }
                 }
+                node.innerHTML = item.text;
                 return item.text;
             },
             panelAddColumnBtnOptions: {},
@@ -268,7 +274,8 @@ export class ARankingView extends AView {
      */
     initImpl() {
         super.initImpl();
-        return (this.built = this.build());
+        this.built = this.build();
+        return this.built;
     }
     /**
      * return the idType of the shown items in LineUp
@@ -277,25 +284,47 @@ export class ARankingView extends AView {
     get itemIDType() {
         return this.options.itemIDType ? IDTypeManager.getInstance().resolveIdType(this.options.itemIDType) : null;
     }
-    parameterChanged(name) {
+    /**
+     * The parameter of this (ranking) view has changed and this ranking needs to adapt to the change.
+     * For example, depending on the set `selectionAdapter` additional dynamic columns can be added or
+     * removed for the paramter.
+     * @param name Name of the changed parameter
+     * @returns A promise to wait for until the ranking has been updated by the selection adapter.
+     */
+    async parameterChanged(name) {
         super.parameterChanged(name);
         if (this.selectionAdapter) {
-            return this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
+            await this.built;
+            return this.selectionAdapter.parameterChanged(this.createSelectionAdapterContext());
         }
-        return undefined;
+        return Promise.resolve();
     }
+    /**
+     * Selection of the current LineUp ranking has changed
+     */
     itemSelectionChanged() {
         this.selectionHelper.setItemSelection(this.getItemSelection());
         this.updateLineUpStats();
         super.itemSelectionChanged();
     }
-    selectionChanged() {
+    /**
+     * Incoming selection from another view has changed and this ranking needs to adapt to the change.
+     * For example, depending on the set `selectionAdapter` additional dynamic columns can be added or
+     * removed for the incoming selected items.
+     * @returns A promise to wait for until the ranking has been updated by the selection adapter.
+     */
+    async selectionChanged() {
         if (this.selectionAdapter) {
-            return this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
+            await this.built;
+            return this.selectionAdapter.selectionChanged(this.createSelectionAdapterContext());
         }
-        return undefined;
+        return Promise.resolve();
     }
-    createContext() {
+    /**
+     * Creates a selection adapter context
+     * @returns selection adapter context
+     */
+    createSelectionAdapterContext() {
         const ranking = this.provider.getLastRanking();
         const columns = ranking ? ranking.flatColumns : [];
         return {
@@ -481,7 +510,7 @@ export class ARankingView extends AView {
         return Promise.all(scores.map((d) => d._score()));
     }
     async withoutTracking(f) {
-        return this.built.then(() => LineupTrackingManager.getInstance().withoutTracking(this.context.ref, f));
+        return LineupTrackingManager.getInstance().withoutTracking(this.context.ref, f);
     }
     /**
      * used by commands to trigger adding a tracked score
@@ -549,7 +578,7 @@ export class ARankingView extends AView {
             .then(() => {
             if (this.selectionAdapter) {
                 // init first time
-                return this.selectionAdapter.selectionChanged(null, () => this.createContext());
+                return this.selectionAdapter.selectionChanged(this.createSelectionAdapterContext());
             }
             return undefined;
         })

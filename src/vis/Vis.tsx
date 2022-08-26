@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3';
+import d3v3 from 'd3v3';
 import { useMemo, useEffect } from 'react';
 import {
   ESupportedPlotlyVis,
@@ -21,6 +21,7 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
+import { useSyncedRef } from '../hooks/useSyncedRef';
 
 const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
@@ -44,6 +45,7 @@ export function Vis({
   shapes = DEFAULT_SHAPES,
   selectionCallback = () => null,
   filterCallback = () => null,
+  setExternalConfig = () => null,
   closeCallback = () => null,
   showCloseButton = false,
   externalConfig = null,
@@ -73,6 +75,7 @@ export function Vis({
    * Optional Prop which is called when a filter is applied. Returns a string identifying what type of filter is desired. This logic will be simplified in the future.
    */
   filterCallback?: (s: EFilterOptions) => void;
+  setExternalConfig?: (config: IVisConfig) => void;
   closeCallback?: () => void;
   showCloseButton?: boolean;
   externalConfig?: IVisConfig;
@@ -117,6 +120,12 @@ export function Vis({
         },
   );
 
+  const setExternalConfigRef = useSyncedRef(setExternalConfig);
+  useEffect(() => {
+    setExternalConfigRef.current?.(visConfig);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visConfig, setExternalConfigRef]);
+
   const setVisConfig = React.useCallback((newConfig: IVisConfig) => {
     _setVisConfig((oldConfig) => {
       return {
@@ -149,7 +158,7 @@ export function Vis({
     }
     // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inconsistentVisConfig.type, columns]);
+  }, [inconsistentVisConfig.type]);
 
   useEffect(() => {
     if (externalConfig) {
@@ -157,8 +166,9 @@ export function Vis({
     }
   }, [externalConfig, setVisConfig]);
 
-  const selectedMap = useMemo(() => {
-    const currMap = {};
+  // Converting the selected list into a map, since searching through the list to find an item is common in the vis components.
+  const selectedMap: { [key: string]: boolean } = useMemo(() => {
+    const currMap: { [key: string]: boolean } = {};
 
     selected.forEach((s) => {
       currMap[s] = true;
@@ -168,7 +178,7 @@ export function Vis({
   }, [selected]);
 
   const scales: Scales = useMemo(() => {
-    const colorScale = d3.scale.ordinal().range(colors);
+    const colorScale = d3v3.scale.ordinal().range(colors);
 
     return {
       color: colorScale,
@@ -250,6 +260,9 @@ export function Vis({
         <BarVis
           config={visConfig}
           setConfig={setVisConfig}
+          selectionCallback={selectionCallback}
+          selectedMap={selectedMap}
+          selectedList={selected}
           columns={columns}
           scales={scales}
           hideSidebar={hideSidebar}
