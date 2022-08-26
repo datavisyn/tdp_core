@@ -1,7 +1,14 @@
+from fastapi import FastAPI
+
 from .plugin.model import AVisynPlugin, RegHelper
 
 
 class VisynPlugin(AVisynPlugin):
+    def init_app(self, app: FastAPI):
+        from .mol_img import img_api
+
+        app.include_router(img_api.app)
+
     def register(self, registry: RegHelper):
         # phovea_server
         registry.append(
