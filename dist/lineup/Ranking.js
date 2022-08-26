@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
+import { LocalDataProvider, EngineRenderer, TaggleRenderer, Column, defaultOptions, isGroup, spaceFillingRule, updateLodRules, toolbar, dialogContext, } from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
 import { LazyColumn } from './internal/column';
@@ -25,6 +25,8 @@ import { ViewUtils } from '../views/ViewUtils';
 import { SelectionUtils } from '../idtype/SelectionUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
+import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 const defaults = {
     itemName: 'item',
     itemNamePlural: 'items',
@@ -85,7 +87,11 @@ const defaults = {
     },
     panelAddColumnBtnOptions: {},
     mode: null,
+    showInContextMode: (col) => col.desc.column === 'id',
 };
+function suffix(name) {
+    return `${name}.visynView`;
+}
 export function Ranking({ data = [], itemSelection = { idtype: null, ids: [] }, columnDesc = [], options: opts = {}, onContextChanged, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, 
 /**
  * Maybe refactor this when using the native lineup implementation of scores
@@ -223,12 +229,49 @@ onAddScoreColumn, }) {
     React.useEffect(() => {
         const initialized = taggleRef.current != null;
         if (!initialized) {
-            providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
-            providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
+            // register custom column types
+            options.customProviderOptions.columnTypes = { ...options.customProviderOptions.columnTypes, smiles: StructureImageColumn };
+            // register custom filter dialogs for custom column types
+            toolbar('filterStructureImage', 'rename')(StructureImageColumn);
+            providerRef.current = new TDPLocalDataProvider([], [], options.customProviderOptions);
+            providerRef.current.on(suffix(LocalDataProvider.EVENT_ORDER_CHANGED), () => null);
+            // add width changed listener for smiles columns in ranking
+            providerRef.current.on(suffix(LocalDataProvider.EVENT_ADD_COLUMN), (col) => {
+                if (col instanceof StructureImageColumn) {
+                    col.on(suffix(Column.EVENT_WIDTH_CHANGED), () => {
+                        // trigger a re-render of LineUp using the new calculated row height in `dynamicHeight()`
+                        taggleRef.current.update();
+                    });
+                }
+            });
+            providerRef.current.on(suffix(LocalDataProvider.EVENT_REMOVE_COLUMN), (col) => {
+                if (col instanceof StructureImageColumn) {
+                    col.on(suffix(Column.EVENT_WIDTH_CHANGED), null); // remove event listener when column is removed
+                }
+            });
             const taggleOptions = merge(defaultOptions(), options.customOptions, {
                 summaryHeader: options.enableHeaderSummary,
                 labelRotation: options.enableHeaderRotation ? 45 : 0,
+                renderers: {
+                    smiles: new StructureImageRenderer(),
+                },
+                toolbarActions: {
+                    // TODO remove default string filter; use `filterString` as key would override the default string filter, but also for string columns
+                    filterStructureImage: {
+                        title: 'Filter …',
+                        onClick: (col, evt, ctx, level, viaShortcut) => {
+                            const dialog = new StructureImageFilterDialog(col, dialogContext(ctx, level, evt), ctx);
+                            dialog.open();
+                        },
+                        options: {
+                            mode: 'menu+shortcut',
+                            featureCategory: 'ranking',
+                            featureLevel: 'basic',
+                        },
+                    },
+                },
             }, options.customOptions);
+            // FIXME simplify the `itemRowHeight` option to have less options and conditions
             if (typeof options.itemRowHeight === 'number' && options.itemRowHeight > 0) {
                 taggleOptions.rowHeight = options.itemRowHeight;
             }
@@ -242,6 +285,30 @@ onAddScoreColumn, }) {
                         return (_a = f(item)) !== null && _a !== void 0 ? _a : (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
                     },
                 });
+            }
+            else {
+                /**
+                 * Calculate the row height for a group or row. If smiles columns are added to the ranking,
+                 * the width of the widest column is taken as row height. If no smiles column is added to the ranking
+                 * the default width is used.
+                 * @param data data of the group or row
+                 * @param ranking current ranking
+                 * @returns dynamic height object for LineUp
+                 */
+                taggleOptions.dynamicHeight = function dynamicRowHeight(data, ranking) {
+                    const DEFAULT_ROW_HEIGHT = defaultOptions().rowHeight; // LineUp default rowHeight = 18
+                    // get list of smiles columns from the current ranking
+                    const smilesColumns = ranking.children.filter((col) => col instanceof StructureImageColumn);
+                    if (smilesColumns.length === 0) {
+                        return { defaultHeight: DEFAULT_ROW_HEIGHT, height: () => DEFAULT_ROW_HEIGHT, padding: () => 0 };
+                    }
+                    const maxColumnHeight = Math.max(DEFAULT_ROW_HEIGHT, ...smilesColumns.map((col) => col.getWidth())); // squared image -> use col width as height
+                    return {
+                        defaultHeight: maxColumnHeight,
+                        height: () => maxColumnHeight,
+                        padding: () => 0,
+                    };
+                };
             }
             taggleRef.current = !options.enableOverviewMode
                 ? new EngineRenderer(providerRef.current, lineupContainerRef.current, taggleOptions)
@@ -257,9 +324,9 @@ onAddScoreColumn, }) {
             // TODO: should we hardcode the generalVis since it is a separate view
             // generalVisRef=new GeneralVisWrapper(providerRef.current, this, this.selectionHelper, this.node.ownerDocument);
             // When a new column desc is added to the provider, update the panel chooser
-            providerRef.current.on(LocalDataProvider.EVENT_ADD_DESC, updatePanelChooser);
+            providerRef.current.on(suffix(LocalDataProvider.EVENT_ADD_DESC), updatePanelChooser);
             // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
-            // providerRef.current.on(LocalDataProvider.EVENT_REMOVE_DESC, updatePanelChooser);
+            // providerRef.current.on(suffix(LocalDataProvider.EVENT_REMOVE_DESC), updatePanelChooser);
             panelRef.current.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, async (_event, order, name, description, sec) => {
                 const ids = selectionHelperRef.current.rowIdsAsSet(order);
                 const namedSet = await RestStorageUtils.saveNamedSet(name, itemIDType, ids, options.subType, description, sec);
