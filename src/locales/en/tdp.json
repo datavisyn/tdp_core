@@ -284,7 +284,13 @@
         "of": "of",
         "selected": "selected",
         "scoreAuthorizationRequired": "Authorization required",
-        "scoreAuthorizationRequiredTitle": "{{name}} authorization is required for this score. Click here to authorize."
+        "scoreAuthorizationRequiredTitle": "{{name}} authorization is required for this score. Click here to authorize.",
+
+        "structuredImage": {
+          "errorMessage": "Error: {{message}}",
+          "filterMissingValues": "Filter rows containing missing values",
+          "rendererTitle": "Chemical Structure"
+        }
       }
     },
 
