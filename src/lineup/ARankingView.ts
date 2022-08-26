@@ -75,15 +75,15 @@ export abstract class ARankingView extends AView {
 
   /**
    * clears and rebuilds this lineup instance from scratch
-   * @returns {Promise<any[]>} promise when done
+   * @returns {Promise<void>} promise when done
    */
-  protected rebuild = debounceAsync(() => this.rebuildImpl(), 100);
+  protected rebuild: () => Promise<void> = debounceAsync(() => this.rebuildImpl(), 100);
 
   /**
    * similar to rebuild but just loads new data and keep the columns
-   * @returns {Promise<any[]>} promise when done
+   * @returns {Promise<void>} promise when done
    */
-  protected reloadData = debounceAsync(() => this.reloadDataImpl(), 100);
+  protected reloadData: () => Promise<void> = debounceAsync(() => this.reloadDataImpl(), 100);
 
   /**
    * updates the list of available columns in the side panel
@@ -352,7 +352,8 @@ export abstract class ARankingView extends AView {
    */
   protected initImpl() {
     super.initImpl();
-    return (this.built = this.build());
+    this.built = this.build();
+    return this.built;
   }
 
   /**
@@ -363,28 +364,50 @@ export abstract class ARankingView extends AView {
     return this.options.itemIDType ? IDTypeManager.getInstance().resolveIdType(this.options.itemIDType) : null;
   }
 
-  protected parameterChanged(name: string): PromiseLike<any> | void {
+  /**
+   * The parameter of this (ranking) view has changed and this ranking needs to adapt to the change.
+   * For example, depending on the set `selectionAdapter` additional dynamic columns can be added or
+   * removed for the paramter.
+   * @param name Name of the changed parameter
+   * @returns A promise to wait for until the ranking has been updated by the selection adapter.
+   */
+  protected async parameterChanged(name: string): Promise<void> {
     super.parameterChanged(name);
     if (this.selectionAdapter) {
-      return this.selectionAdapter.parameterChanged(this.built, () => this.createContext());
+      await this.built;
+      return this.selectionAdapter.parameterChanged(this.createSelectionAdapterContext());
     }
-    return undefined;
+    return Promise.resolve();
   }
 
-  protected itemSelectionChanged(): PromiseLike<any> | void {
+  /**
+   * Selection of the current LineUp ranking has changed
+   */
+  protected itemSelectionChanged(): void {
     this.selectionHelper.setItemSelection(this.getItemSelection());
     this.updateLineUpStats();
     super.itemSelectionChanged();
   }
 
-  protected selectionChanged(): PromiseLike<any> | void {
+  /**
+   * Incoming selection from another view has changed and this ranking needs to adapt to the change.
+   * For example, depending on the set `selectionAdapter` additional dynamic columns can be added or
+   * removed for the incoming selected items.
+   * @returns A promise to wait for until the ranking has been updated by the selection adapter.
+   */
+  protected async selectionChanged(): Promise<void> {
     if (this.selectionAdapter) {
-      return this.selectionAdapter.selectionChanged(this.built, () => this.createContext());
+      await this.built;
+      return this.selectionAdapter.selectionChanged(this.createSelectionAdapterContext());
     }
-    return undefined;
+    return Promise.resolve();
   }
 
-  private createContext(): IContext {
+  /**
+   * Creates a selection adapter context
+   * @returns selection adapter context
+   */
+  private createSelectionAdapterContext(): IContext {
     const ranking = this.provider.getLastRanking();
     const columns = ranking ? ranking.flatColumns : [];
     return {
@@ -591,7 +614,7 @@ export abstract class ARankingView extends AView {
   }
 
   protected async withoutTracking<T>(f: () => T): Promise<T> {
-    return this.built.then(() => LineupTrackingManager.getInstance().withoutTracking(this.context.ref, f));
+    return LineupTrackingManager.getInstance().withoutTracking(this.context.ref, f);
   }
 
   /**
@@ -679,7 +702,7 @@ export abstract class ARankingView extends AView {
       .then(() => {
         if (this.selectionAdapter) {
           // init first time
-          return this.selectionAdapter.selectionChanged(null, () => this.createContext());
+          return this.selectionAdapter.selectionChanged(this.createSelectionAdapterContext());
         }
         return undefined;
       })
@@ -719,14 +742,14 @@ export abstract class ARankingView extends AView {
     this.selectionHelper.setItemSelection(this.getItemSelection());
   }
 
-  private reloadDataImpl() {
+  private reloadDataImpl(): Promise<void> {
     return (this.built = Promise.all([this.built, this.loadRows()]).then((r) => {
       const rows: IRow[] = r[1];
       this.setLineUpData(rows);
     }));
   }
 
-  private rebuildImpl() {
+  private rebuildImpl(): Promise<void> {
     return (this.built = this.built.then(() => this.clear().then(() => this.build())));
   }
 

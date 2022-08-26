@@ -1,9 +1,9 @@
 import { merge } from 'lodash';
 import { RemoveNodeObserver } from '../components/RemoveNodeObserver';
-import { HashProperties } from '../base/HashProperties';
-import { PropertyHandler } from '../base/PropertyHandler';
+import { PropertyHandler } from '../base/url/PropertyHandler';
 import { Ajax } from '../base/ajax';
 import { WebpackEnv } from '../base/WebpackEnv';
+import { HashPropertyHandler } from '../base/url';
 export class AppContext {
     constructor() {
         /**
@@ -27,7 +27,7 @@ export class AppContext {
          * access to hash parameters and set them, too
          * @type {HashProperties}
          */
-        this.hash = new HashProperties();
+        this.hash = new HashPropertyHandler();
         /**
          * access to get parameters
          * @type {PropertyHandler}

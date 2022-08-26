@@ -1,5 +1,5 @@
 import { merge, identity } from 'lodash';
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { PHOVEA_IMPORTER_ValueTypeUtils } from './valuetype/valuetypes';
 import { I18nextManager } from '../i18n';
 import { BaseUtils } from '../base';
@@ -117,7 +117,7 @@ export class ImportUtils {
         const prefix = `a${BaseUtils.randomId(3)}`;
         const rows = header.slice(1);
         const cols = data.map((d) => d.shift());
-        const dataRange = d3.range(rows.length * cols.length);
+        const dataRange = d3v3.range(rows.length * cols.length);
         function byIndex(i, v) {
             const m = i % cols.length;
             if (v !== undefined) {

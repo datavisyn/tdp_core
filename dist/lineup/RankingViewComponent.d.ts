@@ -1,4 +1,5 @@
-import { IRankingProps } from './Ranking';
+/// <reference types="react" />
+import type { IRankingProps } from './Ranking';
 import { ISelection } from '../base/interfaces';
 import { ISelectionAdapter } from './selection/ISelectionAdapter';
 import { IAuthorizationConfiguration } from '../auth/interfaces';
@@ -10,7 +11,7 @@ export interface IRankingViewComponentProps extends IRankingProps {
      * Selection of the previous view
      */
     selection?: ISelection;
-    parameters: any;
+    parameters: any[];
     selectionAdapter?: ISelectionAdapter;
     authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
 }

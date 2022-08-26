@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
 import { ProvenanceGraph, SlideNode } from '../provenance';
 
@@ -20,17 +20,17 @@ export class Player {
     step: 1000,
   };
 
-  private $play: d3.Selection<any>;
+  private $play: d3v3.Selection<any>;
 
   constructor(private graph: ProvenanceGraph, controls: Element, options: any = {}) {
     merge(this.options, options);
 
-    const $controls = d3.select(controls);
+    const $controls = d3v3.select(controls);
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const that = this;
 
     this.$play = $controls.select('[data-player="play"]').on('click', function () {
-      const $i = d3.select(this);
+      const $i = d3v3.select(this);
       if ($i.classed('fa-play') && that.start()) {
         $i.classed('fa-play', false).classed('fa-pause', true);
       } else {
@@ -49,8 +49,8 @@ export class Player {
       that.backward();
     });
 
-    d3.select(document).on('keydown.playpause', () => {
-      const k = <KeyboardEvent>d3.event;
+    d3v3.select(document).on('keydown.playpause', () => {
+      const k = <KeyboardEvent>d3v3.event;
       // pause key
       if (k.keyCode === 19) {
         k.preventDefault();

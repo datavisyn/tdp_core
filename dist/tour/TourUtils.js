@@ -1,4 +1,5 @@
-import { GlobalEventHandler, BaseUtils } from '../base';
+import { GlobalEventHandler } from '../base/event';
+import { BaseUtils } from '../base/BaseUtils';
 export class TourUtils {
     /**
      * start a view help tour
@@ -227,7 +228,7 @@ export class TourUtils {
      */
     static isTourVisible() {
         const counter = document.querySelector('.tdp-tour-step-count');
-        return counter.style.display === 'flex'; // visible -> active
+        return counter && counter.style.display === 'flex'; // visible -> active
     }
 }
 TourUtils.GLOBAL_EVENT_START_TOUR = 'tdpStartTour';

@@ -1,8 +1,8 @@
-import d3 from 'd3';
+import d3v3 from 'd3v3';
 import { merge } from 'lodash';
 import { I18nextManager } from '../../i18n';
 import { EColumnTypes, ESupportedPlotlyVis } from '../interfaces';
-import { resolveColumnValues } from '../general/layoutUtils';
+import { columnNameWithDescription, resolveColumnValues } from '../general/layoutUtils';
 export function isPCP(s) {
     return s.type === ESupportedPlotlyVis.PCP;
 }
@@ -68,15 +68,15 @@ export async function createPCPTraces(columns, config, selectedMap) {
             dimensions: allColValues.map((c) => {
                 if (c.type === EColumnTypes.NUMERICAL) {
                     return {
-                        range: [d3.min(c.resolvedValues.map((v) => v.val)), d3.max(c.resolvedValues.map((v) => v.val))],
-                        label: c.info.name,
+                        range: [d3v3.min(c.resolvedValues.map((v) => v.val)), d3v3.max(c.resolvedValues.map((v) => v.val))],
+                        label: columnNameWithDescription(c.info),
                         values: c.resolvedValues.map((v) => v.val),
                     };
                 }
                 const uniqueList = [...new Set(c.resolvedValues.map((v) => v.val))];
                 return {
                     range: [0, uniqueList.length - 1],
-                    label: c.info.name,
+                    label: columnNameWithDescription(c.info),
                     values: c.resolvedValues.map((curr) => uniqueList.indexOf(curr.val)),
                     tickvals: [...uniqueList.keys()],
                     ticktext: uniqueList,
