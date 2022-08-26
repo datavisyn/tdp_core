@@ -220,7 +220,10 @@ export class PHOVEA_UI_FormDialog extends Dialog {
   }
 
   onSubmit(callback: () => boolean) {
-    return this.modalElement.querySelector('.modal-body > form').addEventListener('submit', callback);
+    return this.modalElement.querySelector('.modal-body > form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      return callback();
+    });
   }
 
   /**
