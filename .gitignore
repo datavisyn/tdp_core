@@ -30,6 +30,7 @@ node_modules/
 *.css
 /package-lock.json
 /yarn.lock
+
 # yarn
 .pnp.*
 .yarn/*
@@ -38,3 +39,6 @@ node_modules/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# env
+/env/

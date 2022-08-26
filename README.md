@@ -8,24 +8,46 @@ Target discovery platform for exploring rankings of genes, disease models, and o
 Installation
 ------------
 
-```
-git clone https://github.com/datavisyn/tdp_core.git
+```bash
+git clone -b develop https://github.com/datavisyn/tdp_core.git  # or any other branch you want to develop in
 cd tdp_core
-npm install
+
+# Frontend
+yarn install
+
+# Backend
+python3 -m venv env  # create a new virutal environment
+source env/bin/activate  # active it
+make develop  # install all dependencies
+```
+
+Local development
+------------
+
+```bash
+# Frontend
+yarn start
+
+# Backend
+python tdp_core
 ```
 
 Testing
 -------
 
-```
-npm test
+```bash
+# Frontend
+yarn run test
+
+# Backend
+make test
 ```
 
 Building
 --------
 
 ```
-npm run build
+yarn run build
 ```
 
 
