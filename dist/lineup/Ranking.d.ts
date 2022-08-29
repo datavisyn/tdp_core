@@ -31,6 +31,7 @@ export interface IRankingProps {
 }
 export interface IRankingOptions extends IARankingViewOptions {
     mode: EViewMode;
+    enableCustomVis: boolean;
 }
 export declare function Ranking({ data, itemSelection, columnDesc, options: opts, onContextChanged, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, 
 /**

@@ -16,7 +16,6 @@
     "type": "git",
     "url": "git@github.com:datavisyn/tdp_core.git"
   },
-  "private": false,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
@@ -78,7 +77,7 @@
     "marked": "~3.0.2",
     "md5": "^2.3.0",
     "papaparse": "~5.3.0",
-    "plotly.js-dist-min": "^2.8.3",
+    "plotly.js-dist-min": "~2.12.0",
     "popper.js": "^1.15.0",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",

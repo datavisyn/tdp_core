@@ -1,4 +1,14 @@
-import { IColumnConstructor, IColumnDesc, IDataProviderOptions, ILocalDataProviderOptions, isSupportType, ITypeFactory, LocalDataProvider } from 'lineupjs';
+import {
+  IColumnConstructor,
+  IColumnDesc,
+  IDataProviderOptions,
+  ILocalDataProviderOptions,
+  isSupportType,
+  ITypeFactory,
+  LocalDataProvider,
+  StringColumn,
+} from 'lineupjs';
+import { StructureImageColumn } from '../structureImage';
 
 /**
  * A data provider which changes the default column width from LineUp
@@ -21,8 +31,10 @@ export default class TDPLocalDataProvider extends LocalDataProvider {
       return col;
     }
 
-    if (desc.type === 'string') {
+    if (type === StringColumn) {
       col.setWidthImpl(120); // use `setWidthImpl` instead of `setWidth` to avoid triggering an event
+    } else if (type === StructureImageColumn) {
+      col.setWidthImpl(70);
     } else {
       col.setWidthImpl(102);
     }
