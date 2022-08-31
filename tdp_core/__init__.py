@@ -81,11 +81,16 @@ class VisynPlugin(AVisynPlugin):
         )
 
         # phovea_security_flask
-        # TODO: Add ENV variables to allow disabling
         registry.append(
             "user_stores",
             "alb_security_store",
             "tdp_core.security.store.alb_security_store",
+            {},
+        )
+        registry.append(
+            "user_stores",
+            "no_security_store",
+            "tdp_core.security.store.no_security_store",
             {},
         )
 
