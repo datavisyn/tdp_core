@@ -10,12 +10,11 @@ class PostgreSQLExecutorWithUrl(PostgreSQLExecutor):
     url: str
 
 
-@pytest.fixture(scope="module")
-def database(postgresql_proc) -> PostgreSQLExecutorWithUrl:
+@pytest.fixture(scope="session")
+def postgres_db(postgresql_proc) -> PostgreSQLExecutorWithUrl:
     d = postgresql_proc
     d.url = f"postgresql://{d.user}:{d.password}@{d.host}:{d.port}/{d.dbname}"
     janitor = DatabaseJanitor(d.user, d.host, d.port, d.dbname, d.version, d.password)
     janitor.init()  # import this ONCE in your conftest.py, not in each test module
-
     yield d
     janitor.drop()
