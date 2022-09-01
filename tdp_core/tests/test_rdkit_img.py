@@ -47,7 +47,7 @@ def test_align(client: TestClient):
 
 def test_substructure(client: TestClient):
     res = client.get("/api/rdkit/", params={"structure": "C", "substructure": "C"})
-    hash_compare(res.content, "7b22e41b1fdf3385454b6ae2655e13e49436ce9812e7392bbc389f4f149b055c")
+    hash_compare(res.content, "715c3f878882d5190eae7ec84b3cf937456f2840618256994fc6b2e9d02498ab")
 
 
 def test_murcko(client: TestClient):
@@ -70,7 +70,7 @@ def test_similarity(client: TestClient, mol, ref, expected):
 def test_maximum_common_substructure(client: TestClient):
     res = client.post("/api/rdkit/mcs/", json=["C#CCP", "C=CCO"])
     assert res.status_code == 200
-    hash_compare(res.content, "97d425b6bbe74b15f2b72e2fde973b0780f301281b1a7b2ee154bb0f3dd86c20")
+    hash_compare(res.content, "94f655f787f55ebdf8bf1b85a63ed50652969ce718ffeb89a6289e739b078e3d")
 
 
 def test_maximum_common_substructure_inconsistent(client: TestClient):
