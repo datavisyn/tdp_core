@@ -156,7 +156,7 @@ export function RankingViewComponent({
   }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters, onContextChangedCallback]);
 
   return (
-    <div ref={viewRef} className={`tdp-view lineup lu-taggle lu ${status !== 'success' && 'tdp-busy'}`}>
+    <div ref={viewRef} className="h-100">
       <Ranking
         data={data}
         columnDesc={columnDesc}

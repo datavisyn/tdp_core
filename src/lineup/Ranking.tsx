@@ -659,7 +659,7 @@ export function Ranking({
   }, [busy, itemSelection]);
 
   return (
-    <div className="d-flex h-100 w-100 lineup lu-taggle lu">
+    <div className="d-flex h-100 w-100 tdp-view lineup lu-taggle lu">
       <div ref={lineupContainerRef} className="lineup-container flex-grow-1" />
     </div>
   );
