@@ -163,8 +163,7 @@ export class ARankingView extends AView {
                 defaultHeight: taggleOptions.rowHeight,
                 padding: () => 0,
                 height: (item) => {
-                    var _a;
-                    return (_a = f(item)) !== null && _a !== void 0 ? _a : (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
+                    return f(item) ?? (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
                 },
             });
         }
@@ -412,7 +411,6 @@ export class ARankingView extends AView {
         });
         const data = new Promise((resolve) => {
             (async () => {
-                var _a;
                 // Wait for the column to be initialized
                 const col = await columnPromise;
                 /**
@@ -423,7 +421,7 @@ export class ARankingView extends AView {
                 let done = false;
                 while (!done) {
                     // eslint-disable-next-line no-await-in-loop
-                    await TDPTokenManager.runAuthorizations(await ((_a = score.getAuthorizationConfiguration) === null || _a === void 0 ? void 0 : _a.call(score)), {
+                    await TDPTokenManager.runAuthorizations(await score.getAuthorizationConfiguration?.(), {
                         // eslint-disable-next-line @typescript-eslint/no-loop-func
                         render: ({ authConfiguration, status, error, trigger }) => {
                             const e = error || outsideError;

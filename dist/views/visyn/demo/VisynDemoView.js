@@ -65,9 +65,9 @@ export function VisynDemoView({ desc, parameters, onParametersChanged }) {
     React.useEffect(() => {
         onParametersChanged((p) => ({
             ...p,
-            columns: fetchData(p === null || p === void 0 ? void 0 : p.dataLength),
+            columns: fetchData(p?.dataLength),
         }));
-    }, [parameters === null || parameters === void 0 ? void 0 : parameters.dataLength, onParametersChanged]);
+    }, [parameters?.dataLength, onParametersChanged]);
     return (React.createElement(React.Fragment, null,
         desc.helpText,
         parameters.columns ? (React.createElement(Vis, { columns: parameters.columns, externalConfig: parameters.config, hideSidebar: true, setExternalConfig: (config) => {

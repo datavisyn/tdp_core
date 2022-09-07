@@ -77,7 +77,7 @@ export declare class ObjectNode<T> extends GraphNode implements IObjectRef<T> {
     get category(): string;
     get hash(): string;
     get description(): string;
-    persist(): any;
+    persist(): import("../graph/graph").IGraphNodeDump;
     restore(p: any): this;
     static restore(p: any): ObjectNode<any>;
     toString(): string;

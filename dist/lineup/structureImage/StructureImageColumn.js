@@ -19,7 +19,6 @@ export class StructureImageColumn extends ValueColumn {
         this.align = null;
     }
     filter(row) {
-        var _a;
         if (!this.isFiltered()) {
             return true;
         }
@@ -32,7 +31,7 @@ export class StructureImageColumn extends ValueColumn {
         if (rowLabel == null || rowLabel.trim() === '') {
             return !this.structureFilter.filterMissing;
         }
-        return (_a = this.structureFilter.matching.has(rowLabel)) !== null && _a !== void 0 ? _a : false;
+        return this.structureFilter.matching.has(rowLabel) ?? false;
     }
     isFiltered() {
         return this.structureFilter != null;

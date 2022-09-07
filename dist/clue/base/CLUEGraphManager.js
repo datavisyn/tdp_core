@@ -147,10 +147,15 @@ export class CLUEGraphManager extends EventHandler {
         this.propertyHandler.removeProp('clue_graph');
         window.location.reload();
     }
-    importGraph(dump, remote = false) {
-        (remote ? this.manager.importRemote(dump) : this.manager.importLocal(dump)).then((graph) => {
-            this.loadGraph(graph.desc);
-        });
+    /**
+     * Import a provenance graph dump locally or remotely. After importing the graph the page reloads with the graph id in the URL.
+     * @param dump Dump of the provenance graph
+     * @param remote Import the dump remote or local
+     * @param descOverrides Object with key value to override the desc of the provenance graph (use with caution)
+     */
+    async importGraph(dump, remote = false, descOverrides) {
+        const graph = await (remote ? this.manager.importRemote(dump, descOverrides) : this.manager.importLocal(dump, descOverrides));
+        this.loadGraph(graph.desc);
     }
     importExistingGraph(graph, extras = {}, cleanUpLocal = false) {
         return this.manager.cloneRemote(graph, extras).then((newGraph) => {

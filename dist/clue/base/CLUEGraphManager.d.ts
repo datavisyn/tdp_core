@@ -1,5 +1,5 @@
 import { EventHandler } from '../../base/event';
-import { IProvenanceGraphDataDescription, ProvenanceGraph } from '../provenance';
+import { IProvenanceGraphDataDescription, IProvenanceGraphDump, ProvenanceGraph } from '../provenance';
 import type { MixedStorageProvenanceGraphManager } from '../provenance/MixedStorageProvenanceGraphManager';
 export interface IClueState {
     graph: string;
@@ -83,7 +83,13 @@ export declare class CLUEGraphManager extends EventHandler {
     list(): Promise<IProvenanceGraphDataDescription[]>;
     delete(graph: IProvenanceGraphDataDescription): PromiseLike<boolean>;
     startFromScratch(): void;
-    importGraph(dump: any, remote?: boolean): void;
+    /**
+     * Import a provenance graph dump locally or remotely. After importing the graph the page reloads with the graph id in the URL.
+     * @param dump Dump of the provenance graph
+     * @param remote Import the dump remote or local
+     * @param descOverrides Object with key value to override the desc of the provenance graph (use with caution)
+     */
+    importGraph(dump: IProvenanceGraphDump, remote?: boolean, descOverrides?: any): Promise<void>;
     importExistingGraph(graph: IProvenanceGraphDataDescription, extras?: any, cleanUpLocal?: boolean): Promise<void>;
     migrateGraph(graph: ProvenanceGraph, extras?: any): PromiseLike<ProvenanceGraph>;
     editGraphMetaData(graph: IProvenanceGraphDataDescription, extras?: any): PromiseLike<IProvenanceGraphDataDescription>;
