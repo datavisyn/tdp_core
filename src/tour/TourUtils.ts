@@ -1,5 +1,6 @@
-import { GlobalEventHandler, BaseUtils } from '../base';
-import { IViewTourContext } from './extensions';
+import { GlobalEventHandler } from '../base/event';
+import { BaseUtils } from '../base/BaseUtils';
+import type { IViewTourContext } from './extensions';
 
 export class TourUtils {
   public static readonly GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
@@ -258,6 +259,6 @@ export class TourUtils {
    */
   static isTourVisible(): boolean {
     const counter = document.querySelector<HTMLElement>('.tdp-tour-step-count')!;
-    return counter.style.display === 'flex'; // visible -> active
+    return counter && counter.style.display === 'flex'; // visible -> active
   }
 }

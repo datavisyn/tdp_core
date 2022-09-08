@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { EventHandler } from '../base';
 import { IDataDescription } from '../data';
 export interface IImporterOptions {
@@ -19,6 +19,6 @@ export declare class Importer extends EventHandler {
         desc: IDataDescription;
     };
     static createImporter(parent: Element, options?: IImporterOptions): Importer;
-    static selectFileLogic($dropZone: d3.Selection<any>, $files: d3.Selection<any>, onFileSelected: (file: File) => any, overCssClass?: string): void;
+    static selectFileLogic($dropZone: d3v3.Selection<any>, $files: d3v3.Selection<any>, onFileSelected: (file: File) => any, overCssClass?: string): void;
 }
 //# sourceMappingURL=Importer.d.ts.map

@@ -86,10 +86,6 @@ export class WrapperUtils {
     }
   }
 
-  static useInMemoryGraph() {
-    return AppContext.getInstance().hash.has('clue_headless') || AppContext.getInstance().hash.getProp('clue_graph', '') === 'memory';
-  }
-
   static triggeredByInputField(evt: KeyboardEvent) {
     const src = <HTMLElement>evt.srcElement;
     const elem = <HTMLElement>evt.target;

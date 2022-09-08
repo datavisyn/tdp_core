@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
@@ -126,7 +126,7 @@ class StateRepr {
       const sizePenality = Math.max(-1, -size / 10);
       // combine to a doi value
       const sum = 6 + isSelected + inpath + sizePenality;
-      r.doi = d3.round(Math.max(0, Math.min(10, sum)) / 10, 1);
+      r.doi = d3v3.round(Math.max(0, Math.min(10, sum)) / 10, 1);
 
       if (category + operation + bookmark + tags > 0) {
         // boost to next level if any of the filters apply
@@ -196,9 +196,9 @@ class StateRepr {
               const start = byLevel[i + 1].indexOf(s.children[0]);
               changed = changed || start !== j;
               if (start < j) {
-                byLevel[i + 1].splice.apply(byLevel[i + 1], [start, 0].concat(d3.range(j - start).map((d) => null)));
+                byLevel[i + 1].splice.apply(byLevel[i + 1], [start, 0].concat(d3v3.range(j - start).map((d) => null)));
               } else if (j < start && j > 0) {
-                level.splice.apply(level, [j, 0].concat(d3.range(start - j).map((d) => null)));
+                level.splice.apply(level, [j, 0].concat(d3v3.range(start - j).map((d) => null)));
                 s.xy[0] = start;
                 j = start;
               }
@@ -274,7 +274,7 @@ class StateRepr {
     }"></i></span>`;
   }
 
-  static render($elem: d3.Selection<StateRepr>) {
+  static render($elem: d3v3.Selection<StateRepr>) {
     $elem
       .classed('doi-xs', (d) => d.lod === LevelOfDetail.ExtraSmall)
       .classed('doi-sm', (d) => d.lod === LevelOfDetail.Small)
@@ -309,7 +309,7 @@ class StateRepr {
     const thumbnail = ThumbnailUtils.thumbnail_url(d.graph, d.s, { width: 512, format: 'png' });
     const notes = d.s.getAttr('note', '');
     const starred = d.s.getAttr('starred', false);
-    const $body = d3.select(dia.body);
+    const $body = d3v3.select(dia.body);
     $body.html(`
     <form class="state_info" onsubmit="return false">
       <span class="star ${starred ? 'fas' : 'far'} fa-bookmark" title="${I18nextManager.getInstance().i18n.t('phovea:clue.provvis.bookmarkThisState')}"></span>
@@ -348,7 +348,7 @@ class StateRepr {
 }
 
 export class LayoutedProvVis extends AVisInstance implements IVisInstance {
-  private $node: d3.Selection<any>;
+  private $node: d3v3.Selection<any>;
 
   private trigger = this.update.bind(this);
 
@@ -369,7 +369,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     });
   };
 
-  private line = d3.svg
+  private line = d3v3.svg
     .line<{ cx: number; cy: number }>()
     .interpolate('step-after')
     .x((d) => d.cx)
@@ -407,7 +407,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     );
     this.options.scale = [1, 1];
     this.options.rotate = 0;
-    this.$node = this.build(d3.select(parent));
+    this.$node = this.build(d3v3.select(parent));
     AppContext.getInstance().onDOMNodeRemoved(this.node, this.destroy, this);
 
     if (!this.options.provVisCollapsed) {
@@ -469,7 +469,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     return undefined;
   }
 
-  private build($parent: d3.Selection<any>) {
+  private build($parent: d3v3.Selection<any>) {
     //  scale = this.options.scale;
     let $p = $parent.select('aside.provenance-layout-vis');
     if ($p.empty()) {
@@ -479,7 +479,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     $p.classed('collapsed', this.options.provVisCollapsed).style('transform', `rotate(${this.options.rotate}deg)`);
 
     if (this.options.hideCLUEButtonsOnCollapse && this.options.provVisCollapsed) {
-      d3.select('header.clue-modeselector').classed('collapsed', true);
+      d3v3.select('header.clue-modeselector').classed('collapsed', true);
     }
 
     $p.html(`
@@ -652,7 +652,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       $p.classed('collapsed', collapsed);
 
       if (this.options.hideCLUEButtonsOnCollapse) {
-        d3.select('header.clue-modeselector').classed('collapsed', collapsed);
+        d3v3.select('header.clue-modeselector').classed('collapsed', collapsed);
       }
     });
 
@@ -660,8 +660,8 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
   }
 
   private onStateClick(d: StateRepr) {
-    (<Event>d3.event).stopPropagation();
-    this.data.selectState(d.s, SelectionUtils.toSelectOperation(<MouseEvent>d3.event));
+    (<Event>d3v3.event).stopPropagation();
+    this.data.selectState(d.s, SelectionUtils.toSelectOperation(<MouseEvent>d3v3.event));
     this.data.jumpTo(d.s);
   }
 
@@ -696,32 +696,32 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       })
       .attr('draggable', true)
       .on('dragstart', (d) => {
-        const e = <DragEvent>(<any>d3.event);
+        const e = <DragEvent>(<any>d3v3.event);
         e.dataTransfer.effectAllowed = 'copy'; // none, copy, copyLink, copyMove, link, linkMove, move, all
         e.dataTransfer.setData('text/plain', d.s.name);
         e.dataTransfer.setData('application/phovea-prov-state', String(d.s.id));
       })
       .on('dragenter', function () {
-        if (DnDUtils.getInstance().hasDnDType(<DragEvent>d3.event, 'application/phovea-prov-state')) {
-          d3.select(this).classed('hover', true);
+        if (DnDUtils.getInstance().hasDnDType(<DragEvent>d3v3.event, 'application/phovea-prov-state')) {
+          d3v3.select(this).classed('hover', true);
           return false;
         }
         return undefined;
       })
       .on('dragover', () => {
-        if (DnDUtils.getInstance().hasDnDType(<DragEvent>d3.event, 'application/phovea-prov-state')) {
-          (<Event>d3.event).preventDefault();
-          DnDUtils.getInstance().updateDropEffect(<DragEvent>d3.event);
+        if (DnDUtils.getInstance().hasDnDType(<DragEvent>d3v3.event, 'application/phovea-prov-state')) {
+          (<Event>d3v3.event).preventDefault();
+          DnDUtils.getInstance().updateDropEffect(<DragEvent>d3v3.event);
           return false;
         }
         return undefined;
       })
       .on('dragleave', function () {
-        d3.select(this).classed('hover', false);
+        d3v3.select(this).classed('hover', false);
       })
       .on('drop', function (d) {
-        d3.select(this).classed('hover', false);
-        const e = <DragEvent>(<any>d3.event);
+        d3v3.select(this).classed('hover', false);
+        const e = <DragEvent>(<any>d3v3.event);
         e.preventDefault();
         const state = that.data.getStateById(parseInt(e.dataTransfer.getData('application/phovea-prov-state'), 10));
         that.data.fork(state.creator, d.s);
@@ -752,9 +752,9 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       .attr('class', 'bookmark far fa-bookmark')
       .on('click', function (d) {
         const v = !d.s.getAttr('starred', false);
-        const e = <Event>d3.event;
+        const e = <Event>d3v3.event;
         d.s.setAttr('starred', v);
-        d3.select(this).classed('fas', v).classed('far', !v);
+        d3v3.select(this).classed('fas', v).classed('far', !v);
         e.stopPropagation();
         e.preventDefault();
       });
@@ -762,7 +762,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
       .append('i')
       .attr('class', 'fas fa-edit')
       .on('click', (d) => {
-        const e = <Event>d3.event;
+        const e = <Event>d3v3.event;
         d.showDialog();
         e.stopPropagation();
         e.preventDefault();
@@ -806,8 +806,8 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     });
 
     this.dim = [
-      d3.max(states, (s) => s.xy[0] + s.size[0]) + (lod >= LevelOfDetail.Medium ? 200 : 0), // for label
-      d3.max(states, (s) => s.xy[1] + s.size[1]),
+      d3v3.max(states, (s) => s.xy[0] + s.size[0]) + (lod >= LevelOfDetail.Medium ? 200 : 0), // for label
+      d3v3.max(states, (s) => s.xy[1] + s.size[1]),
     ];
 
     this.$node.select('svg').attr('width', this.dim[0]).attr('height', this.dim[1]);

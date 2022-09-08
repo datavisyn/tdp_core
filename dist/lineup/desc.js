@@ -1,5 +1,5 @@
-import { createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, createRankDesc, } from 'lineupjs';
-import { extent } from 'd3';
+import { createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, createRankDesc } from 'lineupjs';
+import { extent } from 'd3v3';
 export class ColumnDescUtils {
     static baseColumn(column, options = {}) {
         return {
@@ -30,10 +30,10 @@ export class ColumnDescUtils {
      * @param {Partial<IColumnOptions>} options
      * @returns {IAdditionalColumnDesc}
      */
-    static numberCol(column, min = Number.NaN, max = Number.NaN, options = {}) {
+    static numberCol(column, min, max, options = {}) {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
             type: 'number',
-            domain: [min, max],
+            domain: [min || Number.NaN, max || Number.NaN],
         });
     }
     /**

@@ -49,9 +49,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=requirements("requirements.txt"),
-    extras_require={
-        "develop": requirements("requirements_dev.txt"),
-    },
+    extras_require={"develop": requirements("requirements_dev.txt")},
     # Include all files from the MANIFEST.in file.
     include_package_data=True,
     package_data={},

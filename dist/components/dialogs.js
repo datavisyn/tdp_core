@@ -1,7 +1,9 @@
 import '../webpack/_bootstrap';
 import $ from 'jquery';
 import { merge } from 'lodash';
+import { Modal } from 'bootstrap';
 import { I18nextManager } from '../i18n';
+import { TourUtils } from '../tour/TourUtils';
 import { BaseUtils } from '../base/BaseUtils';
 export class Dialog {
     /**
@@ -19,11 +21,10 @@ export class Dialog {
      */
     constructor(title, primaryBtnText = 'OK', additionalCSSClasses = '', backdrop = true) {
         this.bakKeyDownListener = null; // temporal for restoring an old keydown listener
-        const dialog = document.createElement('div');
-        dialog.setAttribute('role', 'dialog');
-        dialog.classList.add('modal', 'fade');
-        // $(dialog).modal({backdrop});
-        dialog.innerHTML = `
+        this.modalElement = document.createElement('div');
+        this.modalElement.setAttribute('role', 'dialog');
+        this.modalElement.classList.add('modal', 'fade');
+        this.modalElement.innerHTML = `
        <div class="modal-dialog ${additionalCSSClasses}" role="document">
         <div class="modal-content" data-testid="${title
             .replace(/<\/?[^>]+(>|$)/g, '')
@@ -42,39 +43,47 @@ export class Dialog {
           </div>
         </div>
       </div>`;
-        document.body.appendChild(dialog);
-        this.$dialog = $(dialog);
+        document.body.appendChild(this.modalElement);
+        this.bsModal = new Modal(this.modalElement, {
+            // Closes the modal when escape key is pressed
+            keyboard: true,
+            // Puts the focus on the modal when initialized and keeps the focus inside modal with a focus trap.
+            // Set focus to `false` if a tour is visible to avoid focus conflicts between this modal and the tour dialog that automatically focus on the next button.
+            // Otherwise the flag is set to `true` and keep the focus on this dialog.
+            focus: TourUtils.isTourVisible() !== true,
+            // Includes a modal-backdrop element. Alternatively, specify static for a backdrop which doesn't close the modal on click.
+            backdrop,
+        });
     }
     show() {
         this.bakKeyDownListener = document.onkeydown;
         document.onkeydown = (evt) => {
             evt = evt || window.event;
-            if (evt.keyCode === 27) {
-                // 27 === ESC key
+            if (evt.key === 'Escape') {
                 this.hide();
             }
         };
         ++Dialog.openDialogs;
-        return this.$dialog.modal('show');
+        return this.bsModal.show();
     }
     hide() {
         document.onkeydown = this.bakKeyDownListener;
-        return this.$dialog.modal('hide');
+        return this.bsModal.hide();
     }
     get body() {
-        return this.$dialog[0].querySelector('.modal-body');
+        return this.modalElement.querySelector('.modal-body');
     }
     get footer() {
-        return this.$dialog.find('.modal-footer')[0];
+        return this.modalElement.querySelector('.modal-footer');
     }
     get header() {
-        return this.$dialog[0].querySelector('.modal-header');
+        return this.modalElement.querySelector('.modal-header');
     }
     onHide(callback) {
-        this.$dialog.on('hidden.bs.modal', callback);
+        this.modalElement.addEventListener('hidden.bs.modal', callback);
     }
     onSubmit(callback) {
-        return this.$dialog.find('.modal-footer > .submit-dialog').on('click', callback);
+        this.modalElement.querySelector('.modal-footer > .submit-dialog').addEventListener('click', callback);
     }
     hideOnSubmit() {
         this.onSubmit(this.hide.bind(this));
@@ -83,7 +92,7 @@ export class Dialog {
         if (--Dialog.openDialogs > 0) {
             $('body').addClass('modal-open');
         }
-        return this.$dialog.remove();
+        return this.bsModal.dispose();
     }
     static generateDialog(title, primaryBtnText = 'OK', additionalCSSClasses = '') {
         return new Dialog(title, primaryBtnText, additionalCSSClasses);
@@ -161,7 +170,10 @@ export class PHOVEA_UI_FormDialog extends Dialog {
         return new FormData(this.form);
     }
     onSubmit(callback) {
-        return this.$dialog.find('.modal-body > form').on('submit', callback);
+        return this.modalElement.querySelector('.modal-body > form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            return callback();
+        });
     }
     /**
      * simple choose dialog

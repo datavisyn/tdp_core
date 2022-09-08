@@ -55,9 +55,29 @@ export interface ITDPOptions {
      */
     showClueModeButtons: boolean;
     /**
-     * default: true
+     * @default true
      */
     enableProvenanceUrlTracking?: boolean;
+    /**
+     * The CLUE parameters can be encoded in the hash '#clue_graph=...' (value: 'hash')
+     * or as query parameters `?clue_graph=...` (value: 'query') in the URL.
+     *
+     * @related clueRewriteOtherProperty
+     * @default hash
+     */
+    cluePropertyHandler?: 'hash' | 'query';
+    /**
+     * If set to `true` it will rewrite incoming URLs of the property handler that is not selected.
+     *
+     * - With `cluePropertyHandler: 'hash'` it rewrites URLs with `?clue_graph=...` to `#clue_graph=...`
+     * - With `cluePropertyHandler: 'query'` it rewrites URLs with `#clue_graph=...` to `?clue_graph=...`
+     *
+     * If this flag is set to `false` the rewrite is disabled.
+     *
+     * @related cluePropertyHandler
+     * @default false
+     */
+    clueRewriteOtherProperty?: boolean;
     /**
      * options passed to the IProvenanceGraphManager
      */

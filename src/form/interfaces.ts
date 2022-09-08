@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { IEventHandler } from '../base';
 
 /**
@@ -217,7 +217,7 @@ export interface IFormElement extends IEventHandler {
    * Build the current element and add the DOM element to the form DOM element.
    * @param $formNode The parent node this element will be attached to
    */
-  build($formNode: d3.Selection<any>): void;
+  build($formNode: d3v3.Selection<any>): void;
 
   /**
    * Initialize the current element

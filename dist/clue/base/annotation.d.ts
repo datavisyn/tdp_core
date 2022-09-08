@@ -1,4 +1,4 @@
-import * as d3 from 'd3';
+import * as d3v3 from 'd3v3';
 import { SlideNode, ProvenanceGraph } from '../provenance';
 export declare class Renderer {
     private $main;
@@ -11,7 +11,7 @@ export declare class Renderer {
     private act;
     private renderer;
     private anchorWatcher;
-    constructor($main: d3.Selection<any>, graph: ProvenanceGraph, options?: {});
+    constructor($main: d3v3.Selection<any>, graph: ProvenanceGraph, options?: {});
     /**
      * renders the given text by replacing variables and rendering markdown, then return the HTML code to display
      *

@@ -1,3 +1,4 @@
+/// <reference types="react" />
 import { LocalDataProvider, IColumnDesc } from 'lineupjs';
 import { ILazyLoadedColumn } from './internal/column';
 import { EViewMode, IAdditionalColumnDesc, IScoreRow, ISelection } from '../base/interfaces';
@@ -30,6 +31,7 @@ export interface IRankingProps {
 }
 export interface IRankingOptions extends IARankingViewOptions {
     mode: EViewMode;
+    enableCustomVis: boolean;
 }
 export declare function Ranking({ data, itemSelection, columnDesc, options: opts, onContextChanged, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, 
 /**
