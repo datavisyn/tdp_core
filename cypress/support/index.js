@@ -15,7 +15,7 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
-// import 'tdp_core/cypress/support/commands';
+// import '@datavisyn/tdp_core/cypress/support/commands';
 // import 'ordino/cypress/support/commands';
 
 // Alternatively you can use CommonJS syntax:

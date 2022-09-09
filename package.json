@@ -1,5 +1,5 @@
 {
-  "name": "tdp_core",
+  "name": "@datavisyn/tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
   "version": "16.0.2-SNAPSHOT",
   "author": {

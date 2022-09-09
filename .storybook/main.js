@@ -17,7 +17,7 @@ module.exports = {
     // These can only be resolved in a workspace currently, and not in the standalone repo.
     config.resolve.alias = {
       ...(config.resolve.alias || {}),
-      'tdp_core/dist': path.resolve(__dirname, '../', 'dist')
+      '@datavisyn/tdp_core/dist': path.resolve(__dirname, '../', 'dist')
     };
     return config;
   },

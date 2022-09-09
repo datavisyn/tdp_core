@@ -16,8 +16,11 @@ def requirements(file):
     return [r.strip() for r in read_it(file).strip().split("\n")]
 
 
+# Normalize the name of @datavisyn/tdp_core to tdp_core
+name = (pkg["name"].split("/")[1] if "/" in pkg["name"] else pkg["name"]).lower()
+
 setup(
-    name=pkg["name"].lower(),
+    name=name,
     version=pkg["version"].replace("-SNAPSHOT", ".dev0"),
     url=pkg["homepage"],
     description=pkg["description"],
@@ -29,7 +32,7 @@ setup(
     license=pkg["license"],
     zip_safe=False,
     entry_points={
-        "visyn.plugin": ["{0} = {0}:VisynPlugin".format(pkg["name"])],
+        "visyn.plugin": ["{0} = {0}:VisynPlugin".format(name)],
     },
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
