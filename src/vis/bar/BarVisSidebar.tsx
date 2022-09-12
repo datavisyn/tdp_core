@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
+import { Container, Divider, Stack } from '@mantine/core';
 import {
   ColumnInfo,
   EBarDirection,
@@ -15,9 +16,7 @@ import {
   EColumnTypes,
 } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
-import { WarningMessage } from '../sidebar/WarningMessage';
 import { GroupSelect } from '../sidebar/GroupSelect';
-import { MultiplesSelect } from '../sidebar/MultiplesSelect';
 import { BarDirectionButtons } from '../sidebar/BarDirectionButtons';
 import { BarGroupTypeButtons } from '../sidebar/BarGroupTypeButtons';
 import { BarDisplayButtons } from '../sidebar/BarDisplayTypeButtons';
@@ -104,63 +103,68 @@ export function BarVisSidebar({
   }, [extensions]);
 
   return (
-    <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
-      <WarningMessage />
+    <Container p={10} fluid sx={{ width: '100%' }}>
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
-      <hr />
-      <SingleColumnSelect
-        callback={(catColumnSelected: ColumnInfo) =>
-          setConfig({
-            ...config,
-            catColumnSelected,
-            multiples: config.multiples && config.multiples.id === catColumnSelected.id ? null : config.multiples,
-            group: config.group && config.group.id === catColumnSelected.id ? null : config.group,
-          })
-        }
-        columns={columns}
-        currentSelected={config.catColumnSelected}
-        type={[EColumnTypes.CATEGORICAL]}
-        label="Categorical Column"
-      />
-      <AggregateTypeSelect
-        aggregateTypeSelectCallback={(aggregateType: EAggregateTypes) => {
-          if (config.aggregateColumn === null) {
-            setConfig({ ...config, aggregateType, aggregateColumn: columns.find((col) => col.type === EColumnTypes.NUMERICAL).info });
-          } else {
-            setConfig({ ...config, aggregateType });
+      <Divider my="sm" />
+      <Stack spacing="sm">
+        <SingleColumnSelect
+          callback={(catColumnSelected: ColumnInfo) =>
+            setConfig({
+              ...config,
+              catColumnSelected,
+              multiples: config.multiples && config.multiples.id === catColumnSelected?.id ? null : config.multiples,
+              group: config.group && config.group.id === catColumnSelected?.id ? null : config.group,
+            })
           }
-        }}
-        aggregateColumnSelectCallback={(aggregateColumn: ColumnInfo) => setConfig({ ...config, aggregateColumn })}
-        columns={columns}
-        currentSelected={config.aggregateType}
-        aggregateColumn={config.aggregateColumn}
-      />
-      <hr />
+          columns={columns}
+          currentSelected={config.catColumnSelected}
+          type={[EColumnTypes.CATEGORICAL]}
+          label="Categorical Column"
+        />
+        <AggregateTypeSelect
+          aggregateTypeSelectCallback={(aggregateType: EAggregateTypes) => {
+            if (config.aggregateColumn === null) {
+              setConfig({ ...config, aggregateType, aggregateColumn: columns.find((col) => col.type === EColumnTypes.NUMERICAL).info });
+            } else {
+              setConfig({ ...config, aggregateType });
+            }
+          }}
+          aggregateColumnSelectCallback={(aggregateColumn: ColumnInfo) => setConfig({ ...config, aggregateColumn })}
+          columns={columns}
+          currentSelected={config.aggregateType}
+          aggregateColumn={config.aggregateColumn}
+        />
+      </Stack>
+      <Divider my="sm" />
       {mergedExtensions.preSidebar}
 
-      {mergedOptionsConfig.group.enable
-        ? mergedOptionsConfig.group.customComponent || (
-            <GroupSelect
-              groupColumnSelectCallback={(group: ColumnInfo) => setConfig({ ...config, group })}
-              groupTypeSelectCallback={(groupType: EBarGroupingType) => setConfig({ ...config, groupType })}
-              groupDisplaySelectCallback={(display: EBarDisplayType) => setConfig({ ...config, display })}
-              displayType={config.display}
-              groupType={config.groupType}
-              columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
-              currentSelected={config.group}
-            />
-          )
-        : null}
-      {mergedOptionsConfig.multiples.enable
-        ? mergedOptionsConfig.multiples.customComponent || (
-            <MultiplesSelect
-              callback={(multiples: ColumnInfo) => setConfig({ ...config, multiples })}
-              columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
-              currentSelected={config.multiples}
-            />
-          )
-        : null}
-      <hr />
+      <Stack spacing="sm">
+        {mergedOptionsConfig.group.enable
+          ? mergedOptionsConfig.group.customComponent || (
+              <GroupSelect
+                groupColumnSelectCallback={(group: ColumnInfo) => setConfig({ ...config, group })}
+                groupTypeSelectCallback={(groupType: EBarGroupingType) => setConfig({ ...config, groupType })}
+                groupDisplaySelectCallback={(display: EBarDisplayType) => setConfig({ ...config, display })}
+                displayType={config.display}
+                groupType={config.groupType}
+                columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
+                currentSelected={config.group}
+              />
+            )
+          : null}
+        {mergedOptionsConfig.multiples.enable
+          ? mergedOptionsConfig.multiples.customComponent || (
+              <SingleColumnSelect
+                callback={(multiples: ColumnInfo) => setConfig({ ...config, multiples })}
+                columns={columns.filter((c) => config.catColumnSelected && c.info.id !== config.catColumnSelected.id)}
+                currentSelected={config.multiples}
+                label="Multiples"
+                type={[EColumnTypes.CATEGORICAL]}
+              />
+            )
+          : null}
+      </Stack>
+      <Divider my="sm" />
       {mergedOptionsConfig.direction.enable
         ? mergedOptionsConfig.direction.customComponent || (
             <BarDirectionButtons callback={(direction: EBarDirection) => setConfig({ ...config, direction })} currentSelected={config.direction} />
@@ -168,6 +172,6 @@ export function BarVisSidebar({
         : null}
 
       {mergedExtensions.postSidebar}
-    </div>
+    </Container>
   );
 }

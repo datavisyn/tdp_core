@@ -2,6 +2,7 @@ import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
+import { Center, Container, Group, Stack, Text } from '@mantine/core';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
@@ -106,6 +107,10 @@ export function ScatterVis({
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selectedMap, config, scales, shapes]);
 
+  useEffect(() => {
+    console.log('im changing', config);
+  }, [config]);
+
   const layout = React.useMemo(() => {
     if (!traces) {
       return null;
@@ -125,6 +130,12 @@ export function ScatterVis({
       font: {
         family: 'Roboto, sans-serif',
       },
+      margin: {
+        t: 25,
+        r: 25,
+        l: 25,
+        b: 25,
+      },
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
@@ -136,12 +147,13 @@ export function ScatterVis({
   }, [traces, config.dragMode]);
 
   return (
-    <div ref={plotlyDivRef} className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
-      <div
-        className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
-          traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
-        }`}
-      >
+    <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
+      <Stack spacing={0} sx={{ height: '100%' }}>
+        <Center>
+          <Group mt="lg">
+            <BrushOptionButtons callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
+          </Group>
+        </Center>
         {mergedExtensions.prePlot}
         {traceStatus === 'success' && traces?.plots.length > 0 ? (
           <PlotlyComponent
@@ -182,13 +194,10 @@ export function ScatterVis({
         ) : traceStatus !== 'pending' ? (
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}
-        <div className="position-absolute d-flex justify-content-center align-items-center top-0 start-50 translate-middle-x">
-          <BrushOptionButtons callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
-          <OpacitySlider callback={(e) => setConfig({ ...config, alphaSliderVal: e })} currentValue={config.alphaSliderVal} />
-        </div>
+
         {mergedExtensions.postPlot}
         {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
-      </div>
+      </Stack>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>
           <ScatterVisSidebar
@@ -201,6 +210,6 @@ export function ScatterVis({
           />
         </VisSidebarWrapper>
       ) : null}
-    </div>
+    </Container>
   );
 }

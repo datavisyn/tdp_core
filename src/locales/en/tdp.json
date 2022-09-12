@@ -181,7 +181,6 @@
       "scatterError": "To create a Scatterplot, please select at least 2 numerical columns.",
       "stripError": "To create a Strip plot, please select at least 1 numerical column.",
       "barError": "To create a Bar chart, please select 1 categorical column.",
-      "pcpError": "To create a Parallel Coordinates Plot, please select at least 2 numerical or categorical columns.",
       "errorHeader": "Invalid Settings",
       "missingValue": "n/a"
     },

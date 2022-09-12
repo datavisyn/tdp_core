@@ -282,13 +282,12 @@ export class LineUpPanelActions extends EventHandler {
             // Then, add the grouped columns with the ordered group and ordered columns
             Array.from(groupedItems.entries())
                 .sort(([aKey, aVal], [bKey, bVal]) => {
-                var _a, _b;
                 // Sort the groups first
                 const { databaseColumnGroups } = this.options;
                 // If both groups have the same order, sort alphabetically
-                return sortOrder((_a = databaseColumnGroups === null || databaseColumnGroups === void 0 ? void 0 : databaseColumnGroups[aKey]) === null || _a === void 0 ? void 0 : _a.order, (_b = databaseColumnGroups === null || databaseColumnGroups === void 0 ? void 0 : databaseColumnGroups[bKey]) === null || _b === void 0 ? void 0 : _b.order) || aKey.localeCompare(bKey);
+                return sortOrder(databaseColumnGroups?.[aKey]?.order, databaseColumnGroups?.[bKey]?.order) || aKey.localeCompare(bKey);
             })
-                .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort((a, b) => { var _a, _b; return sortOrder((_a = a.chooserGroup) === null || _a === void 0 ? void 0 : _a.order, (_b = b.chooserGroup) === null || _b === void 0 ? void 0 : _b.order); }))));
+                .forEach(([key, value]) => items.push(this.groupedDialog(key, value.sort((a, b) => sortOrder(a.chooserGroup?.order, b.chooserGroup?.order)))));
         }
         if (this.options.enableAddingScoreColumns && loadedScorePlugins.length > 0) {
             items.push({

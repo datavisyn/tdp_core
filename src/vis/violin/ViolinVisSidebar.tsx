@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
+import { Container, Divider, Stack } from '@mantine/core';
 import { ColumnInfo, ESupportedPlotlyVis, EViolinOverlay, IViolinConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
-import { WarningMessage } from '../sidebar/WarningMessage';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 import { ViolinOverlayButtons } from '../sidebar/ViolinOverlayButtons';
 
@@ -54,21 +54,22 @@ export function ViolinVisSidebar({
   }, [extensions]);
 
   return (
-    <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
-      <WarningMessage />
+    <Container fluid sx={{ width: '100%' }} p={10}>
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
-      <hr />
-      <NumericalColumnSelect
-        callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
-        columns={columns}
-        currentSelected={config.numColumnsSelected || []}
-      />
-      <CategoricalColumnSelect
-        callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
-        columns={columns}
-        currentSelected={config.catColumnsSelected || []}
-      />
-      <hr />
+      <Divider my="sm" />
+      <Stack spacing="sm">
+        <NumericalColumnSelect
+          callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
+          columns={columns}
+          currentSelected={config.numColumnsSelected || []}
+        />
+        <CategoricalColumnSelect
+          callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
+          columns={columns}
+          currentSelected={config.catColumnsSelected || []}
+        />
+      </Stack>
+      <Divider my="sm" />
       {mergedExtensions.preSidebar}
 
       {mergedOptionsConfig.overlay.enable
@@ -81,6 +82,6 @@ export function ViolinVisSidebar({
         : null}
 
       {mergedExtensions.postSidebar}
-    </div>
+    </Container>
   );
 }

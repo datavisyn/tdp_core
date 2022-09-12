@@ -21,3 +21,4 @@ export * from './utils';
 export * from './views';
 export * from './vis';
 export * from './wrapper';
+export * from './visynApp';

@@ -2,19 +2,12 @@ import { Plotly } from './Plot';
 
 export enum ESupportedPlotlyVis {
   SCATTER = 'Scatter Plot',
-  PCP = 'Parallel Coordinates Plot',
   VIOLIN = 'Violin Plot',
   STRIP = 'Strip Plot',
   BAR = 'Bar Chart',
 }
 
-export const allVisTypes: ESupportedPlotlyVis[] = [
-  ESupportedPlotlyVis.SCATTER,
-  ESupportedPlotlyVis.BAR,
-  ESupportedPlotlyVis.VIOLIN,
-  ESupportedPlotlyVis.STRIP,
-  ESupportedPlotlyVis.PCP,
-];
+export const allVisTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.SCATTER, ESupportedPlotlyVis.BAR, ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP];
 
 export enum EBarDisplayType {
   ABSOLUTE = 'Absolute',
@@ -110,12 +103,7 @@ export interface IBarConfig {
   aggregateColumn: ColumnInfo | null;
 }
 
-export interface IPCPConfig {
-  type: ESupportedPlotlyVis.PCP;
-  allColumnsSelected: ColumnInfo[];
-}
-
-export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
+export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig;
 
 type ValueGetter<T> = () => T | Promise<T>;
 

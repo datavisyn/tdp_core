@@ -19,7 +19,6 @@ import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
-import { isPCP, pcpMergeDefaultConfig, PCPVis } from './pcp';
 import { getCssValue } from '../utils';
 import { useSyncedRef } from '../hooks/useSyncedRef';
 
@@ -148,10 +147,6 @@ export function Vis({
       const newConfig = stripMergeDefaultConfig(columns, inconsistentVisConfig);
       _setVisConfig({ current: newConfig, consistent: newConfig });
     }
-    if (isPCP(inconsistentVisConfig)) {
-      const newConfig = pcpMergeDefaultConfig(columns, inconsistentVisConfig);
-      _setVisConfig({ current: newConfig, consistent: newConfig });
-    }
     if (isBar(inconsistentVisConfig)) {
       const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
       _setVisConfig({ current: newConfig, consistent: newConfig });
@@ -238,18 +233,6 @@ export function Vis({
           selected={selectedMap}
           columns={columns}
           scales={scales}
-          hideSidebar={hideSidebar}
-          showCloseButton={showCloseButton}
-          closeButtonCallback={closeCallback}
-        />
-      ) : null}
-
-      {isPCP(visConfig) ? (
-        <PCPVis
-          config={visConfig}
-          selected={selectedMap}
-          setConfig={setVisConfig}
-          columns={columns}
           hideSidebar={hideSidebar}
           showCloseButton={showCloseButton}
           closeButtonCallback={closeCallback}

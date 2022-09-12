@@ -1,9 +1,6 @@
 import * as React from 'react';
-import Select, { components, MultiValueProps, Props } from 'react-select';
-import { SortableContainer, SortableContainerProps, SortableElement, SortEndHandler, SortableHandle } from 'react-sortable-hoc';
-import { MultiValueGenericProps } from 'react-select/src/components/MultiValue';
+import { MultiSelect } from '@mantine/core';
 import { ColumnInfo, EColumnTypes, VisColumn } from '../interfaces';
-import { formatOptionLabel } from './utils';
 
 interface NumericalColumnSelectProps {
   callback: (s: ColumnInfo[]) => void;
@@ -11,63 +8,21 @@ interface NumericalColumnSelectProps {
   currentSelected: ColumnInfo[];
 }
 
-function arrayMove<T>(array: readonly T[], from: number, to: number) {
-  const slicedArray = array.slice();
-  slicedArray.splice(to < 0 ? array.length + to : to, 0, slicedArray.splice(from, 1)[0]);
-  return slicedArray;
-}
-
-const SortableMultiValue = SortableElement((props: MultiValueProps<ColumnInfo>) => {
-  // this prevents the menu from being opened/closed when the user clicks
-  // on a value to begin dragging it. ideally, detecting a click (instead of
-  // a drag) would still focus the control and toggle the menu
-  const onMouseDown: React.MouseEventHandler<HTMLDivElement> = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-  const innerProps = { ...props.innerProps, onMouseDown };
-  return <components.MultiValue {...props} innerProps={innerProps} />;
-});
-
-const SortableMultiValueLabel = SortableHandle((props: MultiValueGenericProps<ColumnInfo>) => <components.MultiValueLabel {...props} />);
-
-const SortableSelect = SortableContainer(Select) as unknown as React.ComponentClass<Props<ColumnInfo, boolean> & SortableContainerProps>;
-
 export function NumericalColumnSelect({ callback, columns, currentSelected }: NumericalColumnSelectProps) {
   const selectNumOptions = React.useMemo(() => {
-    return columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => c.info);
+    return columns.filter((c) => c.type === EColumnTypes.NUMERICAL).map((c) => ({ value: c.info.id, label: c.info.name }));
   }, [columns]);
 
-  const onSortEnd: SortEndHandler = ({ oldIndex, newIndex }) => {
-    const newValue = arrayMove(currentSelected, oldIndex, newIndex);
-    callback(newValue);
-  };
-
   return (
-    <>
-      <label className="pt-2 pb-1">Numerical Columns</label>
-      <SortableSelect
-        useDragHandle
-        axis="xy"
-        onSortEnd={onSortEnd}
-        distance={4}
-        getHelperDimensions={({ node }) => node.getBoundingClientRect()}
-        closeMenuOnSelect={false}
-        isMulti
-        formatOptionLabel={formatOptionLabel}
-        getOptionLabel={(option) => option.name}
-        getOptionValue={(option) => option.id}
-        onChange={(e: ColumnInfo[]) => {
-          callback(e.map((c) => c));
-        }}
-        components={{
-          MultiValue: SortableMultiValue,
-          MultiValueLabel: SortableMultiValueLabel,
-        }}
-        name="numColumns"
-        options={selectNumOptions}
-        value={currentSelected}
-      />
-    </>
+    <MultiSelect
+      clearable
+      label="Numerical Columns"
+      onChange={(e: string[]) => {
+        callback(columns.filter((c) => e.includes(c.info.id)).map((c) => c.info));
+      }}
+      name="numColumns"
+      data={selectNumOptions}
+      value={currentSelected.map((c) => c.id)}
+    />
   );
 }

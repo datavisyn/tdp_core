@@ -1,4 +1,6 @@
+import { Box, Slider, Stack, Text } from '@mantine/core';
 import * as React from 'react';
+import { useSyncedRef } from '../../hooks';
 
 interface OpacitySliderProps {
   callback: (n: number) => void;
@@ -6,21 +8,29 @@ interface OpacitySliderProps {
 }
 
 export function OpacitySlider({ callback, currentValue }: OpacitySliderProps) {
+  const something = useSyncedRef(callback);
+
   return (
-    <div className="ps-2 pt-0 m-0">
-      <label htmlFor="alphaSlider" className="form-label m-0 p-0">
+    <Stack spacing={0}>
+      <Text weight={500} size={14}>
         Opacity
-      </label>
-      <input
-        type="range"
-        onChange={(e) => callback(+e.currentTarget.value)}
-        className="form-range"
-        value={currentValue}
-        min="=0"
-        max="1"
-        step=".1"
-        id="alphaSlider"
-      />
-    </div>
+      </Text>
+      <Box sx={{ width: '200px' }}>
+        <Slider
+          step={0.05}
+          value={currentValue}
+          max={1}
+          min={0}
+          marks={[
+            { value: 0.2, label: '20%' },
+            { value: 0.5, label: '50%' },
+            { value: 0.8, label: '80%' },
+          ]}
+          onChange={(n) => {
+            something.current?.(n);
+          }}
+        />
+      </Box>
+    </Stack>
   );
 }

@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
+import { Container, Divider, Stack } from '@mantine/core';
 import { ColumnInfo, ESupportedPlotlyVis, IStripConfig, IVisConfig, VisColumn, ICommonVisSideBarProps } from '../interfaces';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
-import { WarningMessage } from '../sidebar/WarningMessage';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 
 const defaultExtensions = {
@@ -18,8 +18,6 @@ export function StripVisSidebar({
   extensions,
   columns,
   setConfig,
-  className = '',
-  style: { width = '20em', ...style } = {},
 }: {
   config: IStripConfig;
   extensions?: {
@@ -36,23 +34,23 @@ export function StripVisSidebar({
   }, [extensions]);
 
   return (
-    <div className={`container pb-3 pt-2 ${className}`} style={{ width, ...style }}>
-      <WarningMessage />
+    <Container p={10} fluid sx={{ width: '100%' }}>
       <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
-      <hr />
-      <NumericalColumnSelect
-        callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
-        columns={columns}
-        currentSelected={config.numColumnsSelected || []}
-      />
-      <CategoricalColumnSelect
-        callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
-        columns={columns}
-        currentSelected={config.catColumnsSelected || []}
-      />
-      <hr />
+      <Divider my="sm" />
+      <Stack spacing="sm">
+        <NumericalColumnSelect
+          callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
+          columns={columns}
+          currentSelected={config.numColumnsSelected || []}
+        />
+        <CategoricalColumnSelect
+          callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
+          columns={columns}
+          currentSelected={config.catColumnsSelected || []}
+        />
+      </Stack>
       {mergedExtensions.preSidebar}
       {mergedExtensions.postSidebar}
-    </div>
+    </Container>
   );
 }
