@@ -1,14 +1,15 @@
 import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
-import { useEffect } from 'react';
-import { Center, Container, Group, Stack, Text } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import { ActionIcon, Center, Container, Group, Stack } from '@mantine/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../general/layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
-import { OpacitySlider } from '../sidebar/OpacitySlider';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
@@ -73,6 +74,7 @@ export function ScatterVis({
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
   const plotlyDivRef = React.useRef(null);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const ro = new ResizeObserver(() => {
@@ -85,20 +87,6 @@ export function ScatterVis({
     if (plotlyDivRef) {
       ro.observe(plotlyDivRef.current);
     }
-
-    if (hideSidebar) {
-      return;
-    }
-
-    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-
-    menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
   }, [id, hideSidebar, plotlyDivRef]);
 
   const mergedExtensions = React.useMemo(() => {
@@ -106,10 +94,6 @@ export function ScatterVis({
   }, [extensions]);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selectedMap, config, scales, shapes]);
-
-  useEffect(() => {
-    console.log('im changing', config);
-  }, [config]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -147,7 +131,10 @@ export function ScatterVis({
   }, [traces, config.dragMode]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
+    <Container fluid sx={{ flexGrow: 1, height: '100%', overflow: 'hidden' }} ref={plotlyDivRef}>
+      <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+        <FontAwesomeIcon icon={faGear} />
+      </ActionIcon>
       <Stack spacing={0} sx={{ height: '100%' }}>
         <Center>
           <Group mt="lg">
@@ -199,7 +186,7 @@ export function ScatterVis({
         {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </Stack>
       {!hideSidebar ? (
-        <VisSidebarWrapper id={id}>
+        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
           <ScatterVisSidebar
             config={config}
             optionsConfig={optionsConfig}

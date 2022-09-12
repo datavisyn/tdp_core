@@ -16,9 +16,10 @@ export function ColorSelect({ callback, numTypeCallback = () => null, currentNum
   return (
     <Stack spacing="sm">
       <Select
+        clearable
         placeholder="Select Column"
         label="Color"
-        onChange={(e) => callback(columns.find((c) => c.info.id === e).info)}
+        onChange={(e) => callback(columns.find((c) => c.info.id === e)?.info)}
         name="colorSelect"
         data={columns.map((c) => ({ value: c.info.id, label: c.info.name }))}
         value={currentSelected?.id}

@@ -2,6 +2,7 @@ import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect } from 'react';
+import { Container } from '@mantine/core';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
@@ -112,42 +113,36 @@ export function ViolinVis({
   }, [traces]);
 
   return (
-    <div ref={plotlyDivRef} className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
-      <div
-        className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
-          traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
-        }`}
-      >
-        {mergedExtensions.prePlot}
+    <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
+      {mergedExtensions.prePlot}
 
-        {traceStatus === 'success' && traces?.plots.length > 0 ? (
-          <PlotlyComponent
-            divId={`plotlyDiv${id}`}
-            data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-            layout={layout}
-            config={{ responsive: true, displayModeBar: false }}
-            useResizeHandler
-            style={{ width: '100%', height: '100%' }}
-            // plotly redraws everything on updates, so you need to reappend title and
-            onUpdate={() => {
-              for (const p of traces.plots) {
-                d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+      {traceStatus === 'success' && traces?.plots.length > 0 ? (
+        <PlotlyComponent
+          divId={`plotlyDiv${id}`}
+          data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
+          layout={layout}
+          config={{ responsive: true, displayModeBar: false }}
+          useResizeHandler
+          style={{ width: '100%', height: '100%' }}
+          // plotly redraws everything on updates, so you need to reappend title and
+          onUpdate={() => {
+            for (const p of traces.plots) {
+              d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
 
-                d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
-              }
-            }}
-          />
-        ) : traceStatus !== 'pending' ? (
-          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
-        ) : null}
-        {mergedExtensions.postPlot}
-        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
-      </div>
+              d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+            }
+          }}
+        />
+      ) : traceStatus !== 'pending' ? (
+        <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
+      ) : null}
+      {mergedExtensions.postPlot}
+      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       {!hideSidebar ? (
         <VisSidebarWrapper id={id}>
           <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}
-    </div>
+    </Container>
   );
 }

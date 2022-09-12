@@ -49,8 +49,6 @@ export function ScatterVisSidebar({
   columns,
   filterCallback = () => null,
   setConfig,
-  className = '',
-  style: { width = '20em', ...style } = {},
 }: {
   config: IScatterConfig;
   optionsConfig?: {
