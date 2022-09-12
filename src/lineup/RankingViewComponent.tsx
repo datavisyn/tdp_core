@@ -156,7 +156,7 @@ export function RankingViewComponent({
   }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters, onContextChangedCallback]);
 
   return (
-    <div ref={viewRef} className="h-100">
+    <div ref={viewRef} className={`h-100 ${status !== 'success' && 'tdp-busy'}`}>
       <Ranking
         data={data}
         columnDesc={columnDesc}
