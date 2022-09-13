@@ -158,6 +158,7 @@ export function ScatterVis({
                 selectionCallback([...selectedList, clickedId]);
               }
             }}
+            className="tdpCoreVis"
             onSelected={(sel) => {
               selectionCallback(sel ? sel.points.map((d) => (d as any).id) : []);
             }}

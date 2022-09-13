@@ -2,7 +2,9 @@ import * as React from 'react';
 import d3 from 'd3v3';
 import { merge, uniqueId, difference } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
-import { Container } from '@mantine/core';
+import { ActionIcon, Container, Space } from '@mantine/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
@@ -187,6 +189,10 @@ export function BarVis({
   return (
     <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
       {mergedExtensions.prePlot}
+      <Space h="xl" />
+      <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+        <FontAwesomeIcon icon={faGear} />
+      </ActionIcon>
       {traceStatus === 'success' && finalTraces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
@@ -195,6 +201,7 @@ export function BarVis({
           config={{ responsive: true, displayModeBar: false }}
           useResizeHandler
           style={{ width: '100%', height: '100%' }}
+          className="tdpCoreVis"
           onClick={(e) => {
             // plotly types here are just wrong. So have to convert to unknown first.
             const selectedPoints: string[] = e.points[0].customdata as unknown as string[];

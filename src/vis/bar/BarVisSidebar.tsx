@@ -119,7 +119,7 @@ export function BarVisSidebar({
           columns={columns}
           currentSelected={config.catColumnSelected}
           type={[EColumnTypes.CATEGORICAL]}
-          label="Categorical Column"
+          label="Categorical column"
         />
         <AggregateTypeSelect
           aggregateTypeSelectCallback={(aggregateType: EAggregateTypes) => {

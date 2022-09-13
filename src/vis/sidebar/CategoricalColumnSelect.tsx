@@ -1,7 +1,6 @@
 import { MultiSelect } from '@mantine/core';
 import * as React from 'react';
 import { ColumnInfo, EColumnTypes, VisColumn } from '../interfaces';
-import { formatOptionLabel } from './utils';
 
 interface CategoricalColumnSelectProps {
   callback: (s: ColumnInfo[]) => void;
@@ -17,7 +16,7 @@ export function CategoricalColumnSelect({ callback, columns, currentSelected }: 
   return (
     <MultiSelect
       placeholder="Select Column"
-      label="Categorical Columns"
+      label="Categorical columns"
       clearable
       onChange={(e) => callback(columns.filter((c) => e.includes(c.info.id)).map((c) => c.info))}
       name="numColumns"

@@ -16,7 +16,7 @@ export function NumericalColumnSelect({ callback, columns, currentSelected }: Nu
   return (
     <MultiSelect
       clearable
-      label="Numerical Columns"
+      label="Numerical columns"
       onChange={(e: string[]) => {
         callback(columns.filter((c) => e.includes(c.info.id)).map((c) => c.info));
       }}
