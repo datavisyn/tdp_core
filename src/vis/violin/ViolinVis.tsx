@@ -1,7 +1,7 @@
 import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Container } from '@mantine/core';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
@@ -61,6 +61,7 @@ export function ViolinVis({
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
 
   const id = React.useMemo(() => uniqueId('ViolinVis'), []);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   const plotlyDivRef = React.useRef(null);
 
@@ -72,21 +73,7 @@ export function ViolinVis({
     if (plotlyDivRef) {
       ro.observe(plotlyDivRef.current);
     }
-
-    if (hideSidebar) {
-      return;
-    }
-
-    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-
-    menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-  }, [id, hideSidebar, plotlyDivRef]);
+  }, [id, plotlyDivRef]);
 
   const layout = React.useMemo(() => {
     if (!traces) {
@@ -99,6 +86,12 @@ export function ViolinVis({
         // @ts-ignore
         itemclick: false,
         itemdoubleclick: false,
+      },
+      margin: {
+        t: 25,
+        r: 25,
+        l: 25,
+        b: 25,
       },
       font: {
         family: 'Roboto, sans-serif',
@@ -139,7 +132,7 @@ export function ViolinVis({
       {mergedExtensions.postPlot}
       {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       {!hideSidebar ? (
-        <VisSidebarWrapper id={id}>
+        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
           <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}

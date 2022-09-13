@@ -21,7 +21,7 @@ export function VisSidebarWrapper({
       padding="sm"
       lockScroll={false}
       overlayOpacity={0}
-      styles={{ drawer: { position: 'absolute' }, root: { position: 'absolute', padding: 0 } }}
+      styles={{ drawer: { position: 'absolute', overflow: 'auto' }, root: { position: 'absolute', padding: 0 }, header: { margin: 0 } }}
       withinPortal
       position="right"
       shadow="xl"
