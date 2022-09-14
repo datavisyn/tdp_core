@@ -57,7 +57,7 @@ export function StripVis({
   }, [extensions]);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createStripTraces, [columns, config, selected, scales]);
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
   const id = React.useMemo(() => uniqueId('StripVis'), []);
 

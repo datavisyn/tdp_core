@@ -83,7 +83,7 @@ export function BarVis({
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
 
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
   // Make sure selected values is right for each plot.
   const finalTraces = useMemo(() => {
