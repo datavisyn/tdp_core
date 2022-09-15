@@ -1,4 +1,4 @@
-import {Select} from '@mantine/core';
+import { Select } from '@mantine/core';
 import * as React from 'react';
 import { useMemo } from 'react';
 import { ColumnInfo, EAggregateTypes, EColumnTypes, VisColumn } from '../interfaces';
@@ -36,11 +36,10 @@ export function AggregateTypeSelect({
   return (
     <>
       <Select
-      label="Aggregate Type"
+        label="Aggregate type"
         onChange={(option) => aggregateTypeSelectCallback(option as EAggregateTypes)}
         name="numColumns"
         data={selectOptions || []}
-        isOptionDisabled={(option) => (option.value === EAggregateTypes.COUNT ? false : !hasNumCols)}
         value={currentSelected || ''}
       />
       {currentSelected !== EAggregateTypes.COUNT ? (

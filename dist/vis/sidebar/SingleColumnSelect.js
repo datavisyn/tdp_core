@@ -1,12 +1,9 @@
+import { Select } from '@mantine/core';
 import * as React from 'react';
-import Select from 'react-select';
-import { formatOptionLabel } from './utils';
 export function SingleColumnSelect({ callback, columns, currentSelected, label, type }) {
-    const selectCatOptions = React.useMemo(() => {
-        return columns.filter((c) => type.includes(c.type)).map((c) => c.info);
+    const filteredColumnsByType = React.useMemo(() => {
+        return columns.filter((c) => type.includes(c.type)).map((c) => ({ value: c.info.id, label: c.info.name }));
     }, [columns, type]);
-    return (React.createElement(React.Fragment, null,
-        React.createElement("label", { className: "pt-2 pb-1" }, label),
-        React.createElement(Select, { closeMenuOnSelect: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (e) => callback(e), name: "numColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => currentSelected?.id === c.id) })));
+    return (React.createElement(Select, { clearable: true, placeholder: "Select column", label: label, onChange: (e) => callback(columns.find((c) => c.info.id === e)?.info), name: "numColumns", data: filteredColumnsByType, value: currentSelected?.id }));
 }
 //# sourceMappingURL=SingleColumnSelect.js.map

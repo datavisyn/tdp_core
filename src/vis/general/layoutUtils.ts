@@ -26,6 +26,7 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
   traces.plots.forEach((t, i) => {
     layoutEdit[`xaxis${i > 0 ? i + 1 : ''}`] = {
       automargin: true,
+      rangemode: 'tozero',
       tickvals: t.xTicks,
       ticktext: t.xTickLabels,
       text: t.xTicks,
@@ -46,6 +47,7 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Plotly.Layout) {
 
     layoutEdit[`yaxis${i > 0 ? i + 1 : ''}`] = {
       automargin: true,
+      rangemode: 'tozero',
       tickvals: t.yTicks,
       ticktext: t.yTickLabels,
       text: t.yTicks,

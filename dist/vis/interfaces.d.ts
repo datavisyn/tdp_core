@@ -2,15 +2,20 @@
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter Plot",
-    PCP = "Parallel Coordinates Plot",
     VIOLIN = "Violin Plot",
     STRIP = "Strip Plot",
-    BAR = "Bar Chart"
+    BAR = "Bar Chart",
+    HEXBIN = "Hexbin Plot"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EBarDisplayType {
     ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
+}
+export declare enum EHexbinOptions {
+    COLOR = "Color",
+    PIE = "Pie",
+    BINS = "Bins"
 }
 export declare enum EBarDirection {
     VERTICAL = "Vertical",
@@ -88,11 +93,17 @@ export interface IBarConfig {
     aggregateType: EAggregateTypes;
     aggregateColumn: ColumnInfo | null;
 }
-export interface IPCPConfig {
-    type: ESupportedPlotlyVis.PCP;
-    allColumnsSelected: ColumnInfo[];
+export interface IHexbinConfig {
+    type: ESupportedPlotlyVis.HEXBIN;
+    numColumnsSelected: ColumnInfo[];
+    color: ColumnInfo | null;
+    hexRadius: number;
+    isOpacityScale: boolean;
+    isSizeScale: boolean;
+    dragMode: EScatterSelectSettings;
+    hexbinOptions: EHexbinOptions;
 }
-export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
+export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IHexbinConfig;
 declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**

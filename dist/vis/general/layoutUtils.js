@@ -21,13 +21,12 @@ export function beautifyLayout(traces, layout) {
     traces.plots.forEach((t, i) => {
         layoutEdit[`xaxis${i > 0 ? i + 1 : ''}`] = {
             automargin: true,
+            rangemode: 'tozero',
             tickvals: t.xTicks,
             ticktext: t.xTickLabels,
             text: t.xTicks,
             showline: false,
-            showspikes: true,
-            spikecolor: 'black',
-            spikethickness: 2,
+            showspikes: false,
             spikedash: 'dash',
             ticks: 'outside',
             title: {
@@ -42,13 +41,12 @@ export function beautifyLayout(traces, layout) {
         };
         layoutEdit[`yaxis${i > 0 ? i + 1 : ''}`] = {
             automargin: true,
+            rangemode: 'tozero',
             tickvals: t.yTicks,
             ticktext: t.yTickLabels,
             text: t.yTicks,
             showline: false,
-            showspikes: true,
-            spikecolor: 'black',
-            spikethickness: 2,
+            showspikes: false,
             spikedash: 'dash',
             ticks: 'outside',
             title: {

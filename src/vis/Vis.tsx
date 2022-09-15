@@ -21,6 +21,8 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { getCssValue } from '../utils';
 import { useSyncedRef } from '../hooks/useSyncedRef';
+import { hexinbMergeDefaultConfig, isHexbin } from './hexbin/utils';
+import { HexbinVis } from './hexbin/HexbinVis';
 
 const DEFAULT_COLORS = [
   getCssValue('visyn-c1'),
@@ -151,6 +153,10 @@ export function Vis({
       const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
       _setVisConfig({ current: newConfig, consistent: newConfig });
     }
+    if (isHexbin(inconsistentVisConfig)) {
+      const newConfig = hexinbMergeDefaultConfig(columns, inconsistentVisConfig);
+      _setVisConfig({ current: newConfig, consistent: newConfig });
+    }
     // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inconsistentVisConfig.type]);
@@ -252,6 +258,10 @@ export function Vis({
           showCloseButton={showCloseButton}
           closeButtonCallback={closeCallback}
         />
+      ) : null}
+
+      {isHexbin(visConfig) ? (
+        <HexbinVis config={visConfig} setConfig={setVisConfig} selectionCallback={selectionCallback} columns={columns} hideSidebar={hideSidebar} />
       ) : null}
     </>
   );

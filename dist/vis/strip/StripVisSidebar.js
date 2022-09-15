@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import { merge } from 'lodash';
+import { Container, Divider, Stack } from '@mantine/core';
 import { VisTypeSelect } from '../sidebar/VisTypeSelect';
 import { NumericalColumnSelect } from '../sidebar/NumericalColumnSelect';
-import { WarningMessage } from '../sidebar/WarningMessage';
 import { CategoricalColumnSelect } from '../sidebar/CategoricalColumnSelect';
 const defaultExtensions = {
     prePlot: null,
@@ -11,17 +11,16 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function StripVisSidebar({ config, extensions, columns, setConfig, className = '', style: { width = '20em', ...style } = {}, }) {
+export function StripVisSidebar({ config, extensions, columns, setConfig, }) {
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
-    return (React.createElement("div", { className: `container pb-3 pt-2 ${className}`, style: { width, ...style } },
-        React.createElement(WarningMessage, null),
+    return (React.createElement(Container, { p: 10, fluid: true, sx: { width: '100%' } },
         React.createElement(VisTypeSelect, { callback: (type) => setConfig({ ...config, type }), currentSelected: config.type }),
-        React.createElement("hr", null),
-        React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),
-        React.createElement(CategoricalColumnSelect, { callback: (catColumnsSelected) => setConfig({ ...config, catColumnsSelected }), columns: columns, currentSelected: config.catColumnsSelected || [] }),
-        React.createElement("hr", null),
+        React.createElement(Divider, { my: "sm" }),
+        React.createElement(Stack, { spacing: "sm" },
+            React.createElement(NumericalColumnSelect, { callback: (numColumnsSelected) => setConfig({ ...config, numColumnsSelected }), columns: columns, currentSelected: config.numColumnsSelected || [] }),
+            React.createElement(CategoricalColumnSelect, { callback: (catColumnsSelected) => setConfig({ ...config, catColumnsSelected }), columns: columns, currentSelected: config.catColumnsSelected || [] })),
         mergedExtensions.preSidebar,
         mergedExtensions.postSidebar));
 }

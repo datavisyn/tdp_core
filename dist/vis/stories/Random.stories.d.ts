@@ -6,5 +6,4 @@ export declare const ScatterPlot: ComponentStory<typeof Vis>;
 export declare const BarChart: ComponentStory<typeof Vis>;
 export declare const ViolinPlot: ComponentStory<typeof Vis>;
 export declare const StripPlot: ComponentStory<typeof Vis>;
-export declare const ParallelCoordinatesPlot: ComponentStory<typeof Vis>;
 //# sourceMappingURL=Random.stories.d.ts.map

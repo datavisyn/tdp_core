@@ -11,12 +11,13 @@ import { useInitVisynApp } from './useInitVisynApp';
  * @param footer Optional footer component to be passed to AppShell
  * @param appShellProps Optional props to be passed directly to AppShell
  * @param loginMenu Optional custom login menu. If not passed, will default to the VisynLoginMenu.
+ * @param headerHeight Optional height for the header, so that you can properly use 100% inside of your application. Does not set the height of the header, just calculates height elsewhere based on this number
  * @param appName Name of application. Used in default login menu and header.
  * @returns
  */
-export function VisynApp({ header = null, navbar = null, aside = null, footer = null, appShellProps = null, children, appName, loginMenu = React.createElement(VisynLoginMenu, { watch: true, appName: appName }), }) {
+export function VisynApp({ header = null, navbar = null, aside = null, footer = null, appShellProps = null, children, appName, headerHeight = 0, loginMenu = React.createElement(VisynLoginMenu, { watch: true, appName: appName }), }) {
     const { status } = useInitVisynApp();
-    return status === 'success' ? (React.createElement(AppShell, { ...appShellProps, navbar: navbar, aside: aside, footer: footer, header: header || React.createElement(VisynHeader, { appName: appName }) },
+    return status === 'success' ? (React.createElement(AppShell, { styles: { root: { height: '100%' }, body: { height: `calc(100% - ${headerHeight}px)` }, main: { minHeight: '0px' } }, ...appShellProps, navbar: navbar, aside: aside, footer: footer, header: header || React.createElement(VisynHeader, { appName: appName }) },
         loginMenu,
         children)) : null;
 }

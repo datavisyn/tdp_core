@@ -5,13 +5,26 @@ export enum ESupportedPlotlyVis {
   VIOLIN = 'Violin Plot',
   STRIP = 'Strip Plot',
   BAR = 'Bar Chart',
+  HEXBIN = 'Hexbin Plot',
 }
 
-export const allVisTypes: ESupportedPlotlyVis[] = [ESupportedPlotlyVis.SCATTER, ESupportedPlotlyVis.BAR, ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP];
+export const allVisTypes: ESupportedPlotlyVis[] = [
+  ESupportedPlotlyVis.SCATTER,
+  ESupportedPlotlyVis.BAR,
+  ESupportedPlotlyVis.VIOLIN,
+  ESupportedPlotlyVis.STRIP,
+  ESupportedPlotlyVis.HEXBIN,
+];
 
 export enum EBarDisplayType {
   ABSOLUTE = 'Absolute',
   NORMALIZED = 'Normalized',
+}
+
+export enum EHexbinOptions {
+  COLOR = 'Color',
+  PIE = 'Pie',
+  BINS = 'Bins',
 }
 
 export enum EBarDirection {
@@ -103,7 +116,18 @@ export interface IBarConfig {
   aggregateColumn: ColumnInfo | null;
 }
 
-export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig;
+export interface IHexbinConfig {
+  type: ESupportedPlotlyVis.HEXBIN;
+  numColumnsSelected: ColumnInfo[];
+  color: ColumnInfo | null;
+  hexRadius: number;
+  isOpacityScale: boolean;
+  isSizeScale: boolean;
+  dragMode: EScatterSelectSettings;
+  hexbinOptions: EHexbinOptions;
+}
+
+export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IHexbinConfig;
 
 type ValueGetter<T> = () => T | Promise<T>;
 
