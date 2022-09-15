@@ -72,7 +72,7 @@ export class TokenManager extends EventHandler {
      */
     async getTokenAsync(id, options) {
         const token = this.tokens.get(id);
-        if (!token && (options === null || options === void 0 ? void 0 : options.wait)) {
+        if (!token && options?.wait) {
             return new Promise((resolve) => {
                 this.on(TokenManager.EVENT_AUTHORIZATION_STORED, (_, storedId, storedToken) => {
                     if (id === storedId) {

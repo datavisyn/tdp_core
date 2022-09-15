@@ -263,7 +263,6 @@ export class AView extends EventHandler {
         return IDTypeManager.getInstance().mapNameToFirstName(this.selection.idtype, this.selection.ids, idType);
     }
     setItemSelection(selection, name = AView.DEFAULT_SELECTION_NAME) {
-        var _a, _b, _c;
         const current = this.itemSelections.get(name);
         if (current && ViewUtils.isSameSelection(current, selection)) {
             return;
@@ -273,21 +272,21 @@ export class AView extends EventHandler {
         // propagate
         if (selection.idtype) {
             if (name === AView.DEFAULT_SELECTION_NAME) {
-                if ((((_a = selection.ids) === null || _a === void 0 ? void 0 : _a.length) || 0) === 0) {
+                if ((selection.ids?.length || 0) === 0) {
                     selection.idtype.clear(SelectionUtils.defaultSelectionType);
                 }
                 else {
                     selection.idtype.select(selection.ids);
                 }
             }
-            else if ((((_b = selection.ids) === null || _b === void 0 ? void 0 : _b.length) || 0) === 0) {
+            else if ((selection.ids?.length || 0) === 0) {
                 selection.idtype.clear(name);
             }
             else {
                 selection.idtype.select(name, selection.ids);
             }
         }
-        const isEmpty = selection == null || selection.idtype == null || (((_c = selection.ids) === null || _c === void 0 ? void 0 : _c.length) || 0) === 0;
+        const isEmpty = selection == null || selection.idtype == null || (selection.ids?.length || 0) === 0;
         if (!(wasEmpty && isEmpty)) {
             // the selection has changed when we really have some new values not just another empty one
             this.itemSelectionChanged(name);
