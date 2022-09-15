@@ -8,7 +8,7 @@ import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
 import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { getCssValue } from '../utils';
 import { useSyncedRef } from '../hooks/useSyncedRef';
-import { isHexbin } from './hexbin/utils';
+import { hexinbMergeDefaultConfig, isHexbin } from './hexbin/utils';
 import { HexbinVis } from './hexbin/HexbinVis';
 const DEFAULT_COLORS = [
     getCssValue('visyn-c1'),
@@ -87,6 +87,10 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
             const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
             _setVisConfig({ current: newConfig, consistent: newConfig });
         }
+        if (isHexbin(inconsistentVisConfig)) {
+            const newConfig = hexinbMergeDefaultConfig(columns, inconsistentVisConfig);
+            _setVisConfig({ current: newConfig, consistent: newConfig });
+        }
         // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [inconsistentVisConfig.type]);
@@ -125,6 +129,6 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
             }, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
         isStrip(visConfig) ? (React.createElement(StripVis, { config: visConfig, selectionCallback: selectionCallback, setConfig: setVisConfig, selected: selectedMap, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
         isBar(visConfig) ? (React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, selectionCallback: selectionCallback, selectedMap: selectedMap, selectedList: selected, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
-        isHexbin(visConfig) ? (React.createElement(HexbinVis, { config: visConfig, setConfig: setVisConfig, selectionCallback: selectionCallback, columns: columns, hideSidebar: hideSidebar })) : null));
+        isHexbin(visConfig) ? (React.createElement(HexbinVis, { config: visConfig, selected: selectedMap, setConfig: setVisConfig, selectionCallback: selectionCallback, columns: columns, hideSidebar: hideSidebar })) : null));
 }
 //# sourceMappingURL=Vis.js.map

@@ -1,3 +1,4 @@
+import { Container } from '@mantine/core';
 import * as hex from 'd3-hexbin';
 import * as d3v7 from 'd3v7';
 import { uniqueId } from 'lodash';
@@ -10,10 +11,10 @@ import { getHexData } from './utils';
 import { XAxis } from './XAxis';
 import { YAxis } from './YAxis';
 const margin = {
-    left: 50,
-    right: 100,
-    top: 50,
-    bottom: 50,
+    left: 52,
+    right: 25,
+    top: 25,
+    bottom: 53,
 };
 function Legend({ categories, filteredCategories, colorScale, onClick, }) {
     return (React.createElement("div", { className: "ms-2 d-flex flex-column" }, categories.map((c) => {
@@ -102,7 +103,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
             const max = d3v7.max(currentX.allValues.map((c) => c.val));
             const newScale = d3v7
                 .scaleLinear()
-                .domain([min, max])
+                .domain([min - min / 20, max + max / 20])
                 .range([margin.left, margin.left + width]);
             if (xRescaleFunc) {
                 xZoomedScale.current = xRescaleFunc(newScale);
@@ -119,7 +120,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
             const max = d3v7.max(currentY.allValues.map((c) => c.val));
             const newScale = d3v7
                 .scaleLinear()
-                .domain([min, max])
+                .domain([min - min / 20, max + max / 20])
                 .range([margin.top + height, margin.top]);
             if (yRescaleFunc) {
                 yZoomedScale.current = yRescaleFunc(newScale);
@@ -266,8 +267,8 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
     }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale, xScale, yScale]);
     // TODO: svg elements seem weird with style/classNames. I can directly put on a transform to a g, for example, but it seems to work
     // differently than if i use style to do so
-    return (React.createElement("div", { ref: ref, className: "mw-100" },
-        React.createElement("svg", { id: id, width: width + margin.left + margin.right, height: height + margin.top + margin.bottom },
+    return (React.createElement(Container, { ref: ref, fluid: true, sx: { width: '100%' } },
+        React.createElement("svg", { className: "hexbinSvg", id: id, width: width + margin.left + margin.right, height: height + margin.top + margin.bottom },
             React.createElement("defs", null,
                 React.createElement("clipPath", { id: "clip" },
                     React.createElement("rect", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` }, width: width, height: height }))),

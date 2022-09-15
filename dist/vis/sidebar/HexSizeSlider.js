@@ -1,7 +1,17 @@
+import { Box, Slider, Stack, Text } from '@mantine/core';
 import * as React from 'react';
+import { useSyncedRef } from '../../hooks';
 export function HexSizeSlider({ callback, currentValue }) {
-    return (React.createElement("div", { className: "ps-2 pt-1 m-0" },
-        React.createElement("label", { htmlFor: "alphaSlider", className: "form-label m-0 p-0" }, "Hex Size"),
-        React.createElement("input", { type: "range", onChange: (e) => callback(+e.currentTarget.value), className: "form-range", value: currentValue, min: "3", max: "30", step: "1", id: "alphaSlider" })));
+    const something = useSyncedRef(callback);
+    return (React.createElement(Stack, { spacing: 0, mb: 15 },
+        React.createElement(Text, { weight: 500, size: 14 }, "Size"),
+        React.createElement(Box, { sx: { width: '200px' } },
+            React.createElement(Slider, { step: 1, value: currentValue, max: 25, min: 5, marks: [
+                    { value: 10, label: '10' },
+                    { value: 15, label: '15' },
+                    { value: 20, label: '20' },
+                ], onChange: (n) => {
+                    something.current?.(n);
+                } }))));
 }
 //# sourceMappingURL=HexSizeSlider.js.map

@@ -1,7 +1,7 @@
 import { EColumnTypes, IVisConfig, VisColumn, IHexbinConfig, VisNumericalValue, VisCategoricalValue, ColumnInfo } from '../interfaces';
 export declare function isHexbin(s: IVisConfig): s is IHexbinConfig;
 export declare const defaultDensityConfig: IHexbinConfig;
-export declare function densityMergeDefaultConfig(columns: VisColumn[], config: IHexbinConfig): IVisConfig;
+export declare function hexinbMergeDefaultConfig(columns: VisColumn[], config: IHexbinConfig): IVisConfig;
 export declare function getHexData(columns: VisColumn[], numColumnsSelected: ColumnInfo[], colorColumn: ColumnInfo | null): Promise<{
     numColVals: {
         resolvedValues: (VisNumericalValue | VisCategoricalValue)[];

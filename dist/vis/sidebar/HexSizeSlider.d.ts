@@ -1,8 +1,8 @@
 /// <reference types="react" />
-interface HexSizeSliderProps {
+interface OpacitySliderProps {
     callback: (n: number) => void;
     currentValue: number;
 }
-export declare function HexSizeSlider({ callback, currentValue }: HexSizeSliderProps): JSX.Element;
+export declare function HexSizeSlider({ callback, currentValue }: OpacitySliderProps): JSX.Element;
 export {};
 //# sourceMappingURL=HexSizeSlider.d.ts.map

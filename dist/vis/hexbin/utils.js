@@ -14,7 +14,7 @@ export const defaultDensityConfig = {
     dragMode: EScatterSelectSettings.RECTANGLE,
     hexbinOptions: EHexbinOptions.COLOR,
 };
-export function densityMergeDefaultConfig(columns, config) {
+export function hexinbMergeDefaultConfig(columns, config) {
     const merged = merge({}, defaultDensityConfig, config);
     const numCols = columns.filter((c) => c.type === EColumnTypes.NUMERICAL);
     if (merged.numColumnsSelected.length === 0 && numCols.length > 1) {

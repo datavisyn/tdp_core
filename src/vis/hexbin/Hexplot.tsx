@@ -151,7 +151,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
 
       const newScale = d3v7
         .scaleLinear()
-        .domain([min, max])
+        .domain([min - min / 20, max + max / 20])
         .range([margin.left, margin.left + width]);
 
       if (xRescaleFunc) {
@@ -173,7 +173,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
 
       const newScale = d3v7
         .scaleLinear()
-        .domain([min, max])
+        .domain([min - min / 20, max + max / 20])
         .range([margin.top + height, margin.top]);
 
       if (yRescaleFunc) {
@@ -376,7 +376,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
   // differently than if i use style to do so
   return (
     <Container ref={ref} fluid sx={{ width: '100%' }}>
-      <svg id={id} width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+      <svg className="hexbinSvg" id={id} width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
         <defs>
           <clipPath id="clip">
             <rect style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }} width={width} height={height} />

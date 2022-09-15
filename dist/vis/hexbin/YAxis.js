@@ -9,7 +9,8 @@ export function YAxis({ yScale, xRange, horizontalPosition }) {
         }));
     }, [yScale]);
     return (React.createElement(React.Fragment, null,
-        React.createElement("path", { transform: `translate(${horizontalPosition}, 0)`, d: ['M', 0, yScale.range()[0], 'V', yScale.range()[1]].join(' '), fill: "none", stroke: "currentColor" }),
+        React.createElement("path", { transform: `translate(${horizontalPosition}, 0)`, d: ['M', 0, yScale.range()[0], 'V', yScale.range()[1]].join(' '), fill: "none", stroke: "lightgray" }),
+        React.createElement("path", { transform: `translate(${xRange[1]}, 0)`, d: ['M', 0, yScale.range()[0], 'V', yScale.range()[1]].join(' '), fill: "none", stroke: "lightgray" }),
         ticks.map(({ value, yOffset }) => (React.createElement("g", { key: value, transform: `translate(${horizontalPosition}, ${yOffset})` },
             React.createElement("line", { x2: "-6", stroke: "currentColor" }),
             React.createElement("line", { x2: `${xRange[1] - xRange[0]}`, stroke: `${value === 0 ? 'black' : 'lightgray'}` }),
