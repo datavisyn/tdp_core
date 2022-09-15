@@ -7,9 +7,9 @@ import type { IDataType, IDataDescription } from '../../data';
 export class AttributeContainer extends EventHandler implements IPersistable {
   private attrMap = new Map<string, any>();
 
-  persist(): any {
+  persist(): { [key: string]: any } {
     if (this.attrMap.size > 0) {
-      const attrs: any = {};
+      const attrs: { [key: string]: any } = {};
       this.attrMap.forEach((v, k) => (attrs[k] = v));
       return { attrs };
     }
@@ -41,7 +41,7 @@ export class AttributeContainer extends EventHandler implements IPersistable {
     return Array.from(this.attrMap.keys());
   }
 
-  restore(persisted: any) {
+  restore(persisted: { [key: string]: any }) {
     if (persisted.attrs) {
       Object.keys(persisted.attrs).forEach((k) => this.attrMap.set(k, persisted.attrs[k]));
     }
@@ -60,6 +60,25 @@ export class AttributeContainer extends EventHandler implements IPersistable {
     return ai - bi;
   }
 }
+
+export interface IGraphNodeDump {
+  /**
+   * Node type
+   * @default node
+   */
+  type: string;
+
+  /**
+   * Id of this node
+   */
+  id: number;
+
+  /**
+   * Additional node attributes
+   */
+  [key: string]: any;
+}
+
 /**
  * a simple graph none
  */
@@ -82,19 +101,47 @@ export class GraphNode extends AttributeContainer {
     return this._id;
   }
 
-  persist(): any {
+  persist(): IGraphNodeDump {
     const r = super.persist();
     r.type = this.type;
     r.id = this.id;
-    return r;
+    return r as IGraphNodeDump;
   }
 
-  restore(persisted: any) {
+  restore(persisted: IGraphNodeDump) {
     super.restore(persisted);
     (<any>this).type = persisted.type;
     this._id = UniqueIdManager.getInstance().flagId('graph_node', persisted.id);
     return this;
   }
+}
+
+export interface IGraphEdgeDump {
+  /**
+   * Edge type
+   * @default edge
+   */
+  type: string;
+
+  /**
+   * Id of this edge
+   */
+  id: number;
+
+  /**
+   * Id of the source node
+   */
+  source: number;
+
+  /**
+   * Id of the target node
+   */
+  target: number;
+
+  /**
+   * Additional node attributes
+   */
+  [key: string]: any;
 }
 
 export class GraphEdge extends AttributeContainer {
@@ -137,13 +184,13 @@ export class GraphEdge extends AttributeContainer {
     return `${this.source} ${this.type} ${this.target}`;
   }
 
-  persist() {
+  persist(): IGraphEdgeDump {
     const r = super.persist();
     r.type = this.type;
     r.id = this.id;
     r.source = this.source?.id;
     r.target = this.target?.id;
-    return r;
+    return r as IGraphEdgeDump;
   }
 
   restore(p: any, nodes?: (id: number) => GraphNode) {

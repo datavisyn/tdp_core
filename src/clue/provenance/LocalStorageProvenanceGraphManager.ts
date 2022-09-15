@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { ProvenanceGraph } from './ProvenanceGraph';
+import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';
 import { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
 import { IProvenanceGraphDataDescription } from './ICmd';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
@@ -87,7 +87,7 @@ export class LocalStorageProvenanceGraphManager implements IProvenanceGraphManag
     return new ProvenanceGraph(pdesc, newGraph);
   }
 
-  async import(json: any, desc: any = {}): Promise<ProvenanceGraph> {
+  async import(json: IProvenanceGraphDump, desc: any = {}): Promise<ProvenanceGraph> {
     const pdesc = this.createDesc(desc);
     const newGraph = await this.getGraph(pdesc);
     newGraph.restoreDump(json, ProvenanceGraphUtils.provenanceGraphFactory());
