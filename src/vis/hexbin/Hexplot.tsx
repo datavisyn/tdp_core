@@ -1,4 +1,4 @@
-import { Container } from '@mantine/core';
+import { Container, Stack, Chip, Tooltip, Box } from '@mantine/core';
 import * as hex from 'd3-hexbin';
 import { HexbinBin } from 'd3-hexbin';
 import * as d3v7 from 'd3v7';
@@ -20,13 +20,6 @@ interface HexagonalBinProps {
   selected?: { [key: string]: boolean };
 }
 
-const margin = {
-  left: 52,
-  right: 25,
-  top: 25,
-  bottom: 53,
-};
-
 function Legend({
   categories,
   filteredCategories,
@@ -39,21 +32,35 @@ function Legend({
   onClick: (string) => void;
 }) {
   return (
-    <div className="ms-2 d-flex flex-column">
+    <Stack sx={{ width: '80px' }} spacing={10}>
       {categories.map((c) => {
         return (
-          <div
-            className={`p-1 mt-2 d-flex align-items-center ${filteredCategories.includes(c) ? '' : 'bg-light'} cursor-pointer`}
-            style={{ borderRadius: 10 }}
-            key={c}
-            onClick={() => onClick(c)}
-          >
-            <div style={{ borderRadius: 100, width: '10px', height: '10px', backgroundColor: colorScale(c) }} />
-            <div className="ms-1">{c}</div>
-          </div>
+          <Tooltip withinPortal key={c} label={c} withArrow arrowSize={6}>
+            <Box>
+              <Chip
+                variant="filled"
+                onClick={() => onClick(c)}
+                checked={false}
+                styles={{
+                  label: {
+                    width: '100%',
+                    backgroundColor: filteredCategories.includes(c) ? 'lightgrey' : `${colorScale(c)} !important`,
+                    textAlign: 'center',
+                    paddingLeft: '10px',
+                    paddingRight: '10px',
+                    overflow: 'hidden',
+                    color: filteredCategories.includes(c) ? 'black' : 'white',
+                    textOverflow: 'ellipsis',
+                  },
+                }}
+              >
+                {c}
+              </Chip>
+            </Box>
+          </Tooltip>
         );
       })}
-    </div>
+    </Stack>
   );
 }
 
@@ -86,6 +93,15 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
 
     return null;
   }, [allColumns?.colorColVals, config.color, colsStatus, filteredCategories]);
+
+  const margin = useMemo(() => {
+    return {
+      left: 52,
+      right: config.color ? 80 : 25,
+      top: 25,
+      bottom: 53,
+    };
+  }, [config.color]);
 
   // getting currentX data values, both original and filtered.
   const currentX = useMemo(() => {
@@ -141,7 +157,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
     return () => {
       ro.disconnect();
     };
-  }, []);
+  }, [margin]);
 
   // create x scale
   const xScale = useMemo(() => {
@@ -370,7 +386,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
         d3v7.select(this).call(brush.move, null);
       }),
     );
-  }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale, xScale, yScale]);
+  }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale, xScale, yScale, margin]);
 
   // TODO: svg elements seem weird with style/classNames. I can directly put on a transform to a g, for example, but it seems to work
   // differently than if i use style to do so
@@ -412,7 +428,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
         </text>
         <rect id={`${id}zoom`} width={width} height={height} opacity={0} pointerEvents={config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none'} />
       </svg>
-      <div className="position-absolute" style={{ left: margin.left + width, top: margin.top }}>
+      <div className="position-absolute" style={{ right: 0, top: margin.top + 60 }}>
         <Legend
           categories={colorScale ? colorScale.domain() : []}
           filteredCategories={colorScale ? filteredCategories : []}

@@ -66,81 +66,81 @@ export function SingleHex({
   let counter = 0;
 
   return (
-    <Tooltip withinPortal label="Hello">
-      <g>
-        {hexbinOption === EHexbinOptions.BINS && isCategorySelected
-          ? catMapKeys.sort().map((key) => {
-              const currPath = cutHex(
-                d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius),
-                isSizeScale ? radiusScale(hexData.length) : hexRadius,
-                counter,
-                Math.ceil(catMap[key] / hexDivisor),
-              );
-              counter += Math.ceil(catMap[key] / hexDivisor);
+    <g>
+      <clipPath id={`${hexData.x},${hexData.y}Clip`}>
+        <path
+          d={d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius)}
+          style={{
+            transform: `translate(${hexData.x}px, ${hexData.y}px)`,
+          }}
+        />
+      </clipPath>
+      {hexbinOption === EHexbinOptions.BINS && isCategorySelected
+        ? catMapKeys.sort().map((key) => {
+            const currPath = cutHex(
+              d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius),
+              isSizeScale ? radiusScale(hexData.length) : hexRadius,
+              counter,
+              Math.ceil(catMap[key] / hexDivisor),
+            );
+            counter += Math.ceil(catMap[key] / hexDivisor);
 
-              return (
+            return (
+              <g key={`${hexData.x},${hexData.y},${key}`} clipPath={isSelected ? `url(#${hexData.x},${hexData.y}Clip)` : null}>
                 <path
-                  id={`${hexData.x},${hexData.y},${key}`}
-                  key={`${hexData.x},${hexData.y},${key}`}
-                  clipPath={`url(#${hexData.x}, ${hexData.y},${key})`}
                   d={currPath}
                   style={{
                     fill: `${colorScale ? colorScale(key) : 'black'}`,
-                    clipPath: `url(#${hexData.x},${hexData.y})`,
                     transform: `translate(${hexData.x}px, ${hexData.y}px)`,
                     stroke: isSelected ? '#E29609' : 'white',
-                    strokeWidth: isSelected ? 10 : 0,
+                    strokeWidth: isSelected ? 3 : 0,
                     fillOpacity: isOpacityScale ? opacityScale(hexData.length) : '1',
                   }}
                 />
-              );
-            })
-          : null}
+              </g>
+            );
+          })
+        : null}
 
-        {hexbinOption === EHexbinOptions.COLOR || !isCategorySelected ? (
+      {hexbinOption === EHexbinOptions.COLOR || !isCategorySelected ? (
+        <g clipPath={isSelected ? `url(#${hexData.x},${hexData.y}Clip)` : null}>
           <path
             d={d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius)}
-            id={`${hexData.x},${hexData.y}`}
-            key={`${hexData.x},${hexData.y}`}
-            clipPath={`url(#${hexData.x},${hexData.y})`}
             style={{
               fill: `${colorScale ? colorScale(topCategory) : 'black'}`,
-              clipPath: `url(#${hexData.x},${hexData.y})`,
               transform: `translate(${hexData.x}px, ${hexData.y}px)`,
               stroke: isSelected ? '#E29609' : 'white',
-              strokeWidth: isSelected ? 10 : 0,
+              strokeWidth: isSelected ? 3 : 0,
               fillOpacity: isOpacityScale ? opacityScale(hexData.length) : '1',
             }}
           />
-        ) : null}
-        {hexbinOption === EHexbinOptions.PIE && isCategorySelected ? (
-          <>
-            {isOpacityScale ? (
+        </g>
+      ) : null}
+      {hexbinOption === EHexbinOptions.PIE && isCategorySelected ? (
+        <>
+          {isOpacityScale ? (
+            <g clipPath={isSelected ? `url(#${hexData.x},${hexData.y}Clip)` : null}>
               <path
                 d={d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius)}
-                id={`${hexData.x},${hexData.y}`}
-                key={`${hexData.x},${hexData.y}`}
-                clipPath={`url(#${hexData.x},${hexData.y})`}
                 style={{
                   fill: `${'black'}`,
-                  clipPath: `url(#${hexData.x},${hexData.y})`,
                   transform: `translate(${hexData.x}px, ${hexData.y}px)`,
                   stroke: isSelected ? '#E29609' : 'white',
-                  strokeWidth: isSelected ? 10 : 0,
+                  strokeWidth: isSelected ? 3 : 0,
                   fillOpacity: opacityScale(hexData.length),
                 }}
               />
-            ) : null}
-            <PieChart
-              data={catMapVals as number[]}
-              dataCategories={catMapKeys}
-              radius={isSizeScale ? radiusScale(hexData.length) / 2 : hexRadius / 2}
-              transform={`translate(${hexData.x}px, ${hexData.y}px)`}
-              colorScale={colorScale}
-            />
-          </>
-        ) : null}
-      </g>
-    </Tooltip>
+            </g>
+          ) : null}
+          <PieChart
+            data={catMapVals as number[]}
+            dataCategories={catMapKeys}
+            radius={isSizeScale ? radiusScale(hexData.length) / 2 : hexRadius / 2}
+            transform={`translate(${hexData.x}px, ${hexData.y}px)`}
+            colorScale={colorScale}
+          />
+        </>
+      ) : null}
+    </g>
   );
 }
