@@ -18,8 +18,10 @@ export class StructureImageColumn extends ValueColumn {
         this.structureFilter = null;
         this.align = null;
     }
+    createEventList() {
+        return super.createEventList().concat([StringColumn.EVENT_FILTER_CHANGED]);
+    }
     filter(row) {
-        var _a;
         if (!this.isFiltered()) {
             return true;
         }
@@ -32,7 +34,7 @@ export class StructureImageColumn extends ValueColumn {
         if (rowLabel == null || rowLabel.trim() === '') {
             return !this.structureFilter.filterMissing;
         }
-        return (_a = this.structureFilter.matching.has(rowLabel)) !== null && _a !== void 0 ? _a : false;
+        return this.structureFilter.matching.has(rowLabel) ?? false;
     }
     isFiltered() {
         return this.structureFilter != null;
@@ -50,6 +52,11 @@ export class StructureImageColumn extends ValueColumn {
             return;
         }
         this.fire([StringColumn.EVENT_FILTER_CHANGED, Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.structureFilter, (this.structureFilter = filter));
+    }
+    clearFilter() {
+        const was = this.isFiltered();
+        this.setFilter(null);
+        return was;
     }
     getAlign() {
         return this.align;
