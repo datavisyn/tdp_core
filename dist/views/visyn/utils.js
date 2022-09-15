@@ -13,18 +13,18 @@ export function setStateActionCaller(valueOrFunction, currentValue) {
     return valueOrFunction;
 }
 export function isVisynViewPluginDesc(desc) {
-    return (desc === null || desc === void 0 ? void 0 : desc.type) === EXTENSION_POINT_VISYN_VIEW;
+    return desc?.type === EXTENSION_POINT_VISYN_VIEW;
 }
 export function isVisynSimpleViewDesc(desc) {
-    return isVisynViewPluginDesc(desc) && (desc === null || desc === void 0 ? void 0 : desc.visynViewType) === 'simple';
+    return isVisynViewPluginDesc(desc) && desc?.visynViewType === 'simple';
 }
 export function isVisynSimpleView(plugin) {
-    return isVisynViewPluginDesc(plugin === null || plugin === void 0 ? void 0 : plugin.desc) && (plugin === null || plugin === void 0 ? void 0 : plugin.viewType) === 'simple';
+    return isVisynViewPluginDesc(plugin?.desc) && plugin?.viewType === 'simple';
 }
 export function isVisynDataViewDesc(desc) {
-    return isVisynViewPluginDesc(desc) && (desc === null || desc === void 0 ? void 0 : desc.visynViewType) === 'data';
+    return isVisynViewPluginDesc(desc) && desc?.visynViewType === 'data';
 }
 export function isVisynDataView(plugin) {
-    return isVisynViewPluginDesc(plugin === null || plugin === void 0 ? void 0 : plugin.desc) && (plugin === null || plugin === void 0 ? void 0 : plugin.viewType) === 'data';
+    return isVisynViewPluginDesc(plugin?.desc) && plugin?.viewType === 'data';
 }
 //# sourceMappingURL=utils.js.map

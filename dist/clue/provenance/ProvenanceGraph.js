@@ -69,7 +69,7 @@ export class ProvenanceGraph extends ADataType {
     }
     selectedStates(type = SelectionUtils.defaultSelectionType) {
         const sel = this.idtypes[ProvenanceGraphDim.State].selections(type);
-        if ((sel === null || sel === void 0 ? void 0 : sel.length) === 0) {
+        if (sel?.length === 0) {
             return [];
         }
         const lookup = new Map();
@@ -85,7 +85,7 @@ export class ProvenanceGraph extends ADataType {
     }
     selectedSlides(type = SelectionUtils.defaultSelectionType) {
         const sel = this.idtypes[ProvenanceGraphDim.Slide].selections(type);
-        if ((sel === null || sel === void 0 ? void 0 : sel.length) === 0) {
+        if (sel?.length === 0) {
             return [];
         }
         const lookup = new Map();

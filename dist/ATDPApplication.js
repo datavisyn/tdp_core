@@ -47,12 +47,11 @@ export class ATDPApplication extends ACLUEWrapper {
      * TODO make public and remove call in constructor in the future
      */
     async initialize() {
-        var _a, _b;
         const configPromise = ATDPApplication.initializeClientConfig(this.options);
         const i18nPromise = I18nextManager.getInstance().initI18n();
         await Promise.all([configPromise, i18nPromise]);
         // Prefill the token manager with authorization configurations
-        if ((_b = (_a = this.options.clientConfig) === null || _a === void 0 ? void 0 : _a.tokenManager) === null || _b === void 0 ? void 0 : _b.authorizationConfigurations) {
+        if (this.options.clientConfig?.tokenManager?.authorizationConfigurations) {
             await TDPTokenManager.addAuthorizationConfiguration(Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({ id, ...config })));
         }
         await this.build(document.body, { replaceBody: false });
@@ -86,12 +85,12 @@ export class ATDPApplication extends ACLUEWrapper {
      */
     static async initializeClientConfig(options) {
         // If the clientConfig is falsy, assume no client configuration should be loaded.
-        if (!(options === null || options === void 0 ? void 0 : options.clientConfig)) {
+        if (!options?.clientConfig) {
             return null;
         }
         // Otherwise, load and merge the configuration into the existing one.
         const parsedConfig = await ATDPApplication.loadClientConfig();
-        options.clientConfig = merge((options === null || options === void 0 ? void 0 : options.clientConfig) || {}, parsedConfig || {});
+        options.clientConfig = merge(options?.clientConfig || {}, parsedConfig || {});
         return options;
     }
     createHeader(parent) {
@@ -171,7 +170,7 @@ export class ATDPApplication extends ACLUEWrapper {
                     size: 'sm',
                 });
             }
-            provenanceMenu === null || provenanceMenu === void 0 ? void 0 : provenanceMenu.setGraph(g);
+            provenanceMenu?.setGraph(g);
         });
         const provVis = VisLoader.loadProvenanceGraphVis(graph, content, {
             thumbnails: false,
