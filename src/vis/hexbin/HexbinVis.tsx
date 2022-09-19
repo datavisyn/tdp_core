@@ -60,7 +60,7 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
             />
           </Group>
         </Center>
-        <SimpleGrid style={{ height: '100%' }}>
+        <SimpleGrid style={{ height: '100%' }} cols={config.numColumnsSelected.length > 2 ? config.numColumnsSelected.length : 1}>
           {config.numColumnsSelected.length < 2 ? (
             <InvalidCols
               headerMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader')}
@@ -78,7 +78,11 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
                           selectionCallback={selectionCallback}
                           selected={selected}
                           config={config}
-                          columns={columns.filter((col) => col.info.id === xCol.id || col.info.id === yCol.id || col.info.id === config.color?.id)}
+                          columns={[
+                            columns.find((col) => col.info.id === yCol.id),
+                            columns.find((col) => col.info.id === xCol.id),
+                            columns.find((col) => col.info.id === config.color?.id),
+                          ]}
                         />
                       );
                     }
@@ -87,7 +91,16 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
                   });
                 })
               ) : (
-                <Hexplot selectionCallback={selectionCallback} selected={selected} config={config} columns={columns} />
+                <Hexplot
+                  selectionCallback={selectionCallback}
+                  selected={selected}
+                  config={config}
+                  columns={[
+                    columns.find((col) => col.info.id === config.numColumnsSelected[0].id),
+                    columns.find((col) => col.info.id === config.numColumnsSelected[1].id),
+                    columns.find((col) => col.info.id === config.color?.id),
+                  ]}
+                />
               )}
               {mergedExtensions.postPlot}
             </>

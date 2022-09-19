@@ -415,7 +415,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
             transform: `translate(${margin.left + width / 2}px, ${margin.top + height + 30}px)`,
           }}
         >
-          {config.numColumnsSelected[0]?.name}
+          {allColumns?.numColVals[0]?.info.name}
         </text>
         <text
           dominantBaseline="middle"
@@ -424,9 +424,16 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
             transform: `translate(10px, ${margin.top + height / 2}px) rotate(-90deg)`,
           }}
         >
-          {config.numColumnsSelected[1]?.name}
+          {allColumns?.numColVals[1]?.info.name}
         </text>
-        <rect id={`${id}zoom`} width={width} height={height} opacity={0} pointerEvents={config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none'} />
+        <rect
+          transform={`translate(${margin.left}, ${margin.top})`}
+          id={`${id}zoom`}
+          width={width}
+          height={height}
+          opacity={0}
+          pointerEvents={config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none'}
+        />
       </svg>
       <div className="position-absolute" style={{ right: 0, top: margin.top + 60 }}>
         <Legend

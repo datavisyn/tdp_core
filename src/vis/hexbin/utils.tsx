@@ -24,8 +24,8 @@ export const defaultDensityConfig: IHexbinConfig = {
   color: null,
   isOpacityScale: true,
   isSizeScale: false,
-  hexRadius: 16,
-  dragMode: EScatterSelectSettings.RECTANGLE,
+  hexRadius: 10,
+  dragMode: EScatterSelectSettings.PAN,
   hexbinOptions: EHexbinOptions.COLOR,
 };
 
@@ -62,9 +62,7 @@ export async function getHexData(
     info: ColumnInfo;
   };
 }> {
-  const numCols: VisNumericalColumn[] = numColumnsSelected
-    .filter((col) => columns.find((c) => c.info.id === col.id))
-    .map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
+  const numCols: VisNumericalColumn[] = [columns[0] as VisNumericalColumn, columns[1] as VisNumericalColumn];
 
   const numColVals = await resolveColumnValues(numCols);
 
