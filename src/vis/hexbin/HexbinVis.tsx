@@ -53,7 +53,11 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
       <Stack spacing={0} sx={{ height: '100%' }}>
         <Center>
           <Group mt="lg">
-            <BrushOptionButtons callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
+            <BrushOptionButtons
+              callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })}
+              options={[EScatterSelectSettings.RECTANGLE, EScatterSelectSettings.PAN]}
+              dragMode={config.dragMode}
+            />
           </Group>
         </Center>
         <SimpleGrid style={{ height: '100%' }}>

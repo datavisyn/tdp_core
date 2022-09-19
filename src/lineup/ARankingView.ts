@@ -71,7 +71,7 @@ export abstract class ARankingView extends AView {
 
   private readonly panel: LineUpPanelActions;
 
-  private readonly generalVis: LineupVisWrapper;
+  private readonly generalVis: Promise<LineupVisWrapper>;
 
   /**
    * clears and rebuilds this lineup instance from scratch
@@ -248,13 +248,29 @@ export abstract class ARankingView extends AView {
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
 
-    this.generalVis = new LineupVisWrapper({
-      provider: this.provider,
-      selectionCallback: (ids: string[]) => {
-        // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
-        this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
-      },
-      doc: this.node.ownerDocument,
+    this.generalVis = import('../vis').then(() => {
+      const newVis = new LineupVisWrapper({
+        provider: this.provider,
+        selectionCallback: (ids: string[]) => {
+          // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+          this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+        },
+        doc: this.node.ownerDocument,
+      });
+
+      if (this.options.enableSidePanel) {
+        this.node.appendChild(newVis.node);
+      }
+
+      this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel: ISelection) => {
+        newVis.updateCustomVis();
+      });
+
+      this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+        newVis.toggleCustomVis();
+      });
+
+      return newVis;
     });
 
     // When a new column desc is added to the provider, update the panel chooser
@@ -276,9 +292,7 @@ export abstract class ARankingView extends AView {
     this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
       this.taggle.zoomIn();
     });
-    this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-      this.generalVis.toggleCustomVis();
-    });
+
     if (this.options.enableOverviewMode) {
       const rule = spaceFillingRule(taggleOptions);
 
@@ -294,7 +308,6 @@ export abstract class ARankingView extends AView {
 
     if (this.options.enableSidePanel) {
       this.node.appendChild(this.panel.node);
-      this.node.appendChild(this.generalVis.node);
       if (this.options.enableSidePanel !== 'top') {
         this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
       }
@@ -302,7 +315,6 @@ export abstract class ARankingView extends AView {
 
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel: ISelection) => {
       this.setItemSelection(sel);
-      this.generalVis.updateCustomVis();
     });
     this.selectionAdapter = this.createSelectionAdapter();
   }
@@ -455,7 +467,9 @@ export abstract class ARankingView extends AView {
     }
 
     this.panel.hide();
-    this.generalVis.hide();
+    this.generalVis.then((vis) => {
+      vis.hide();
+    });
 
     if (this.dump !== null) {
       return;

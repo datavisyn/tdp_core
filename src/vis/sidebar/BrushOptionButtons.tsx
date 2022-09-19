@@ -7,9 +7,14 @@ import { EScatterSelectSettings } from '../interfaces';
 interface BrushOptionProps {
   callback: (dragMode: EScatterSelectSettings) => void;
   dragMode: EScatterSelectSettings;
+  options?: EScatterSelectSettings[];
 }
 
-export function BrushOptionButtons({ callback, dragMode }: BrushOptionProps) {
+export function BrushOptionButtons({
+  callback,
+  dragMode,
+  options = [EScatterSelectSettings.RECTANGLE, EScatterSelectSettings.LASSO, EScatterSelectSettings.PAN, EScatterSelectSettings.ZOOM],
+}: BrushOptionProps) {
   return (
     <SegmentedControl
       value={dragMode}
@@ -19,7 +24,7 @@ export function BrushOptionButtons({ callback, dragMode }: BrushOptionProps) {
         { label: <FontAwesomeIcon icon={faPaintBrush} />, value: EScatterSelectSettings.LASSO },
         { label: <FontAwesomeIcon icon={faArrowsAlt} />, value: EScatterSelectSettings.PAN },
         { label: <FontAwesomeIcon icon={faSearchPlus} />, value: EScatterSelectSettings.ZOOM },
-      ]}
+      ].filter((d) => options.includes(d.value))}
     />
   );
 }
