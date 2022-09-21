@@ -182,4 +182,3 @@ StripPlot.args = {
     ],
   },
 };
-
