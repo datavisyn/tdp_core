@@ -7,7 +7,7 @@ import { Plotly } from '../Plot';
  * @param maxLength Maximum text length (default: 50)
  */
 export function truncateText(text: string, maxLength = 50) {
-  return text.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
+  return text?.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
 }
 
 export function columnNameWithDescription(col: ColumnInfo) {

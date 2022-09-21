@@ -4,7 +4,7 @@
  * @param maxLength Maximum text length (default: 50)
  */
 export function truncateText(text, maxLength = 50) {
-    return text.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
+    return text?.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
 }
 export function columnNameWithDescription(col) {
     return col.description ? `${col.name}: ${col.description}` : col.name;
@@ -20,7 +20,7 @@ export function beautifyLayout(traces, layout) {
     layoutEdit.annotations = [];
     traces.plots.forEach((t, i) => {
         layoutEdit[`xaxis${i > 0 ? i + 1 : ''}`] = {
-            automargin: true,
+            automargin: false,
             rangemode: 'tozero',
             tickvals: t.xTicks,
             ticktext: t.xTickLabels,
@@ -40,7 +40,7 @@ export function beautifyLayout(traces, layout) {
             },
         };
         layoutEdit[`yaxis${i > 0 ? i + 1 : ''}`] = {
-            automargin: true,
+            automargin: false,
             rangemode: 'tozero',
             tickvals: t.yTicks,
             ticktext: t.yTickLabels,

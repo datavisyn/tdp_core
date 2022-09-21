@@ -293,11 +293,11 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
             yScale ? React.createElement(YAxis, { horizontalPosition: margin.left, xRange: [margin.left, width + margin.left], yScale: yZoomedScale.current || yScale }) : null,
             React.createElement("text", { dominantBaseline: "middle", textAnchor: "middle", style: {
                     transform: `translate(${margin.left + width / 2}px, ${margin.top + height + 30}px)`,
-                } }, config.numColumnsSelected[0]?.name),
+                } }, allColumns?.numColVals[0]?.info.name),
             React.createElement("text", { dominantBaseline: "middle", textAnchor: "middle", style: {
                     transform: `translate(10px, ${margin.top + height / 2}px) rotate(-90deg)`,
-                } }, config.numColumnsSelected[1]?.name),
-            React.createElement("rect", { id: `${id}zoom`, width: width, height: height, opacity: 0, pointerEvents: config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none' })),
+                } }, allColumns?.numColVals[1]?.info.name),
+            React.createElement("rect", { transform: `translate(${margin.left}, ${margin.top})`, id: `${id}zoom`, width: width, height: height, opacity: 0, pointerEvents: config.dragMode === EScatterSelectSettings.PAN ? 'auto' : 'none' })),
         React.createElement("div", { className: "position-absolute", style: { right: 0, top: margin.top + 60 } },
             React.createElement(Legend, { categories: colorScale ? colorScale.domain() : [], filteredCategories: colorScale ? filteredCategories : [], colorScale: colorScale || null, onClick: (s) => filteredCategories.includes(s)
                     ? setFilteredCategories(filteredCategories.filter((f) => f !== s))

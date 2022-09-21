@@ -10,8 +10,8 @@ export const defaultDensityConfig = {
     color: null,
     isOpacityScale: true,
     isSizeScale: false,
-    hexRadius: 16,
-    dragMode: EScatterSelectSettings.RECTANGLE,
+    hexRadius: 10,
+    dragMode: EScatterSelectSettings.PAN,
     hexbinOptions: EHexbinOptions.COLOR,
 };
 export function hexinbMergeDefaultConfig(columns, config) {
@@ -32,9 +32,7 @@ export function hexinbMergeDefaultConfig(columns, config) {
     return merged;
 }
 export async function getHexData(columns, numColumnsSelected, colorColumn) {
-    const numCols = numColumnsSelected
-        .filter((col) => columns.find((c) => c.info.id === col.id))
-        .map((c) => columns.find((col) => col.info.id === c.id));
+    const numCols = [columns[0], columns[1]];
     const numColVals = await resolveColumnValues(numCols);
     const colorColVals = await resolveSingleColumn(colorColumn ? columns.find((col) => col.info.id === colorColumn.id) : null);
     return { numColVals, colorColVals };
