@@ -83,8 +83,6 @@ export function ScatterVisSidebar({
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
-  console.log(config);
-
   return (
     <Container fluid sx={{ width: '100%' }} p={10}>
       <Stack spacing={0}>
