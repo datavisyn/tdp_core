@@ -126,7 +126,6 @@ export function ScatterVisSidebar({
         <Stack spacing={30}>
           <OpacitySlider
             callback={(e) => {
-              console.log(e)
               if (config.alphaSliderVal !== e) {
                 setConfig({ ...config, alphaSliderVal: e });
               }
