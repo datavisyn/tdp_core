@@ -1,4 +1,7 @@
 import { Box, Slider, Stack, Text } from '@mantine/core';
+import { debounce } from 'lodash';
+import { useMemo } from 'react';
+
 import * as React from 'react';
 import { useSyncedRef } from '../../hooks';
 
@@ -8,7 +11,11 @@ interface OpacitySliderProps {
 }
 
 export function OpacitySlider({ callback, currentValue }: OpacitySliderProps) {
-  const something = useSyncedRef(callback);
+  const syncedCallback = useSyncedRef(callback);
+
+  const debouncedCallback = useMemo(() => {
+    return debounce((n: number) => syncedCallback.current?.(n), 10);
+  }, [syncedCallback]);
 
   return (
     <Stack spacing={0}>
@@ -27,7 +34,7 @@ export function OpacitySlider({ callback, currentValue }: OpacitySliderProps) {
             { value: 0.8, label: '80%' },
           ]}
           onChange={(n) => {
-            something.current?.(n);
+            debouncedCallback(n);
           }}
         />
       </Box>

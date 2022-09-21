@@ -1,5 +1,4 @@
 import { AppShell, AppShellProps } from '@mantine/core';
-import { Callbacks } from 'jquery';
 import * as React from 'react';
 import { JSXElementConstructor, ReactElement } from 'react';
 import { VisynHeader } from './header/VisynHeader';
