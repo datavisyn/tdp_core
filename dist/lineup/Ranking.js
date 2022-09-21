@@ -446,7 +446,7 @@ onAddScoreColumn, }) {
             //   return selectionAdapter?.selectionChanged(createContext(selection));
             // })
             .then(() => {
-            onBuiltLineUp?.(providerRef.current);
+            onBuiltLineUp?.(providerRef.current, taggleRef.current);
             setBusy(false);
             taggleRef.current.update();
             setBuilt(true);
