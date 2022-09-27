@@ -1,3 +1,4 @@
+import { ICategory } from 'lineupjs';
 import { Ajax } from './ajax';
 import { AppContext } from '../app';
 import { IDTypeLike } from '../idtype';
@@ -123,7 +124,7 @@ export interface IServerColumn {
   /**
    * the categories in case of type=categorical
    */
-  categories?: string[];
+  categories?: string[] | ICategory[];
 
   /**
    * the minimal value in case of type=number
