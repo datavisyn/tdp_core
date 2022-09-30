@@ -97,7 +97,6 @@ export function Ranking({ data = [], itemSelection = { idtype: null, ids: [] }, 
  * Maybe refactor this when using the native lineup implementation of scores
  */
 onAddScoreColumn, }) {
-    var _a, _b;
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
     const options = merge({}, defaults, opts);
@@ -112,7 +111,7 @@ onAddScoreColumn, }) {
     const selectionHelperRef = React.useRef(null);
     const panelRef = React.useRef(null);
     React.useEffect(() => {
-        const sel = (itemSelection === null || itemSelection === void 0 ? void 0 : itemSelection.ids) ? itemSelection : { idtype: null, ids: [] };
+        const sel = itemSelection?.ids ? itemSelection : { idtype: null, ids: [] };
         itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -137,7 +136,6 @@ onAddScoreColumn, }) {
         });
         const data = new Promise((resolve) => {
             (async () => {
-                var _a;
                 // Wait for the column to be initialized
                 const col = await columnPromise;
                 /**
@@ -148,7 +146,7 @@ onAddScoreColumn, }) {
                 let done = false;
                 while (!done) {
                     // eslint-disable-next-line no-await-in-loop
-                    await TDPTokenManager.runAuthorizations(await ((_a = score.getAuthorizationConfiguration) === null || _a === void 0 ? void 0 : _a.call(score)), {
+                    await TDPTokenManager.runAuthorizations(await score.getAuthorizationConfiguration?.(), {
                         // eslint-disable-next-line @typescript-eslint/no-loop-func
                         render: ({ authConfiguration, status, error, trigger }) => {
                             const e = error || outsideError;
@@ -281,8 +279,7 @@ onAddScoreColumn, }) {
                     defaultHeight: taggleOptions.rowHeight,
                     padding: () => 0,
                     height: (item) => {
-                        var _a;
-                        return (_a = f(item)) !== null && _a !== void 0 ? _a : (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
+                        return f(item) ?? (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
                     },
                 });
             }
@@ -331,7 +328,7 @@ onAddScoreColumn, }) {
                 const ids = selectionHelperRef.current.rowIdsAsSet(order);
                 const namedSet = await RestStorageUtils.saveNamedSet(name, itemIDType, ids, options.subType, description, sec);
                 NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
-                onUpdateEntryPoint === null || onUpdateEntryPoint === void 0 ? void 0 : onUpdateEntryPoint(namedSet);
+                onUpdateEntryPoint?.(namedSet);
             });
             panelRef.current.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, async (_event, scoreName, scoreId, p) => {
                 const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
@@ -346,7 +343,7 @@ onAddScoreColumn, }) {
                     // data already loaded use await to get value
                     return { ...r, ...{ data: await r.data } };
                 }));
-                onAddScoreColumn === null || onAddScoreColumn === void 0 ? void 0 : onAddScoreColumn(loadedResults);
+                onAddScoreColumn?.(loadedResults);
             });
             panelRef.current.on(LineUpPanelActions.EVENT_ZOOM_OUT, () => {
                 taggleRef.current.zoomOut();
@@ -401,17 +398,16 @@ onAddScoreColumn, }) {
                 const isEmpty = currentSelection == null || currentSelection.idtype == null || currentSelection.ids.length === 0;
                 if (!(wasEmpty && isEmpty)) {
                     // the selection has changed when we really have some new values not just another empty one
-                    onItemSelectionChanged === null || onItemSelectionChanged === void 0 ? void 0 : onItemSelectionChanged();
+                    onItemSelectionChanged?.();
                 }
-                onItemSelect === null || onItemSelect === void 0 ? void 0 : onItemSelect(current, currentSelection, name);
+                onItemSelect?.(current, currentSelection, name);
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const stringCols = (_b = (_a = providerRef.current) === null || _a === void 0 ? void 0 : _a.getLastRanking()) === null || _b === void 0 ? void 0 : _b.flatColumns.toString();
+    const stringCols = providerRef.current?.getLastRanking()?.flatColumns.toString();
     const columns = useMemo(() => {
-        var _a;
-        const ranking = (_a = providerRef.current) === null || _a === void 0 ? void 0 : _a.getLastRanking();
+        const ranking = providerRef.current?.getLastRanking();
         return ranking ? ranking.flatColumns : [];
         // This dep is needed because the columns are not part of a normal variable, only part of a ref. Probably should think of a better way.
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -423,7 +419,7 @@ onAddScoreColumn, }) {
             add: (columns) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
             remove: (columns) => Promise.resolve(columns.forEach((c) => c.removeMe())),
         };
-        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
+        onContextChanged?.(context);
     }, [addColumn, columns, onContextChanged, colorsRef]);
     const build = React.useMemo(() => async () => {
         setBusy(true);
@@ -442,15 +438,15 @@ onAddScoreColumn, }) {
             // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
             remove: (columns) => Promise.resolve(columns.forEach((c) => c.removeMe())),
         };
-        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(selectionAdapterContext);
-        onCustomizeRanking === null || onCustomizeRanking === void 0 ? void 0 : onCustomizeRanking(LineupUtils.wrapRanking(providerRef.current, ranking));
+        onContextChanged?.(selectionAdapterContext);
+        onCustomizeRanking?.(LineupUtils.wrapRanking(providerRef.current, ranking));
         return (Promise.resolve()
             // TODO: check if this is needed
             // .then(async () => {
             //   return selectionAdapter?.selectionChanged(createContext(selection));
             // })
             .then(() => {
-            onBuiltLineUp === null || onBuiltLineUp === void 0 ? void 0 : onBuiltLineUp(providerRef.current);
+            onBuiltLineUp?.(providerRef.current);
             setBusy(false);
             taggleRef.current.update();
             setBuilt(true);
@@ -514,6 +510,7 @@ onAddScoreColumn, }) {
             selectionHelperRef.current.setItemSelection(itemSelection);
         }
     }, [busy, itemSelection]);
-    return React.createElement("div", { ref: lineupContainerRef, className: "lineup-container" });
+    return (React.createElement("div", { className: "d-flex h-100 w-100 tdp-view lineup lu-taggle lu" },
+        React.createElement("div", { ref: lineupContainerRef, className: "lineup-container flex-grow-1" })));
 }
 //# sourceMappingURL=Ranking.js.map

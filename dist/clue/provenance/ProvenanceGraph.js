@@ -69,7 +69,7 @@ export class ProvenanceGraph extends ADataType {
     }
     selectedStates(type = SelectionUtils.defaultSelectionType) {
         const sel = this.idtypes[ProvenanceGraphDim.State].selections(type);
-        if ((sel === null || sel === void 0 ? void 0 : sel.length) === 0) {
+        if (sel?.length === 0) {
             return [];
         }
         const lookup = new Map();
@@ -85,7 +85,7 @@ export class ProvenanceGraph extends ADataType {
     }
     selectedSlides(type = SelectionUtils.defaultSelectionType) {
         const sel = this.idtypes[ProvenanceGraphDim.Slide].selections(type);
-        if ((sel === null || sel === void 0 ? void 0 : sel.length) === 0) {
+        if (sel?.length === 0) {
             return [];
         }
         const lookup = new Map();
@@ -541,10 +541,11 @@ export class ProvenanceGraph extends ADataType {
         return s;
     }
     persist() {
-        const r = this.backend.persist();
-        r.act = this.act ? this.act.id : null;
-        r.lastAction = this.lastAction ? this.lastAction.id : null;
-        return r;
+        return {
+            ...this.backend.persist(),
+            act: this.act ? this.act.id : null,
+            lastAction: this.lastAction ? this.lastAction.id : null,
+        };
     }
     /*
      restore(persisted: any) {

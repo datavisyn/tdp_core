@@ -1,7 +1,7 @@
 import { EventHandler } from '../../base/event';
 import { UserSession } from '../../app';
 import { I18nextManager } from '../../i18n';
-import { IProvenanceGraphDataDescription, ProvenanceGraph } from '../provenance';
+import { IProvenanceGraphDataDescription, IProvenanceGraphDump, ProvenanceGraph } from '../provenance';
 import type { MixedStorageProvenanceGraphManager } from '../provenance/MixedStorageProvenanceGraphManager';
 import { CommonPropertyHandler, HashPropertyHandler, QueryPropertyHandler } from '../../base/url';
 
@@ -226,10 +226,15 @@ export class CLUEGraphManager extends EventHandler {
     window.location.reload();
   }
 
-  importGraph(dump: any, remote = false) {
-    (remote ? this.manager.importRemote(dump) : this.manager.importLocal(dump)).then((graph) => {
-      this.loadGraph(graph.desc);
-    });
+  /**
+   * Import a provenance graph dump locally or remotely. After importing the graph the page reloads with the graph id in the URL.
+   * @param dump Dump of the provenance graph
+   * @param remote Import the dump remote or local
+   * @param descOverrides Object with key value to override the desc of the provenance graph (use with caution)
+   */
+  async importGraph(dump: IProvenanceGraphDump, remote = false, descOverrides?: any) {
+    const graph = await (remote ? this.manager.importRemote(dump, descOverrides) : this.manager.importLocal(dump, descOverrides));
+    this.loadGraph(graph.desc);
   }
 
   importExistingGraph(graph: IProvenanceGraphDataDescription, extras: any = {}, cleanUpLocal = false) {
