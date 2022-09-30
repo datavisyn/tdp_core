@@ -161,10 +161,9 @@ export class TDPApplicationUtils {
         return {
             node: div,
             resolve: (data) => {
-                var _a;
                 const oths = toSet(data.get('permission_others').toString());
                 const grp = toSet(data.get('permission_group').toString());
-                const groupName = (_a = data.get('permission_group_name')) === null || _a === void 0 ? void 0 : _a.toString();
+                const groupName = data.get('permission_group_name')?.toString();
                 const bddies = toSet(data.get('permission_buddies').toString());
                 const buddiesName = data
                     .get('permission_buddies_name')

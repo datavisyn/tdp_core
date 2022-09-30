@@ -17,10 +17,12 @@ export declare class StructureImageColumn extends ValueColumn<string> {
     protected structureFilter: IStructureImageFilter | null;
     protected align: string | null;
     constructor(id: string, desc: Readonly<IValueColumnDesc<string>>);
+    protected createEventList(): string[];
     filter(row: IDataRow): boolean;
     isFiltered(): boolean;
     getFilter(): IStructureImageFilter;
     setFilter(filter: IStructureImageFilter | null): void;
+    clearFilter(): boolean;
     getAlign(): string | null;
     setAlign(structure: string | null): void;
 }

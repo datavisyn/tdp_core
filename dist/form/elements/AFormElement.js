@@ -44,12 +44,11 @@ export class AFormElement extends EventHandler {
         return this.elementDesc.required;
     }
     validate() {
-        var _a;
         if (!this.isVisible() || !this.isRequired()) {
             return true;
         }
         const v = this.hasValue();
-        (_a = this.$inputNode) === null || _a === void 0 ? void 0 : _a.classed('is-invalid', !v);
+        this.$inputNode?.classed('is-invalid', !v);
         return v;
     }
     hasValue() {

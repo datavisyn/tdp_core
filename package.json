@@ -1,7 +1,7 @@
 {
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
-  "version": "16.0.1",
+  "version": "16.1.0",
   "author": {
     "name": "datavisyn GmbH",
     "email": "contact@datavisyn.io",

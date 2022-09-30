@@ -1,4 +1,4 @@
-import { ProvenanceGraph } from './ProvenanceGraph';
+import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';
 import { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
 import { IProvenanceGraphDataDescription } from './ICmd';
 import { GraphBase } from '../graph/GraphBase';
@@ -29,7 +29,7 @@ export declare class LocalStorageProvenanceGraphManager implements IProvenanceGr
     getGraph(desc: IProvenanceGraphDataDescription): PromiseLike<LocalStorageGraph>;
     get(desc: IProvenanceGraphDataDescription): Promise<ProvenanceGraph>;
     clone(graph: GraphBase, desc?: any): Promise<ProvenanceGraph>;
-    import(json: any, desc?: any): Promise<ProvenanceGraph>;
+    import(json: IProvenanceGraphDump, desc?: any): Promise<ProvenanceGraph>;
     delete(desc: IProvenanceGraphDataDescription): Promise<boolean>;
     edit(graph: ProvenanceGraph | IProvenanceGraphDataDescription, desc?: any): Promise<IProvenanceGraphDataDescription>;
     private createDesc;

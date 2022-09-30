@@ -3,12 +3,16 @@ import { EventHandler } from '../../base/event';
 import type { IDataType, IDataDescription } from '../../data';
 export declare class AttributeContainer extends EventHandler implements IPersistable {
     private attrMap;
-    persist(): any;
+    persist(): {
+        [key: string]: any;
+    };
     setAttr(attr: string, value: any): void;
     hasAttr(attr: string): boolean;
     getAttr(attr: string, defaultValue?: any): any;
     get attrs(): string[];
-    restore(persisted: any): this;
+    restore(persisted: {
+        [key: string]: any;
+    }): this;
     /**
      * comparator by index
      * @param a
@@ -16,6 +20,21 @@ export declare class AttributeContainer extends EventHandler implements IPersist
      * @returns {number}
      */
     static byIndex(a: AttributeContainer, b: AttributeContainer): number;
+}
+export interface IGraphNodeDump {
+    /**
+     * Node type
+     * @default node
+     */
+    type: string;
+    /**
+     * Id of this node
+     */
+    id: number;
+    /**
+     * Additional node attributes
+     */
+    [key: string]: any;
 }
 /**
  * a simple graph none
@@ -27,8 +46,31 @@ export declare class GraphNode extends AttributeContainer {
     private _id;
     constructor(type?: string, id?: number);
     get id(): number;
-    persist(): any;
-    restore(persisted: any): this;
+    persist(): IGraphNodeDump;
+    restore(persisted: IGraphNodeDump): this;
+}
+export interface IGraphEdgeDump {
+    /**
+     * Edge type
+     * @default edge
+     */
+    type: string;
+    /**
+     * Id of this edge
+     */
+    id: number;
+    /**
+     * Id of the source node
+     */
+    source: number;
+    /**
+     * Id of the target node
+     */
+    target: number;
+    /**
+     * Additional node attributes
+     */
+    [key: string]: any;
 }
 export declare class GraphEdge extends AttributeContainer {
     readonly type: string;
@@ -40,7 +82,7 @@ export declare class GraphEdge extends AttributeContainer {
     private init;
     takeDown(): void;
     toString(): string;
-    persist(): any;
+    persist(): IGraphEdgeDump;
     restore(p: any, nodes?: (id: number) => GraphNode): this;
     static isGraphType(type: string | RegExp): (edge: GraphEdge) => boolean;
 }

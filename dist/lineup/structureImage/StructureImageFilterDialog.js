@@ -1,7 +1,6 @@
 import { ADialog } from 'lineupjs';
 import { debounce } from 'lodash';
 import { I18nextManager } from '../../i18n';
-import { StructureImageColumn } from './StructureImageColumn';
 // copied from lineupjs
 function findFilterMissing(node) {
     return node.getElementsByClassName('lu-filter-missing')[0].previousElementSibling;
@@ -49,9 +48,9 @@ export class StructureImageFilterDialog extends ADialog {
             this.column.setFilter(null);
             return;
         }
-        const columnType = Object.entries(this.ctx.provider.columnTypes).find(([key, value]) => value === StructureImageColumn)[0];
-        // FIXME find a better way to get all data for the structured image column from the data provider
-        const structures = this.ctx.provider.data.map((row) => row[columnType]) || [];
+        const provider = this.ctx.provider;
+        const data = provider.viewRawRows(provider.getFirstRanking().getOrder());
+        const structures = data.map((d) => this.column.getValue(d));
         // empty input field, but missing values checkbox is checked
         if (filter == null && filterMissing) {
             this.column.setFilter({ filter, filterMissing, matching: new Set(structures) }); // pass all structures as set and filter missing values in column.filter()
