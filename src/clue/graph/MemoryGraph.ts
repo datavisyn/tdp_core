@@ -1,5 +1,5 @@
 import { IPersistable } from '../../base/IPersistable';
-import { GraphBase, GraphFactoryUtils, IGraphFactory } from './GraphBase';
+import { GraphBase, GraphFactoryUtils, IGraphDump, IGraphFactory } from './GraphBase';
 import { GraphEdge, GraphNode, IGraphDataDescription } from './graph';
 
 export class MemoryGraph extends GraphBase implements IPersistable {
@@ -10,7 +10,7 @@ export class MemoryGraph extends GraphBase implements IPersistable {
     this.factory = factory;
   }
 
-  restore(persisted: any) {
+  restore(persisted: IGraphDump) {
     const lookup = new Map<number, GraphNode>();
     persisted.nodes.forEach((p: any) => {
       const n = this.factory.makeNode(p);

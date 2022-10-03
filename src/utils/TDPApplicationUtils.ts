@@ -313,7 +313,7 @@ export class TDPApplicationUtils {
     };
   }
 
-  static initSession(map: object) {
+  static initSession(map: Record<string, unknown>) {
     return ActionUtils.action(
       ActionMetaData.actionMeta(
         I18nextManager.getInstance().i18n.t('tdp:core.initializeSession'),

@@ -6,8 +6,18 @@ import { ActionNode } from './ActionNode';
 import { IAction, IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph } from './ICmd';
 import { SlideNode } from './SlideNode';
 import { GraphEdge } from '../graph/graph';
-import { GraphBase } from '../graph/GraphBase';
+import { GraphBase, IGraphDump } from '../graph/GraphBase';
 import { ActionMetaData } from './ActionMeta';
+export interface IProvenanceGraphDump extends IGraphDump {
+    /**
+     * Id of the last state node
+     */
+    act: number | null;
+    /**
+     * Id of the last action
+     */
+    lastAction: number | null;
+}
 export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> implements IProvenanceGraph {
     backend: GraphBase;
     private static readonly PROPAGATED_EVENTS;
@@ -83,7 +93,7 @@ export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescr
     private copyAction;
     private copyBranch;
     private makeState;
-    persist(): any;
+    persist(): IProvenanceGraphDump;
     wrapAsSlide(state: StateNode): SlideNode;
     cloneSingleSlideNode(state: SlideNode): SlideNode;
     /**
