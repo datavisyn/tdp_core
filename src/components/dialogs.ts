@@ -136,7 +136,8 @@ export class Dialog {
     if (--Dialog.openDialogs > 0) {
       $('body').addClass('modal-open');
     }
-    return this.bsModal.dispose();
+    this.bsModal.dispose();
+    this.modalElement.remove();
   }
 
   static generateDialog(title: string, primaryBtnText = 'OK', additionalCSSClasses = '') {
