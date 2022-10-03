@@ -37,11 +37,11 @@ export function LoginDialog({
       <Container fluid>
         <Stack>
           <Center>
-            <Title order={4}>{`Welcome to ${appName}`}</Title>
+            <Title order={4}> {I18nextManager.getInstance().i18n.t('tdp:core.visynApp.welcome', { appName })}</Title>
           </Center>
           <Divider />
           <Center>
-            <Text mb="lg">Please log in to continue</Text>
+            <Text mb="lg"> {I18nextManager.getInstance().i18n.t('tdp:core.visynApp.login')}</Text>
           </Center>
         </Stack>
       </Container>

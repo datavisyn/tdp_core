@@ -29,7 +29,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         }
         let isTraceSelected = false;
         const editedTraces = { ...traces };
-        editedTraces === null || editedTraces === void 0 ? void 0 : editedTraces.plots.forEach((plot) => {
+        editedTraces?.plots.forEach((plot) => {
             // custom data on each trace is the ids of every element in that section of the bar.
             const tracePoints = plot.data.customdata;
             const selectedIndices = [];
@@ -53,7 +53,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             }
         });
         if (isTraceSelected) {
-            editedTraces === null || editedTraces === void 0 ? void 0 : editedTraces.plots.forEach((plot) => {
+            editedTraces?.plots.forEach((plot) => {
                 if (plot.data.selectedpoints === null) {
                     plot.data.selectedpoints = [];
                 }
@@ -113,7 +113,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
     return (React.createElement("div", { ref: plotlyDivRef, className: "d-flex flex-row w-100 h-100", style: { minHeight: '0px' } },
         React.createElement("div", { className: `position-relative d-flex justify-content-center align-items-center flex-grow-1 ${traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''}` },
             mergedExtensions.prePlot,
-            traceStatus === 'success' && (finalTraces === null || finalTraces === void 0 ? void 0 : finalTraces.plots.length) > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (e) => {
+            traceStatus === 'success' && finalTraces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (e) => {
                     // plotly types here are just wrong. So have to convert to unknown first.
                     const selectedPoints = e.points[0].customdata;
                     let removeSelectionFlag = true;
@@ -141,7 +141,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                         d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
                         d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
-                } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: finalTraces === null || finalTraces === void 0 ? void 0 : finalTraces.errorMessageHeader, bodyMessage: (traceError === null || traceError === void 0 ? void 0 : traceError.message) || (finalTraces === null || finalTraces === void 0 ? void 0 : finalTraces.errorMessage) })) : null,
+                } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: finalTraces?.errorMessageHeader, bodyMessage: traceError?.message || finalTraces?.errorMessage })) : null,
             mergedExtensions.postPlot,
             showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id },
