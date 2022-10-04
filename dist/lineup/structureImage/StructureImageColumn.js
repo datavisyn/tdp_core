@@ -18,9 +18,6 @@ export class StructureImageColumn extends ValueColumn {
         this.structureFilter = null;
         this.align = null;
     }
-    createEventList() {
-        return super.createEventList().concat([StringColumn.EVENT_FILTER_CHANGED]);
-    }
     filter(row) {
         if (!this.isFiltered()) {
             return true;
@@ -52,11 +49,6 @@ export class StructureImageColumn extends ValueColumn {
             return;
         }
         this.fire([StringColumn.EVENT_FILTER_CHANGED, Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.structureFilter, (this.structureFilter = filter));
-    }
-    clearFilter() {
-        const was = this.isFiltered();
-        this.setFilter(null);
-        return was;
     }
     getAlign() {
         return this.align;

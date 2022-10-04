@@ -315,8 +315,7 @@ export class ARankingView extends AView {
     async selectionChanged() {
         if (this.selectionAdapter) {
             await this.built;
-            await this.selectionAdapter.selectionChanged(this.createSelectionAdapterContext());
-            this.generalVis.updateCustomVis();
+            return this.selectionAdapter.selectionChanged(this.createSelectionAdapterContext());
         }
         return Promise.resolve();
     }
