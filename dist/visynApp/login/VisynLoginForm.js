@@ -17,6 +17,6 @@ export function VisynLoginForm({ onLogin }) {
             React.createElement(TextInput, { placeholder: I18nextManager.getInstance().i18n.t('phovea:security_flask.username'), label: I18nextManager.getInstance().i18n.t('phovea:security_flask.username'), ...form.getInputProps('username'), required: true }),
             React.createElement(TextInput, { type: isShowPassword ? 'text' : 'password', placeholder: I18nextManager.getInstance().i18n.t('phovea:security_flask.password'), label: I18nextManager.getInstance().i18n.t('phovea:security_flask.password'), ...form.getInputProps('password'), rightSection: React.createElement(ActionIcon, { onClick: () => setIsShowPassword(!isShowPassword) }, isShowPassword ? React.createElement(FontAwesomeIcon, { icon: faEye }) : React.createElement(FontAwesomeIcon, { icon: faEyeSlash })), required: true })),
         React.createElement(Group, { position: "right" },
-            React.createElement(Button, { fullWidth: false, mt: "md", type: "submit", className: "btn btn-primary" }, I18nextManager.getInstance().i18n.t('core:visynApp.loginButton')))));
+            React.createElement(Button, { fullWidth: false, mt: "md", type: "submit", className: "btn btn-primary" }, I18nextManager.getInstance().i18n.t('tdp:core.visynApp.loginButton')))));
 }
 //# sourceMappingURL=VisynLoginForm.js.map

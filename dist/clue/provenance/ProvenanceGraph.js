@@ -541,10 +541,11 @@ export class ProvenanceGraph extends ADataType {
         return s;
     }
     persist() {
-        const r = this.backend.persist();
-        r.act = this.act ? this.act.id : null;
-        r.lastAction = this.lastAction ? this.lastAction.id : null;
-        return r;
+        return {
+            ...this.backend.persist(),
+            act: this.act ? this.act.id : null,
+            lastAction: this.lastAction ? this.lastAction.id : null,
+        };
     }
     /*
      restore(persisted: any) {
