@@ -51,6 +51,16 @@ export declare class PluginRegistry implements IRegistry {
      * determines the factory method to use in case of the 'new ' syntax wrap the class constructor using a factory method
      */
     getFactoryMethod(instance: any, factory: string | null): any;
+    /**
+     * Removes all registered plugins if no custom remove function is provided.
+     * @param remove Custom function to remove only specific plugins.
+     * @example
+     *
+     * removePlugins((desc)=>desc.type === "tdpView");
+     * // => removes all plugins of type "tdpView"
+     *
+     */
+    removePlugins<T extends IPluginDesc>(remove?: (desc: T) => boolean): void;
     private static instance;
     static getInstance(): PluginRegistry;
 }
