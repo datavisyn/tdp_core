@@ -135,7 +135,7 @@ export declare type VisynDataViewPluginType<Param extends Record<string, unknown
     /**
      * Data array matching the columns defined in the `dataDesc`.
      */
-    data: Record<string, unknown>[];
+    data: Record<string, Record<string, unknown>>;
     /**
      * Data column description describing the given `data`.
      * TODO:: Type to IReprovisynServerColumn when we merge that into tdp_core
