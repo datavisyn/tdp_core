@@ -55,10 +55,10 @@ export declare class PluginRegistry implements IRegistry {
      * Removes all registered plugins if no custom remove function is provided.
      * @param remove Custom function to remove only specific plugins.
      * @example
-     *
-     * removePlugins((desc)=>desc.type === "tdpView");
+     * ```ts
+     * PluginRegistry.getInstance().removePlugins((desc) => desc.type === 'tdpView');
      * // => removes all plugins of type "tdpView"
-     *
+     * ```
      */
     removePlugins<T extends IPluginDesc>(remove?: (desc: T) => boolean): void;
     private static instance;

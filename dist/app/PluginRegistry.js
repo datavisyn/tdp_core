@@ -136,10 +136,10 @@ export class PluginRegistry {
      * Removes all registered plugins if no custom remove function is provided.
      * @param remove Custom function to remove only specific plugins.
      * @example
-     *
-     * removePlugins((desc)=>desc.type === "tdpView");
+     * ```ts
+     * PluginRegistry.getInstance().removePlugins((desc) => desc.type === 'tdpView');
      * // => removes all plugins of type "tdpView"
-     *
+     * ```
      */
     removePlugins(remove = () => false) {
         this.registry = this.registry.filter((d) => !remove(d));
