@@ -156,22 +156,4 @@ StripPlot.args = {
         catColumnsSelected: [],
     },
 };
-export const ParallelCoordinatesPlot = Template.bind({});
-ParallelCoordinatesPlot.args = {
-    externalConfig: {
-        type: ESupportedPlotlyVis.PCP,
-        allColumnsSelected: [
-            {
-                description: '',
-                id: 'pca_x',
-                name: 'pca_x',
-            },
-            {
-                description: '',
-                id: 'pca_y',
-                name: 'pca_y',
-            },
-        ],
-    },
-};
 //# sourceMappingURL=Random.stories.js.map

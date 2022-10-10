@@ -2,7 +2,6 @@
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter Plot",
-    PCP = "Parallel Coordinates Plot",
     VIOLIN = "Violin Plot",
     STRIP = "Strip Plot",
     BAR = "Bar Chart"
@@ -88,11 +87,7 @@ export interface IBarConfig {
     aggregateType: EAggregateTypes;
     aggregateColumn: ColumnInfo | null;
 }
-export interface IPCPConfig {
-    type: ESupportedPlotlyVis.PCP;
-    allColumnsSelected: ColumnInfo[];
-}
-export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
+export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig;
 declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**

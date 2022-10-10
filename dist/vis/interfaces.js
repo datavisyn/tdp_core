@@ -1,18 +1,11 @@
 export var ESupportedPlotlyVis;
 (function (ESupportedPlotlyVis) {
     ESupportedPlotlyVis["SCATTER"] = "Scatter Plot";
-    ESupportedPlotlyVis["PCP"] = "Parallel Coordinates Plot";
     ESupportedPlotlyVis["VIOLIN"] = "Violin Plot";
     ESupportedPlotlyVis["STRIP"] = "Strip Plot";
     ESupportedPlotlyVis["BAR"] = "Bar Chart";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
-export const allVisTypes = [
-    ESupportedPlotlyVis.SCATTER,
-    ESupportedPlotlyVis.BAR,
-    ESupportedPlotlyVis.VIOLIN,
-    ESupportedPlotlyVis.STRIP,
-    ESupportedPlotlyVis.PCP,
-];
+export const allVisTypes = [ESupportedPlotlyVis.SCATTER, ESupportedPlotlyVis.BAR, ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP];
 export var EBarDisplayType;
 (function (EBarDisplayType) {
     EBarDisplayType["ABSOLUTE"] = "Absolute";

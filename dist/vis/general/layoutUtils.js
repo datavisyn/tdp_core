@@ -25,9 +25,7 @@ export function beautifyLayout(traces, layout) {
             ticktext: t.xTickLabels,
             text: t.xTicks,
             showline: false,
-            showspikes: true,
-            spikecolor: 'black',
-            spikethickness: 2,
+            showspikes: false,
             spikedash: 'dash',
             ticks: 'outside',
             title: {
@@ -46,9 +44,7 @@ export function beautifyLayout(traces, layout) {
             ticktext: t.yTickLabels,
             text: t.yTicks,
             showline: false,
-            showspikes: true,
-            spikecolor: 'black',
-            spikethickness: 2,
+            showspikes: false,
             spikedash: 'dash',
             ticks: 'outside',
             title: {

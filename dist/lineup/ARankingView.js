@@ -179,14 +179,19 @@ export class ARankingView extends AView {
         this.node.appendChild(luBackdrop);
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-        this.generalVis = new LineupVisWrapper({
-            provider: this.provider,
-            selectionCallback: (ids) => {
-                // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
-                this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
-            },
-            doc: this.node.ownerDocument,
-        });
+        if (this.options.enableVisPanel) {
+            this.generalVis = new LineupVisWrapper({
+                provider: this.provider,
+                selectionCallback: (ids) => {
+                    // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                    this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+                },
+                doc: this.node.ownerDocument,
+            });
+            this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+                this.generalVis.toggleCustomVis();
+            });
+        }
         // When a new column desc is added to the provider, update the panel chooser
         this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
         // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
@@ -206,9 +211,6 @@ export class ARankingView extends AView {
         this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
             this.taggle.zoomIn();
         });
-        this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-            this.generalVis.toggleCustomVis();
-        });
         if (this.options.enableOverviewMode) {
             const rule = spaceFillingRule(taggleOptions);
             this.panel.on(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, (_event, isOverviewActive) => {
@@ -221,14 +223,18 @@ export class ARankingView extends AView {
         }
         if (this.options.enableSidePanel) {
             this.node.appendChild(this.panel.node);
-            this.node.appendChild(this.generalVis.node);
+            if (options.enableVisPanel) {
+                this.node.appendChild(this.generalVis.node);
+            }
             if (this.options.enableSidePanel !== 'top') {
                 this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
             }
         }
         this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
             this.setItemSelection(sel);
-            this.generalVis.updateCustomVis();
+            if (options.enableVisPanel) {
+                this.generalVis.updateCustomVis();
+            }
         });
         this.selectionAdapter = this.createSelectionAdapter();
     }
@@ -365,7 +371,9 @@ export class ARankingView extends AView {
             return;
         }
         this.panel.hide();
-        this.generalVis.hide();
+        if (this.options.enableVisPanel) {
+            this.generalVis.hide();
+        }
         if (this.dump !== null) {
             return;
         }
