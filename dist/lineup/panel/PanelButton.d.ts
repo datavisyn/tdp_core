@@ -25,7 +25,6 @@ export interface IPanelButtonOptions {
  */
 export declare class PanelButton implements IPanelButton {
     readonly node: HTMLElement;
-    private readonly options;
     /**
      * Constructor of the PanelButton
      * @param parent The parent HTML DOM element
