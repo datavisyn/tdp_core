@@ -56,6 +56,9 @@ export class LineupVisWrapper {
   };
 
   updateCustomVis = () => {
+    if (this.viewable) {
+      return;
+    }
     const ranking = this.props.provider.getFirstRanking();
     const data = this.props.provider.viewRawRows(ranking.getOrder());
 
@@ -126,10 +129,16 @@ export class LineupVisWrapper {
   toggleCustomVis = () => {
     this.viewable = !this.viewable;
     this.node.style.display = this.viewable ? 'flex' : 'none';
-
-    this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ORDER_CHANGED}.track`, this.updateCustomVis);
-    this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.track`, this.updateCustomVis);
-    this.props.provider.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.track`, this.updateCustomVis);
+    if (this.viewable) {
+      // TODO: Add unique ranking id to the event listener id to avoid removing EL of other vis wrappers
+      this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ORDER_CHANGED}.visWrapper`, this.updateCustomVis);
+      this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.visWrapper`, this.updateCustomVis);
+      this.props.provider.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.visWrapper`, this.updateCustomVis);
+    } else {
+      this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ORDER_CHANGED}.visWrapper`, null);
+      this.props.provider.getFirstRanking().on(`${Ranking.EVENT_ADD_COLUMN}.visWrapper`, null);
+      this.props.provider.on(`${LocalDataProvider.EVENT_SELECTION_CHANGED}.visWrapper`, null);
+    }
 
     this.updateCustomVis();
   };
