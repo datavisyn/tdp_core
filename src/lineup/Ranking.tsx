@@ -81,7 +81,7 @@ export interface IRankingProps {
 
   onUpdateEntryPoint?: (namedSet: unknown) => void;
   onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
-  onBuiltLineUp?: (provider: LocalDataProvider) => void;
+  onBuiltLineUp?: (provider: LocalDataProvider, engine: EngineRenderer | TaggleRenderer) => void;
 }
 
 const defaults: IRankingOptions = {
@@ -582,7 +582,7 @@ export function Ranking({
           //   return selectionAdapter?.selectionChanged(createContext(selection));
           // })
           .then(() => {
-            onBuiltLineUp?.(providerRef.current);
+            onBuiltLineUp?.(providerRef.current, taggleRef.current);
             setBusy(false);
             taggleRef.current.update();
             setBuilt(true);

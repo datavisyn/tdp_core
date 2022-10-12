@@ -2,9 +2,9 @@ import { Alert, Modal, Stack, Title, Text, Center, Divider, Container } from '@m
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { VisynLoginForm } from './VisynLoginForm';
 import { I18nextManager } from '../../i18n/I18nextManager';
 import { LoginUtils } from '../../base/LoginUtils';
+import { VisynLoginForm } from './VisynLoginForm';
 
 /**
  * Basic login dialog
@@ -37,11 +37,11 @@ export function LoginDialog({
       <Container fluid>
         <Stack>
           <Center>
-            <Title order={4}>{`Welcome to ${appName}`}</Title>
+            <Title order={4}> {I18nextManager.getInstance().i18n.t('tdp:core.visynApp.welcome', { appName })}</Title>
           </Center>
           <Divider />
           <Center>
-            <Text mb="lg">Please log in to continue</Text>
+            <Text mb="lg"> {I18nextManager.getInstance().i18n.t('tdp:core.visynApp.login')}</Text>
           </Center>
         </Stack>
       </Container>

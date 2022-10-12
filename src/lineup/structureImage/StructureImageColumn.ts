@@ -43,6 +43,10 @@ export class StructureImageColumn extends ValueColumn<string> {
     );
   }
 
+  protected createEventList() {
+    return super.createEventList().concat([StringColumn.EVENT_FILTER_CHANGED]);
+  }
+
   filter(row: IDataRow): boolean {
     if (!this.isFiltered()) {
       return true;
@@ -83,6 +87,12 @@ export class StructureImageColumn extends ValueColumn<string> {
     }
 
     this.fire([StringColumn.EVENT_FILTER_CHANGED, Column.EVENT_DIRTY_VALUES, Column.EVENT_DIRTY], this.structureFilter, (this.structureFilter = filter));
+  }
+
+  clearFilter() {
+    const was = this.isFiltered();
+    this.setFilter(null);
+    return was;
   }
 
   getAlign(): string | null {

@@ -77,12 +77,11 @@ export class GraphBase extends AGraph {
         return Promise.resolve(this);
     }
     persist() {
-        const r = {
+        return {
             root: this.desc.id,
+            nodes: this.nodes.map((s) => s.persist()),
+            edges: this.edges.map((l) => l.persist()),
         };
-        r.nodes = this.nodes.map((s) => s.persist());
-        r.edges = this.edges.map((l) => l.persist());
-        return r;
     }
     restore(dump) {
         return this;

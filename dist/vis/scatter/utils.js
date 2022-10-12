@@ -41,7 +41,7 @@ export function moveSelectedToFront(col, selectedMap) {
     const sortedCol = [...remainingVals, ...selectedVals];
     return sortedCol;
 }
-export async function createScatterTraces(columns, numColumnsSelected, shape, color, alphaSliderVal, colorScaleType, scales, shapes) {
+export async function createScatterTraces(columns, selected, config, scales, shapes) {
     let plotCounter = 1;
     const emptyVal = {
         plots: [],
@@ -52,15 +52,22 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
         errorMessageHeader: I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader'),
         formList: ['color', 'shape', 'bubble', 'opacity'],
     };
-    if (!numColumnsSelected) {
+    if (!config.numColumnsSelected) {
         return emptyVal;
     }
-    const numCols = numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
+    const hasSelected = Object.values(selected).includes(true);
+    const numCols = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id));
     const plots = [];
     const validCols = await resolveColumnValues(numCols);
-    const shapeCol = await resolveSingleColumn(getCol(columns, shape));
-    const colorCol = await resolveSingleColumn(getCol(columns, color));
-    const shapeScale = shape
+    const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
+    const colorCol = await resolveSingleColumn(getCol(columns, config.color));
+    validCols.forEach((c) => {
+        c.resolvedValues = moveSelectedToFront(c.resolvedValues, selected);
+    });
+    if (colorCol) {
+        colorCol.resolvedValues = moveSelectedToFront(colorCol.resolvedValues, selected);
+    }
+    const shapeScale = config.shape
         ? d3v3.scale
             .ordinal()
             .domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))])
@@ -68,15 +75,15 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
         : null;
     let min = 0;
     let max = 0;
-    if (color) {
+    if (config.color) {
         min = d3v3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
         max = d3v3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
     }
-    const numericalColorScale = color
+    const numericalColorScale = config.color
         ? d3v3.scale
             .linear()
             .domain([max, (max + min) / 2, min])
-            .range(colorScaleType === ENumericalColorScaleType.SEQUENTIAL
+            .range(config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL
             ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')]
             : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')])
         : null;
@@ -103,37 +110,22 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
                 hovertext: validCols[0].resolvedValues.map((v, i) => `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${colorCol ? `${columnNameWithDescription(colorCol.info)}: ${colorCol.resolvedValues[i].val}` : ''}`),
                 hoverinfo: 'text',
                 text: validCols[0].resolvedValues.map((v) => v.id.toString()),
-                // plotly is stupid and doesnt know its own types
-                // @ts-ignore
-                selected: {
-                    marker: {
-                        line: {
-                            width: 0,
-                        },
-                        symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                        color: colorCol
-                            ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)))
-                            : SELECT_COLOR,
-                        opacity: 1,
-                        size: 8,
+                marker: {
+                    line: {
+                        width: 0,
                     },
+                    symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
+                    color: colorCol
+                        ? hasSelected
+                            ? colorCol.resolvedValues.map((v) => selected[v.id] ? (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)) : DEFAULT_COLOR)
+                            : colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)))
+                        : validCols[0].resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
+                    opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
+                    size: 8,
                 },
-                unselected: {
-                    marker: {
-                        line: {
-                            width: 0,
-                        },
-                        symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                        color: colorCol
-                            ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val)))
-                            : DEFAULT_COLOR,
-                        opacity: colorCol ? 0.2 : alphaSliderVal,
-                        size: 8,
-                    },
-                },
-                xLabel: columnNameWithDescription(validCols[0].info),
-                yLabel: columnNameWithDescription(validCols[1].info),
             },
+            xLabel: columnNameWithDescription(validCols[0].info),
+            yLabel: columnNameWithDescription(validCols[1].info),
         });
     }
     else {
@@ -154,7 +146,7 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
                             marker: {
                                 color: DEFAULT_COLOR,
                             },
-                            opacity: alphaSliderVal,
+                            opacity: config.alphaSliderVal,
                         },
                         xLabel: columnNameWithDescription(xCurr.info),
                         yLabel: columnNameWithDescription(yCurr.info),
@@ -178,33 +170,22 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
                             },
                             showlegend: false,
                             text: validCols[0].resolvedValues.map((v) => v.id.toString()),
-                            // plotly is stupid and doesnt know its own types
-                            // @ts-ignore
-                            selected: {
-                                marker: {
-                                    line: {
-                                        width: 0,
-                                    },
-                                    symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                                    color: colorCol
-                                        ? colorCol.resolvedValues.map((v) => colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
-                                        : SELECT_COLOR,
-                                    opacity: alphaSliderVal,
-                                    size: 8,
+                            marker: {
+                                line: {
+                                    width: 0,
                                 },
-                            },
-                            unselected: {
-                                marker: {
-                                    line: {
-                                        width: 0,
-                                    },
-                                    symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
-                                    color: colorCol
-                                        ? colorCol.resolvedValues.map((v) => colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
-                                        : DEFAULT_COLOR,
-                                    opacity: 0.2,
-                                    size: 8,
-                                },
+                                symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
+                                color: colorCol
+                                    ? hasSelected
+                                        ? colorCol.resolvedValues.map((v) => selected[v.id]
+                                            ? colorCol.type === EColumnTypes.NUMERICAL
+                                                ? numericalColorScale(v.val)
+                                                : scales.color(v.val)
+                                            : DEFAULT_COLOR)
+                                        : colorCol.resolvedValues.map((v) => colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val) : scales.color(v.val))
+                                    : xCurr.resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
+                                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
+                                size: 8,
                             },
                         },
                         xLabel: columnNameWithDescription(xCurr.info),
@@ -228,7 +209,6 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
                 mode: 'markers',
                 visible: 'legendonly',
                 legendgroup: 'color',
-                hoverinfo: 'skip',
                 // @ts-ignore
                 legendgrouptitle: {
                     text: columnNameWithDescription(colorCol.info),
@@ -240,7 +220,7 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
                     symbol: 'circle',
                     size: 8,
                     color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : DEFAULT_COLOR,
-                    opacity: alphaSliderVal,
+                    opacity: config.alphaSliderVal,
                 },
                 transforms: [
                     {
@@ -272,7 +252,6 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
                 visible: 'legendonly',
                 showlegend: true,
                 legendgroup: 'shape',
-                hoverinfo: 'skip',
                 // @ts-ignore
                 legendgrouptitle: {
                     text: columnNameWithDescription(shapeCol.info),
@@ -281,7 +260,7 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
                     line: {
                         width: 0,
                     },
-                    opacity: alphaSliderVal,
+                    opacity: config.alphaSliderVal,
                     size: 8,
                     symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val)) : 'circle',
                     color: DEFAULT_COLOR,

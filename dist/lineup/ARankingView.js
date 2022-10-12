@@ -179,26 +179,26 @@ export class ARankingView extends AView {
         this.node.appendChild(luBackdrop);
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-        this.generalVis = import('../vis').then(() => {
-            const newVis = new LineupVisWrapper({
-                provider: this.provider,
-                selectionCallback: (ids) => {
-                    // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
-                    this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
-                },
-                doc: this.node.ownerDocument,
-            });
-            if (this.options.enableSidePanel) {
+        if (this.options.enableVisPanel) {
+            this.generalVis = import('../vis').then(() => {
+                const newVis = new LineupVisWrapper({
+                    provider: this.provider,
+                    selectionCallback: (ids) => {
+                        // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                        this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+                    },
+                    doc: this.node.ownerDocument,
+                });
                 this.node.appendChild(newVis.node);
-            }
-            this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
-                newVis.updateCustomVis();
+                this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
+                    newVis.updateCustomVis();
+                });
+                this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+                    newVis.toggleCustomVis();
+                });
+                return newVis;
             });
-            this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-                newVis.toggleCustomVis();
-            });
-            return newVis;
-        });
+        }
         // When a new column desc is added to the provider, update the panel chooser
         this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
         // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
@@ -372,7 +372,7 @@ export class ARankingView extends AView {
             return;
         }
         this.panel.hide();
-        this.generalVis.then((vis) => {
+        this.generalVis?.then((vis) => {
             vis.hide();
         });
         if (this.dump !== null) {

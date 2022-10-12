@@ -1,8 +1,25 @@
-import { GraphNode, GraphEdge, AGraph, IGraph, IGraphDataDescription } from './graph';
+import { GraphNode, GraphEdge, AGraph, IGraph, IGraphDataDescription, IGraphNodeDump, IGraphEdgeDump } from './graph';
 
 export interface IGraphFactory {
   makeNode(p: any): GraphNode;
   makeEdge(p: any, lookup: (id: number) => GraphNode): GraphEdge;
+}
+
+export interface IGraphDump {
+  /**
+   * Name taken from the `desc.id`
+   */
+  root: string;
+
+  /**
+   * List of serializable nodes
+   */
+  nodes: IGraphNodeDump[];
+
+  /**
+   * List of serializable edges
+   */
+  edges: IGraphEdgeDump[];
 }
 
 export class GraphFactoryUtils {
@@ -97,16 +114,15 @@ export class GraphBase extends AGraph implements IGraph {
     return Promise.resolve(this);
   }
 
-  persist() {
-    const r: any = {
+  persist(): IGraphDump {
+    return {
       root: this.desc.id,
+      nodes: this.nodes.map((s) => s.persist()),
+      edges: this.edges.map((l) => l.persist()),
     };
-    r.nodes = this.nodes.map((s) => s.persist());
-    r.edges = this.edges.map((l) => l.persist());
-    return r;
   }
 
-  restore(dump: any) {
+  restore(dump: IGraphDump) {
     return this;
   }
 }

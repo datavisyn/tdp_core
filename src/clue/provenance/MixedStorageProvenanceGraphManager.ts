@@ -1,4 +1,4 @@
-import { ProvenanceGraph } from './ProvenanceGraph';
+import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';
 import { IProvenanceGraphManager } from './provenance';
 import { IProvenanceGraphDataDescription } from './ICmd';
 import { LocalStorageProvenanceGraphManager, ILocalStorageProvenanceGraphManagerOptions } from './LocalStorageProvenanceGraphManager';
@@ -74,15 +74,15 @@ export class MixedStorageProvenanceGraphManager implements IProvenanceGraphManag
     return this.remote.migrate(graph, extras);
   }
 
-  importLocal(json: any, desc: any = {}) {
+  importLocal(json: IProvenanceGraphDump, desc: any = {}) {
     return this.local.import(json, desc);
   }
 
-  importRemote(json: any, desc: any = {}) {
+  importRemote(json: IProvenanceGraphDump, desc: any = {}) {
     return this.remote.import(json, desc);
   }
 
-  import(json: any, desc: any = {}) {
+  import(json: IProvenanceGraphDump, desc: any = {}) {
     return this.importLocal(json, desc);
   }
 

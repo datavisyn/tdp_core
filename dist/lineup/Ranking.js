@@ -446,7 +446,7 @@ onAddScoreColumn, }) {
             //   return selectionAdapter?.selectionChanged(createContext(selection));
             // })
             .then(() => {
-            onBuiltLineUp?.(providerRef.current);
+            onBuiltLineUp?.(providerRef.current, taggleRef.current);
             setBusy(false);
             taggleRef.current.update();
             setBuilt(true);
@@ -510,6 +510,7 @@ onAddScoreColumn, }) {
             selectionHelperRef.current.setItemSelection(itemSelection);
         }
     }, [busy, itemSelection]);
-    return React.createElement("div", { ref: lineupContainerRef, className: "lineup-container" });
+    return (React.createElement("div", { className: "d-flex h-100 w-100 tdp-view lineup lu-taggle lu" },
+        React.createElement("div", { ref: lineupContainerRef, className: "lineup-container flex-grow-1" })));
 }
 //# sourceMappingURL=Ranking.js.map

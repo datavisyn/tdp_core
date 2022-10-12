@@ -20,7 +20,7 @@ export function beautifyLayout(traces, layout) {
     layoutEdit.annotations = [];
     traces.plots.forEach((t, i) => {
         layoutEdit[`xaxis${i > 0 ? i + 1 : ''}`] = {
-            automargin: false,
+            automargin: true,
             rangemode: 'tozero',
             tickvals: t.xTicks,
             ticktext: t.xTickLabels,
@@ -40,7 +40,7 @@ export function beautifyLayout(traces, layout) {
             },
         };
         layoutEdit[`yaxis${i > 0 ? i + 1 : ''}`] = {
-            automargin: false,
+            automargin: true,
             rangemode: 'tozero',
             tickvals: t.yTicks,
             ticktext: t.yTickLabels,

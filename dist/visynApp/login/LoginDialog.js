@@ -2,9 +2,9 @@ import { Alert, Modal, Stack, Title, Text, Center, Divider, Container } from '@m
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { VisynLoginForm } from './VisynLoginForm';
 import { I18nextManager } from '../../i18n/I18nextManager';
 import { LoginUtils } from '../../base/LoginUtils';
+import { VisynLoginForm } from './VisynLoginForm';
 /**
  * Basic login dialog
  */
@@ -13,10 +13,14 @@ export function LoginDialog({ show = false, hasWarning, hasError, setError, appN
         React.createElement(Container, { fluid: true },
             React.createElement(Stack, null,
                 React.createElement(Center, null,
-                    React.createElement(Title, { order: 4 }, `Welcome to ${appName}`)),
+                    React.createElement(Title, { order: 4 },
+                        " ",
+                        I18nextManager.getInstance().i18n.t('tdp:core.visynApp.welcome', { appName }))),
                 React.createElement(Divider, null),
                 React.createElement(Center, null,
-                    React.createElement(Text, { mb: "lg" }, "Please log in to continue")))),
+                    React.createElement(Text, { mb: "lg" },
+                        " ",
+                        I18nextManager.getInstance().i18n.t('tdp:core.visynApp.login'))))),
         React.createElement(Stack, null,
             hasError ? (React.createElement(Alert, { icon: React.createElement(FontAwesomeIcon, { icon: faCircleExclamation }), title: "Error", color: "red", radius: "md" }, I18nextManager.getInstance().i18n.t('phovea:security_flask.alertWrongCredentials'))) : null,
             hasWarning ? (React.createElement(Alert, { icon: React.createElement(FontAwesomeIcon, { icon: faCircleExclamation }), title: "Warning", color: "yellow", radius: "md" }, I18nextManager.getInstance().i18n.t('phovea:security_flask.alertOffline'))) : null,
