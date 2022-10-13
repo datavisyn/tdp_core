@@ -24,25 +24,12 @@ import { useSyncedRef } from '../hooks/useSyncedRef';
 import { hexinbMergeDefaultConfig, isHexbin } from './hexbin/utils';
 import { HexbinVis } from './hexbin/HexbinVis';
 
-const DEFAULT_COLORS = [
-  getCssValue('visyn-c1'),
-  getCssValue('visyn-c2'),
-  getCssValue('visyn-c3'),
-  getCssValue('visyn-c4'),
-  getCssValue('visyn-c5'),
-  getCssValue('visyn-c6'),
-  getCssValue('visyn-c7'),
-  getCssValue('visyn-c8'),
-  getCssValue('visyn-c9'),
-  getCssValue('visyn-c10'),
-];
-
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
 
 export function Vis({
   columns,
   selected = [],
-  colors = DEFAULT_COLORS,
+  colors = null,
   shapes = DEFAULT_SHAPES,
   selectionCallback = () => null,
   filterCallback = () => null,
@@ -179,7 +166,22 @@ export function Vis({
   }, [selected]);
 
   const scales: Scales = useMemo(() => {
-    const colorScale = d3v3.scale.ordinal().range(colors);
+    const colorScale = d3v3.scale
+      .ordinal()
+      .range(
+        colors || [
+          getCssValue('visyn-c1'),
+          getCssValue('visyn-c2'),
+          getCssValue('visyn-c3'),
+          getCssValue('visyn-c4'),
+          getCssValue('visyn-c5'),
+          getCssValue('visyn-c6'),
+          getCssValue('visyn-c7'),
+          getCssValue('visyn-c8'),
+          getCssValue('visyn-c9'),
+          getCssValue('visyn-c10'),
+        ],
+      );
 
     return {
       color: colorScale,

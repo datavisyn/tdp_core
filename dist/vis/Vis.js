@@ -10,20 +10,8 @@ import { getCssValue } from '../utils';
 import { useSyncedRef } from '../hooks/useSyncedRef';
 import { hexinbMergeDefaultConfig, isHexbin } from './hexbin/utils';
 import { HexbinVis } from './hexbin/HexbinVis';
-const DEFAULT_COLORS = [
-    getCssValue('visyn-c1'),
-    getCssValue('visyn-c2'),
-    getCssValue('visyn-c3'),
-    getCssValue('visyn-c4'),
-    getCssValue('visyn-c5'),
-    getCssValue('visyn-c6'),
-    getCssValue('visyn-c7'),
-    getCssValue('visyn-c8'),
-    getCssValue('visyn-c9'),
-    getCssValue('visyn-c10'),
-];
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
-export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, hideSidebar = false, }) {
+export function Vis({ columns, selected = [], colors = null, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, hideSidebar = false, }) {
     // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
     // To ensure that we never render an incosistent config, keep a consistent and a current in the config. Always render the consistent.
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -108,7 +96,20 @@ export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = 
         return currMap;
     }, [selected]);
     const scales = useMemo(() => {
-        const colorScale = d3v3.scale.ordinal().range(colors);
+        const colorScale = d3v3.scale
+            .ordinal()
+            .range(colors || [
+            getCssValue('visyn-c1'),
+            getCssValue('visyn-c2'),
+            getCssValue('visyn-c3'),
+            getCssValue('visyn-c4'),
+            getCssValue('visyn-c5'),
+            getCssValue('visyn-c6'),
+            getCssValue('visyn-c7'),
+            getCssValue('visyn-c8'),
+            getCssValue('visyn-c9'),
+            getCssValue('visyn-c10'),
+        ]);
         return {
             color: colorScale,
         };
