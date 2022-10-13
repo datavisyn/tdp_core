@@ -132,6 +132,18 @@ export class PluginRegistry {
         }
         return instance[f];
     }
+    /**
+     * Removes all registered plugins if no custom remove function is provided.
+     * @param remove Custom function to remove only specific plugins.
+     * @example
+     * ```ts
+     * PluginRegistry.getInstance().removePlugins((desc) => desc.type === 'tdpView');
+     * // => removes all plugins of type "tdpView"
+     * ```
+     */
+    removePlugins(remove = () => false) {
+        this.registry = this.registry.filter((d) => !remove(d));
+    }
     static getInstance() {
         if (!PluginRegistry.instance) {
             PluginRegistry.instance = new PluginRegistry();
