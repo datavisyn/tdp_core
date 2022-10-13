@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { LocalDataProvider, IColumnDesc } from 'lineupjs';
+import { LocalDataProvider, EngineRenderer, TaggleRenderer, IColumnDesc } from 'lineupjs';
 import { ILazyLoadedColumn } from './internal/column';
 import { EViewMode, IAdditionalColumnDesc, IScoreRow, ISelection } from '../base/interfaces';
 import { IContext } from './selection/ISelectionAdapter';
@@ -27,7 +27,7 @@ export interface IRankingProps {
     onAddScoreColumn?: (r: IScoreResult[]) => void;
     onUpdateEntryPoint?: (namedSet: unknown) => void;
     onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
-    onBuiltLineUp?: (provider: LocalDataProvider) => void;
+    onBuiltLineUp?: (provider: LocalDataProvider, engine: EngineRenderer | TaggleRenderer) => void;
 }
 export interface IRankingOptions extends IARankingViewOptions {
     mode: EViewMode;

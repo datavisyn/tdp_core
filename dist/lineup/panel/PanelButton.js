@@ -10,8 +10,10 @@ export class PanelButton {
     constructor(parent, options) {
         this.node = parent.ownerDocument.createElement('button');
         this.node.setAttribute('type', 'button');
-        this.node.setAttribute('data-testid', `${options.title.replace(/\s+/g, '-').toLowerCase()}-button`);
-        this.node.title = options.title;
+        if (options.title) {
+            this.node.setAttribute('data-testid', `${options.title.replace(/\s+/g, '-').toLowerCase()}-button`);
+            this.node.title = options.title;
+        }
         this.node.className = `btn btn-sm ${options.btnClass || 'btn-text-dark'} ${options.cssClass || ''}`;
         this.node.innerHTML = `<i class="${options.faIcon} fa-fw"></i>`;
         this.node.addEventListener('click', (evt) => {
