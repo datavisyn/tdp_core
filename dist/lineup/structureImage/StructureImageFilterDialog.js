@@ -49,7 +49,7 @@ export class StructureImageFilterDialog extends ADialog {
             return;
         }
         const provider = this.ctx.provider;
-        const data = provider.viewRawRows(provider.getFirstRanking().getOrder());
+        const data = provider.viewRawRows(new Array(provider.getFirstRanking().length).fill(null).map((_, i) => i));
         const structures = data.map((d) => this.column.getValue(d));
         // empty input field, but missing values checkbox is checked
         if (filter == null && filterMissing) {
