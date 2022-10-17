@@ -52,7 +52,7 @@ export class ABaseSelectionAdapter {
         if (diffAdded.length) {
             await this.addDynamicColumns(context, diffAdded);
         }
-        return onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
+        return onContextChanged?.(context);
     }
     // TODO this function is currently useless, because it requires an `IAdditionalColumnDesc` where `selectedId` is mandatory and then assigns it again
     static patchDesc(desc, selectedId) {

@@ -20,4 +20,5 @@ export * from './tour';
 export * from './utils';
 export * from './views';
 export * from './vis';
+export * from './visynApp';
 export * from './wrapper';

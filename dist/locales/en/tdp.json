@@ -261,7 +261,12 @@
                 "of": "of",
                 "selected": "selected",
                 "scoreAuthorizationRequired": "Authorization required",
-                "scoreAuthorizationRequiredTitle": "{{name}} authorization is required for this score. Click here to authorize."
+                "scoreAuthorizationRequiredTitle": "{{name}} authorization is required for this score. Click here to authorize.",
+                "structureImage": {
+                    "errorMessage": "Error: {{message}}",
+                    "filterMissingValues": "Filter rows containing missing values",
+                    "rendererTitle": "Chemical Structure"
+                }
             }
         },
         "views": {
@@ -293,6 +298,11 @@
                     "timeoutError": "Authorization did not complete within timeframe."
                 }
             }
+        },
+        "visynApp": {
+            "welcome": "Welcome to {{appName}}",
+            "login": "Please log in to continue",
+            "loginButton": "Log In"
         }
     }
 }

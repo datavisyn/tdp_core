@@ -30,10 +30,10 @@ export class ColumnDescUtils {
      * @param {Partial<IColumnOptions>} options
      * @returns {IAdditionalColumnDesc}
      */
-    static numberCol(column, min = Number.NaN, max = Number.NaN, options = {}) {
+    static numberCol(column, min, max, options = {}) {
         return Object.assign(ColumnDescUtils.baseColumn(column, options), {
             type: 'number',
-            domain: [min, max],
+            domain: [min || Number.NaN, max || Number.NaN],
         });
     }
     /**
@@ -145,11 +145,11 @@ export class ColumnDescUtils {
         });
     }
     static isHierarchical(categories) {
-        if ((categories === null || categories === void 0 ? void 0 : categories.length) === 0 || typeof (categories === null || categories === void 0 ? void 0 : categories[0]) === 'string') {
+        if (categories?.length === 0 || typeof categories?.[0] === 'string') {
             return false;
         }
         // check if any has a given parent name
-        return categories === null || categories === void 0 ? void 0 : categories.some((c) => c.parent != null);
+        return categories?.some((c) => c.parent != null);
     }
     static deriveHierarchy(categories) {
         const lookup = new Map();

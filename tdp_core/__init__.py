@@ -1,7 +1,14 @@
+from fastapi import FastAPI
+
 from .plugin.model import AVisynPlugin, RegHelper
 
 
 class VisynPlugin(AVisynPlugin):
+    def init_app(self, app: FastAPI):
+        from .mol_img import img_api
+
+        app.include_router(img_api.app)
+
     def register(self, registry: RegHelper):
         # phovea_server
         registry.append(
@@ -74,11 +81,16 @@ class VisynPlugin(AVisynPlugin):
         )
 
         # phovea_security_flask
-        # TODO: Add ENV variables to allow disabling
         registry.append(
             "user_stores",
             "alb_security_store",
             "tdp_core.security.store.alb_security_store",
+            {},
+        )
+        registry.append(
+            "user_stores",
+            "no_security_store",
+            "tdp_core.security.store.no_security_store",
             {},
         )
 

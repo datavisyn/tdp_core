@@ -7,7 +7,6 @@ import {
   EngineRenderer,
   TaggleRenderer,
   Column,
-  createLocalDataProvider,
   ITaggleOptions,
   defaultOptions,
   IGroupItem,
@@ -17,8 +16,12 @@ import {
   spaceFillingRule,
   updateLodRules,
   IColumnDesc,
-  Ranking as LineUpRanking,
   UIntTypedArray,
+  toolbar,
+  IRankingHeaderContext,
+  dialogContext,
+  Ranking as LineUpRanking,
+  IDynamicHeight,
 } from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
@@ -35,7 +38,6 @@ import { IARankingViewOptions } from './IARankingViewOptions';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils } from '../base/BaseUtils';
 import { IDTypeManager } from '../idtype/IDTypeManager';
-import { useSyncedRef } from '../hooks/useSyncedRef';
 import { AView } from '../views/AView';
 import { InvalidTokenError, TDPTokenManager } from '../auth/TokenManager';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
@@ -50,6 +52,8 @@ import { ViewUtils } from '../views/ViewUtils';
 import { SelectionUtils } from '../idtype/SelectionUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
+import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;
@@ -77,10 +81,10 @@ export interface IRankingProps {
 
   onUpdateEntryPoint?: (namedSet: unknown) => void;
   onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
-  onBuiltLineUp?: (provider: LocalDataProvider) => void;
+  onBuiltLineUp?: (provider: LocalDataProvider, engine: EngineRenderer | TaggleRenderer) => void;
 }
 
-const defaults = {
+const defaults: IRankingOptions = {
   itemName: 'item',
   itemNamePlural: 'items',
   itemRowHeight: null,
@@ -141,10 +145,16 @@ const defaults = {
   },
   panelAddColumnBtnOptions: {},
   mode: null,
+  showInContextMode: (col: Column) => (col.desc as any).column === 'id',
 };
 
 export interface IRankingOptions extends IARankingViewOptions {
   mode: EViewMode;
+  enableCustomVis: boolean;
+}
+
+function suffix(name: string): string {
+  return `${name}.visynView`;
 }
 
 export function Ranking({
@@ -309,8 +319,30 @@ export function Ranking({
   React.useEffect(() => {
     const initialized = taggleRef.current != null;
     if (!initialized) {
-      providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
-      providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
+      // register custom column types
+      options.customProviderOptions.columnTypes = { ...options.customProviderOptions.columnTypes, smiles: StructureImageColumn };
+
+      // register custom filter dialogs for custom column types
+      toolbar('filterStructureImage', 'rename')(StructureImageColumn);
+
+      providerRef.current = new TDPLocalDataProvider([], [], options.customProviderOptions);
+      providerRef.current.on(suffix(LocalDataProvider.EVENT_ORDER_CHANGED), () => null);
+
+      // add width changed listener for smiles columns in ranking
+      providerRef.current.on(suffix(LocalDataProvider.EVENT_ADD_COLUMN), (col) => {
+        if (col instanceof StructureImageColumn) {
+          col.on(suffix(Column.EVENT_WIDTH_CHANGED), () => {
+            // trigger a re-render of LineUp using the new calculated row height in `dynamicHeight()`
+            taggleRef.current.update();
+          });
+        }
+      });
+
+      providerRef.current.on(suffix(LocalDataProvider.EVENT_REMOVE_COLUMN), (col) => {
+        if (col instanceof StructureImageColumn) {
+          col.on(suffix(Column.EVENT_WIDTH_CHANGED), null); // remove event listener when column is removed
+        }
+      });
 
       const taggleOptions: ITaggleOptions = merge(
         defaultOptions(),
@@ -318,10 +350,29 @@ export function Ranking({
         {
           summaryHeader: options.enableHeaderSummary,
           labelRotation: options.enableHeaderRotation ? 45 : 0,
+          renderers: {
+            smiles: new StructureImageRenderer(),
+          },
+          toolbarActions: {
+            // TODO remove default string filter; use `filterString` as key would override the default string filter, but also for string columns
+            filterStructureImage: {
+              title: 'Filter …', // the toolbar icon is derived from this string! (= transformed to `lu-action-filter`)
+              onClick: (col: StructureImageColumn, evt: MouseEvent, ctx: IRankingHeaderContext, level: number, viaShortcut: boolean) => {
+                const dialog = new StructureImageFilterDialog(col, dialogContext(ctx, level, evt), ctx);
+                dialog.open();
+              },
+              options: {
+                mode: 'menu+shortcut',
+                featureCategory: 'ranking',
+                featureLevel: 'basic',
+              },
+            },
+          },
         } as Partial<ITaggleOptions>,
         options.customOptions,
       );
 
+      // FIXME simplify the `itemRowHeight` option to have less options and conditions
       if (typeof options.itemRowHeight === 'number' && options.itemRowHeight > 0) {
         taggleOptions.rowHeight = options.itemRowHeight;
       } else if (typeof options.itemRowHeight === 'function') {
@@ -333,7 +384,35 @@ export function Ranking({
             return f(item) ?? (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
           },
         });
+      } else {
+        /**
+         * Calculate the row height for a group or row. If smiles columns are added to the ranking,
+         * the width of the widest column is taken as row height. If no smiles column is added to the ranking
+         * the default width is used.
+         * @param data data of the group or row
+         * @param ranking current ranking
+         * @returns dynamic height object for LineUp
+         */
+        taggleOptions.dynamicHeight = function dynamicRowHeight(data: (IGroupItem | IGroupData)[], ranking: LineUpRanking): IDynamicHeight {
+          const DEFAULT_ROW_HEIGHT = defaultOptions().rowHeight; // LineUp default rowHeight = 18
+
+          // get list of smiles columns from the current ranking
+          const smilesColumns = ranking.children.filter((col) => col instanceof StructureImageColumn);
+
+          if (smilesColumns.length === 0) {
+            return { defaultHeight: DEFAULT_ROW_HEIGHT, height: () => DEFAULT_ROW_HEIGHT, padding: () => 0 };
+          }
+
+          const maxColumnHeight = Math.max(DEFAULT_ROW_HEIGHT, ...smilesColumns.map((col) => col.getWidth())); // squared image -> use col width as height
+
+          return {
+            defaultHeight: maxColumnHeight,
+            height: () => maxColumnHeight,
+            padding: () => 0,
+          };
+        };
       }
+
       taggleRef.current = !options.enableOverviewMode
         ? new EngineRenderer(providerRef.current, lineupContainerRef.current, taggleOptions)
         : new TaggleRenderer(
@@ -356,10 +435,10 @@ export function Ranking({
       // generalVisRef=new GeneralVisWrapper(providerRef.current, this, this.selectionHelper, this.node.ownerDocument);
 
       // When a new column desc is added to the provider, update the panel chooser
-      providerRef.current.on(LocalDataProvider.EVENT_ADD_DESC, updatePanelChooser);
+      providerRef.current.on(suffix(LocalDataProvider.EVENT_ADD_DESC), updatePanelChooser);
 
       // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
-      // providerRef.current.on(LocalDataProvider.EVENT_REMOVE_DESC, updatePanelChooser);
+      // providerRef.current.on(suffix(LocalDataProvider.EVENT_REMOVE_DESC), updatePanelChooser);
       panelRef.current.on(
         LineUpPanelActions.EVENT_SAVE_NAMED_SET,
         async (_event, order: number[], name: string, description: string, sec: Partial<ISecureItem>) => {
@@ -480,7 +559,9 @@ export function Ranking({
       providerRef.current.setData(data);
       selectionHelperRef.current.rows = data;
       selectionHelperRef.current.setItemSelection(itemSelections.get(AView.DEFAULT_SELECTION_NAME));
+
       ColumnDescUtils.createInitialRanking(providerRef.current, {});
+
       const ranking = providerRef.current.getLastRanking();
       const columns = ranking ? ranking.flatColumns : [];
       const selectionAdapterContext: Omit<IContext, 'selection'> = {
@@ -501,7 +582,7 @@ export function Ranking({
           //   return selectionAdapter?.selectionChanged(createContext(selection));
           // })
           .then(() => {
-            onBuiltLineUp?.(providerRef.current);
+            onBuiltLineUp?.(providerRef.current, taggleRef.current);
             setBusy(false);
             taggleRef.current.update();
             setBuilt(true);
@@ -577,5 +658,9 @@ export function Ranking({
     }
   }, [busy, itemSelection]);
 
-  return <div ref={lineupContainerRef} className="lineup-container" />;
+  return (
+    <div className="d-flex h-100 w-100 tdp-view lineup lu-taggle lu">
+      <div ref={lineupContainerRef} className="lineup-container flex-grow-1" />
+    </div>
+  );
 }

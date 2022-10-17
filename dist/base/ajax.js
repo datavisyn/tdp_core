@@ -7,7 +7,7 @@ export class AjaxError extends Error {
     }
 }
 export function isAjaxError(error) {
-    return (error === null || error === void 0 ? void 0 : error.response) instanceof Response;
+    return error?.response instanceof Response;
 }
 export class Ajax {
     /**

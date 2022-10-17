@@ -9,11 +9,23 @@ import { ActionNode } from './ActionNode';
 import { IAction, IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph } from './ICmd';
 import { SlideNode } from './SlideNode';
 import { GraphEdge, GraphNode } from '../graph/graph';
-import { GraphBase } from '../graph/GraphBase';
+import { GraphBase, IGraphDump } from '../graph/GraphBase';
 import { ProvenanceGraphDim } from './provenance';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { MemoryGraph } from '../graph/MemoryGraph';
 import { ActionMetaData } from './ActionMeta';
+
+export interface IProvenanceGraphDump extends IGraphDump {
+  /**
+   * Id of the last state node
+   */
+  act: number | null;
+
+  /**
+   * Id of the last action
+   */
+  lastAction: number | null;
+}
 
 export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> implements IProvenanceGraph {
   private static readonly PROPAGATED_EVENTS = ['sync', 'add_edge', 'add_node', 'sync_node', 'sync_edge', 'sync_start'];
@@ -641,11 +653,12 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
     return s;
   }
 
-  persist() {
-    const r = (<any>this.backend).persist();
-    r.act = this.act ? this.act.id : null;
-    r.lastAction = this.lastAction ? this.lastAction.id : null;
-    return r;
+  persist(): IProvenanceGraphDump {
+    return {
+      ...this.backend.persist(),
+      act: this.act ? this.act.id : null,
+      lastAction: this.lastAction ? this.lastAction.id : null,
+    };
   }
 
   /*

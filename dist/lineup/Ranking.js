@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { LocalDataProvider, EngineRenderer, TaggleRenderer, createLocalDataProvider, defaultOptions, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
+import { LocalDataProvider, EngineRenderer, TaggleRenderer, Column, defaultOptions, isGroup, spaceFillingRule, updateLodRules, toolbar, dialogContext, } from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
 import { LazyColumn } from './internal/column';
@@ -25,6 +25,8 @@ import { ViewUtils } from '../views/ViewUtils';
 import { SelectionUtils } from '../idtype/SelectionUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
+import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 const defaults = {
     itemName: 'item',
     itemNamePlural: 'items',
@@ -85,13 +87,16 @@ const defaults = {
     },
     panelAddColumnBtnOptions: {},
     mode: null,
+    showInContextMode: (col) => col.desc.column === 'id',
 };
+function suffix(name) {
+    return `${name}.visynView`;
+}
 export function Ranking({ data = [], itemSelection = { idtype: null, ids: [] }, columnDesc = [], options: opts = {}, onContextChanged, onUpdateEntryPoint, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, 
 /**
  * Maybe refactor this when using the native lineup implementation of scores
  */
 onAddScoreColumn, }) {
-    var _a, _b;
     const [busy, setBusy] = React.useState(false);
     const [built, setBuilt] = React.useState(false);
     const options = merge({}, defaults, opts);
@@ -106,7 +111,7 @@ onAddScoreColumn, }) {
     const selectionHelperRef = React.useRef(null);
     const panelRef = React.useRef(null);
     React.useEffect(() => {
-        const sel = (itemSelection === null || itemSelection === void 0 ? void 0 : itemSelection.ids) ? itemSelection : { idtype: null, ids: [] };
+        const sel = itemSelection?.ids ? itemSelection : { idtype: null, ids: [] };
         itemSelections.set(AView.DEFAULT_SELECTION_NAME, sel);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -131,7 +136,6 @@ onAddScoreColumn, }) {
         });
         const data = new Promise((resolve) => {
             (async () => {
-                var _a;
                 // Wait for the column to be initialized
                 const col = await columnPromise;
                 /**
@@ -142,7 +146,7 @@ onAddScoreColumn, }) {
                 let done = false;
                 while (!done) {
                     // eslint-disable-next-line no-await-in-loop
-                    await TDPTokenManager.runAuthorizations(await ((_a = score.getAuthorizationConfiguration) === null || _a === void 0 ? void 0 : _a.call(score)), {
+                    await TDPTokenManager.runAuthorizations(await score.getAuthorizationConfiguration?.(), {
                         // eslint-disable-next-line @typescript-eslint/no-loop-func
                         render: ({ authConfiguration, status, error, trigger }) => {
                             const e = error || outsideError;
@@ -223,12 +227,49 @@ onAddScoreColumn, }) {
     React.useEffect(() => {
         const initialized = taggleRef.current != null;
         if (!initialized) {
-            providerRef.current = createLocalDataProvider([], [], options.customProviderOptions);
-            providerRef.current.on(LocalDataProvider.EVENT_ORDER_CHANGED, () => null);
+            // register custom column types
+            options.customProviderOptions.columnTypes = { ...options.customProviderOptions.columnTypes, smiles: StructureImageColumn };
+            // register custom filter dialogs for custom column types
+            toolbar('filterStructureImage', 'rename')(StructureImageColumn);
+            providerRef.current = new TDPLocalDataProvider([], [], options.customProviderOptions);
+            providerRef.current.on(suffix(LocalDataProvider.EVENT_ORDER_CHANGED), () => null);
+            // add width changed listener for smiles columns in ranking
+            providerRef.current.on(suffix(LocalDataProvider.EVENT_ADD_COLUMN), (col) => {
+                if (col instanceof StructureImageColumn) {
+                    col.on(suffix(Column.EVENT_WIDTH_CHANGED), () => {
+                        // trigger a re-render of LineUp using the new calculated row height in `dynamicHeight()`
+                        taggleRef.current.update();
+                    });
+                }
+            });
+            providerRef.current.on(suffix(LocalDataProvider.EVENT_REMOVE_COLUMN), (col) => {
+                if (col instanceof StructureImageColumn) {
+                    col.on(suffix(Column.EVENT_WIDTH_CHANGED), null); // remove event listener when column is removed
+                }
+            });
             const taggleOptions = merge(defaultOptions(), options.customOptions, {
                 summaryHeader: options.enableHeaderSummary,
                 labelRotation: options.enableHeaderRotation ? 45 : 0,
+                renderers: {
+                    smiles: new StructureImageRenderer(),
+                },
+                toolbarActions: {
+                    // TODO remove default string filter; use `filterString` as key would override the default string filter, but also for string columns
+                    filterStructureImage: {
+                        title: 'Filter …',
+                        onClick: (col, evt, ctx, level, viaShortcut) => {
+                            const dialog = new StructureImageFilterDialog(col, dialogContext(ctx, level, evt), ctx);
+                            dialog.open();
+                        },
+                        options: {
+                            mode: 'menu+shortcut',
+                            featureCategory: 'ranking',
+                            featureLevel: 'basic',
+                        },
+                    },
+                },
             }, options.customOptions);
+            // FIXME simplify the `itemRowHeight` option to have less options and conditions
             if (typeof options.itemRowHeight === 'number' && options.itemRowHeight > 0) {
                 taggleOptions.rowHeight = options.itemRowHeight;
             }
@@ -238,10 +279,33 @@ onAddScoreColumn, }) {
                     defaultHeight: taggleOptions.rowHeight,
                     padding: () => 0,
                     height: (item) => {
-                        var _a;
-                        return (_a = f(item)) !== null && _a !== void 0 ? _a : (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
+                        return f(item) ?? (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
                     },
                 });
+            }
+            else {
+                /**
+                 * Calculate the row height for a group or row. If smiles columns are added to the ranking,
+                 * the width of the widest column is taken as row height. If no smiles column is added to the ranking
+                 * the default width is used.
+                 * @param data data of the group or row
+                 * @param ranking current ranking
+                 * @returns dynamic height object for LineUp
+                 */
+                taggleOptions.dynamicHeight = function dynamicRowHeight(data, ranking) {
+                    const DEFAULT_ROW_HEIGHT = defaultOptions().rowHeight; // LineUp default rowHeight = 18
+                    // get list of smiles columns from the current ranking
+                    const smilesColumns = ranking.children.filter((col) => col instanceof StructureImageColumn);
+                    if (smilesColumns.length === 0) {
+                        return { defaultHeight: DEFAULT_ROW_HEIGHT, height: () => DEFAULT_ROW_HEIGHT, padding: () => 0 };
+                    }
+                    const maxColumnHeight = Math.max(DEFAULT_ROW_HEIGHT, ...smilesColumns.map((col) => col.getWidth())); // squared image -> use col width as height
+                    return {
+                        defaultHeight: maxColumnHeight,
+                        height: () => maxColumnHeight,
+                        padding: () => 0,
+                    };
+                };
             }
             taggleRef.current = !options.enableOverviewMode
                 ? new EngineRenderer(providerRef.current, lineupContainerRef.current, taggleOptions)
@@ -257,14 +321,14 @@ onAddScoreColumn, }) {
             // TODO: should we hardcode the generalVis since it is a separate view
             // generalVisRef=new GeneralVisWrapper(providerRef.current, this, this.selectionHelper, this.node.ownerDocument);
             // When a new column desc is added to the provider, update the panel chooser
-            providerRef.current.on(LocalDataProvider.EVENT_ADD_DESC, updatePanelChooser);
+            providerRef.current.on(suffix(LocalDataProvider.EVENT_ADD_DESC), updatePanelChooser);
             // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
-            // providerRef.current.on(LocalDataProvider.EVENT_REMOVE_DESC, updatePanelChooser);
+            // providerRef.current.on(suffix(LocalDataProvider.EVENT_REMOVE_DESC), updatePanelChooser);
             panelRef.current.on(LineUpPanelActions.EVENT_SAVE_NAMED_SET, async (_event, order, name, description, sec) => {
                 const ids = selectionHelperRef.current.rowIdsAsSet(order);
                 const namedSet = await RestStorageUtils.saveNamedSet(name, itemIDType, ids, options.subType, description, sec);
                 NotificationHandler.successfullySaved(I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.successfullySaved'), name);
-                onUpdateEntryPoint === null || onUpdateEntryPoint === void 0 ? void 0 : onUpdateEntryPoint(namedSet);
+                onUpdateEntryPoint?.(namedSet);
             });
             panelRef.current.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, async (_event, scoreName, scoreId, p) => {
                 const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
@@ -279,7 +343,7 @@ onAddScoreColumn, }) {
                     // data already loaded use await to get value
                     return { ...r, ...{ data: await r.data } };
                 }));
-                onAddScoreColumn === null || onAddScoreColumn === void 0 ? void 0 : onAddScoreColumn(loadedResults);
+                onAddScoreColumn?.(loadedResults);
             });
             panelRef.current.on(LineUpPanelActions.EVENT_ZOOM_OUT, () => {
                 taggleRef.current.zoomOut();
@@ -334,17 +398,16 @@ onAddScoreColumn, }) {
                 const isEmpty = currentSelection == null || currentSelection.idtype == null || currentSelection.ids.length === 0;
                 if (!(wasEmpty && isEmpty)) {
                     // the selection has changed when we really have some new values not just another empty one
-                    onItemSelectionChanged === null || onItemSelectionChanged === void 0 ? void 0 : onItemSelectionChanged();
+                    onItemSelectionChanged?.();
                 }
-                onItemSelect === null || onItemSelect === void 0 ? void 0 : onItemSelect(current, currentSelection, name);
+                onItemSelect?.(current, currentSelection, name);
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-    const stringCols = (_b = (_a = providerRef.current) === null || _a === void 0 ? void 0 : _a.getLastRanking()) === null || _b === void 0 ? void 0 : _b.flatColumns.toString();
+    const stringCols = providerRef.current?.getLastRanking()?.flatColumns.toString();
     const columns = useMemo(() => {
-        var _a;
-        const ranking = (_a = providerRef.current) === null || _a === void 0 ? void 0 : _a.getLastRanking();
+        const ranking = providerRef.current?.getLastRanking();
         return ranking ? ranking.flatColumns : [];
         // This dep is needed because the columns are not part of a normal variable, only part of a ref. Probably should think of a better way.
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -356,7 +419,7 @@ onAddScoreColumn, }) {
             add: (columns) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
             remove: (columns) => Promise.resolve(columns.forEach((c) => c.removeMe())),
         };
-        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(context);
+        onContextChanged?.(context);
     }, [addColumn, columns, onContextChanged, colorsRef]);
     const build = React.useMemo(() => async () => {
         setBusy(true);
@@ -375,15 +438,15 @@ onAddScoreColumn, }) {
             // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
             remove: (columns) => Promise.resolve(columns.forEach((c) => c.removeMe())),
         };
-        onContextChanged === null || onContextChanged === void 0 ? void 0 : onContextChanged(selectionAdapterContext);
-        onCustomizeRanking === null || onCustomizeRanking === void 0 ? void 0 : onCustomizeRanking(LineupUtils.wrapRanking(providerRef.current, ranking));
+        onContextChanged?.(selectionAdapterContext);
+        onCustomizeRanking?.(LineupUtils.wrapRanking(providerRef.current, ranking));
         return (Promise.resolve()
             // TODO: check if this is needed
             // .then(async () => {
             //   return selectionAdapter?.selectionChanged(createContext(selection));
             // })
             .then(() => {
-            onBuiltLineUp === null || onBuiltLineUp === void 0 ? void 0 : onBuiltLineUp(providerRef.current);
+            onBuiltLineUp?.(providerRef.current, taggleRef.current);
             setBusy(false);
             taggleRef.current.update();
             setBuilt(true);
@@ -447,6 +510,7 @@ onAddScoreColumn, }) {
             selectionHelperRef.current.setItemSelection(itemSelection);
         }
     }, [busy, itemSelection]);
-    return React.createElement("div", { ref: lineupContainerRef, className: "lineup-container" });
+    return (React.createElement("div", { className: "d-flex h-100 w-100 tdp-view lineup lu-taggle lu" },
+        React.createElement("div", { ref: lineupContainerRef, className: "lineup-container flex-grow-1" })));
 }
 //# sourceMappingURL=Ranking.js.map

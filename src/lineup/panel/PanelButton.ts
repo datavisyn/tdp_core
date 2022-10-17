@@ -28,8 +28,6 @@ export interface IPanelButtonOptions {
 export class PanelButton implements IPanelButton {
   readonly node: HTMLElement;
 
-  private readonly options: IPanelButtonOptions;
-
   /**
    * Constructor of the PanelButton
    * @param parent The parent HTML DOM element
@@ -38,8 +36,10 @@ export class PanelButton implements IPanelButton {
   constructor(parent: HTMLElement, options: IPanelButtonOptions) {
     this.node = parent.ownerDocument.createElement('button');
     this.node.setAttribute('type', 'button');
-    this.node.setAttribute('data-testid', `${options.title.replace(/\s+/g, '-').toLowerCase()}-button`);
-    this.node.title = options.title;
+    if (options.title) {
+      this.node.setAttribute('data-testid', `${options.title.replace(/\s+/g, '-').toLowerCase()}-button`);
+      this.node.title = options.title;
+    }
     this.node.className = `btn btn-sm ${options.btnClass || 'btn-text-dark'} ${options.cssClass || ''}`;
     this.node.innerHTML = `<i class="${options.faIcon} fa-fw"></i>`;
 

@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from tdp_core import manager
 from tdp_core.security.model import User
 from tdp_core.security.store.alb_security_store import create as create_alb_security_store
+from tdp_core.security.store.no_security_store import create as create_no_security_store
 
 
 def test_api_key(client: TestClient):
@@ -141,3 +142,20 @@ def test_alb_security_store(client: TestClient):
     response = client.post("/logout", headers=headers)
     assert response.status_code == 200
     assert response.json()["alb_security_store"]["redirect"] == "http://localhost/logout"
+
+
+def test_no_security_store(client: TestClient):
+    # Add some basic configuration
+    manager.settings.tdp_core.security.store.no_security_store.enable = True
+    manager.settings.tdp_core.security.store.no_security_store.user = "test_name"
+    manager.settings.tdp_core.security.store.no_security_store.roles = ["test_role"]
+
+    store = create_no_security_store()
+    assert store is not None
+
+    manager.security.user_stores = [store]
+
+    user_info = client.get("/loggedinas").json()
+    assert user_info != '"not_yet_logged_in"'
+    assert user_info["name"] == "test_name"
+    assert user_info["roles"] == ["test_role"]
