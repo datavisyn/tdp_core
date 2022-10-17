@@ -335,12 +335,13 @@ onAddScoreColumn, }) {
                 const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
                 const plugin = await pluginDesc.load();
                 let params;
-                if (!WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-                    const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
-                    params = await AttachemntUtils.resolveExternalized(storedParams);
+                // skip attachment utils call when feature flag is enabled
+                if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+                    params = p;
                 }
                 else {
-                    params = p;
+                    const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
+                    params = await AttachemntUtils.resolveExternalized(storedParams);
                 }
                 const score = plugin.factory(params, pluginDesc);
                 const scores = Array.isArray(score) ? score : [score];

@@ -454,11 +454,12 @@ export function Ranking({
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
         const plugin = await pluginDesc.load();
         let params;
-        if (!WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+        // skip attachment utils call when feature flag is enabled
+        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+          params = p;
+        } else {
           const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
           params = await AttachemntUtils.resolveExternalized(storedParams);
-        } else {
-          params = p;
         }
         const score: IScore<any> | IScore<any>[] = plugin.factory(params, pluginDesc);
         const scores = Array.isArray(score) ? score : [score];
