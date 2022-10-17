@@ -54,7 +54,7 @@ import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
-import {WebpackEnv} from '../base';
+import { WebpackEnv } from '../base';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;
