@@ -54,6 +54,7 @@ import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+import {WebpackEnv} from '../base';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;
@@ -450,10 +451,15 @@ export function Ranking({
       );
 
       panelRef.current.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, async (_event, scoreName: string, scoreId: string, p: any) => {
-        const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
         const plugin = await pluginDesc.load();
-        const params = await AttachemntUtils.resolveExternalized(storedParams);
+        let params;
+        if (!WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+          const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
+          params = await AttachemntUtils.resolveExternalized(storedParams);
+        } else {
+          params = p;
+        }
         const score: IScore<any> | IScore<any>[] = plugin.factory(params, pluginDesc);
         const scores = Array.isArray(score) ? score : [score];
         const results = await Promise.all(scores.map((s) => addScoreColumn(s)));
