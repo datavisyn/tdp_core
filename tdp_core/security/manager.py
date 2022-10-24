@@ -115,7 +115,17 @@ class SecurityManager:
     @property
     def current_user(self) -> Optional[User]:
         try:
-            return self.load_from_request(get_request())
+            req = get_request()
+            # Fetch the existing user from the request if there is any
+            try:
+                user = req.state.user
+                if user:
+                    return user
+            except (KeyError, AttributeError):
+                pass
+            # If there is no user, try to load it from the request and store it in the request
+            user = req.state.user = self.load_from_request(get_request())
+            return user
         except HTTPException:
             return None
         except Exception:
@@ -182,7 +192,8 @@ class SecurityManager:
         async def refresh_token_middleware(request: Request, call_next):
             response = await call_next(request)
             try:
-                user = self.current_user
+                # Use the cached user from the request, to only refresh a token if the user was actually requested. This avoids calling load_from_request for every request.
+                user = request.state.user
                 if user and user.access_token:
                     exp_timestamp = access_token_to_payload(user.access_token)["exp"]
                     target_timestamp = datetime.timestamp(
@@ -191,7 +202,7 @@ class SecurityManager:
                     if target_timestamp > exp_timestamp:
                         access_token, payload = user_to_access_token(user)
                         add_access_token_to_response(response, access_token)
-            except (RuntimeError, KeyError):
+            except (RuntimeError, KeyError, AttributeError):
                 # Case where there is not a valid JWT. Just return the original respone
                 pass
             finally:
