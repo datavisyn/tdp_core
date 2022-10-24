@@ -16,8 +16,8 @@ cd tdp_core
 yarn install
 
 # Backend
-python3 -m venv env  # create a new virutal environment
-source env/bin/activate  # active it
+python3 -m venv .venv  # create a new virtual environment
+source .venv/bin/activate  # active it
 make develop  # install all dependencies
 ```
 
