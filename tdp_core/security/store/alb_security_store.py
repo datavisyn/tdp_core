@@ -35,7 +35,8 @@ class ALBSecurityStore(BaseStore):
                 # Create new user from given attributes
                 user = deep_get(user_data, self.token_user_attr)
                 _log.debug("user: %s", user)
-                roles = deep_get(user_data, self.token_roles_attr)
+                if self.token_roles_attr:
+                    roles = deep_get(user_data, self.token_roles_attr)
                 if not roles:
                     roles = []
                 elif type(roles) != dict:
