@@ -1,4 +1,4 @@
-import { ProvenanceGraph } from './ProvenanceGraph';
+import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';
 import { IProvenanceGraphManager } from './provenance';
 import { IProvenanceGraphDataDescription } from './ICmd';
 import { ILocalStorageProvenanceGraphManagerOptions } from './LocalStorageProvenanceGraphManager';
@@ -20,9 +20,9 @@ export declare class MixedStorageProvenanceGraphManager implements IProvenanceGr
     cloneLocal(desc: IProvenanceGraphDataDescription, extras?: any): Promise<ProvenanceGraph>;
     cloneRemote(desc: IProvenanceGraphDataDescription, extras?: any): Promise<ProvenanceGraph>;
     migrateRemote(graph: ProvenanceGraph, extras?: any): PromiseLike<ProvenanceGraph>;
-    importLocal(json: any, desc?: any): Promise<ProvenanceGraph>;
-    importRemote(json: any, desc?: any): PromiseLike<ProvenanceGraph>;
-    import(json: any, desc?: any): Promise<ProvenanceGraph>;
+    importLocal(json: IProvenanceGraphDump, desc?: any): Promise<ProvenanceGraph>;
+    importRemote(json: IProvenanceGraphDump, desc?: any): PromiseLike<ProvenanceGraph>;
+    import(json: IProvenanceGraphDump, desc?: any): Promise<ProvenanceGraph>;
     createLocal(desc?: any): Promise<ProvenanceGraph>;
     createRemote(desc?: any): Promise<ProvenanceGraph>;
     create(desc?: any): Promise<ProvenanceGraph>;

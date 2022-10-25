@@ -163,8 +163,7 @@ export class ARankingView extends AView {
                 defaultHeight: taggleOptions.rowHeight,
                 padding: () => 0,
                 height: (item) => {
-                    var _a;
-                    return (_a = f(item)) !== null && _a !== void 0 ? _a : (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
+                    return f(item) ?? (isGroup(item) ? taggleOptions.groupHeight : taggleOptions.rowHeight);
                 },
             });
         }
@@ -180,14 +179,19 @@ export class ARankingView extends AView {
         this.node.appendChild(luBackdrop);
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-        this.generalVis = new LineupVisWrapper({
-            provider: this.provider,
-            selectionCallback: (ids) => {
-                // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
-                this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
-            },
-            doc: this.node.ownerDocument,
-        });
+        if (this.options.enableVisPanel) {
+            this.generalVis = new LineupVisWrapper({
+                provider: this.provider,
+                selectionCallback: (ids) => {
+                    // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                    this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+                },
+                doc: this.node.ownerDocument,
+            });
+            this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+                this.generalVis.toggleCustomVis();
+            });
+        }
         // When a new column desc is added to the provider, update the panel chooser
         this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
         // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
@@ -207,9 +211,6 @@ export class ARankingView extends AView {
         this.panel.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
             this.taggle.zoomIn();
         });
-        this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-            this.generalVis.toggleCustomVis();
-        });
         if (this.options.enableOverviewMode) {
             const rule = spaceFillingRule(taggleOptions);
             this.panel.on(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, (_event, isOverviewActive) => {
@@ -222,14 +223,18 @@ export class ARankingView extends AView {
         }
         if (this.options.enableSidePanel) {
             this.node.appendChild(this.panel.node);
-            this.node.appendChild(this.generalVis.node);
+            if (options.enableVisPanel) {
+                this.node.appendChild(this.generalVis.node);
+            }
             if (this.options.enableSidePanel !== 'top') {
                 this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
             }
         }
         this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
             this.setItemSelection(sel);
-            this.generalVis.updateCustomVis();
+            if (options.enableVisPanel) {
+                this.generalVis.updateCustomVis();
+            }
         });
         this.selectionAdapter = this.createSelectionAdapter();
     }
@@ -239,16 +244,17 @@ export class ARankingView extends AView {
      */
     init(params, onParameterChange) {
         return super.init(params, onParameterChange).then(() => {
-            if (!WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-                // inject stats
-                const base = params.querySelector('form') || params;
-                base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
-                const container = base.lastElementChild;
-                container.appendChild(this.stats);
-                if (this.options.enableSidePanel === 'top') {
-                    container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
-                    container.insertAdjacentElement('afterbegin', this.panel.node);
-                }
+            if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+                return; // do nothing when feature flag is enabled
+            }
+            // inject stats
+            const base = params.querySelector('form') || params;
+            base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
+            const container = base.lastElementChild;
+            container.appendChild(this.stats);
+            if (this.options.enableSidePanel === 'top') {
+                container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
+                container.insertAdjacentElement('afterbegin', this.panel.node);
             }
         });
     }
@@ -366,7 +372,9 @@ export class ARankingView extends AView {
             return;
         }
         this.panel.hide();
-        this.generalVis.hide();
+        if (this.options.enableVisPanel) {
+            this.generalVis.hide();
+        }
         if (this.dump !== null) {
             return;
         }
@@ -412,7 +420,6 @@ export class ARankingView extends AView {
         });
         const data = new Promise((resolve) => {
             (async () => {
-                var _a;
                 // Wait for the column to be initialized
                 const col = await columnPromise;
                 /**
@@ -423,7 +430,7 @@ export class ARankingView extends AView {
                 let done = false;
                 while (!done) {
                     // eslint-disable-next-line no-await-in-loop
-                    await TDPTokenManager.runAuthorizations(await ((_a = score.getAuthorizationConfiguration) === null || _a === void 0 ? void 0 : _a.call(score)), {
+                    await TDPTokenManager.runAuthorizations(await score.getAuthorizationConfiguration?.(), {
                         // eslint-disable-next-line @typescript-eslint/no-loop-func
                         render: ({ authConfiguration, status, error, trigger }) => {
                             const e = error || outsideError;
@@ -518,6 +525,7 @@ export class ARankingView extends AView {
      * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
      */
     async addTrackedScoreColumn(score, position) {
+        // skip provenance impl when feature flag is enabled
         if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
             return this.addScoreColumn(score, position);
         }
@@ -532,6 +540,7 @@ export class ARankingView extends AView {
      * @returns {Promise<boolean>}
      */
     async removeTrackedScoreColumn(columnId) {
+        // skip provenance impl when feature flag is enabled
         if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
             const column = this.provider.find(columnId);
             return column.removeMe();

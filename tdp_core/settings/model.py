@@ -33,9 +33,17 @@ class AlbSecurityStoreSettings(BaseModel):
     signout_url: Optional[str] = None
 
 
+class NoSecurityStoreSettings(BaseModel):
+    enable: bool = False
+    user: str = "admin"
+    roles: List[str] = []
+
+
 class SecurityStoreSettings(BaseModel):
     alb_security_store: AlbSecurityStoreSettings = AlbSecurityStoreSettings()
     """Settings for the ALB security store"""
+    no_security_store: NoSecurityStoreSettings = NoSecurityStoreSettings()
+    """Settings for the no security store"""
 
 
 class SecuritySettings(BaseModel):

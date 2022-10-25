@@ -18,7 +18,7 @@ export function ProxyViewComponent({ site }) {
             currentNode.addEventListener('load', listener);
             currentNode.addEventListener('loadstart', listener);
         }
-        return () => currentNode === null || currentNode === void 0 ? void 0 : currentNode.removeEventListener('load', listener);
+        return () => currentNode?.removeEventListener('load', listener);
     }, [loadingFrame, site]);
     return (React.createElement("div", { className: `w-100 h-100 ${websiteLoading ? 'tdp-busy' : ''}` },
         React.createElement("iframe", { ref: loadingFrame, className: "w-100 h-100", src: site })));

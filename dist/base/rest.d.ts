@@ -1,3 +1,4 @@
+import { ICategory } from 'lineupjs';
 import { IDTypeLike } from '../idtype';
 import { IScoreRow } from './interfaces';
 /**
@@ -95,8 +96,9 @@ export interface IServerColumn {
     type: 'categorical' | 'number' | 'string';
     /**
      * the categories in case of type=categorical
+     * Compliant with https://github.com/lineupjs/lineupjs/blob/fad387fc892753ca819ea1a6b21b6568891c806e/src/model/ICategoricalColumn.ts#L7
      */
-    categories?: string[];
+    categories?: (string | Partial<ICategory>)[];
     /**
      * the minimal value in case of type=number
      */

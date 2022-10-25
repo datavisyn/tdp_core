@@ -94,8 +94,8 @@ async function setPlotsWithGroupsAndMultiples(columns, catCol, aggregateType, ag
                 const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
                 const allObjsIds = new Set(allObjs.map((o) => o.id));
                 const joinedObjs = allObjs.filter((c) => allGroupObjsIds.has(c.id) && allMultiplesObjsIds.has(c.id));
-                const aggregateValues = getAggregateValues(aggregateType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
-                const ungroupedAggregateValues = getAggregateValues(aggregateType, currMultiplesColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues, uniqueMultiplesVals);
+                const aggregateValues = getAggregateValues(aggregateType, joinedObjs, aggColValues?.resolvedValues);
+                const ungroupedAggregateValues = getAggregateValues(aggregateType, currMultiplesColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)), aggColValues?.resolvedValues, uniqueMultiplesVals);
                 return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
             })
                 .flat();
@@ -161,8 +161,8 @@ async function setPlotsWithGroups(columns, catCol, aggregateType, aggregateColum
             const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
             const allObjsIds = new Set(allObjs.map((o) => o.id));
             const joinedObjs = allObjs.filter((allVal) => allGroupObjsIds.has(allVal.id));
-            const aggregateValues = getAggregateValues(aggregateType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
-            const ungroupedAggregateValues = getAggregateValues(aggregateType, groupColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)), aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues, uniqueGroupVals, true);
+            const aggregateValues = getAggregateValues(aggregateType, joinedObjs, aggColValues?.resolvedValues);
+            const ungroupedAggregateValues = getAggregateValues(aggregateType, groupColumn.resolvedValues.filter((val) => allObjsIds.has(val.id)), aggColValues?.resolvedValues, uniqueGroupVals, true);
             return joinedObjs.length === 0 ? [0] : normalizedFlag ? (aggregateValues[0] / ungroupedAggregateValues) * 100 : aggregateValues;
         })
             .flat();
@@ -225,7 +225,7 @@ async function setPlotsWithMultiples(columns, catCol, aggregateType, aggregateCo
             .map((v) => {
             const allObjs = catColValues.resolvedValues.filter((c) => c.val === v);
             const joinedObjs = allObjs.filter((c) => allMultiplesObjsIds.has(c.id));
-            return joinedObjs.length === 0 ? [0] : getAggregateValues(aggregateType, joinedObjs, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+            return joinedObjs.length === 0 ? [0] : getAggregateValues(aggregateType, joinedObjs, aggColValues?.resolvedValues);
         })
             .flat();
         const plotAggregateAxisName = createAxisLabel(aggregateType, aggregateColumn);
@@ -276,7 +276,7 @@ async function setPlotsBasic(columns, aggregateType, aggregateColumn, catCol, co
     const catColValues = await resolveSingleColumn(catCol);
     const aggColValues = await resolveSingleColumn(aggregateColumn);
     const vertFlag = config.direction === EBarDirection.VERTICAL;
-    const aggValues = getAggregateValues(aggregateType, catColValues.resolvedValues, aggColValues === null || aggColValues === void 0 ? void 0 : aggColValues.resolvedValues);
+    const aggValues = getAggregateValues(aggregateType, catColValues.resolvedValues, aggColValues?.resolvedValues);
     const valArr = [...new Set(catColValues.resolvedValues.map((v) => v.val))];
     // stores the actual points of each bar/section of bar in the custom data.
     const valIdArr = valArr.map((val) => []);

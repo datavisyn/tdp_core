@@ -1,8 +1,8 @@
 import { merge } from 'lodash';
 import { DataCache } from '../../data/DataCache';
 import { ProvenanceGraph } from './ProvenanceGraph';
-import { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
-import { IProvenanceGraphDataDescription } from './ICmd';
+import type { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
+import type { IProvenanceGraphDataDescription } from './ICmd';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { GraphBase } from '../graph/GraphBase';
 import { UserSession } from '../../app/UserSession';

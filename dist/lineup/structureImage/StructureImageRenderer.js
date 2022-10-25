@@ -7,7 +7,6 @@ function getImageURL(structure, substructure = null, align = null) {
     return `/api/rdkit/?structure=${encodeURIComponent(structure)}${substructure ? `&substructure=${encodeURIComponent(substructure)}` : ''}${align ? `&align=${encodeURIComponent(align)}` : ''}`;
 }
 async function fetchImage({ url, data, method }) {
-    var _a;
     const response = await fetch(url, {
         headers: {
             'Content-Type': 'application/json',
@@ -22,7 +21,7 @@ async function fetchImage({ url, data, method }) {
             : {}),
     });
     if (!response.ok) {
-        throw Error(((_a = (await response.json().catch(() => null))) === null || _a === void 0 ? void 0 : _a.message) || response.statusText);
+        throw Error((await response.json().catch(() => null))?.message || response.statusText);
     }
     return response.text();
 }
@@ -57,22 +56,20 @@ export class StructureImageRenderer {
         return {
             template,
             update: (n, d) => {
-                var _a;
                 if (!renderMissingDOM(n, col, d)) {
-                    if ((_a = d.v.images) === null || _a === void 0 ? void 0 : _a[0]) {
+                    if (d.v.images?.[0]) {
                         n.style.backgroundImage = svgToCSSBackground(d.v.images[0]);
                         return null;
                     }
-                    const value = col === null || col === void 0 ? void 0 : col.getValue(d);
+                    const value = col?.getValue(d);
                     // Load aysnc to avoid triggering
                     return abortAble(new Promise((resolve) => {
                         window.setTimeout(() => resolve(value), 500);
                     })).then((image) => {
-                        var _a;
                         if (typeof image === 'symbol') {
                             return;
                         }
-                        n.style.backgroundImage = `url('${getImageURL(value, (_a = col.getFilter()) === null || _a === void 0 ? void 0 : _a.filter, col.getAlign())}')`;
+                        n.style.backgroundImage = `url('${getImageURL(value, col.getFilter()?.filter, col.getAlign())}')`;
                         n.title = value;
                         n.href = `https://pubchem.ncbi.nlm.nih.gov/#query=${value}`;
                     });

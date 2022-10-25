@@ -54,6 +54,7 @@ import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+import { WebpackEnv } from '../base';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;
@@ -81,7 +82,7 @@ export interface IRankingProps {
 
   onUpdateEntryPoint?: (namedSet: unknown) => void;
   onCustomizeRanking?: (rankingWrapper: IRankingWrapper) => void;
-  onBuiltLineUp?: (provider: LocalDataProvider) => void;
+  onBuiltLineUp?: (provider: LocalDataProvider, engine: EngineRenderer | TaggleRenderer) => void;
 }
 
 const defaults: IRankingOptions = {
@@ -450,10 +451,16 @@ export function Ranking({
       );
 
       panelRef.current.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, async (_event, scoreName: string, scoreId: string, p: any) => {
-        const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
         const plugin = await pluginDesc.load();
-        const params = await AttachemntUtils.resolveExternalized(storedParams);
+        let params;
+        // skip attachment utils call when feature flag is enabled
+        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+          params = p;
+        } else {
+          const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
+          params = await AttachemntUtils.resolveExternalized(storedParams);
+        }
         const score: IScore<any> | IScore<any>[] = plugin.factory(params, pluginDesc);
         const scores = Array.isArray(score) ? score : [score];
         const results = await Promise.all(scores.map((s) => addScoreColumn(s)));
@@ -582,7 +589,7 @@ export function Ranking({
           //   return selectionAdapter?.selectionChanged(createContext(selection));
           // })
           .then(() => {
-            onBuiltLineUp?.(providerRef.current);
+            onBuiltLineUp?.(providerRef.current, taggleRef.current);
             setBusy(false);
             taggleRef.current.update();
             setBuilt(true);
@@ -658,5 +665,9 @@ export function Ranking({
     }
   }, [busy, itemSelection]);
 
-  return <div ref={lineupContainerRef} className="lineup-container" />;
+  return (
+    <div className="d-flex h-100 w-100 tdp-view lineup lu-taggle lu">
+      <div ref={lineupContainerRef} className="lineup-container flex-grow-1" />
+    </div>
+  );
 }
