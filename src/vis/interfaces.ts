@@ -1,4 +1,4 @@
-import { Plotly } from './Plot';
+import type { Plotly } from './Plot';
 
 export enum ESupportedPlotlyVis {
   SCATTER = 'Scatter Plot',

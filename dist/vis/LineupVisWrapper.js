@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CategoricalColumn, LocalDataProvider, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
+// TODO: Lazify
 import { Vis } from './Vis';
 import { EColumnTypes, EFilterOptions } from './interfaces';
 import { I18nextManager } from '../i18n/I18nextManager';

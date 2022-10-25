@@ -42,7 +42,7 @@ import { debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { ISecureItem } from '../security';
-import { LineupVisWrapper } from '../vis';
+import type { LineupVisWrapper } from '../vis';
 import { WebpackEnv } from '../base/WebpackEnv';
 
 /**
@@ -71,7 +71,7 @@ export abstract class ARankingView extends AView {
 
   private readonly panel: LineUpPanelActions;
 
-  private readonly generalVis: LineupVisWrapper;
+  private generalVis: LineupVisWrapper;
 
   /**
    * clears and rebuilds this lineup instance from scratch
@@ -247,8 +247,9 @@ export abstract class ARankingView extends AView {
     this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
-    if (this.options.enableVisPanel) {
-      this.generalVis = new LineupVisWrapper({
+
+    import('../vis/LineupVisWrapper').then((m) => {
+      this.generalVis = new m.LineupVisWrapper({
         provider: this.provider,
         selectionCallback: (ids: string[]) => {
           // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
@@ -260,7 +261,12 @@ export abstract class ARankingView extends AView {
       this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
         this.generalVis.toggleCustomVis();
       });
-    }
+
+      if (this.options.enableSidePanel) {
+        this.node.appendChild(this.generalVis.node);
+      }
+    });
+    // this.generalVis = new LineupVisWrapper();
 
     // When a new column desc is added to the provider, update the panel chooser
     this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
@@ -296,11 +302,6 @@ export abstract class ARankingView extends AView {
 
     if (this.options.enableSidePanel) {
       this.node.appendChild(this.panel.node);
-
-      if (options.enableVisPanel) {
-        this.node.appendChild(this.generalVis.node);
-      }
-
       if (this.options.enableSidePanel !== 'top') {
         this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
       }
@@ -308,10 +309,7 @@ export abstract class ARankingView extends AView {
 
     this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel: ISelection) => {
       this.setItemSelection(sel);
-
-      if (options.enableVisPanel) {
-        this.generalVis.updateCustomVis();
-      }
+      this.generalVis?.updateCustomVis();
     });
     this.selectionAdapter = this.createSelectionAdapter();
   }
@@ -465,9 +463,7 @@ export abstract class ARankingView extends AView {
     }
 
     this.panel.hide();
-    if (this.options.enableVisPanel) {
-      this.generalVis.hide();
-    }
+    this.generalVis.hide();
 
     if (this.dump !== null) {
       return;
