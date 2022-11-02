@@ -2,7 +2,7 @@ import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect, useState } from 'react';
-import { ActionIcon, Center, Container, Group, Stack } from '@mantine/core';
+import { ActionIcon, Center, Container, Group, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { InvalidCols } from '../general/InvalidCols';
@@ -72,8 +72,9 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         return beautifyLayout(traces, innerLayout);
     }, [traces, config.dragMode]);
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', overflow: 'hidden' }, ref: plotlyDivRef },
-        React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
-            React.createElement(FontAwesomeIcon, { icon: faGear })),
+        React.createElement(Tooltip, { withinPortal: true, label: "Open Settings" },
+            React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
+                React.createElement(FontAwesomeIcon, { icon: faGear }))),
         React.createElement(Stack, { spacing: 0, sx: { height: '100%' } },
             React.createElement(Center, null,
                 React.createElement(Group, { mt: "lg" },

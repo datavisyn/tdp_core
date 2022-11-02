@@ -1,10 +1,10 @@
 export var ESupportedPlotlyVis;
 (function (ESupportedPlotlyVis) {
-    ESupportedPlotlyVis["SCATTER"] = "Scatter Plot";
-    ESupportedPlotlyVis["VIOLIN"] = "Violin Plot";
-    ESupportedPlotlyVis["STRIP"] = "Strip Plot";
-    ESupportedPlotlyVis["BAR"] = "Bar Chart";
-    ESupportedPlotlyVis["HEXBIN"] = "Hexbin Plot";
+    ESupportedPlotlyVis["SCATTER"] = "Scatter plot";
+    ESupportedPlotlyVis["VIOLIN"] = "Violin plot";
+    ESupportedPlotlyVis["STRIP"] = "Strip plot";
+    ESupportedPlotlyVis["BAR"] = "Bar chart";
+    ESupportedPlotlyVis["HEXBIN"] = "Hexbin plot";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
 export const allVisTypes = [
     ESupportedPlotlyVis.SCATTER,

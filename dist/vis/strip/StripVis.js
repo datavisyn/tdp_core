@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as d3v7 from 'd3v7';
 import { merge, uniqueId } from 'lodash';
 import { useMemo, useEffect, useState } from 'react';
-import { ActionIcon, Container, Space } from '@mantine/core';
+import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { PlotlyComponent, Plotly } from '../Plot';
@@ -65,8 +65,9 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
     }, [traces]);
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%' }, ref: plotlyDivRef },
         React.createElement(Space, { h: "xl" }),
-        React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
-            React.createElement(FontAwesomeIcon, { icon: faGear })),
+        React.createElement(Tooltip, { withinPortal: true, label: "Open Settings" },
+            React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
+                React.createElement(FontAwesomeIcon, { icon: faGear }))),
         mergedExtensions.prePlot,
         traceStatus === 'success' && traces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, className: "tdpCoreVis", onSelected: (sel) => {
                 selectionCallback(sel ? sel.points.map((d) => d.id) : []);
