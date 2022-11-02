@@ -302,7 +302,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
   useEffect(() => {
     const zoom = d3v7.zoom();
 
-    if (!xScale || !yScale || config.dragMode === EScatterSelectSettings.RECTANGLE) {
+    if (!xScale || !yScale) {
       return;
     }
 
@@ -321,7 +321,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
     });
 
     d3v7.select(`#${id}zoom`).call(zoom);
-  }, [id, xScale, yScale, height, width, config.dragMode]);
+  }, [id, xScale, yScale, height, width]);
 
   // apply brushing
   useEffect(() => {
