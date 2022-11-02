@@ -74,7 +74,6 @@ export function HexbinVisSidebar({
           <HexSizeSwitch currentValue={config.isSizeScale} callback={(isSizeScale: boolean) => setConfig({ ...config, isSizeScale })} />
           <HexOpacitySwitch currentValue={config.isOpacityScale} callback={(isOpacityScale: boolean) => setConfig({ ...config, isOpacityScale })} />
         </Stack>
-        {/* <HexbinOptionSelect callback={(hexbinOptions: EHexbinOptions) => setConfig({ ...config, hexbinOptions })} currentSelected={config.hexbinOptions} /> */}
         {mergedExtensions.preSidebar}
         {mergedExtensions.postSidebar}
       </Stack>

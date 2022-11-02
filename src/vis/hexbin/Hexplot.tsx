@@ -237,8 +237,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
   // simple radius scale for the hexes
   const radiusScale = useMemo(() => {
     if (colsStatus === 'success') {
-      const min = d3v7.min(hexes.map((h) => h.length));
-      const max = d3v7.max(hexes.map((h) => h.length));
+      const [min, max] = d3v7.extent(hexes, (h) => h.length);
 
       return d3v7
         .scaleLinear()
@@ -252,8 +251,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
   // simple opacity scale for the hexes
   const opacityScale = useMemo(() => {
     if (colsStatus === 'success') {
-      const min = d3v7.min(hexes.map((h) => h.length));
-      const max = d3v7.max(hexes.map((h) => h.length));
+      const [min, max] = d3v7.extent(hexes, (h) => h.length);
 
       return d3v7.scaleLinear().domain([min, max]).range([0.1, 1]);
     }
