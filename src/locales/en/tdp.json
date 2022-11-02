@@ -183,6 +183,7 @@
       "barError": "To create a Bar chart, please select 1 categorical column.",
       "errorHeader": "Invalid settings",
       "openSettings": "Open settings",
+      "hexbinOptions": "Hexbin options",
       "missingValue": "n/a"
     },
 
