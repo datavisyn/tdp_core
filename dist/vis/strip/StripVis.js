@@ -13,6 +13,7 @@ import { useAsync } from '../../hooks';
 import { StripVisSidebar } from './StripVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -58,14 +59,13 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
             autosize: true,
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
-            violingap: 0,
             dragmode: 'select',
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces]);
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%' }, ref: plotlyDivRef },
         React.createElement(Space, { h: "xl" }),
-        React.createElement(Tooltip, { withinPortal: true, label: "Open Settings" },
+        React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear }))),
         mergedExtensions.prePlot,

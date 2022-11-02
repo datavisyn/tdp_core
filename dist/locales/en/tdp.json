@@ -168,6 +168,7 @@
             "stripError": "To create a Strip plot, please select at least 1 numerical column.",
             "barError": "To create a Bar chart, please select 1 categorical column.",
             "errorHeader": "Invalid Settings",
+            "openSettings": "Open settings",
             "missingValue": "n/a"
         },
         "lineup": {

@@ -1,8 +1,7 @@
 import * as React from 'react';
+import { Container, Alert } from '@mantine/core';
 export function InvalidCols({ headerMessage, bodyMessage }) {
-    return (React.createElement("div", { className: "card w-25 h-10 justify-content-center" },
-        React.createElement("div", { className: "card-header" }, headerMessage),
-        React.createElement("div", { className: "card-body" },
-            React.createElement("p", { className: "card-text" }, bodyMessage))));
+    return (React.createElement(Container, null,
+        React.createElement(Alert, { title: "Bummer!", color: "red" }, "Something terrible happened! You made a mistake and there is no going back, your data was lost forever!")));
 }
 //# sourceMappingURL=InvalidCols.js.map

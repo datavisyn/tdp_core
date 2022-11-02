@@ -14,6 +14,7 @@ import { createBarTraces } from './utils';
 import { BarVisSidebar } from './BarVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -112,7 +113,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%' }, ref: plotlyDivRef },
         mergedExtensions.prePlot,
         React.createElement(Space, { h: "xl" }),
-        React.createElement(Tooltip, { withinPortal: true, label: "Open Settings" },
+        React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear }))),
         traceStatus === 'success' && finalTraces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, className: "tdpCoreVis", onClick: (e) => {

@@ -28,7 +28,7 @@ function Legend({
 }: {
   categories: string[];
   filteredCategories: string[];
-  colorScale: any;
+  colorScale: d3v7.ScaleOrdinal<string, string>;
   onClick: (string) => void;
 }) {
   return (
@@ -72,13 +72,11 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
   const yZoomedScale = useRef<d3v7.ScaleLinear<number, number, never>>(null);
   const [xZoomTransform, setXZoomTransform] = useState(0);
   const [yZoomTransform, setYZoomTransform] = useState(0);
-  const [xRescaleFunc, setXRescaleFunc] = useState<any>(null);
-  const [yRescaleFunc, setYRescaleFunc] = useState<any>(null);
   const [zoomScale, setZoomScale] = useState(1);
 
   const [filteredCategories, setFilteredCategories] = useState<string[]>([]);
 
-  const { value: allColumns, status: colsStatus, error: colsError } = useAsync(getHexData, [columns, config.numColumnsSelected, config.color]);
+  const { value: allColumns, status: colsStatus } = useAsync(getHexData, [columns, config.numColumnsSelected, config.color]);
 
   const id = React.useMemo(() => uniqueId('HexPlot'), []);
 
@@ -170,10 +168,6 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
         .domain([min - min / 20, max + max / 20])
         .range([margin.left, margin.left + width]);
 
-      if (xRescaleFunc) {
-        xZoomedScale.current = xRescaleFunc(newScale);
-      }
-
       return newScale;
     }
 
@@ -191,10 +185,6 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
         .scaleLinear()
         .domain([min - min / 20, max + max / 20])
         .range([margin.top + height, margin.top]);
-
-      if (yRescaleFunc) {
-        yZoomedScale.current = yRescaleFunc(newScale);
-      }
 
       return newScale;
     }
@@ -322,13 +312,8 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
       const newX = transform.rescaleX(xScale);
       const newY = transform.rescaleY(yScale);
 
-      // Question: I dont think this should be a ref, because it doesnt actually cause a re render. Only the other setters below make it work, if i moved them above this code there would be bugs.
-      // But when I made it a useState object it didnt work with the object.
       xZoomedScale.current = newX;
       yZoomedScale.current = newY;
-
-      setXRescaleFunc(() => (x) => transform.rescaleX(x));
-      setYRescaleFunc(() => (y) => transform.rescaleY(y));
 
       setZoomScale(transform.k);
       setXZoomTransform(transform.x);
@@ -340,17 +325,16 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
 
   // apply brushing
   useEffect(() => {
+    // Since our brush doesnt persist after selection anyways, we can safely just do nothing
     if (config.dragMode !== EScatterSelectSettings.RECTANGLE) {
-      d3v7.select(`#${id}brush`).selectAll('rect').remove();
-      return;
+      return undefined;
     }
 
     const brush = d3v7.brush().extent([
       [margin.left, margin.top],
       [margin.left + width, margin.top + height],
     ]);
-    // it does look like we are creating a ton of brush events without cleaning them up right here.
-    // But d3v7.call will remove the previous brush event when called, so this actually works as expected.
+
     d3v7.select(`#${id}brush`).call(
       // this is a real function and not a => so that I can use d3v7.select(this) inside to clear the brush
       brush.on('end', function (event: D3BrushEvent<any>) {
@@ -384,10 +368,12 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
         d3v7.select(this).call(brush.move, null);
       }),
     );
-  }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale, xScale, yScale, margin]);
 
-  // TODO: svg elements seem weird with style/classNames. I can directly put on a transform to a g, for example, but it seems to work
-  // differently than if i use style to do so
+    return () => {
+      brush.on('end', null);
+    };
+  }, [width, height, id, hexes, selectionCallback, config.dragMode, xScale, yScale, margin]);
+
   return (
     <Container ref={ref} fluid sx={{ width: '100%' }}>
       <svg className="hexbinSvg" id={id} width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>

@@ -14,6 +14,7 @@ import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -66,13 +67,12 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             autosize: true,
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
-            violingap: 0,
             dragmode: config.dragMode,
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces, config.dragMode]);
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', overflow: 'hidden' }, ref: plotlyDivRef },
-        React.createElement(Tooltip, { withinPortal: true, label: "Open Settings" },
+        React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear }))),
         React.createElement(Stack, { spacing: 0, sx: { height: '100%' } },

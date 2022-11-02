@@ -13,5 +13,5 @@ export function HexbinOptionSelect({ callback, currentSelected }: HexbinOptionSe
     { value: EHexbinOptions.BINS, label: EHexbinOptions.BINS },
     { value: EHexbinOptions.PIE, label: EHexbinOptions.PIE },
   ];
-  return <Select label="Hexbin Options" onChange={(e) => callback(e as EHexbinOptions)} data={options} value={currentSelected} />;
+  return <Select label="Hexbin options" onChange={(e) => callback(e as EHexbinOptions)} data={options} value={currentSelected} />;
 }
