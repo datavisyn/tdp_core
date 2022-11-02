@@ -2,7 +2,7 @@ import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect, useState } from 'react';
-import { ActionIcon, Container, Space } from '@mantine/core';
+import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
@@ -111,9 +111,11 @@ export function ViolinVis({
     <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
       <Space h="xl" />
 
-      <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-        <FontAwesomeIcon icon={faGear} />
-      </ActionIcon>
+      <Tooltip withinPortal label="Open Settings">
+        <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <FontAwesomeIcon icon={faGear} />
+        </ActionIcon>
+      </Tooltip>
       {mergedExtensions.prePlot}
 
       {traceStatus === 'success' && traces?.plots.length > 0 ? (

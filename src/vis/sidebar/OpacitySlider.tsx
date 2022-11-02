@@ -25,7 +25,7 @@ export function OpacitySlider({ callback, currentValue }: OpacitySliderProps) {
       <Box sx={{ width: '200px' }}>
         <Slider
           step={0.05}
-          value={currentValue}
+          value={+currentValue.toFixed(2)}
           max={1}
           min={0}
           marks={[
