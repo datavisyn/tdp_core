@@ -110,7 +110,7 @@ export function SingleHex({
               fill: `${colorScale ? (isSelected || Object.keys(selected).length === 0 ? colorScale(topCategory) : 'gray') : 'black'}`,
               transform: `translate(${hexData.x}px, ${hexData.y}px)`,
               stroke: isSelected ? '#E29609' : 'white',
-              strokeWidth: isSelected ? 1 : 0,
+              strokeWidth: isSelected ? (colorScale ? 1 : 2) : 0,
               fillOpacity: isOpacityScale ? opacityScale(hexData.length) : '1',
             }}
           />
