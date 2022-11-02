@@ -14,6 +14,7 @@ import { createBarTraces } from './utils';
 import { BarVisSidebar } from './BarVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 
 interface BarVisProps {
   config: IBarConfig;
@@ -151,7 +152,7 @@ export function BarVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: any = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -189,7 +190,7 @@ export function BarVis({
     <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
       {mergedExtensions.prePlot}
       <Space h="xl" />
-      <Tooltip withinPortal label="Open Settings">
+      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
         <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
           <FontAwesomeIcon icon={faGear} />
         </ActionIcon>
