@@ -15,6 +15,7 @@ import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 
 const defaultExtensions = {
   prePlot: null,
@@ -132,7 +133,7 @@ export function ScatterVis({
 
   return (
     <Container fluid sx={{ flexGrow: 1, height: '100%', overflow: 'hidden' }} ref={plotlyDivRef}>
-      <Tooltip withinPortal label="Open Settings">
+      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
         <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
           <FontAwesomeIcon icon={faGear} />
         </ActionIcon>

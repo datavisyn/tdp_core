@@ -14,6 +14,7 @@ import { useAsync } from '../../hooks';
 import { StripVisSidebar } from './StripVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 
 interface StripVisProps {
   config: IStripConfig;
@@ -107,7 +108,7 @@ export function StripVis({
   return (
     <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
       <Space h="xl" />
-      <Tooltip withinPortal label="Open Settings">
+      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
         <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
           <FontAwesomeIcon icon={faGear} />
         </ActionIcon>
