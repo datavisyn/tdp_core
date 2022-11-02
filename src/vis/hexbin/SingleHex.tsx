@@ -90,10 +90,10 @@ export function SingleHex({
                 <path
                   d={currPath}
                   style={{
-                    fill: `${colorScale ? colorScale(key) : 'black'}`,
+                    fill: `${colorScale ? (isSelected || Object.keys(selected).length === 0 ? colorScale(key) : 'gray') : 'black'}`,
                     transform: `translate(${hexData.x}px, ${hexData.y}px)`,
                     stroke: isSelected ? '#E29609' : 'white',
-                    strokeWidth: isSelected ? 3 : 0,
+                    strokeWidth: isSelected ? 1 : 0,
                     fillOpacity: isOpacityScale ? opacityScale(hexData.length) : '1',
                   }}
                 />
@@ -110,7 +110,7 @@ export function SingleHex({
               fill: `${colorScale ? (isSelected || Object.keys(selected).length === 0 ? colorScale(topCategory) : 'gray') : 'black'}`,
               transform: `translate(${hexData.x}px, ${hexData.y}px)`,
               stroke: isSelected ? '#E29609' : 'white',
-              strokeWidth: isSelected ? 3 : 0,
+              strokeWidth: isSelected ? 1 : 0,
               fillOpacity: isOpacityScale ? opacityScale(hexData.length) : '1',
             }}
           />
@@ -125,8 +125,8 @@ export function SingleHex({
                 style={{
                   fill: `${'black'}`,
                   transform: `translate(${hexData.x}px, ${hexData.y}px)`,
-                  stroke: 'white',
-                  strokeWidth: 0,
+                  stroke: isSelected ? '#E29609' : 'white',
+                  strokeWidth: isSelected ? 1 : 0,
                   fillOpacity: opacityScale(hexData.length),
                 }}
               />
