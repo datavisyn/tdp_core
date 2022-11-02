@@ -2,7 +2,7 @@ import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect, useState } from 'react';
-import { ActionIcon, Center, Container, Group, Stack } from '@mantine/core';
+import { ActionIcon, Center, Container, Group, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
@@ -132,9 +132,11 @@ export function ScatterVis({
 
   return (
     <Container fluid sx={{ flexGrow: 1, height: '100%', overflow: 'hidden' }} ref={plotlyDivRef}>
-      <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-        <FontAwesomeIcon icon={faGear} />
-      </ActionIcon>
+      <Tooltip withinPortal label="Open Settings">
+        <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <FontAwesomeIcon icon={faGear} />
+        </ActionIcon>
+      </Tooltip>
       <Stack spacing={0} sx={{ height: '100%' }}>
         <Center>
           <Group mt="lg">

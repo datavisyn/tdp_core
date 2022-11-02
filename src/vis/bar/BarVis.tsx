@@ -2,7 +2,7 @@ import * as React from 'react';
 import d3 from 'd3v3';
 import { merge, uniqueId, difference } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
-import { ActionIcon, Container, Space } from '@mantine/core';
+import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
@@ -170,7 +170,6 @@ export function BarVis({
       autosize: true,
       grid: { rows: finalTraces.rows, columns: finalTraces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
       barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
       dragmode: false,
     };
@@ -190,9 +189,11 @@ export function BarVis({
     <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
       {mergedExtensions.prePlot}
       <Space h="xl" />
-      <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-        <FontAwesomeIcon icon={faGear} />
-      </ActionIcon>
+      <Tooltip withinPortal label="Open Settings">
+        <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <FontAwesomeIcon icon={faGear} />
+        </ActionIcon>
+      </Tooltip>
       {traceStatus === 'success' && finalTraces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
