@@ -152,7 +152,7 @@ export function BarVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: any = {
       showlegend: true,
       legend: {
         // @ts-ignore
