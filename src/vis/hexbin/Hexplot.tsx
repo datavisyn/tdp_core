@@ -1,4 +1,4 @@
-import { Container, Stack, Chip, Tooltip, Box } from '@mantine/core';
+import { Container, Stack, Chip, Tooltip, Box, ScrollArea } from '@mantine/core';
 import * as hex from 'd3-hexbin';
 import { HexbinBin } from 'd3-hexbin';
 import * as d3v7 from 'd3v7';
@@ -25,42 +25,46 @@ function Legend({
   filteredCategories,
   colorScale,
   onClick,
+  height,
 }: {
   categories: string[];
   filteredCategories: string[];
   colorScale: d3v7.ScaleOrdinal<string, string>;
   onClick: (string) => void;
+  height: number;
 }) {
   return (
-    <Stack sx={{ width: '80px' }} spacing={10}>
-      {categories.map((c) => {
-        return (
-          <Tooltip withinPortal key={c} label={c} withArrow arrowSize={6}>
-            <Box>
-              <Chip
-                variant="filled"
-                onClick={() => onClick(c)}
-                checked={false}
-                styles={{
-                  label: {
-                    width: '100%',
-                    backgroundColor: filteredCategories.includes(c) ? 'lightgrey' : `${colorScale(c)} !important`,
-                    textAlign: 'center',
-                    paddingLeft: '10px',
-                    paddingRight: '10px',
-                    overflow: 'hidden',
-                    color: filteredCategories.includes(c) ? 'black' : 'white',
-                    textOverflow: 'ellipsis',
-                  },
-                }}
-              >
-                {c}
-              </Chip>
-            </Box>
-          </Tooltip>
-        );
-      })}
-    </Stack>
+    <ScrollArea style={{ height }}>
+      <Stack sx={{ width: '80px' }} spacing={10}>
+        {categories.map((c) => {
+          return (
+            <Tooltip withinPortal key={c} label={c} withArrow arrowSize={6}>
+              <Box>
+                <Chip
+                  variant="filled"
+                  onClick={() => onClick(c)}
+                  checked={false}
+                  styles={{
+                    label: {
+                      width: '100%',
+                      backgroundColor: filteredCategories.includes(c) ? 'lightgrey' : `${colorScale(c)} !important`,
+                      textAlign: 'center',
+                      paddingLeft: '10px',
+                      paddingRight: '10px',
+                      overflow: 'hidden',
+                      color: filteredCategories.includes(c) ? 'black' : 'white',
+                      textOverflow: 'ellipsis',
+                    },
+                  }}
+                >
+                  {c}
+                </Chip>
+              </Box>
+            </Tooltip>
+          );
+        })}
+      </Stack>
+    </ScrollArea>
   );
 }
 
@@ -429,6 +433,7 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
               ? setFilteredCategories(filteredCategories.filter((f) => f !== s))
               : setFilteredCategories([...filteredCategories, s])
           }
+          height={height}
         />
       </div>
     </Container>
