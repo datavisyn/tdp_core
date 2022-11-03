@@ -64,7 +64,7 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
           {config.numColumnsSelected.length < 2 ? (
             <InvalidCols
               headerMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.errorHeader')}
-              bodyMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.scatterError')}
+              bodyMessage={I18nextManager.getInstance().i18n.t('tdp:core.vis.hexbinError')}
             />
           ) : (
             <>

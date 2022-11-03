@@ -178,7 +178,8 @@
 
     "vis": {
       "violinError": "To create a Violin plot, please select at least 1 numerical column.",
-      "scatterError": "To create a Scatterplot, please select at least 2 numerical columns.",
+      "scatterError": "To create a Scatter plot, please select at least 2 numerical columns.",
+      "hexbinError": "To create a Hexbin plot, please select at least 2 numerical columns.",
       "stripError": "To create a Strip plot, please select at least 1 numerical column.",
       "barError": "To create a Bar chart, please select 1 categorical column.",
       "errorHeader": "Invalid settings",

@@ -1,4 +1,4 @@
-import { Container, Stack, Chip, Tooltip, Box } from '@mantine/core';
+import { Container, Stack, Chip, Tooltip, Box, ScrollArea } from '@mantine/core';
 import * as hex from 'd3-hexbin';
 import * as d3v7 from 'd3v7';
 import { uniqueId } from 'lodash';
@@ -10,23 +10,24 @@ import { SingleHex } from './SingleHex';
 import { getHexData } from './utils';
 import { XAxis } from './XAxis';
 import { YAxis } from './YAxis';
-function Legend({ categories, filteredCategories, colorScale, onClick, }) {
-    return (React.createElement(Stack, { sx: { width: '80px' }, spacing: 10 }, categories.map((c) => {
-        return (React.createElement(Tooltip, { withinPortal: true, key: c, label: c, withArrow: true, arrowSize: 6 },
-            React.createElement(Box, null,
-                React.createElement(Chip, { variant: "filled", onClick: () => onClick(c), checked: false, styles: {
-                        label: {
-                            width: '100%',
-                            backgroundColor: filteredCategories.includes(c) ? 'lightgrey' : `${colorScale(c)} !important`,
-                            textAlign: 'center',
-                            paddingLeft: '10px',
-                            paddingRight: '10px',
-                            overflow: 'hidden',
-                            color: filteredCategories.includes(c) ? 'black' : 'white',
-                            textOverflow: 'ellipsis',
-                        },
-                    } }, c))));
-    })));
+function Legend({ categories, filteredCategories, colorScale, onClick, height, }) {
+    return (React.createElement(ScrollArea, { style: { height } },
+        React.createElement(Stack, { sx: { width: '80px' }, spacing: 10 }, categories.map((c) => {
+            return (React.createElement(Tooltip, { withinPortal: true, key: c, label: c, withArrow: true, arrowSize: 6 },
+                React.createElement(Box, null,
+                    React.createElement(Chip, { variant: "filled", onClick: () => onClick(c), checked: false, styles: {
+                            label: {
+                                width: '100%',
+                                backgroundColor: filteredCategories.includes(c) ? 'lightgrey' : `${colorScale(c)} !important`,
+                                textAlign: 'center',
+                                paddingLeft: '10px',
+                                paddingRight: '10px',
+                                overflow: 'hidden',
+                                color: filteredCategories.includes(c) ? 'black' : 'white',
+                                textOverflow: 'ellipsis',
+                            },
+                        } }, c))));
+        }))));
 }
 export function Hexplot({ config, columns, selectionCallback = () => null, selected = {} }) {
     const ref = useRef(null);
@@ -36,11 +37,9 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
     const yZoomedScale = useRef(null);
     const [xZoomTransform, setXZoomTransform] = useState(0);
     const [yZoomTransform, setYZoomTransform] = useState(0);
-    const [xRescaleFunc, setXRescaleFunc] = useState(null);
-    const [yRescaleFunc, setYRescaleFunc] = useState(null);
     const [zoomScale, setZoomScale] = useState(1);
     const [filteredCategories, setFilteredCategories] = useState([]);
-    const { value: allColumns, status: colsStatus, error: colsError } = useAsync(getHexData, [columns, config.numColumnsSelected, config.color]);
+    const { value: allColumns, status: colsStatus } = useAsync(getHexData, [columns, config.numColumnsSelected, config.color]);
     const id = React.useMemo(() => uniqueId('HexPlot'), []);
     // getting current categorical column values, original and filtered
     const currentColorColumn = useMemo(() => {
@@ -118,9 +117,6 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
                 .scaleLinear()
                 .domain([min - min / 20, max + max / 20])
                 .range([margin.left, margin.left + width]);
-            if (xRescaleFunc) {
-                xZoomedScale.current = xRescaleFunc(newScale);
-            }
             return newScale;
         }
         return null;
@@ -135,9 +131,6 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
                 .scaleLinear()
                 .domain([min - min / 20, max + max / 20])
                 .range([margin.top + height, margin.top]);
-            if (yRescaleFunc) {
-                yZoomedScale.current = yRescaleFunc(newScale);
-            }
             return newScale;
         }
         return null;
@@ -218,37 +211,31 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
     // // apply zoom/panning
     useEffect(() => {
         const zoom = d3v7.zoom();
-        if (!xScale || !yScale || config.dragMode === EScatterSelectSettings.RECTANGLE) {
+        if (!xScale || !yScale) {
             return;
         }
         zoom.on('zoom', (event) => {
             const { transform } = event;
             const newX = transform.rescaleX(xScale);
             const newY = transform.rescaleY(yScale);
-            // Question: I dont think this should be a ref, because it doesnt actually cause a re render. Only the other setters below make it work, if i moved them above this code there would be bugs.
-            // But when I made it a useState object it didnt work with the object.
             xZoomedScale.current = newX;
             yZoomedScale.current = newY;
-            setXRescaleFunc(() => (x) => transform.rescaleX(x));
-            setYRescaleFunc(() => (y) => transform.rescaleY(y));
             setZoomScale(transform.k);
             setXZoomTransform(transform.x);
             setYZoomTransform(transform.y);
         });
         d3v7.select(`#${id}zoom`).call(zoom);
-    }, [id, xScale, yScale, height, width, config.dragMode]);
+    }, [id, xScale, yScale, height, width]);
     // apply brushing
     useEffect(() => {
+        // Since our brush doesnt persist after selection anyways, we can safely just do nothing
         if (config.dragMode !== EScatterSelectSettings.RECTANGLE) {
-            d3v7.select(`#${id}brush`).selectAll('rect').remove();
-            return;
+            return undefined;
         }
         const brush = d3v7.brush().extent([
             [margin.left, margin.top],
             [margin.left + width, margin.top + height],
         ]);
-        // it does look like we are creating a ton of brush events without cleaning them up right here.
-        // But d3v7.call will remove the previous brush event when called, so this actually works as expected.
         d3v7.select(`#${id}brush`).call(
         // this is a real function and not a => so that I can use d3v7.select(this) inside to clear the brush
         brush.on('end', function (event) {
@@ -275,9 +262,10 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
             selectionCallback(allSelectedPoints);
             d3v7.select(this).call(brush.move, null);
         }));
-    }, [width, height, id, hexes, selectionCallback, config.dragMode, xZoomTransform, yZoomTransform, zoomScale, xScale, yScale, margin]);
-    // TODO: svg elements seem weird with style/classNames. I can directly put on a transform to a g, for example, but it seems to work
-    // differently than if i use style to do so
+        return () => {
+            brush.on('end', null);
+        };
+    }, [width, height, id, hexes, selectionCallback, config.dragMode, xScale, yScale, margin]);
     return (React.createElement(Container, { ref: ref, fluid: true, sx: { width: '100%' } },
         React.createElement("svg", { className: "hexbinSvg", id: id, width: width + margin.left + margin.right, height: height + margin.top + margin.bottom },
             React.createElement("defs", null,
@@ -299,6 +287,6 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
         React.createElement("div", { className: "position-absolute", style: { right: 0, top: margin.top + 60 } },
             React.createElement(Legend, { categories: colorScale ? colorScale.domain() : [], filteredCategories: colorScale ? filteredCategories : [], colorScale: colorScale || null, onClick: (s) => filteredCategories.includes(s)
                     ? setFilteredCategories(filteredCategories.filter((f) => f !== s))
-                    : setFilteredCategories([...filteredCategories, s]) }))));
+                    : setFilteredCategories([...filteredCategories, s]), height: height }))));
 }
 //# sourceMappingURL=Hexplot.js.map
