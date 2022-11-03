@@ -98,7 +98,6 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             autosize: true,
             grid: { rows: finalTraces.rows, columns: finalTraces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
-            violingap: 0,
             barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
             dragmode: false,
         };

@@ -160,7 +160,7 @@ export function BarVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -173,7 +173,6 @@ export function BarVis({
       autosize: true,
       grid: { rows: finalTraces.rows, columns: finalTraces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
       barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
       dragmode: false,
     };

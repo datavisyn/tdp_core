@@ -131,16 +131,16 @@ export declare type VisynSimpleViewPluginType<Param extends Record<string, unkno
 /**
  * Plugin type for all data backed visyn views. Extends the visyn view props with data and their description.
  */
-export declare type VisynDataViewPluginType<Param extends Record<string, unknown> = Record<string, unknown>, Desc extends Record<string, unknown> = Record<string, unknown>> = DefineVisynViewPlugin<'data', Param, {
+export declare type VisynDataViewPluginType<Param extends Record<string, unknown> = Record<string, unknown>, Desc extends Record<string, unknown> = Record<string, unknown>, ColumnDesc = IServerColumn[], Data = Record<string, unknown>[]> = DefineVisynViewPlugin<'data', Param, {
     /**
      * Data array matching the columns defined in the `dataDesc`.
      */
-    data: Record<string, unknown>[];
+    data: Data;
     /**
      * Data column description describing the given `data`.
      * TODO:: Type to IReprovisynServerColumn when we merge that into tdp_core
      */
-    columnDesc: IServerColumn[] | any[];
+    columnDesc: ColumnDesc;
     /**
      * List of items which are filtered out of the view. Ids match the idtype from 'desc.idtype'
      */

@@ -111,7 +111,7 @@ export function ScatterVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -128,7 +128,6 @@ export function ScatterVis({
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
       dragmode: config.dragMode,
     };
 
