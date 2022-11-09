@@ -4,7 +4,7 @@ from typing import Optional
 import jwt
 
 from ... import manager
-from ..model import User
+from ..model import LogoutReturnValue, User
 from .base_store import BaseStore
 
 _log = logging.getLogger(__name__)
@@ -59,7 +59,7 @@ class ALBSecurityStore(BaseStore):
         if self.signout_url:
             payload["alb_security_store"] = {"redirect": self.signout_url}
 
-        return {"data": payload, "cookies": cookies}
+        return LogoutReturnValue(data=payload, cookies=cookies)
 
 
 def create():
