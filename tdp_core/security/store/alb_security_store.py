@@ -37,6 +37,7 @@ class ALBSecurityStore(BaseStore):
                 _log.debug("user: %s", user)
                 if self.token_roles_attr:
                     roles = user_data[self.token_roles_attr]
+                _log.debug("roletype: %s", type(roles))
                 if not roles:
                     roles = []
                 elif type(roles) != dict:
