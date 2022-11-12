@@ -40,7 +40,7 @@ class ALBSecurityStore(BaseStore):
                 _log.debug("roletype: %s", type(roles))
                 if not roles:
                     roles = []
-                elif type(roles) == string:
+                elif type(roles) == str:
                     roles = [roles]
                 _log.debug("roles: %s", roles)
                 return User(id=user, roles=roles)
