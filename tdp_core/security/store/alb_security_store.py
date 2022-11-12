@@ -33,10 +33,10 @@ class ALBSecurityStore(BaseStore):
                 user_data = jwt.decode(encoded, options={"verify_signature": False})
                 _log.debug(f"user data: {user_data}")
                 # Create new user from given attributes
-                user = deep_get(user_data, self.token_user_attr)
+                user = user_data[self.token_user_attr]
                 _log.debug("user: %s", user)
                 if self.token_roles_attr:
-                    roles = deep_get(user_data, self.token_roles_attr)
+                    roles = user_data[self.token_roles_attr]
                 if not roles:
                     roles = []
                 elif type(roles) != dict:
@@ -77,15 +77,3 @@ def create():
         )
 
     return None
-
-
-def deep_get(obj, path):
-    if not path:
-        return None
-    keys = path.split(".")
-    for key in keys:
-        try:
-            obj = obj[key]
-        except KeyError:
-            return None
-    return obj
