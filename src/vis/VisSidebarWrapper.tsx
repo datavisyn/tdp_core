@@ -20,7 +20,7 @@ export function VisSidebarWrapper({
       closeOnClickOutside
       padding="sm"
       lockScroll={false}
-      withOverlay={false}
+      overlayOpacity={0}
       zIndex={50}
       styles={{ drawer: { position: 'absolute', overflow: 'hidden' }, root: { position: 'absolute', padding: 0 }, header: { margin: 0 } }}
       position="right"
