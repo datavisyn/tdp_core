@@ -131,12 +131,14 @@ export function ScatterVis({
   }, [traces, config.dragMode]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden' }} ref={plotlyDivRef}>
+    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }} ref={plotlyDivRef}>
       <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
         <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
           <FontAwesomeIcon icon={faGear} />
         </ActionIcon>
       </Tooltip>
+      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
+
       <Stack spacing={0} sx={{ height: '100%' }}>
         <Center>
           <Group mt="lg">
@@ -186,7 +188,6 @@ export function ScatterVis({
         ) : null}
 
         {mergedExtensions.postPlot}
-        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </Stack>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>

@@ -187,7 +187,9 @@ export function BarVis({
   }, [finalTraces]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden' }} ref={plotlyDivRef}>
+    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }} ref={plotlyDivRef}>
+      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
+
       {mergedExtensions.prePlot}
       <Space h="xl" />
       <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
@@ -240,7 +242,6 @@ export function BarVis({
         <InvalidCols headerMessage={finalTraces?.errorMessageHeader} bodyMessage={traceError?.message || finalTraces?.errorMessage} />
       ) : null}
       {mergedExtensions.postPlot}
-      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       {!hideSidebar ? (
         <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
           <BarVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />

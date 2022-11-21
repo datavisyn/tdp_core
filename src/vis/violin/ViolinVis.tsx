@@ -109,8 +109,9 @@ export function ViolinVis({
   }, [traces]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%' }} ref={plotlyDivRef}>
+    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', position: 'relative' }} ref={plotlyDivRef}>
       <Space h="xl" />
+      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
 
       <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
         <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
@@ -141,7 +142,6 @@ export function ViolinVis({
         <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
       ) : null}
       {mergedExtensions.postPlot}
-      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       {!hideSidebar ? (
         <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
           <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
