@@ -16,7 +16,7 @@ export class PanelTab extends EventHandler {
         this.options = {
             faIcon: 'fas fa-sliders-h',
             title: I18nextManager.getInstance().i18n.t('tdp:core.lineup.LineupPanelActions.rankingPanelTabTitle'),
-            width: '24em',
+            width: '26em',
             order: 0,
         };
         this.node = parent.ownerDocument.createElement('div');
