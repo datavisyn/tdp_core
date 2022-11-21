@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { ActionIcon, Center, Container, Group, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { Layout } from 'plotly.js-dist-min';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
@@ -16,7 +17,6 @@ import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 import { I18nextManager } from '../../i18n';
-import {Layout} from 'plotly.js-dist-min';
 
 const defaultExtensions = {
   prePlot: null,

@@ -5,6 +5,7 @@ import { useMemo, useEffect, useState } from 'react';
 import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { Layout } from 'plotly.js-dist-min';
 import { IVisConfig, VisColumn, IStripConfig, Scales } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
@@ -15,7 +16,6 @@ import { StripVisSidebar } from './StripVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 import { I18nextManager } from '../../i18n';
-import {Layout} from 'plotly.js-dist-min';
 
 interface StripVisProps {
   config: IStripConfig;
