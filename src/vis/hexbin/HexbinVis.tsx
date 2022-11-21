@@ -46,7 +46,7 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
   const id = React.useMemo(() => uniqueId('PCPVis'), []);
 
   return (
-    <Container p={0} fluid sx={{ flexGrow: 1, height: '100%', overflow: 'hidden' }} ref={ref}>
+    <Container p={0} fluid sx={{ flexGrow: 1, height: '100%', overflow: 'hidden', width: '100%', position: 'relative' }} ref={ref}>
       <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
         <FontAwesomeIcon icon={faGear} />
       </ActionIcon>

@@ -15,6 +15,7 @@ import { ViolinVisSidebar } from './ViolinVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 import { I18nextManager } from '../../i18n';
+import {Layout} from 'plotly.js-dist-min';
 
 interface ViolinVisProps {
   config: IViolinConfig;
@@ -83,7 +84,7 @@ export function ViolinVis({
       return null;
     }
 
-    const innerLayout: any = {
+    const innerLayout: Partial<Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -102,7 +103,6 @@ export function ViolinVis({
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
     };
 
     return beautifyLayout(traces, innerLayout);

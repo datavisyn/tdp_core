@@ -71,10 +71,11 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces, config.dragMode]);
-    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', overflow: 'hidden' }, ref: plotlyDivRef },
+    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }, ref: plotlyDivRef },
         React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear }))),
+        showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         React.createElement(Stack, { spacing: 0, sx: { height: '100%' } },
             React.createElement(Center, null,
                 React.createElement(Group, { mt: "lg" },
@@ -104,8 +105,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                         d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces?.errorMessageHeader, bodyMessage: traceError?.message || traces?.errorMessage })) : null,
-            mergedExtensions.postPlot,
-            showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
+            mergedExtensions.postPlot),
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
             React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));
 }

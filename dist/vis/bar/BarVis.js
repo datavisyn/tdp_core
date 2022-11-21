@@ -110,7 +110,8 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         }
         return [...finalTraces.plots.map((p) => p.data), ...finalTraces.legendPlots.map((p) => p.data)];
     }, [finalTraces]);
-    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%' }, ref: plotlyDivRef },
+    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }, ref: plotlyDivRef },
+        showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         mergedExtensions.prePlot,
         React.createElement(Space, { h: "xl" }),
         React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
@@ -146,7 +147,6 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                 }
             } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: finalTraces?.errorMessageHeader, bodyMessage: traceError?.message || finalTraces?.errorMessage })) : null,
         mergedExtensions.postPlot,
-        showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
             React.createElement(BarVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
 }

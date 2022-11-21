@@ -15,6 +15,7 @@ import { BarVisSidebar } from './BarVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 import { I18nextManager } from '../../i18n';
+import {Layout} from 'plotly.js-dist-min';
 
 interface BarVisProps {
   config: IBarConfig;
@@ -152,7 +153,7 @@ export function BarVis({
       return null;
     }
 
-    const innerLayout: any = {
+    const innerLayout: Partial<Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore

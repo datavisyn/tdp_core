@@ -15,6 +15,7 @@ import { StripVisSidebar } from './StripVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 import { I18nextManager } from '../../i18n';
+import {Layout} from 'plotly.js-dist-min';
 
 interface StripVisProps {
   config: IStripConfig;
@@ -79,10 +80,9 @@ export function StripVis({
       return null;
     }
 
-    const innerLayout: any = {
+    const innerLayout: Partial<Layout> = {
       showlegend: true,
       legend: {
-        // @ts-ignore
         itemclick: false,
         itemdoubleclick: false,
       },

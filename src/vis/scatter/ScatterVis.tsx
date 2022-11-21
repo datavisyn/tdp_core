@@ -16,6 +16,7 @@ import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 import { I18nextManager } from '../../i18n';
+import {Layout} from 'plotly.js-dist-min';
 
 const defaultExtensions = {
   prePlot: null,
@@ -101,7 +102,7 @@ export function ScatterVis({
       return null;
     }
 
-    const innerLayout: any = {
+    const innerLayout: Partial<Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore

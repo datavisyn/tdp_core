@@ -43,7 +43,6 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
         const innerLayout = {
             showlegend: true,
             legend: {
-                // @ts-ignore
                 itemclick: false,
                 itemdoubleclick: false,
             },
@@ -63,8 +62,9 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces]);
-    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%' }, ref: plotlyDivRef },
+    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', position: 'relative' }, ref: plotlyDivRef },
         React.createElement(Space, { h: "xl" }),
+        showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear }))),
@@ -80,7 +80,6 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
                 }
             } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces?.errorMessageHeader, bodyMessage: traceError?.message || traces?.errorMessage })) : null,
         mergedExtensions.postPlot,
-        showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
             React.createElement(StripVisSidebar, { config: config, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
 }
