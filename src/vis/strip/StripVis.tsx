@@ -105,7 +105,7 @@ export function StripVis({
   }, [traces]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
+    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%' }} ref={plotlyDivRef}>
       <Space h="xl" />
       <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
         <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>

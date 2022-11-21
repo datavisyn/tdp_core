@@ -175,7 +175,7 @@ export async function createScatterTraces(
                 )
               : colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
             : validCols[0].resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
-          opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
+          opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
           size: 8,
         },
       },
@@ -246,7 +246,7 @@ export async function createScatterTraces(
                         colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
                       )
                   : xCurr.resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
-                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : hasSelected && colorCol ? 0.2 : config.alphaSliderVal)),
+                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
                 size: 8,
               },
             },

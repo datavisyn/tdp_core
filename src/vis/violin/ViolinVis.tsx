@@ -109,7 +109,7 @@ export function ViolinVis({
   }, [traces]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
+    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%' }} ref={plotlyDivRef}>
       <Space h="xl" />
 
       <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
