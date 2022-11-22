@@ -88,7 +88,7 @@ export function StripVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -101,7 +101,6 @@ export function StripVis({
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
       dragmode: 'select',
     };
 
