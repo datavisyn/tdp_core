@@ -67,7 +67,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             autosize: true,
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
-            violingap: 0,
             dragmode: config.dragMode,
         };
         return beautifyLayout(traces, innerLayout);
