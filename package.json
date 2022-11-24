@@ -1,7 +1,7 @@
 {
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
-  "version": "16.2.0",
+  "version": "16.2.1",
   "author": {
     "name": "datavisyn GmbH",
     "email": "contact@datavisyn.io",
@@ -53,20 +53,20 @@
     "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
   },
   "dependencies": {
+    "@emotion/react": "^11.0.0",
     "@fortawesome/fontawesome-free": "^6.1.1",
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
     "@fortawesome/free-regular-svg-icons": "^6.1.2",
     "@fortawesome/free-solid-svg-icons": "^6.1.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@mantine/core": "^5.0.0",
+    "@mantine/form": "^5.0.0",
+    "@mantine/hooks": "^5.0.0",
     "@popperjs/core": "^2.9.3",
     "@types/bootstrap": "~5.0.15",
     "@types/d3v3": "npm:@types/d3@~3.5.36",
     "@types/d3v7": "npm:@types/d3@^7.4.0",
     "@types/jquery": "~3.5.5",
-    "@emotion/react": "^11.0.0",
-    "@mantine/core": "^5.0.0",
-    "@mantine/form": "^5.0.0",
-    "@mantine/hooks": "^5.0.0",
     "@types/papaparse": "~5.3.0",
     "@types/plotly.js-dist-min": "^2.3.0",
     "@types/react": "^16.9.23",
@@ -99,7 +99,7 @@
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "use-deep-compare-effect": "^1.8.0",
-    "visyn_scripts": "^1.0.1"
+    "visyn_scripts": "^1.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.17.7",

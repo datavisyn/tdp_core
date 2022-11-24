@@ -92,7 +92,7 @@ export function ViolinVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -105,7 +105,6 @@ export function ViolinVis({
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
     };
 
     return beautifyLayout(traces, innerLayout);
