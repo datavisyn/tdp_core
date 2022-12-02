@@ -1,8 +1,22 @@
 name: build
 
-on: [push, workflow_dispatch]
+on:
+  workflow_dispatch:
+    inputs:
+      cypress:
+        description: 'Run cypress'
+        required: false
+        type: boolean
+        default: false
+  push:
 
 jobs:
   build:
-    uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@main
-    secrets: inherit 
+    uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@new_deployment
+    secrets: inherit
+
+  cypress:
+    needs: build
+    if: inputs.cypress == true || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/release-')
+    uses: datavisyn/github-workflows/.github/workflows/cypress.yml@new_deployment
+    secrets: inherit
