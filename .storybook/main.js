@@ -1,6 +1,12 @@
 const path = require('path');
 
+// loading our custom webpack.config.js
+const webpackConfig = require('visyn_scripts/config/webpack.config.js');
+
 module.exports = {
+  core: {
+    builder: 'webpack5',
+  },
   stories: [
     "../src/**/*.stories.mdx",
     "../src/**/*.stories.@(js|jsx|ts|tsx)"
@@ -19,6 +25,9 @@ module.exports = {
       ...(config.resolve.alias || {}),
       'tdp_core/dist': path.resolve(__dirname, '../', 'dist')
     };
-    return config;
+    return { 
+      // using our custom webpack config
+     ...webpackConfig({ workspace_mode: 'single' }, { mode: 'production' })
+    };
   },
 }
