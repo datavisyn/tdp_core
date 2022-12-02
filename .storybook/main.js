@@ -1,4 +1,5 @@
 const path = require('path');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // loading our custom webpack.config.js
 const webpackConfig = require('visyn_scripts/config/webpack.config.js');
@@ -26,8 +27,9 @@ module.exports = {
       'tdp_core/dist': path.resolve(__dirname, '../', 'dist')
     };
     return { 
-      // using our custom webpack config
-     ...webpackConfig({ workspace_mode: 'single' }, { mode: 'production' })
-    };
+      ...config,
+      module: { ...config.module, rules: webpackConfig({ workspace_mode: 'single' }, { mode: 'production' }).module.rules },
+      plugins: [new MiniCssExtractPlugin()]
+    }
   },
 }
