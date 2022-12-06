@@ -1,4 +1,5 @@
 import { merge } from 'lodash';
+import { UserSession } from '../app/UserSession';
 import { I18nextManager } from '../i18n';
 import { BuildInfo } from './buildInfo';
 import { AppMetaDataUtils } from './metaData';
@@ -384,15 +385,21 @@ export class AppHeader {
             $(selector).modal('hide');
         });
     }
-    showAndFocusOn(selector, focusSelector) {
-        import('jquery').then((jquery) => {
-            const $selector = $(selector);
-            $selector
-                .modal('show')
-                // @ts-ignore
-                .on('shown.bs.modal', function () {
+    async showAndFocusOn(selector, focusSelector) {
+        await import('jquery');
+        const $selector = $(selector);
+        $selector
+            .modal('show')
+            // @ts-ignore
+            .on('shown.bs.modal', () => {
+            // Because the modal is async we should check if we were logged in
+            // exactly when the animation of opening the modal was happening
+            if (UserSession.getInstance().isLoggedIn()) {
+                this.hideDialog(selector);
+            }
+            else {
                 $($selector).trigger('focus');
-            });
+            }
         });
     }
     static create(parent, options = {}) {
