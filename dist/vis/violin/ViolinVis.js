@@ -58,7 +58,6 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             autosize: true,
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
-            violingap: 0,
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces]);
