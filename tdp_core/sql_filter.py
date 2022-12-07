@@ -2,8 +2,6 @@ import logging
 
 from werkzeug.datastructures import MultiDict
 
-from . import manager
-
 _log = logging.getLogger(__name__)
 
 
