@@ -122,7 +122,7 @@ export declare class AppHeader {
     toggleReportBugLink(isVisible: boolean, contentGenerator?: (title: HTMLElement, content: HTMLElement) => void): void;
     private toggleAboutLink;
     hideDialog(selector: string): void;
-    showAndFocusOn(selector: string, focusSelector: string): void;
+    showAndFocusOn(selector: string, focusSelector: string): Promise<void>;
     static create(parent: HTMLElement, options?: IAppHeaderOptions): AppHeader;
 }
 //# sourceMappingURL=header.d.ts.map
