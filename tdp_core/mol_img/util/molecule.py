@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from rdkit.Chem import Mol, TemplateAlign, rdFMCS
+from rdkit.Chem import Mol, TemplateAlign, rdFMCS  # type: ignore
 
 
 def maximum_common_substructure_query_mol(mols: List[Mol]) -> Optional[Mol]:

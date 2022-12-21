@@ -1,7 +1,7 @@
 from typing import Dict, Optional
 
 from pydantic import BaseModel
-from rdkit.Chem import Mol, MolFromSmarts, MolFromSmiles
+from rdkit.Chem import Mol, MolFromSmarts, MolFromSmiles  # type: ignore
 from starlette.responses import Response
 
 

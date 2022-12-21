@@ -70,7 +70,7 @@ class MappingManager(object):
                     paths.append(newpath)
         return sorted(paths, key=len)
 
-    def __resolve_single(self, from_idtype, to_idtype, ids):
+    def __resolve_single(self, from_idtype, to_idtype, ids) -> list:
         from_mappings = self.mappers.get(from_idtype, {})
         to_mappings = from_mappings.get(to_idtype, [])
         if not to_mappings:
@@ -125,7 +125,7 @@ class MappingManager(object):
     def maps_to(self, from_idtype):
         return list(self.paths.get(from_idtype, {}).keys())
 
-    def __call__(self, from_idtype, to_idtype, ids):
+    def __call__(self, from_idtype, to_idtype, ids) -> list:
         # If both id types are the same, simply return
         if from_idtype == to_idtype:
             return ids
@@ -162,12 +162,12 @@ class MappingManager(object):
                 return result
 
             # Otherwise, check if every mapping was 1 to 1
-            lengths = [len(x) for x in result]
+            lengths = [len(x) for x in result]  # type: ignore
             # If any result array is longer than 1, we need to flatten and later merge it
             needs_merging = max(lengths, default=0) > 1
             # Flatten result and assign to values
             values = list(chain.from_iterable(result))
-        return result
+        return result  # type: ignore
 
     def search(self, from_idtype, to_idtype, query, max_results=None):
         """

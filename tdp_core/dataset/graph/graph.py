@@ -112,7 +112,7 @@ class AGraph(ADataSetEntry, metaclass=abc.ABCMeta):
 
 def _resolve_parser(format):
     for p in manager.registry.list("graph-parser"):
-        if p.format == format:
+        if p.format == format:  # type: ignore
             return p.load()
 
 

@@ -36,7 +36,7 @@ def test_invalid(client: TestClient, structure):
 def test_valid(client: TestClient, structure, expected):
     res = client.get("/api/rdkit/", params={"structure": structure})
     assert res.status_code == 200
-    assert res.headers.get("content-type").startswith("image/svg")
+    assert res.headers["content-type"].startswith("image/svg")
     hash_compare(res.content, expected)
 
 

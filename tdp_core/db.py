@@ -1,6 +1,9 @@
 import logging
+from typing import Any, Dict, List, Optional
 
 from flask import abort
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import Session
 from werkzeug.datastructures import MultiDict
 
 from . import manager
@@ -105,7 +108,7 @@ class WrappedSession(object):
         :param engine:
         """
         _log.info("creating session")
-        self._session = manager.db.create_session(engine)
+        self._session: Session = manager.db.create_session(engine)
         self._supports_array_parameter = _supports_sql_parameters(engine.name)
 
     def execute(self, sql, **kwargs):
@@ -115,13 +118,11 @@ class WrappedSession(object):
         :param kwargs: additional args to replace
         :return: the session result
         """
-        import sqlalchemy
-
         parsed = to_query(sql, self._supports_array_parameter, kwargs)
         _log.info("%s (%s)", parsed, kwargs)
         try:
             return self._session.execute(parsed, kwargs)
-        except sqlalchemy.exc.OperationalError as error:
+        except OperationalError as error:
             abort(408, error)
 
     def run(self, sql, **kwargs):
@@ -154,7 +155,7 @@ class WrappedSession(object):
         if self._session:
             _log.info("removing session again")
             self._session.close()
-            self._session = None
+            self._session = None  # type: ignore
 
     def __del__(self):
         self._destroy()
@@ -194,7 +195,7 @@ def get_columns(engine, table_name):
             r["type"] = "number"
         elif isinstance(t, types.Enum):
             r["type"] = "categorical"
-            r["categories"] = sorted(t.enums, key=lambda s: s.lower())
+            r["categories"] = sorted(t.enums, key=lambda s: s.lower())  # type: ignore
         return r
 
     return map(_normalize_columns, columns)
@@ -235,7 +236,7 @@ def _handle_aggregated_score(base_view, config, replacements, args):
     return replacements
 
 
-def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql_argument=None):
+def prepare_arguments(view, config, replacements=None, arguments: Optional[Dict] = None, extra_sql_argument=None):
     """
     prepares for the given view the kwargs and replacements based on the given input
     :param view: db view
@@ -267,10 +268,10 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
             parser = info.type if info and info.type is not None else lambda x: x
             try:
                 if info and info.as_list:
-                    vs = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key)
+                    vs: List[Any] = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key)  # type: ignore
                     value = tuple([parser(v) for v in vs])  # multi values need to be a tuple not a list
                 elif info and info.list_as_tuple:
-                    vs = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key, [])
+                    vs = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key, [])  # type: ignore
                     if len(vs) == 0:
                         value = "(1, null)"
                     else:
@@ -346,7 +347,7 @@ def get_data(
         return query(engine, arguments, filters), view
 
     with session(engine) as sess:
-        if config.statement_timeout is not None:
+        if config.statement_timeout and config.statement_timeout_query:
             _log.info("set statement_timeout to {}".format(config.statement_timeout))
             sess.execute(config.statement_timeout_query.format(config.statement_timeout))
         r = sess.run(query.format(**replace), **kwargs)
@@ -434,7 +435,7 @@ def get_count(database, view_name, args):
         return count_query(engine, processed_args, where_clause)
 
     with session(engine) as sess:
-        if config.statement_timeout is not None:
+        if config.statement_timeout and config.statement_timeout_query:
             _log.info("set statement_timeout to {}".format(config.statement_timeout))
             sess.execute(config.statement_timeout_query.format(config.statement_timeout))
         r = sess.run(count_query.format(**replace), **kwargs)

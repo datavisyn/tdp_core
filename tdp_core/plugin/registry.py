@@ -92,7 +92,7 @@ class Registry(object):
     def __iter__(self):
         return iter(self._extensions)
 
-    def list(self, plugin_type=None):
+    def list(self, plugin_type=None) -> List[ExtensionDesc] | "Registry":
         if plugin_type is None:
             return self
         if not hasattr(plugin_type, "__call__"):  # not a callable

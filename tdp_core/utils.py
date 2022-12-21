@@ -3,7 +3,8 @@ import logging
 from builtins import range
 from typing import Union
 
-from flask import Response, abort, make_response, request
+from flask import abort, make_response, request
+from flask.wrappers import Response
 
 from . import manager
 

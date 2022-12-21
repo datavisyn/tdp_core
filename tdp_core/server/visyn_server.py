@@ -2,7 +2,7 @@ import logging
 import logging.config
 import sys
 import threading
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
@@ -16,7 +16,7 @@ logging.config.dictConfig(default_logging_dict)
 
 
 def create_visyn_server(
-    *, fast_api_args: Optional[Dict] = {}, start_cmd: Optional[str] = None, workspace_config: Optional[Dict] = None
+    *, fast_api_args: Dict[str, Any] = {}, start_cmd: Optional[str] = None, workspace_config: Optional[Dict] = None
 ) -> FastAPI:
     """
     Create a new FastAPI instance while ensuring that the configuration and plugins are loaded, extension points are registered, database migrations are executed, ...
@@ -84,7 +84,7 @@ def create_visyn_server(
     from ..dbmigration.manager import DBMigrationManager
 
     app.state.db_migration = manager.db_migration = DBMigrationManager()
-    manager.db_migration.init_app(app, manager.registry.list("tdp-sql-database-migration"))
+    manager.db_migration.init_app(app, manager.registry.list("tdp-sql-database-migration"))  # type: ignore
 
     from ..security.manager import create_security_manager
 
@@ -112,8 +112,13 @@ def create_visyn_server(
     namespace_plugins = manager.registry.list("namespace")
     _log.info(f"Registering {len(namespace_plugins)} legacy namespaces via WSGIMiddleware")
     for p in namespace_plugins:
-        _log.info(f"Registering legacy namespace: {p.namespace}")
-        app.mount(p.namespace, WSGIMiddleware(init_legacy_app(p.load().factory())))
+        namespace = p.namespace  # type: ignore
+        _log.info(f"Registering legacy namespace: {namespace}")
+
+        sub_app = p.load().factory()
+        init_legacy_app(sub_app)
+
+        app.mount(namespace, WSGIMiddleware(sub_app))
 
     # Load all FastAPI apis
     router_plugins = manager.registry.list("fastapi_router")
@@ -142,7 +147,7 @@ def create_visyn_server(
     app.add_middleware(RequestContextMiddleware)
 
     # TODO: Move up?
-    app.add_api_route("/health", health)
-    app.add_api_route("/api/buildInfo.json", build_info)
+    app.add_api_route("/health", health)  # type: ignore
+    app.add_api_route("/api/buildInfo.json", build_info)  # type: ignore
 
     return app

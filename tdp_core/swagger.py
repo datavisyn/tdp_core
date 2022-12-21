@@ -1,8 +1,10 @@
 import json
 import logging
 from collections import OrderedDict
+from typing import Any
 
-from flask import Flask, Response, render_template
+from flask import Flask, render_template
+from flask.wrappers import Response
 from jinja2 import Template
 
 from . import db, manager
@@ -22,7 +24,7 @@ def _gen():
     here = path.abspath(path.dirname(__file__))
 
     files = [path.join(here, "swagger", p) for p in ["swagger.yml", "db.yml"]]  # , 'proxy.yml', 'storage.yml']]
-    base = yaml_load(files)
+    base: dict[str, Any] = yaml_load(files)  # type: ignore
     base["paths"] = OrderedDict(sorted(base["paths"].items(), key=lambda t: t[0]))
 
     with io.open(path.join(here, "swagger", "view.tmpl.yml"), "r", encoding="utf-8") as f:
@@ -149,7 +151,7 @@ def _gen():
             view_yaml = template.render(**keys)
             # _log.info(view_yaml)
             part = safe_load(view_yaml)
-            base = data_merge(base, part)
+            base = data_merge(base, part)  # type: ignore
 
     # post process using extensions
     for p in manager.registry.list("tdp-swagger-postprocessor"):

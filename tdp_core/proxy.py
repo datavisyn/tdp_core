@@ -1,7 +1,8 @@
 import logging
 
 import requests
-from flask import Flask, Response, abort, request
+from flask import Flask, abort, request
+from flask.wrappers import Response
 
 from . import manager
 
@@ -15,7 +16,7 @@ def _to_site_url(site):
     for p in proxy_defs:
         if p.id == site:
             headers = getattr(p, "headers") if hasattr(p, "headers") else dict()
-            return p.url.format(**request.args.to_dict()), headers
+            return p.url.format(**request.args.to_dict()), headers  # type: ignore
     # none matching found
     return None, None
 

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, Dict, Type
+from typing import Any, Dict, Optional, Type
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -13,8 +13,8 @@ class RegHelper(object):
     def __iter__(self):
         return iter(self._items)
 
-    def append(self, type_: str, id_: str, module_: Any, desc: Dict[str, Any] = None):
-        desc = {} if desc is None else desc
+    def append(self, type_: str, id_: str, module_: Any, desc: Dict[str, Any] = {}):
+        desc = {} if not desc else desc
         desc["type"] = type_
         desc["id"] = id_
         desc["module"] = module_
@@ -35,5 +35,5 @@ class AVisynPlugin(ABC):
         pass
 
     @property
-    def setting_class(self) -> Type[BaseModel]:
+    def setting_class(self) -> Optional[Type[BaseModel]]:
         return None

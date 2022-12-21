@@ -1,6 +1,7 @@
 import logging
 import re
 from collections import OrderedDict
+from typing import Any, Optional
 
 import sqlalchemy
 from sqlalchemy.engine import Engine
@@ -49,7 +50,7 @@ class DBView(object):
         self.query = query
         self.queries = {}
         self.columns = OrderedDict()
-        self.columns_filled_up = None
+        self.columns_filled_up = False
         self.replacements = []
         self.valid_replacements = {}
         self.arguments = []
@@ -65,7 +66,7 @@ class DBView(object):
     def dump(self, name):
         from collections import OrderedDict
 
-        r = OrderedDict(name=name, description=self.description, type=self.query_type)
+        r: OrderedDict[str, Any] = OrderedDict(name=name, description=self.description, type=self.query_type)
         r["idType"] = self.idtype
         r["query"] = clean_query(self.query)
         args = [a for a in self.arguments]
@@ -609,10 +610,10 @@ class DBConnector(object):
         """
         self.agg_score = agg_score or default_agg_score
         self.views = views
-        self.dburl = None
+        self.dburl: str = None  # type: ignore
         self.mappings = mappings
         self.statement_timeout = None
-        self.statement_timeout_query = None
+        self.statement_timeout_query: Optional[str] = None
         self.description = ""
 
     def dump(self, name):
@@ -621,13 +622,16 @@ class DBConnector(object):
     def create_engine(self, config) -> Engine:
         engine_options = config.get("engine", {})
         engine = sqlalchemy.create_engine(self.dburl, **engine_options)
-        # Assuming that gevent monkey patched the builtin
-        # threading library, we're likely good to use
-        # SQLAlchemy's QueuePool, which is the default
-        # pool class.  However, we need to make it use
-        # threadlocal connections
-        # https://github.com/kljensen/async-flask-sqlalchemy-example/blob/master/server.py
-        engine.pool._use_threadlocal = True
+        try:
+            # Assuming that gevent monkey patched the builtin
+            # threading library, we're likely good to use
+            # SQLAlchemy's QueuePool, which is the default
+            # pool class.  However, we need to make it use
+            # threadlocal connections
+            # https://github.com/kljensen/async-flask-sqlalchemy-example/blob/master/server.py
+            engine.pool._use_threadlocal = True  # type: ignore
+        except Exception:
+            pass
 
         return engine
 

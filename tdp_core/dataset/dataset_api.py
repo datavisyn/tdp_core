@@ -1,7 +1,8 @@
 import logging
 from builtins import str
 
-from flask import Flask, Response, abort, make_response, request
+from flask import Flask, abort, make_response, request
+from flask.wrappers import Response
 
 from .. import manager
 from ..utils import etag, jsonify, to_json
@@ -92,7 +93,7 @@ def _list_datasets():
         data = [d.to_description() for d in iter() if query(d)]
 
         limit = request.values.get("limit", -1)
-        if 0 < limit < len(data):
+        if 0 < int(limit) < len(data):
             data = data[:limit]
 
         format = request.args.get("format", "json")

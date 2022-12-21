@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .manager import current_user
 from .model import ANONYMOUS_USER, User
 
@@ -66,7 +68,7 @@ def _includes(items, item):
     return False
 
 
-def can(item, permission: int, user: User = None):
+def can(item, permission: int, user: Optional[User] = None):
     if user is None:
         user = current_user()
 
@@ -96,13 +98,13 @@ def can(item, permission: int, user: User = None):
     return permission in others
 
 
-def can_read(data_description, user=None):
+def can_read(data_description, user: Optional[User] = None):
     return can(data_description, PERMISSION_READ, user)
 
 
-def can_write(data_description, user=None):
+def can_write(data_description, user: Optional[User] = None):
     return can(data_description, PERMISSION_WRITE, user)
 
 
-def can_execute(data_description, user=None):
+def can_execute(data_description, user: Optional[User] = None):
     return can(data_description, PERMISSION_EXECUTE, user)

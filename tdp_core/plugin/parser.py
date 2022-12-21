@@ -50,7 +50,7 @@ class EntryPointPlugin(object):
         self.name = self.id
         self.title = self.name
         self.description = ""
-        self.version = entry_point.dist.version
+        self.version = entry_point.dist.version if entry_point.dist else "0.0.0"
         self.extensions = []
 
     @staticmethod
@@ -115,7 +115,7 @@ def get_config_from_plugins(plugins: List[EntryPointPlugin]) -> Tuple[List[Dict[
             # Load the class of the config and wrap it in a tuple like (<clazz>, ...),
             # such that pydantic can use it as type-hint in the create_model class.
             # Otherwise, it would except <clazz> to be the default value...
-            models[plugin.id] = (plugin_settings_model, ...)
+            models[plugin.id] = (plugin_settings_model, ...)  # type: ignore
 
         # TODO: Currently we append an empty object as "default", but we should actually pass an instance of the settings model instead.
         files.append({f"{plugin.id}": {}})

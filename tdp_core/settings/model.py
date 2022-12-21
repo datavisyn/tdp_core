@@ -100,11 +100,11 @@ class GlobalSettings(BaseSettings):
     jwt_header_name: str = "Authorization"
     jwt_header_type: str = "Bearer"
     jwt_cookie_secure: bool = False
-    jwt_cookie_samesite: str = "Strict"
+    jwt_cookie_samesite: Optional[Literal["lax", "strict", "none"]] = "strict"
     jwt_access_cookie_path: str = "/"
 
     # General settings for tdp_core
-    tdp_core: TDPCoreSettings = TDPCoreSettings()
+    tdp_core: TDPCoreSettings = TDPCoreSettings()  # type: ignore
 
     @property
     def is_development_mode(self) -> bool:

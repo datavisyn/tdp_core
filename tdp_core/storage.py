@@ -15,7 +15,7 @@ _log = logging.getLogger(__name__)
 app = Flask(__name__)
 
 
-@app.route("/namedsets/", methods=["GET", "POST"])
+@app.route("/namedsets/", methods=["GET", "POST"])  # type: ignore
 @etag
 def list_namedset():
     db = MongoClient(c.host, c.port)[c.db_namedsets]
@@ -52,7 +52,7 @@ def list_namedset():
         return jsonify(entry)
 
 
-@app.route("/namedset/<namedset_id>", methods=["GET", "DELETE", "PUT"])
+@app.route("/namedset/<namedset_id>", methods=["GET", "DELETE", "PUT"])  # type: ignore
 @etag
 def get_namedset(namedset_id):
     db = MongoClient(c.host, c.port)[c.db_namedsets]
@@ -128,7 +128,7 @@ def post_attachment():
     return id
 
 
-@app.route("/attachment/<attachment_id>", methods=["GET", "DELETE", "PUT"])
+@app.route("/attachment/<attachment_id>", methods=["GET", "DELETE", "PUT"])  # type: ignore
 @etag
 def get_attachment(attachment_id):
     db = MongoClient(c.host, c.port)[c.db_namedsets]

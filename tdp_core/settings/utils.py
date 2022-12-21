@@ -27,4 +27,4 @@ def load_config_file(path: str) -> Dict[str, Any]:
     Opens any `*.json` file and loads it via `jsoncfg.loads`.
     """
     with codecs.open(path, "r", "utf-8") as fi:
-        return jsoncfg.loads(fi.read())
+        return jsoncfg.loads(fi.read()) or {}

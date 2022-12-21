@@ -23,9 +23,9 @@ def format_json(dataset, args):
 
 def resolve_formatter(type, format):
     for p in manager.registry.list(type + "-formatter"):
-        if p.format == format:
+        if p.format == format:  # type: ignore
             return p.load()
-    formats = ",".join(p.format for p in manager.registry.list(type + "-formatter"))
+    formats = ",".join(p.format for p in manager.registry.list(type + "-formatter"))  # type: ignore
     abort(400, 'unknown format "{0}" possible formats are: {1}'.format(format, formats))
 
 

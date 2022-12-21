@@ -34,7 +34,7 @@ class MongoGraph(graph.AGraph):
 
         import datetime
 
-        entry = dict(
+        entry: dict[str, int | datetime.datetime | str] = dict(
             name=data["name"],
             description=data.get("description", ""),
             creator=user.name,
@@ -130,7 +130,8 @@ class MongoGraph(graph.AGraph):
             return False
         if self._nodes:
             n = self.get_node(id)
-            self._nodes.remove(n)
+            if n:
+                self._nodes.remove(n)
         self._entry["nnodes"] -= 1
         # remove node and all associated edges
         self._db.graph_data.update(self._find_data, {"$pull": dict(nodes=dict(id=id))}, multi=False)
@@ -216,7 +217,8 @@ class MongoGraph(graph.AGraph):
             return False
         if self._edges:
             n = self.get_edge(id)
-            self._edges.remove(n)
+            if n:
+                self._edges.remove(n)
         self._entry["nedges"] -= 1
         self._db.graph.update(self._find_me, {"$inc": dict(nedges=-1)})
         self._db.graph_data.update(self._find_data, {"$pull": dict(edges=dict(id=id))})

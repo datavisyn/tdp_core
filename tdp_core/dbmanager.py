@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 from fastapi import FastAPI
 from sqlalchemy.engine import Engine
@@ -26,7 +26,7 @@ class DBManager(object):
         app.add_middleware(CloseWebSessionsMiddleware)
 
         for p in manager.registry.list("tdp-sql-database-definition"):
-            config = manager.settings.get_nested(p.configKey)
+            config: Dict[str, Any] = manager.settings.get_nested(p.configKey)  # type: ignore
             connector: DBConnector = p.load().factory()
             if not connector.dburl:
                 connector.dburl = config["dburl"]
@@ -38,7 +38,7 @@ class DBManager(object):
                 _log.critical(
                     "no db url defined for %s at config key %s - is your configuration up to date?",
                     p.id,
-                    p.configKey,
+                    p.configKey,  # type: ignore
                 )
                 continue
 

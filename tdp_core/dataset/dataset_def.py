@@ -97,7 +97,7 @@ class ADataSetProvider(object, metaclass=abc.ABCMeta):
     def __len__(self):
         import itertools
 
-        return itertools.count(self)
+        return itertools.count(self)  # type: ignore
 
     @abc.abstractmethod
     def __iter__(self):

@@ -44,10 +44,10 @@ def access_token_to_payload(token: str) -> Dict:
     return jwt.decode(token, manager.settings.secret_key, algorithms=[manager.settings.jwt_algorithm])
 
 
-def access_token_to_user(token: str) -> User:
+def access_token_to_user(token: str) -> Optional[User]:
     payload = access_token_to_payload(token)
-    username: str = payload.get("sub")
-    if username is None:
+    username: Optional[str] = payload.get("sub")
+    if not username:
         return None
     return User(id=username, access_token=token, roles=payload.get("roles", []))
 
@@ -91,12 +91,16 @@ class SecurityManager:
         u = self.current_user
         response_payload = {}
         response_cookies = []
+
+        if not u:
+            return response_payload, response_cookies
+
         for store in self.user_stores:
             customizations = store.logout(u) or LogoutReturnValue()
             # data is an arbitrary Dict which is added to the response payload.
-            response_payload.update(customizations.data)
+            response_payload.update(customizations.data or {})
             # cookies is a list of Dicts which are passed 1:1 to response.set_cookie.
-            response_cookies.extend(customizations.cookies)
+            response_cookies.extend(customizations.cookies or [])
         return response_payload, response_cookies
 
     def _delegate_stores_until_not_none(self, store_method_name: str, *args):
@@ -244,7 +248,7 @@ def is_logged_in():
 
 def current_username():
     u = manager.security.current_user
-    return u.name if hasattr(u, "name") else ANONYMOUS_USER.name
+    return u.name if u and hasattr(u, "name") else ANONYMOUS_USER.name
 
 
 def current_user():
@@ -258,7 +262,7 @@ def login_required(f=None, *, users=(), roles=()):
     """Usage: @login_required or @login_required(users=("admin") or @login_required(roles=("admin"))"""
 
     def login_required_inner(fn=None):
-        @wraps(fn)
+        @wraps(fn)  # type: ignore
         def decorator(*args, **kwargs):
             u = manager.security.current_user
             # Allow access only if a user is available
@@ -270,7 +274,7 @@ def login_required(f=None, *, users=(), roles=()):
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED, detail="User role not in allowed_roles in login_required request"
                 )
-            return fn(*args, **kwargs)
+            return fn(*args, **kwargs)  # type: ignore
 
         return decorator
 

@@ -2,10 +2,11 @@ import logging
 import re
 from argparse import REMAINDER
 from os import path
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import alembic.command
 import alembic.config
+from alembic.util.exc import CommandError
 from fastapi import FastAPI
 
 from .. import manager
@@ -29,7 +30,7 @@ class DBMigration(object):
         script_location: str,
         *,
         auto_upgrade: bool = False,
-        version_table_schema: str = None,
+        version_table_schema: Optional[str] = None,
     ):
         """
         Initializes a new migration object and optionally carries out an upgrade.
@@ -59,7 +60,7 @@ class DBMigration(object):
                 self.execute(["upgrade", "head"])
                 _log.info(f"Successfully upgraded database {self.id}")
             # As alembic is actually a commandline tool, it sometimes uses sys.exit (https://github.com/sqlalchemy/alembic/blob/master/alembic/util/messaging.py#L63)
-            except (SystemExit, alembic.util.exc.CommandError):
+            except (SystemExit, CommandError):
                 _log.exception(f"Error upgrading database {self.id}")
 
     def __repr__(self) -> str:
@@ -90,11 +91,11 @@ class DBMigration(object):
         """
         if arguments:
             # Join the list with spaces
-            arguments = " ".join(arguments)
+            arguments_str = " ".join(arguments)
             # For all the command patterns we have ..
             for key, value in self.custom_commands.items():
                 # .. check if we can match the command pattern with the given string
-                matched = re.match(f"{key}$", arguments)
+                matched = re.match(f"{key}$", arguments_str)
                 if matched:
                     # If we have a match, call format with the captured groups and split by ' '
                     return value.format(*matched.groups()).split(" ")
@@ -162,8 +163,11 @@ class DBMigrationManager(object):
         for p in plugins:
             _log.info("DBMigration found: %s", p.id)
 
+            # TODO: The AExtensionDesc doesn't have any typing information, so we need to cast it to Any here
+            p: Any = p
+
             # Check if configKey is set, otherwise use the plugin configuration
-            config = manager.settings.get_nested(p.configKey, {}) if hasattr(p, "configKey") else {}
+            config: dict = manager.settings.get_nested(p.configKey, {}) if hasattr(p, "configKey") else {}  # type: ignore
 
             # Priority of assignments: Configuration File -> Plugin Definition
             id = config.get("id") or (p.id if hasattr(p, "id") else None)
@@ -211,10 +215,10 @@ class DBMigrationManager(object):
 
             # Create new migration
             migration = DBMigration(
-                id,
-                db_url,
-                script_location,
-                auto_upgrade=auto_upgrade,
+                id,  # type: ignore
+                db_url,  # type: ignore
+                script_location,  # type: ignore
+                auto_upgrade=auto_upgrade,  # type: ignore
                 version_table_schema=version_table_schema,
             )
 
@@ -276,6 +280,6 @@ def create_migration_command(parser):
 
             # Using REMAINDER as nargs causes the argument to be be optional, but '+' does not work because it also parses additional --attr with the parser which should actually be ignored.
             # Therefore, args.command might be empty and we simply pass None to trigger the error message
-            manager.db_migration[args.id].execute(args.command if len(args.command) > 0 else None)
+            manager.db_migration[args.id].execute(args.command if len(args.command) > 0 else None)  # type: ignore
 
     return lambda args: lambda: execute(args)

@@ -1,15 +1,16 @@
 from contextvars import ContextVar
+from typing import Optional
 
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 
 REQUEST_CTX_KEY = "fastapi_request"
 
-_request_ctx_var: ContextVar[str] = ContextVar(REQUEST_CTX_KEY, default=None)
+_request_ctx_var: ContextVar[Optional[Request]] = ContextVar(REQUEST_CTX_KEY, default=None)
 
 
 def get_request() -> Request:
-    return _request_ctx_var.get()
+    return _request_ctx_var.get()  # type: ignore TODO: It is None in non-request context
 
 
 class RequestContextMiddleware(BaseHTTPMiddleware):

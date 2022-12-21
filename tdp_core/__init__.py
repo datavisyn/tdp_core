@@ -10,6 +10,10 @@ class VisynPlugin(AVisynPlugin):
         app.include_router(img_api.app)
 
     def register(self, registry: RegHelper):
+        import logging
+
+        _log = logging.getLogger(__name__)
+
         # phovea_server
         registry.append(
             "namespace",
@@ -23,7 +27,14 @@ class VisynPlugin(AVisynPlugin):
             "tdp_core.id_mapping.idtype_api",
             {"namespace": "/api/idtype", "factory": "create_idtype"},
         )
-        registry.append("json-encoder", "numpy", "tdp_core.encoder.json_encoder")
+
+        try:
+            import numpy  # noqa, type: ignore
+
+            registry.append("json-encoder", "numpy", "tdp_core.encoder.json_encoder")
+        except ImportError:
+            _log.info('numpy not available, skipping "numpy" json encoder')
+
         registry.append("json-encoder", "set-encoder", "tdp_core.encoder.set_encoder", {})
 
         registry.append(
@@ -63,8 +74,6 @@ class VisynPlugin(AVisynPlugin):
         registry.append_router("tdp_plugin_router", "tdp_core.plugin.router", {})
         registry.append("namespace", "tdp_xlsx2json", "tdp_core.xlsx", {"namespace": "/api/tdp/xlsx"})
         registry.append("mapping_provider", "tdp_core", "tdp_core.mapping_table")
-        # TODO: Check if this is still required?
-        registry.append("greenifier", "psycopg2", "tdp_core.sql_use_gevent", {})
 
         # DB migration plugins
         registry.append(

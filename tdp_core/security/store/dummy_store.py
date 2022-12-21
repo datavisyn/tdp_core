@@ -26,7 +26,6 @@ class DummyStore(BaseStore):
         self._users = [
             DummyUser(
                 id=v["name"],
-                name=v["name"],
                 roles=v["roles"],
                 password=v["password"],
                 salt=v["salt"],

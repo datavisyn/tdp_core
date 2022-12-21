@@ -3,7 +3,8 @@ from datetime import datetime
 from tempfile import NamedTemporaryFile
 
 import dateutil.parser
-from flask import Flask, Response, abort, jsonify, request
+from flask import Flask, abort, jsonify, request
+from flask.wrappers import Response
 from openpyxl import Workbook, load_workbook
 from openpyxl.cell import WriteOnlyCell
 from openpyxl.styles import Font
@@ -42,7 +43,7 @@ def _xlsx2json():
     if not file:
         abort(403, "missing file")
 
-    wb = load_workbook(file, read_only=True, data_only=True)
+    wb = load_workbook(file, read_only=True, data_only=True)  # type: ignore
 
     def convert_row(row, cols):
         result = {}
@@ -78,7 +79,7 @@ def _xlsx2json_array():
     if not file:
         abort(403, "missing file")
 
-    wb = load_workbook(file, read_only=True, data_only=True)
+    wb = load_workbook(file, read_only=True, data_only=True)  # type: ignore
 
     def convert_row(row):
         return [_convert_value(cell.value) for cell in row]
@@ -94,7 +95,7 @@ def _xlsx2json_array():
 
 @app.route("/from_json", methods=["POST"])
 def _json2xlsx():
-    data = request.json
+    data: dict = request.json  # type: ignore
     wb = Workbook(write_only=True)
 
     bold = Font(bold=True)
@@ -102,9 +103,9 @@ def _json2xlsx():
     def to_cell(v):
         # If the native value cannot be used as Excel value, used the stringified version instead.
         try:
-            return WriteOnlyCell(ws, value=v)
+            return WriteOnlyCell(ws, value=v)  # type: ignore
         except ValueError:
-            return WriteOnlyCell(ws, value=str(v))
+            return WriteOnlyCell(ws, value=str(v))  # type: ignore
 
     def to_header(v):
         c = to_cell(v)
@@ -139,7 +140,7 @@ def _json2xlsx():
 
 @app.route("/from_json_array", methods=["POST"])
 def _json_array2xlsx():
-    data = request.json
+    data: list = request.json  # type: ignore
     wb = Workbook(write_only=True)
     ws = wb.create_sheet()
 
