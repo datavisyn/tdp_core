@@ -620,8 +620,13 @@ class DBConnector(object):
         return OrderedDict(name=name, description=self.description)
 
     def create_engine(self, config) -> Engine:
-        engine_options = config.get("engine", {})
-        return sqlalchemy.create_engine(self.dburl, pool_size=30, pool_pre_ping=True, **engine_options)
+        engine_options = dict(
+            # Increase the pool size to 30 to avoid "too many clients" errors
+            pool_size=30,
+            pool_pre_ping=True,
+        )
+        engine_options.update(config.get("engine", {}))
+        return sqlalchemy.create_engine(self.dburl, **engine_options)
 
     def create_sessionmaker(self, engine) -> sessionmaker:
         return sessionmaker(bind=engine)
