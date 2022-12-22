@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.security.utils import get_authorization_scheme_param
 
 from .. import manager
-from ..middleware.request_context_middleware import get_request
+from ..middleware.request_context_plugin import get_request
 from .model import ANONYMOUS_USER, LogoutReturnValue, User
 from .store.base_store import BaseStore
 
@@ -119,17 +119,18 @@ class SecurityManager:
     @property
     def current_user(self) -> Optional[User]:
         try:
-            req = get_request()
-            # Fetch the existing user from the request if there is any
-            try:
-                user = req.state.user
-                if user:
-                    return user
-            except (KeyError, AttributeError):
-                pass
-            # If there is no user, try to load it from the request and store it in the request
-            user = req.state.user = self.load_from_request(get_request())
-            return user
+            r = get_request()
+            if r:
+                # Fetch the existing user from the request if there is any
+                try:
+                    user = r.state.user
+                    if user:
+                        return user
+                except (KeyError, AttributeError):
+                    pass
+                # If there is no user, try to load it from the request and store it in the request
+                user = r.state.user = self.load_from_request(r)
+                return user
         except HTTPException:
             return None
         except Exception:

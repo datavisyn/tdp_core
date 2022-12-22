@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from . import manager
 from .dbview import DBConnector
 from .middleware.close_web_sessions_middleware import CloseWebSessionsMiddleware
-from .middleware.request_context_middleware import get_request
+from .middleware.request_context_plugin import get_request
 
 _log = logging.getLogger(__name__)
 
@@ -27,7 +27,8 @@ class DBManager(object):
 
         for p in manager.registry.list("tdp-sql-database-definition"):
             config: Dict[str, Any] = manager.settings.get_nested(p.configKey)  # type: ignore
-            connector: DBConnector = p.load().factory()
+            # Only instantiate the connector if it has a module factory, otherwise use an empty one
+            connector: DBConnector = p.load().factory() if p.module else DBConnector()
             if not connector.dburl:
                 connector.dburl = config["dburl"]
             if not connector.statement_timeout:
@@ -93,11 +94,14 @@ class DBManager(object):
         """
         session = self.create_session(engine_or_id)
 
+        r = get_request()
+        if not r:
+            raise Exception("No request found, did you use a create_web_sesssion outside of a request?")
         try:
-            existing_sessions = get_request().state.db_sessions
+            existing_sessions = r.state.db_sessions
         except (KeyError, AttributeError):
             existing_sessions = []
-            get_request().state.db_sessions = existing_sessions
+            r.state.db_sessions = existing_sessions
         existing_sessions.append(session)
 
         return session

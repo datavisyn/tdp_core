@@ -8,6 +8,7 @@ from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
 from pydantic.utils import deep_update
+from starlette_context.middleware import RawContextMiddleware
 
 from ..settings.constants import default_logging_dict
 
@@ -60,7 +61,6 @@ def create_visyn_server(
     )
 
     from ..middleware.exception_handler_middleware import ExceptionHandlerMiddleware
-    from ..middleware.request_context_middleware import RequestContextMiddleware
 
     # TODO: For some reason, a @app.exception_handler(Exception) is not called here. We use a middleware instead.
     app.add_middleware(ExceptionHandlerMiddleware)
@@ -143,8 +143,10 @@ def create_visyn_server(
     for p in plugins:
         p.plugin.init_app(app)
 
-    # Add middleware to access Request "outside"
-    app.add_middleware(RequestContextMiddleware)
+    from ..middleware.request_context_plugin import RequestContextPlugin
+
+    # Use starlette-context to store the current request globally, i.e. accessible via context['request']
+    app.add_middleware(RawContextMiddleware, plugins=(RequestContextPlugin(),))
 
     # TODO: Move up?
     app.add_api_route("/health", health)  # type: ignore
