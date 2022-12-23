@@ -51,6 +51,11 @@ class SecuritySettings(BaseModel):
 
 
 class TDPCoreSettings(BaseModel):
+    total_anyio_tokens: int = 100
+    """
+    The total number of threads to use for anyio. FastAPI uses these threads to run sync routes concurrently.
+    """
+
     disable: DisableSettings = DisableSettings()
     enabled_plugins: List[str] = []
 
@@ -73,7 +78,7 @@ class TDPCoreSettings(BaseModel):
                 "name": "sam",
                 "salt": "2338b858597b4937ad1c5db4b524f56d",
                 "password": "814cbf874d3da7c01327b50c96bedf7db26357e0b4be25623242a33b33861651c3efd90d5c1a6410a646f356c73adf2de473611dee158672e8ee073767dc88f2",
-                "roles": ["sam", "admin"],
+                "roles": ["sam"],
             },
         ]
     )

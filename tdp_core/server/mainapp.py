@@ -140,7 +140,7 @@ def build_info():
 
 
 # health check for docker-compose, kubernetes
-def health():
+async def health():
     return "ok"
 
 

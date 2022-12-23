@@ -4,6 +4,7 @@ import sys
 import threading
 from typing import Any, Dict, Optional
 
+import anyio
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
@@ -151,5 +152,12 @@ def create_visyn_server(
     # TODO: Move up?
     app.add_api_route("/health", health)  # type: ignore
     app.add_api_route("/api/buildInfo.json", build_info)  # type: ignore
+
+    @app.on_event("startup")
+    async def change_anyio_total_tokens():
+        # FastAPI uses anyio threads to handle sync endpoint concurrently.
+        # This is a workaround to increase the number of threads to 100, as the default is only 40.
+        limiter = anyio.to_thread.current_default_thread_limiter()
+        limiter.total_tokens = manager.settings.tdp_core.total_anyio_tokens
 
     return app
