@@ -232,13 +232,13 @@ def create_security_manager():
     """
     :return: the security manager
     """
-    _log.info("Creating security_manager")
-
     user_stores = list(filter(None, [p.load().factory() for p in manager.registry.list("user_stores")]))
     if len(user_stores) == 0 or manager.settings.tdp_core.alwaysAppendDummyStore:
-        from .store import dummy_store
+        from .store.dummy_store import DummyStore
 
-        user_stores.append(dummy_store.create())
+        user_stores.append(DummyStore())
+
+    _log.info(f"Initializing SecurityManager with {', '.join([s.__class__.__name__ for s in user_stores]) or 'no user stores'}")
 
     return SecurityManager(user_stores=user_stores)
 

@@ -36,8 +36,15 @@ def create_visyn_server(
     workspace_config = workspace_config if isinstance(workspace_config, dict) else load_workspace_config()
     manager.settings = GlobalSettings(**workspace_config)
     logging.config.dictConfig(manager.settings.tdp_core.logging)
+
+    # Filter out the metrics endpoint from the access log
+    class EndpointFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            return "GET /metrics" not in record.getMessage()
+
+    logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
+
     _log = logging.getLogger(__name__)
-    _log.info("Workspace settings successfully loaded")
 
     # Load the initial plugins
     from ..plugin.parser import get_config_from_plugins, load_all_plugins
@@ -48,7 +55,6 @@ def create_visyn_server(
     visyn_server_settings = create_model("VisynServerSettings", __base__=GlobalSettings, **plugin_settings_models)
     # Patch the global settings by instantiating the new settings model with the global config, all config.json(s), and pydantic models
     manager.settings = visyn_server_settings(**deep_update(*plugin_config_files, workspace_config))
-    _log.info("All settings successfully loaded")
 
     app = FastAPI(
         debug=manager.settings.is_development_mode,
@@ -74,8 +80,6 @@ def create_visyn_server(
 
     app.state.registry = manager.registry = Registry()
     manager.registry.init_app(app, plugins)
-
-    _log.info("Plugin registry successfully initialized")
 
     from ..dbmanager import DBManager
 
@@ -111,10 +115,9 @@ def create_visyn_server(
     from .utils import init_legacy_app, load_after_server_started_hooks
 
     namespace_plugins = manager.registry.list("namespace")
-    _log.info(f"Registering {len(namespace_plugins)} legacy namespaces via WSGIMiddleware")
+    _log.info(f"Registering {len(namespace_plugins)} legacy namespace(s) via WSGIMiddleware")
     for p in namespace_plugins:
         namespace = p.namespace  # type: ignore
-        _log.info(f"Registering legacy namespace: {namespace}")
 
         sub_app = p.load().factory()
         init_legacy_app(sub_app)
@@ -123,10 +126,9 @@ def create_visyn_server(
 
     # Load all FastAPI apis
     router_plugins = manager.registry.list("fastapi_router")
-    _log.info(f"Registering {len(router_plugins)} API-routers")
+    _log.info(f"Registering {len(router_plugins)} FastAPI router(s)")
     # Load all namespace plugins as WSGIMiddleware plugins
     for p in router_plugins:
-        _log.info(f"Registering router: {p.id}")
         app.include_router(p.load().factory())
 
     # load `after_server_started` extension points which are run immediately after server started,

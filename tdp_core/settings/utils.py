@@ -18,7 +18,7 @@ def load_workspace_config() -> Dict[str, Any]:
         _log.info(f"Loading workspace config.json from {global_}")
         return load_config_file(global_)
     else:
-        _log.info(f"No workspace config.json found at {global_}, using empty dict as default")
+        _log.info(f"No {global_} found, using empty dict")
         return {}
 
 

@@ -50,8 +50,3 @@ class DummyStore(BaseStore):
 
     def logout(self, user):
         pass
-
-
-def create():
-    _log.info("Creating dummy store")
-    return DummyStore()

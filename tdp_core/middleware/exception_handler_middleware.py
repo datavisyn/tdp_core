@@ -30,7 +30,7 @@ class ExceptionHandlerMiddleware:
         try:
             await self.app(scope, receive, _send)
         except Exception as e:
-            logging.exception("An error occurred in FastAPI")
+            logging.exception(repr(e))
             response = await http_exception_handler(
                 None,  # type: ignore
                 e if isinstance(e, HTTPException) else HTTPException(status_code=500, detail=detail_from_exception(e)),

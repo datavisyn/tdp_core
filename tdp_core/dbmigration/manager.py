@@ -156,12 +156,11 @@ class DBMigrationManager(object):
         self._migrations: Dict[str, DBMigration] = dict()
 
     def init_app(self, app: FastAPI, plugins: List[AExtensionDesc] = []):
-        _log.info("Initializing DBMigrationManager")
-
+        _log.info(f"Initializing DBMigrationManager with {', '.join([p.id for p in plugins]) or 'no plugins'}")
         auto_upgrade_default = manager.settings.tdp_core.migrations.autoUpgrade
 
         for p in plugins:
-            _log.info("DBMigration found: %s", p.id)
+            _log.info(f"Database migration found: {p.id}")
 
             # TODO: The AExtensionDesc doesn't have any typing information, so we need to cast it to Any here
             p: Any = p

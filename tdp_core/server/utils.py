@@ -33,7 +33,7 @@ def init_legacy_app(app: Flask):
     @app.errorhandler(Exception)  # type: ignore
     async def handle_exception(e):
         """Handles Flask exceptions by returning the same JSON response as FastAPI#HTTPException would."""
-        _log.exception("An error occurred in Flask")
+        _log.exception(repr(e))
         # Extract status information if a Flask#HTTPException is given, otherwise return 500 with exception information
         status_code = e.code if isinstance(e, HTTPException) else 500
         detail = detail_from_exception(e)
@@ -56,12 +56,13 @@ def load_after_server_started_hooks():
 
     after_server_started_hooks = [p.load().factory() for p in manager.registry.list("after_server_started")]
 
-    _log.info(f"Found {len(after_server_started_hooks)} `after_server_started` extension points to run")
+    if after_server_started_hooks:
+        _log.info(f"Found {len(after_server_started_hooks)} after_server_started extension(s) to run")
 
-    for hook in after_server_started_hooks:
-        hook()
+        for hook in after_server_started_hooks:
+            hook()
 
-    _log.info("Elapsed time for server startup hooks: %d seconds", time.time() - start)
+        _log.info("Elapsed time for server startup hooks: %d seconds", time.time() - start)
 
 
 def detail_from_exception(e: Exception) -> Optional[str]:
@@ -75,4 +76,4 @@ def detail_from_exception(e: Exception) -> Optional[str]:
     if isinstance(e, HTTPException):
         return e.description
     # Fallback to the string representation of the exception
-    return str(e)
+    return repr(e)

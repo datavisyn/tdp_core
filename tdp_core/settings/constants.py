@@ -1,19 +1,22 @@
 default_logging_dict = {
     "version": 1,
-    # "disable_existing_loggers": False,
+    "disable_existing_loggers": False,
     "formatters": {
-        "simple": {
-            "format": "%(asctime)s %(levelname)s %(name)s: %(message)s",
-            "datefmt": "%H:%M:%S",
+        "default": {
+            "()": "uvicorn.logging.DefaultFormatter",
+            "format": "%(levelprefix)s %(asctime)s | %(name)30s | %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
-        "line": {"format": "%(asctime)s %(levelname)s %(name)s(%(pathname)s:%(lineno)s): %(message)s"},
+    },
+    "loggers": {
+        "uvicorn": {"handlers": ["default"]},
     },
     "handlers": {
-        "console": {
+        "default": {
             "class": "logging.StreamHandler",
-            "formatter": "simple",
-            "stream": "ext://sys.stdout",
+            "formatter": "default",
+            "stream": "ext://sys.stderr",
         }
     },
-    "root": {"level": "INFO", "handlers": ["console"]},
+    "root": {"level": "INFO", "handlers": ["default"]},
 }

@@ -84,7 +84,7 @@ def load_all_plugins() -> List[EntryPointPlugin]:
     plugins: List[EntryPointPlugin] = [p for p in _find_entry_point_plugins() if not is_disabled_plugin(p)]
     plugins.sort(key=lambda p: p.id)
 
-    _log.info(f"Discovered {len(plugins)} plugins: {', '.join([d.id for d in plugins])}")
+    _log.info(f"Discovered {len(plugins)} plugin(s): {', '.join([d.id for d in plugins])}")
 
     return plugins
 
@@ -95,7 +95,7 @@ def get_extensions_from_plugins(plugins: List[EntryPointPlugin]) -> List:
         reg = RegHelper(plugin)
         plugin.plugin.register(reg)
         ext = [r for r in reg if not is_disabled_extension(r, "python", plugin)]
-        logging.info(f"plugin {plugin.id} registered {len(ext)} extension(s)")
+        _log.info(f"Plugin {plugin.id} registered {len(ext)} extension(s)")
         plugin.extensions = ext
         server_extensions.extend(ext)
 
@@ -111,7 +111,7 @@ def get_config_from_plugins(plugins: List[EntryPointPlugin]) -> Tuple[List[Dict[
     for plugin in plugins:
         plugin_settings_model = plugin.plugin.setting_class
         if plugin_settings_model:
-            logging.info(f"Plugin {plugin.id} has a settings model")
+            _log.info(f"Plugin {plugin.id} has a settings model")
             # Load the class of the config and wrap it in a tuple like (<clazz>, ...),
             # such that pydantic can use it as type-hint in the create_model class.
             # Otherwise, it would except <clazz> to be the default value...
