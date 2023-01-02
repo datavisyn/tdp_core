@@ -7,7 +7,7 @@ from pymongo.collection import ReturnDocument
 import tdp_core.security as security
 
 from . import manager
-from .utils import etag, fix_id, random_id
+from .utils import fix_id, random_id
 
 c = manager.settings.tdp_core.mongo
 _log = logging.getLogger(__name__)
@@ -16,7 +16,6 @@ app = Flask(__name__)
 
 
 @app.route("/namedsets/", methods=["GET", "POST"])  # type: ignore
-@etag
 def list_namedset():
     db = MongoClient(c.host, c.port)[c.db_namedsets]
 
@@ -53,7 +52,6 @@ def list_namedset():
 
 
 @app.route("/namedset/<namedset_id>", methods=["GET", "DELETE", "PUT"])  # type: ignore
-@etag
 def get_namedset(namedset_id):
     db = MongoClient(c.host, c.port)[c.db_namedsets]
     result = list(db.namedsets.find(dict(id=namedset_id), {"_id": 0}))
@@ -110,7 +108,6 @@ def _generate_id():
 
 
 @app.route("/attachment/", methods=["POST"])
-@etag
 def post_attachment():
     """
     simple attachment management
@@ -129,7 +126,6 @@ def post_attachment():
 
 
 @app.route("/attachment/<attachment_id>", methods=["GET", "DELETE", "PUT"])  # type: ignore
-@etag
 def get_attachment(attachment_id):
     db = MongoClient(c.host, c.port)[c.db_namedsets]
     result = list(db.attachments.find(dict(id=attachment_id), {"_id": 0}))

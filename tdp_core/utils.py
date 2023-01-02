@@ -3,7 +3,7 @@ import logging
 from builtins import range
 from typing import Union
 
-from flask import abort, make_response, request
+from flask import abort, make_response
 from flask.wrappers import Response
 
 from . import manager
@@ -82,33 +82,6 @@ def no_cache(f):
     """Insert a no-cache directive in the response. This decorator just
     invokes the cache-control decorator with the specific directives."""
     return cache_control("private", "no-cache", "no-store", "max-age=0")(f)
-
-
-def etag(f):
-    """Add entity tag (etag) handling to the decorated route."""
-    import functools
-
-    @functools.wraps(f)
-    def wrapped(*args, **kwargs):
-        if request.method not in ["GET", "HEAD"]:
-            # etags only make sense for request that are cacheable, so only
-            # GET and HEAD requests are allowed
-            return f(*args, **kwargs)
-
-        # invoke the wrapped function and generate a response object from
-        # its result
-        rv = f(*args, **kwargs)
-        rv = make_response(rv)
-
-        # if the response is not a code 200 OK then we let it through
-        # unchanged
-        if rv.status_code != 200 or rv.direct_passthrough or not rv.implicit_sequence_conversion:
-            return rv
-
-        rv.add_etag()
-        return rv.make_conditional(request)
-
-    return wrapped
 
 
 def fix_id(id):
@@ -228,14 +201,3 @@ def jsonify(obj, *args, **kwargs):
     :return:
     """
     return Response(to_json(obj, *args, **kwargs), mimetype="application/json; charset=utf-8")
-
-
-def glob_recursivly(path, match):
-    import fnmatch
-    import os
-
-    for dirpath, dirnames, files in os.walk(path):
-        if match is None:
-            return None
-        for f in fnmatch.filter(files, match):
-            yield os.path.join(dirpath, f)

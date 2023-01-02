@@ -4,7 +4,6 @@ from flask import Flask, abort, jsonify, request
 
 from .. import manager
 from ..dataset.dataset_def import to_idtype_description
-from ..utils import etag
 
 app_idtype = Flask(__name__)
 
@@ -12,7 +11,6 @@ _log = logging.getLogger(__name__)
 
 
 @app_idtype.route("/")
-@etag
 def _list_idtypes():
     tmp = dict()
     # TODO: We probably don't want to have these idtypes as "all" idtypes
@@ -27,7 +25,6 @@ def _list_idtypes():
 
 
 @app_idtype.route("/<idtype>/")
-@etag
 def _maps_to(idtype):
     target_id_types = manager.id_mapping.maps_to(idtype)
     return jsonify(target_id_types)

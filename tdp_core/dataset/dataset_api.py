@@ -5,7 +5,7 @@ from flask import Flask, abort, make_response, request
 from flask.wrappers import Response
 
 from .. import manager
-from ..utils import etag, jsonify, to_json
+from ..utils import jsonify, to_json
 from .dataset import add, get, iter, list_datasets, remove
 
 app = Flask(__name__)
@@ -86,7 +86,6 @@ def _to_query(query):
 
 
 @app.route("/", methods=["GET", "POST"])
-@etag
 def _list_datasets():
     if request.method == "GET":
         query = _to_query(request.values)
@@ -111,7 +110,6 @@ def _list_datasets():
 
 
 @app.route("/<dataset_id>", methods=["PUT", "GET", "DELETE", "POST"])
-@etag
 def _get_dataset(dataset_id):
     if request.method == "PUT":
         return _update_dataset(dataset_id, request)
@@ -128,7 +126,6 @@ def _get_dataset(dataset_id):
 
 
 @app.route("/<dataset_id>/desc")
-@etag
 def _get_dataset_desc(dataset_id):
     d = get(dataset_id)
     if not d:

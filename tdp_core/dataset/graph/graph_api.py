@@ -1,7 +1,6 @@
 from flask import abort, jsonify, request
 
 from ... import manager
-from ...utils import etag
 
 
 def _to_desc():
@@ -87,13 +86,11 @@ def _list_type(dataset_getter, name="node"):
 
 def add_graph_handler(app, dataset_getter):
     @app.route("/graph/<datasetid>")
-    @etag
     def list_graphs(datasetid):
         d = dataset_getter(datasetid, "graph")
         return jsonify(d.to_description())
 
     @app.route("/graph/<datasetid>/data")
-    @etag
     def get_graph_data(datasetid):
         d = dataset_getter(datasetid, "graph")
         formatter = resolve_formatter("graph", request.args.get("format", "json"))
@@ -103,13 +100,13 @@ def add_graph_handler(app, dataset_getter):
     app.add_url_rule(
         "/graph/<datasetid>/node",
         "list_nodes",
-        etag(list_nodes),
+        list_nodes,
         methods=["GET", "POST", "DELETE"],
     )
     app.add_url_rule(
         "/graph/<datasetid>/node/<int:itemid>",
         "handle_node",
-        etag(handle_node),
+        handle_node,
         methods=["GET", "PUT", "DELETE"],
     )
 
@@ -117,13 +114,13 @@ def add_graph_handler(app, dataset_getter):
     app.add_url_rule(
         "/graph/<datasetid>/edge",
         "list_edges",
-        etag(list_edges),
+        list_edges,
         methods=["GET", "POST", "DELETE"],
     )
     app.add_url_rule(
         "/graph/<datasetid>/edge/<int:itemid>",
         "handle_edge",
-        etag(handle_edge),
+        handle_edge,
         methods=["GET", "PUT", "DELETE"],
     )
 
