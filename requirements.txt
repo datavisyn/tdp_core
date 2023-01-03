@@ -8,6 +8,15 @@ json-cfg==0.4.2
 marshmallow-sqlalchemy==0.28.1
 marshmallow==3.19.0
 openpyxl==3.0.9
+opentelemetry-api==1.15.0
+opentelemetry-exporter-otlp==1.15.0
+opentelemetry-instrumentation-fastapi==0.36b0
+opentelemetry-instrumentation-httpx==0.36b0
+opentelemetry-instrumentation-logging==0.36b0
+opentelemetry-instrumentation-requests==0.36b0
+opentelemetry-instrumentation-sqlalchemy==0.36b0
+opentelemetry-instrumentation-system-metrics==0.36b0
+opentelemetry-sdk==1.15.0
 Pillow==9.3.0
 psycopg==3.1.7
 psycopg2==2.9.5
@@ -16,6 +25,7 @@ pyjwt==2.6.0
 pymongo~=3.11.1
 pytest-postgresql==4.1.1
 python-dateutil==2.8.2
+python-logging-loki==0.3.1
 python-memcached==1.59
 python-multipart==0.0.5
 rdkit==2022.3.5

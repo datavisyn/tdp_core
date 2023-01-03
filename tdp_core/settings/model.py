@@ -50,11 +50,18 @@ class SecuritySettings(BaseModel):
     store: SecurityStoreSettings = SecurityStoreSettings()
 
 
+class TelemetrySettings(BaseModel):
+    enabled: bool = True
+    # TODO: More granular settings like loki, ...
+
+
 class TDPCoreSettings(BaseModel):
     total_anyio_tokens: int = 100
     """
     The total number of threads to use for anyio. FastAPI uses these threads to run sync routes concurrently.
     """
+
+    telemetry: TelemetrySettings = TelemetrySettings()
 
     disable: DisableSettings = DisableSettings()
     enabled_plugins: List[str] = []

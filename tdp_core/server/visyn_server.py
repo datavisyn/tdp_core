@@ -37,13 +37,6 @@ def create_visyn_server(
     manager.settings = GlobalSettings(**workspace_config)
     logging.config.dictConfig(manager.settings.tdp_core.logging)
 
-    # Filter out the metrics endpoint from the access log
-    class EndpointFilter(logging.Filter):
-        def filter(self, record: logging.LogRecord) -> bool:
-            return "GET /metrics" not in record.getMessage()
-
-    logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
-
     _log = logging.getLogger(__name__)
 
     # Load the initial plugins
@@ -74,6 +67,11 @@ def create_visyn_server(
 
     # Store all globals also in app.state.<manager> to allow access in FastAPI routes via request.app.state.<manager>.
     app.state.settings = manager.settings
+
+    if manager.settings.tdp_core.telemetry.enabled:
+        from ..telemetry import init_telemetry
+
+        init_telemetry(app, app_name="app", endpoint="http://localhost:4317")
 
     # Initialize global managers.
     from ..plugin.registry import Registry
