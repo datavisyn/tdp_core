@@ -5,8 +5,8 @@ import threading
 from typing import Any, Dict, Optional
 
 import anyio
-from a2wsgi import WSGIMiddleware
 from fastapi import FastAPI
+from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
 from pydantic.utils import deep_update
 from starlette_context.middleware import RawContextMiddleware
