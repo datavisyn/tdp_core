@@ -50,8 +50,16 @@ class SecuritySettings(BaseModel):
     store: SecurityStoreSettings = SecurityStoreSettings()
 
 
-class TelemetrySettings(BaseModel):
-    enabled: bool = True
+class BaseTelemetrySettings(BaseModel):
+    enabled: bool = False
+
+
+class TelemetrySettings(BaseTelemetrySettings):
+    traces: BaseTelemetrySettings = BaseTelemetrySettings()
+    metrics: BaseTelemetrySettings = BaseTelemetrySettings()
+
+    logs: BaseTelemetrySettings = BaseTelemetrySettings()
+    metrics_middleware: BaseTelemetrySettings = BaseTelemetrySettings()
     # TODO: More granular settings like loki, ...
 
 

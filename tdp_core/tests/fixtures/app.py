@@ -18,15 +18,18 @@ def mock_plugins(monkeypatch):
 
 
 @pytest.fixture
-def app() -> Generator[FastAPI, Any, None]:
-    yield create_visyn_server(
-        workspace_config={
-            "tdp_core": {"enabled_plugins": ["tdp_core"]},
-        }
-    )
+def workspace_config() -> dict:
+    return {
+        "tdp_core": {"enabled_plugins": ["tdp_core"], "telemetry": {"enabled": False}},
+    }
 
 
 @pytest.fixture
-def client(app: FastAPI) -> Generator[TestClient, Any, None]:
+def app(workspace_config) -> Generator[FastAPI, Any, None]:
+    yield create_visyn_server(workspace_config=workspace_config)
+
+
+@pytest.fixture
+def client(app: FastAPI, request) -> Generator[TestClient, Any, None]:
     with TestClient(app) as client:
         yield client

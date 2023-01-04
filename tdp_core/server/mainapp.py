@@ -139,11 +139,6 @@ def build_info():
     return build_info
 
 
-# health check for docker-compose, kubernetes
-async def health():
-    return "ok"
-
-
 def create():
     # check initialization
     app = Flask(__name__)

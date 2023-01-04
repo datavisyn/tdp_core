@@ -138,7 +138,7 @@ def create_visyn_server(
     t.start()
 
     # TODO: Check mainapp.py what it does and transfer them here. Currently, we cannot mount a flask app at root, such that the flask app is now mounted at /app/
-    from .mainapp import build_info, health
+    from .mainapp import build_info
 
     # Call init_app callback for every plugin
     for p in plugins:
@@ -149,8 +149,14 @@ def create_visyn_server(
     # Use starlette-context to store the current request globally, i.e. accessible via context['request']
     app.add_middleware(RawContextMiddleware, plugins=(RequestContextPlugin(),))
 
+    @app.get("/health", tags=["Telemetry"])
+    async def health_check():
+        """
+        Health check endpoint for monitoring.
+        """
+        return "ok"
+
     # TODO: Move up?
-    app.add_api_route("/health", health)  # type: ignore
     app.add_api_route("/api/buildInfo.json", build_info)  # type: ignore
 
     @app.on_event("startup")
