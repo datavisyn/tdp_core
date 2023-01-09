@@ -31,6 +31,8 @@ class AlbSecurityStoreSettings(BaseModel):
     enable: bool = False
     cookie_name: Optional[str] = None
     signout_url: Optional[str] = None
+    token_user_attr: Optional[str] = "email"
+    token_roles_attr: Optional[str] = None
 
 
 class NoSecurityStoreSettings(BaseModel):
