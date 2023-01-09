@@ -3,9 +3,9 @@ alembic==1.9.0
 cachetools==5.2.0
 fastapi[all]==0.89.0
 flask-swagger-ui==3.36.0
-Flask[async]==2.2.2
+Flask[async]>=2.1.0,<2.2.0
 json-cfg==0.4.2
-marshmallow-sqlalchemy==0.28.1
+marshmallow-sqlalchemy>=0.26.0,<0.27.0
 marshmallow==3.19.0
 openpyxl==3.0.9
 Pillow==9.3.0
@@ -25,3 +25,5 @@ starlette-context==0.3.5
 urllib3==1.26.9
 uvicorn[standard]==0.20.0
 yamlreader==3.0.4
+apache-superset@git+https://github.com/apache/superset.git@516d56b7e8b7edf34894ae731e71f33375f4fd04#egg=apache-superset # Install some commit from master
+cryptography~=38.0.0 # Required for superset
