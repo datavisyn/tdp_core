@@ -11,9 +11,9 @@ from prometheus_client.parser import text_string_to_metric_families
                 "enabled_plugins": ["tdp_core"],
                 "telemetry": {
                     "enabled": True,
-                    "metrics": {"enabled": True},
+                    "metrics": {"enabled": True, "export_endpoint": None},
                     "metrics_middleware": {"enabled": True},
-                    "traces": {"enabled": False},
+                    "traces": {"enabled": False, "export_endpoint": None},
                     "logs": {"enabled": False},
                 },
             },
@@ -23,7 +23,9 @@ from prometheus_client.parser import text_string_to_metric_families
 def test_fastapi_metrics(client: TestClient):
     # Trigger a request
     client.get("/health")
-    parsed = {m.name: m for m in text_string_to_metric_families(client.get("/metrics").text)}
+
+    metrics_text = client.get("/metrics").text
+    parsed = {m.name: m for m in text_string_to_metric_families(metrics_text)}
 
     # Check for app info
     fastapi_app_info_metric = parsed["fastapi_app_info_1"]  # TODO: Why _1?
@@ -40,7 +42,8 @@ def test_fastapi_metrics(client: TestClient):
 
     # Trigger it again
     client.get("/health")
-    parsed = {m.name: m for m in text_string_to_metric_families(client.get("/metrics").text)}
+    metrics_text = client.get("/metrics").text
+    parsed = {m.name: m for m in text_string_to_metric_families(metrics_text)}
 
     # And check for increased counts
     fastapi_requests_metric = parsed["fastapi_requests_1"]  # TODO: Why _1?

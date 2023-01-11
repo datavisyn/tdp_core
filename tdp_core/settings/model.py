@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Literal, Optional
 
-from pydantic import BaseModel, BaseSettings, Extra, Field
+from pydantic import AnyHttpUrl, BaseModel, BaseSettings, Extra, Field
 
 from .constants import default_logging_dict
 
@@ -54,9 +54,17 @@ class BaseTelemetrySettings(BaseModel):
     enabled: bool = False
 
 
+class MetricsTelemetrySettings(BaseTelemetrySettings):
+    export_endpoint: AnyHttpUrl | None = None  # could be "http://localhost:4317"
+
+
+class TracesTelemetrySettings(BaseTelemetrySettings):
+    export_endpoint: AnyHttpUrl | None = None
+
+
 class TelemetrySettings(BaseTelemetrySettings):
-    traces: BaseTelemetrySettings = BaseTelemetrySettings()
-    metrics: BaseTelemetrySettings = BaseTelemetrySettings()
+    traces: TracesTelemetrySettings = TracesTelemetrySettings()
+    metrics: MetricsTelemetrySettings = MetricsTelemetrySettings()
 
     logs: BaseTelemetrySettings = BaseTelemetrySettings()
     metrics_middleware: BaseTelemetrySettings = BaseTelemetrySettings()

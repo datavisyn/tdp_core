@@ -71,7 +71,7 @@ def create_visyn_server(
     if manager.settings.tdp_core.telemetry.enabled:
         from ..telemetry import init_telemetry
 
-        init_telemetry(app, app_name="app", endpoint="http://localhost:4317")
+        init_telemetry(app, app_name="app")
 
     # Initialize global managers.
     from ..plugin.registry import Registry

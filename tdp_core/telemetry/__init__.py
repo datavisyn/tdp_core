@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 import opentelemetry.metrics as metrics
 import opentelemetry.trace as trace
@@ -13,7 +14,7 @@ from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from opentelemetry.instrumentation.sqlalchemy import SQLAlchemyInstrumentor
 from opentelemetry.instrumentation.system_metrics import SystemMetricsInstrumentor
 from opentelemetry.sdk.metrics import MeterProvider  # type: ignore
-from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader  # type: ignore
+from opentelemetry.sdk.metrics.export import MetricReader, PeriodicExportingMetricReader  # type: ignore
 from opentelemetry.sdk.resources import SERVICE_NAME, Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -24,7 +25,7 @@ from .. import manager
 _log = logging.getLogger(__name__)
 
 
-def init_telemetry(app: FastAPI, app_name: str, endpoint: str) -> None:
+def init_telemetry(app: FastAPI, app_name: str) -> None:
     # The FastAPI instrumentation is adding a middleware which is instantiated more than once, causing warnings for existing instruments
     # See https://github.com/open-telemetry/opentelemetry-python-contrib/issues/1335
     class InstrumentWarningFilter(logging.Filter):
@@ -37,22 +38,29 @@ def init_telemetry(app: FastAPI, app_name: str, endpoint: str) -> None:
     resource = Resource.create(attributes={"service_name": app_name, SERVICE_NAME: app_name, "compose_service": app_name})
 
     metrics_enabled = manager.settings.tdp_core.telemetry.metrics.enabled
+    metrics_export_endpoint = manager.settings.tdp_core.telemetry.metrics.export_endpoint
     traces_enabled = manager.settings.tdp_core.telemetry.traces.enabled
+    traces_export_endpoint = manager.settings.tdp_core.telemetry.traces.export_endpoint
     timeout = 1
 
     if metrics_enabled:
         _log.info("Enabling OpenTelemetry metrics")
+
+        metric_readers: List[MetricReader] = [PrometheusMetricReader()]
+
+        if metrics_export_endpoint:
+            metric_readers.append(
+                PeriodicExportingMetricReader(
+                    OTLPMetricExporter(endpoint=metrics_export_endpoint, timeout=timeout),
+                    export_interval_millis=5_000,
+                    export_timeout_millis=timeout * 1_000,
+                )
+            )
+
         # Create MeterProvider with exporters and set it as the global meter provider
         meter = MeterProvider(
             resource=resource,
-            metric_readers=[
-                PeriodicExportingMetricReader(
-                    OTLPMetricExporter(endpoint=endpoint, timeout=timeout),
-                    export_interval_millis=5_000,
-                    export_timeout_millis=timeout * 1_000,
-                ),
-                PrometheusMetricReader(),
-            ],
+            metric_readers=metric_readers,
         )
         metrics.set_meter_provider(meter)
 
@@ -71,7 +79,7 @@ def init_telemetry(app: FastAPI, app_name: str, endpoint: str) -> None:
             media_type = CONTENT_TYPE_LATEST
 
         @app.get("/metrics", tags=["Telemetry"], response_class=CustomMetricsResponse)
-        def prometheus_metrics() -> Response:
+        def prometheus_metrics():
             """
             Prometheus metrics endpoint
             """
@@ -82,8 +90,10 @@ def init_telemetry(app: FastAPI, app_name: str, endpoint: str) -> None:
         # Create TracerProvider and set it as the global tracer provider
         tracer = TracerProvider(resource=resource)
         trace.set_tracer_provider(tracer)
-        # Add the exporter to the tracer
-        tracer.add_span_processor(BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint, timeout=timeout)))
+
+        if traces_export_endpoint:
+            # Add the exporter to the tracer
+            tracer.add_span_processor(BatchSpanProcessor(OTLPSpanExporter(endpoint=traces_export_endpoint, timeout=timeout)))
 
         # Trace instrumentors
         LoggingInstrumentor().instrument(set_logging_format=False, tracer_provider=tracer)
