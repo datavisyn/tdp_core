@@ -1,7 +1,6 @@
 import logging
 import os
 import re
-from builtins import next
 
 from flask import Flask, send_from_directory
 from werkzeug.security import safe_join
@@ -120,7 +119,7 @@ def build_info():
 
     dependencies = []
     all_plugins = []
-    build_info = dict(plugins=all_plugins, dependencies=dependencies)
+    build_info = {"plugins": all_plugins, "dependencies": dependencies}
 
     requirements = "requirements.txt"
     if os.path.exists(requirements):
@@ -133,7 +132,7 @@ def build_info():
             build_info["version"] = p.version  # type: ignore
             build_info["resolved"] = p.resolved  # type: ignore
         else:
-            desc = dict(name=p.name, version=p.version, resolved=p.resolved)
+            desc = {"name": p.name, "version": p.version, "resolved": p.resolved}
             all_plugins.append(desc)
 
     return build_info

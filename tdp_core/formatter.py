@@ -7,8 +7,8 @@ def _format_csv(array_of_dicts):
 
     try:
         import pandas as pd  # type: ignore
-    except ImportError:
-        raise ImportError("pandas is required to format as csv")
+    except ImportError as e:
+        raise ImportError("pandas is required to format as csv") from e
 
     if not array_of_dicts:
         return Response("", mimetype="text/csv")

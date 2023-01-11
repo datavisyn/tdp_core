@@ -1,3 +1,5 @@
+import contextlib
+
 from fastapi import FastAPI
 
 from .request_context_plugin import get_request
@@ -18,11 +20,7 @@ class CloseWebSessionsMiddleware:
 
         r = get_request()
         if r:
-            try:
+            with contextlib.suppress(KeyError, AttributeError):
                 for db_session in r.state.db_sessions:
-                    try:
+                    with contextlib.suppress(Exception):
                         db_session.close()
-                    except Exception:
-                        pass
-            except (KeyError, AttributeError):
-                pass

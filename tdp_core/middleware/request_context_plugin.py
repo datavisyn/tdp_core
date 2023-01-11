@@ -1,5 +1,3 @@
-from typing import Optional
-
 from starlette.requests import HTTPConnection, Request
 from starlette_context import context
 from starlette_context.plugins.base import Plugin
@@ -13,5 +11,5 @@ class RequestContextPlugin(Plugin):
     # The returned value will be inserted in the context with this key
     key = "request"
 
-    async def process_request(self, request: Request | HTTPConnection) -> Optional[Request | HTTPConnection]:
+    async def process_request(self, request: Request | HTTPConnection) -> Request | HTTPConnection | None:
         return request

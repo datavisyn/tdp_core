@@ -6,13 +6,13 @@ from .utils import fix_id, random_id
 
 class MongoGraph(graph.AGraph):
     def __init__(self, entry, db):
-        super(MongoGraph, self).__init__(entry["name"], "mongodb", entry.get("id", None), entry.get("attrs", None))
+        super().__init__(entry["name"], "mongodb", entry.get("id", None), entry.get("attrs", None))
         self._entry = entry
         self._db = db
         from bson.objectid import ObjectId
 
-        self._find_me = dict(_id=self._entry["_id"])
-        self._find_data = dict(_id=ObjectId(self._entry["refid"]))
+        self._find_me = {"_id": self._entry["_id"]}
+        self._find_data = {"_id": ObjectId(self._entry["refid"])}
 
         self._nodes = None
         self._edges = None
@@ -34,15 +34,15 @@ class MongoGraph(graph.AGraph):
 
         import datetime
 
-        entry: dict[str, int | datetime.datetime | str] = dict(
-            name=data["name"],
-            description=data.get("description", ""),
-            creator=user.name,
-            nnodes=len(data["nodes"]),
-            nedges=len(data["edges"]),
-            attrs=data.get("attrs", {}),
-            ts=datetime.datetime.utcnow(),
-        )
+        entry: dict[str, int | datetime.datetime | str] = {
+            "name": data["name"],
+            "description": data.get("description", ""),
+            "creator": user.name,
+            "nnodes": len(data["nodes"]),
+            "nedges": len(data["edges"]),
+            "attrs": data.get("attrs", {}),
+            "ts": datetime.datetime.utcnow(),
+        }
 
         if "group" in data:
             entry["group"] = data["group"]
@@ -53,7 +53,7 @@ class MongoGraph(graph.AGraph):
         if id is not None:
             entry["id"] = id
 
-        data_entry = dict(nodes=data["nodes"], edges=data["edges"])
+        data_entry = {"nodes": data["nodes"], "edges": data["edges"]}
         data_id = db.graph_data.insert_one(data_entry).inserted_id
 
         entry["refid"] = str(data_id)
@@ -84,7 +84,7 @@ class MongoGraph(graph.AGraph):
         return self._entry["nedges"]
 
     def to_description(self):
-        r = super(MongoGraph, self).to_description()
+        r = super().to_description()
 
         if self._entry is not None:
             r["description"] = self._entry["description"]
@@ -102,8 +102,8 @@ class MongoGraph(graph.AGraph):
     def add_node(self, data):
         if not self.can_write():
             return False
-        self._db.graph.update(self._find_me, {"$inc": dict(nnodes=1)})
-        self._db.graph_data.update(self._find_data, {"$push": dict(nodes=data)})
+        self._db.graph.update(self._find_me, {"$inc": {"nnodes": 1}})
+        self._db.graph_data.update(self._find_data, {"$push": {"nodes": data}})
         self._entry["nnodes"] += 1
         if self._nodes:
             self._nodes.append(graph.GraphNode(data["type"], data["id"], data.get("attrs", None)))
@@ -134,11 +134,11 @@ class MongoGraph(graph.AGraph):
                 self._nodes.remove(n)
         self._entry["nnodes"] -= 1
         # remove node and all associated edges
-        self._db.graph_data.update(self._find_data, {"$pull": dict(nodes=dict(id=id))}, multi=False)
+        self._db.graph_data.update(self._find_data, {"$pull": {"nodes": {"id": id}}}, multi=False)
 
         self._db.graph_data.update(
             self._find_data,
-            {"$pull": dict(edges={"$or": [dict(source=id), dict(target=id)]})},
+            {"$pull": {"edges": {"$or": [{"source": id}, {"target": id}]}}},
             multi=True,
         )
 
@@ -150,7 +150,7 @@ class MongoGraph(graph.AGraph):
             self._entry["nedges"] = len(self._db.graph_data.find_one(self._find_data, {"edges": 1})["edges"])
         self._db.graph.update(
             self._find_me,
-            {"$inc": dict(nnodes=-1), "$set": dict(nedges=self._entry["nedges"])},
+            {"$inc": {"nnodes": -1}, "$set": {"nedges": self._entry["nedges"]}},
         )
 
         return True
@@ -170,8 +170,8 @@ class MongoGraph(graph.AGraph):
     def clear(self):
         if not self.can_write():
             return False
-        self._db.graph.update(self._find_me, {"$set": dict(nnodes=0, nedges=0)})
-        self._db.graph_data.update(self._find_data, {"$set": dict(nodes=[], edges=[])})
+        self._db.graph.update(self._find_me, {"$set": {"nnodes": 0, "nedges": 0}})
+        self._db.graph_data.update(self._find_data, {"$set": {"nodes": [], "edges": []}})
         self._nodes = None
         self._edges = None
         self._entry["nnodes"] = 0
@@ -181,8 +181,8 @@ class MongoGraph(graph.AGraph):
     def add_edge(self, data):
         if not self.can_write():
             return False
-        self._db.graph.update(self._find_me, {"$inc": dict(nedges=1)})
-        self._db.graph_data.update(self._find_data, {"$push": dict(edges=data)})
+        self._db.graph.update(self._find_me, {"$inc": {"nedges": 1}})
+        self._db.graph_data.update(self._find_data, {"$push": {"edges": data}})
         self._entry["nedges"] += 1
         if self._edges:
             self._edges.append(
@@ -220,8 +220,8 @@ class MongoGraph(graph.AGraph):
             if n:
                 self._edges.remove(n)
         self._entry["nedges"] -= 1
-        self._db.graph.update(self._find_me, {"$inc": dict(nedges=-1)})
-        self._db.graph_data.update(self._find_data, {"$pull": dict(edges=dict(id=id))})
+        self._db.graph.update(self._find_me, {"$inc": {"nedges": -1}})
+        self._db.graph_data.update(self._find_data, {"$pull": {"edges": {"id": id}}})
         return True
 
     def remove(self):
@@ -293,7 +293,7 @@ class GraphProvider(ADataSetProvider):
         return False
 
     def upload(self, data, files, id=None):
-        if not data.get("type", "unknown") == "graph":
+        if data.get("type", "unknown") != "graph":
             return None  # can't handle
         from tdp_core.security import current_user
 

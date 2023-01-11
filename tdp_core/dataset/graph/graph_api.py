@@ -25,7 +25,7 @@ def resolve_formatter(type, format):
         if p.format == format:  # type: ignore
             return p.load()
     formats = ",".join(p.format for p in manager.registry.list(type + "-formatter"))  # type: ignore
-    abort(400, 'unknown format "{0}" possible formats are: {1}'.format(format, formats))
+    abort(400, 'unknown format "{}" possible formats are: {}'.format(format, formats))
 
 
 def _list_items(dataset_getter, name, datasetid):

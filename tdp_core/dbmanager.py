@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, Union
+from typing import Any
 
 from fastapi import FastAPI
 from sqlalchemy.engine import Engine
@@ -13,18 +13,18 @@ from .middleware.request_context_plugin import get_request
 _log = logging.getLogger(__name__)
 
 
-class DBManager(object):
+class DBManager:
     def __init__(self):
-        self.connectors: Dict[str, DBConnector] = {}
+        self.connectors: dict[str, DBConnector] = {}
         self._plugins = {}
-        self._engines = dict()
-        self._sessionmakers = dict()
+        self._engines = {}
+        self._sessionmakers = {}
 
     def init_app(self, app: FastAPI):
         app.add_middleware(CloseWebSessionsMiddleware)
 
         for p in manager.registry.list("tdp-sql-database-definition"):
-            config: Dict[str, Any] = manager.settings.get_nested(p.configKey)  # type: ignore
+            config: dict[str, Any] = manager.settings.get_nested(p.configKey)  # type: ignore
             # Only instantiate the connector if it has a module factory, otherwise use an empty one
             connector: DBConnector = p.load().factory() if p.module else DBConnector()
             if not connector.dburl:
@@ -70,7 +70,7 @@ class DBManager(object):
             raise NotImplementedError("missing db connector: " + item)
         return self.connectors[item]
 
-    def engine(self, item: Union[Engine, str]) -> Engine:
+    def engine(self, item: Engine | str) -> Engine:
         if isinstance(item, Engine):
             return item
 
@@ -78,10 +78,10 @@ class DBManager(object):
             raise NotImplementedError("missing db connector: " + item)
         return self._load_engine(item)
 
-    def create_session(self, engine_or_id: Union[Engine, str]) -> Session:
+    def create_session(self, engine_or_id: Engine | str) -> Session:
         return self._sessionmakers[self.engine(engine_or_id)]()
 
-    def create_web_session(self, engine_or_id: Union[Engine, str]) -> Session:
+    def create_web_session(self, engine_or_id: Engine | str) -> Session:
         """
         Create a session that is added to the request state as db_session, which automatically closes it in the db_session middleware.
         """

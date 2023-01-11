@@ -7,7 +7,7 @@ from .dbview import DBMapping
 _log = logging.getLogger(__name__)
 
 
-class SQLMappingTable(object):
+class SQLMappingTable:
     def __init__(self, mapping: DBMapping, engine):
         self.from_idtype = mapping.from_idtype
         self.to_idtype = mapping.to_idtype
@@ -43,7 +43,7 @@ def _discover_mappings():
             yield SQLMappingTable(mapping, engine)
 
 
-class SQLMappingProvider(object):
+class SQLMappingProvider:
     def __init__(self):
         self._mappings = list(_discover_mappings())
 

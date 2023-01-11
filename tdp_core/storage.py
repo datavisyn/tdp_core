@@ -20,8 +20,8 @@ def list_namedset():
     db = MongoClient(c.host, c.port)[c.db_namedsets]
 
     if request.method == "GET":
-        q = dict(idType=request.args["idType"]) if "idType" in request.args else {}
-        return jsonify(list((d for d in db.namedsets.find(q, {"_id": 0}) if security.can_read(d))))
+        q = {"idType": request.args["idType"]} if "idType" in request.args else {}
+        return jsonify(([d for d in db.namedsets.find(q, {"_id": 0}) if security.can_read(d)]))
 
     if request.method == "POST":
         id = _generate_id()
@@ -34,18 +34,18 @@ def list_namedset():
         sub_type_key = request.values.get("subTypeKey", "")
         sub_type_value = request.values.get("subTypeValue", "")
         type = int(request.values.get("type", "0"))
-        entry = dict(
-            id=id,
-            name=name,
-            creator=creator,
-            permissions=permissions,
-            ids=ids,
-            idType=id_type,
-            description=description,
-            subTypeKey=sub_type_key,
-            subTypeValue=sub_type_value,
-            type=type,
-        )
+        entry = {
+            "id": id,
+            "name": name,
+            "creator": creator,
+            "permissions": permissions,
+            "ids": ids,
+            "idType": id_type,
+            "description": description,
+            "subTypeKey": sub_type_key,
+            "subTypeValue": sub_type_value,
+            "type": type,
+        }
         db.namedsets.insert_one(entry)
         del entry["_id"]
         return jsonify(entry)
@@ -54,7 +54,7 @@ def list_namedset():
 @app.route("/namedset/<namedset_id>", methods=["GET", "DELETE", "PUT"])  # type: ignore
 def get_namedset(namedset_id):
     db = MongoClient(c.host, c.port)[c.db_namedsets]
-    result = list(db.namedsets.find(dict(id=namedset_id), {"_id": 0}))
+    result = list(db.namedsets.find({"id": namedset_id}, {"_id": 0}))
     entry = result[0] if len(result) > 0 else None
 
     if not entry:
@@ -68,15 +68,15 @@ def get_namedset(namedset_id):
     if request.method == "DELETE":
         if not security.can_write(entry):
             abort(403, 'Namedset with id "{}" is write protected'.format(namedset_id))
-        q = dict(id=namedset_id)
+        q = {"id": namedset_id}
         result = db.namedsets.remove(q)
         return jsonify(result["n"])  # number of deleted documents
 
     if request.method == "PUT":
         if not security.can_write(entry):
             abort(403, 'Namedset with id "{}" is write protected'.format(namedset_id))
-        filter = dict(id=namedset_id)
-        values = dict()
+        filter = {"id": namedset_id}
+        values = {}
         for key in ["name", "idType", "description", "subTypeKey", "subTypeValue"]:
             if key in request.form:
                 values[key] = request.form[key]
@@ -93,7 +93,7 @@ def get_namedset(namedset_id):
 
 def get_namedset_by_id(namedset_id):
     db = MongoClient(c.host, c.port)[c.db_namedsets]
-    q = dict(id=namedset_id)
+    q = {"id": namedset_id}
     result = list(db.namedsets.find(q, {"_id": 0}))
     if not result:
         abort(404, 'Namedset with id "{}" cannot be found'.format(namedset_id))
@@ -120,7 +120,7 @@ def post_attachment():
     creator = security.current_username()
     permissions = security.DEFAULT_PERMISSION
 
-    entry = dict(id=id, creator=creator, permissions=permissions, data=request.data)
+    entry = {"id": id, "creator": creator, "permissions": permissions, "data": request.data}
     db.attachments.insert_one(entry)
     return id
 
@@ -128,7 +128,7 @@ def post_attachment():
 @app.route("/attachment/<attachment_id>", methods=["GET", "DELETE", "PUT"])  # type: ignore
 def get_attachment(attachment_id):
     db = MongoClient(c.host, c.port)[c.db_namedsets]
-    result = list(db.attachments.find(dict(id=attachment_id), {"_id": 0}))
+    result = list(db.attachments.find({"id": attachment_id}, {"_id": 0}))
     entry = result[0] if len(result) > 0 else None
 
     if not entry:
@@ -142,16 +142,16 @@ def get_attachment(attachment_id):
     if request.method == "DELETE":
         if not security.can_write(entry):
             abort(403, 'Attachment with id "{}" is write protected'.format(attachment_id))
-        q = dict(id=attachment_id)
+        q = {"id": attachment_id}
         result = db.attachments.remove(q)
         return jsonify(result["n"])  # number of deleted documents
 
     if request.method == "PUT":
         if not security.can_write(entry):
             abort(403, 'Attachment with id "{}" is write protected'.format(attachment_id))
-        filter = dict(id=attachment_id)
+        filter = {"id": attachment_id}
         # keep the encoded string
-        query = {"$set": dict(data=request.data)}
+        query = {"$set": {"data": request.data}}
         db.attachments.find_one_and_update(filter, query)
         return attachment_id
 

@@ -1,12 +1,11 @@
 import datetime as dt
 import decimal
-from builtins import object, range
 
 import numpy as np  # type: ignore
 import numpy.ma as ma  # type: ignore
 
 
-class NumpyTablesEncoder(object):
+class NumpyTablesEncoder:
     def __contains__(self, obj):
         if isinstance(obj, np.ndarray):  # type: ignore
             return True
