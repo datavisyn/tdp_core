@@ -114,7 +114,8 @@
     "@storybook/preset-scss": "^1.0.3",
     "@storybook/react": "^6.5.14",
     "@storybook/testing-library": "0.0.9",
-    "cypress": "^11.2.0"
+    "cypress": "^11.2.0",
+    "storybook-addon-swc": "^1.1.9"
   },
   "overrides": {
     "@types/react": "^16.9.23",
