@@ -5,6 +5,10 @@ flake8 = flake8 $(pkg_src) setup.py
 isort = isort $(pkg_src) setup.py
 black = black --line-length 140 $(pkg_src) setup.py
 
+.PHONY: start  ## Start the development server
+start:
+	python $(pkg_src)
+
 .PHONY: all  ## Perform the most common development-time rules
 all: format lint test
 
