@@ -3,9 +3,9 @@ alembic==1.9.0
 cachetools==5.2.0
 fastapi[all]==0.89.0
 flask-swagger-ui==3.36.0
-Flask[async]==2.2.2
+Flask[async]>=2.1.0,<=2.2.2
 json-cfg==0.4.2
-marshmallow-sqlalchemy==0.28.1
+marshmallow-sqlalchemy>=0.26.0,<=0.28.1
 marshmallow==3.19.0
 openpyxl==3.0.9
 Pillow==9.3.0
