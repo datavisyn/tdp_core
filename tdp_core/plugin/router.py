@@ -28,7 +28,7 @@ def get_plugins():
                 "description": e.description,
                 "version": e.version,
             }
-            for e in manager.registry.list()
+            for e in manager.registry
         ],
     }
 

@@ -1,3 +1,5 @@
+from typing import Generator
+
 import pytest
 from pytest_postgresql.executor import PostgreSQLExecutor
 from pytest_postgresql.factories import postgresql_proc
@@ -11,7 +13,7 @@ class PostgreSQLExecutorWithUrl(PostgreSQLExecutor):
 
 
 @pytest.fixture(scope="session")
-def postgres_db(postgresql_proc) -> PostgreSQLExecutorWithUrl:
+def postgres_db(postgresql_proc) -> Generator[PostgreSQLExecutorWithUrl, None, None]:
     d = postgresql_proc
     d.url = f"postgresql://{d.user}:{d.password}@{d.host}:{d.port}/{d.dbname}"
     janitor = DatabaseJanitor(d.user, d.host, d.port, d.dbname, d.version, d.password)

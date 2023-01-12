@@ -1,5 +1,4 @@
 import abc
-from builtins import object
 
 from ..security import can_read, can_write
 from ..utils import fix_id
@@ -12,10 +11,10 @@ def to_plural(s):
 
 
 def to_idtype_description(id):
-    return dict(id=id, name=id, names=to_plural(id))
+    return {"id": id, "name": id, "names": to_plural(id)}
 
 
-class ADataSetEntry(object, metaclass=abc.ABCMeta):
+class ADataSetEntry(metaclass=abc.ABCMeta):
     """
     A basic dataset entry
     """
@@ -43,7 +42,7 @@ class ADataSetEntry(object, metaclass=abc.ABCMeta):
         """
         :return: a dictionary describing this dataset in a client understandable format
         """
-        return dict(type=self.type, name=self.name, id=self.id, fqname=self.fqname)
+        return {"type": self.type, "name": self.name, "id": self.id, "fqname": self.fqname}
 
     def to_idtype_descriptions(self):
         """
@@ -84,7 +83,7 @@ class ADataSetEntry(object, metaclass=abc.ABCMeta):
         converts this dataset to a json compatible format
         :return: a json compatible dataset representation
         """
-        return dict()
+        return {}
 
     def can_read(self, user=None):
         return can_read(self.to_description(), user)
@@ -93,11 +92,11 @@ class ADataSetEntry(object, metaclass=abc.ABCMeta):
         return can_write(self.to_description(), user)
 
 
-class ADataSetProvider(object, metaclass=abc.ABCMeta):
+class ADataSetProvider(metaclass=abc.ABCMeta):
     def __len__(self):
         import itertools
 
-        return itertools.count(self)
+        return itertools.count(self)  # type: ignore
 
     @abc.abstractmethod
     def __iter__(self):

@@ -3,7 +3,7 @@ This encoder is required to handle changes of data types in Python 3.7 by adding
 """
 
 
-class SetEncoder(object):
+class SetEncoder:
     def __contains__(self, obj):
         return isinstance(obj, set)
 

@@ -2,9 +2,21 @@
 from functools import wraps
 
 from ..formatter import formatter
-from .manager import current_user, current_username, is_logged_in, login_required  # NOQA
+from .manager import (  # NOQA
+    current_user,
+    current_username,
+    is_logged_in,
+    login_required,
+)
 from .model import User  # NOQA
-from .permissions import DEFAULT_PERMISSION, _includes, can, can_execute, can_read, can_write  # NOQA
+from .permissions import (  # NOQA
+    DEFAULT_PERMISSION,
+    _includes,
+    can,
+    can_execute,
+    can_read,
+    can_write,
+)
 
 
 # custom login_required decorator to be able to disable the login for DBViews, i.e. to make them public

@@ -1,9 +1,9 @@
 import logging
 import os
 import re
-from builtins import next
 
-from flask import Flask, safe_join, send_from_directory
+from flask import Flask, send_from_directory
+from werkzeug.security import safe_join
 
 from .. import manager
 
@@ -37,7 +37,7 @@ def _deliver(path):
         return "This page does not exist", 404
 
     # serve public
-    if os.path.exists(safe_join(public_dir, path)):
+    if os.path.exists(safe_join(public_dir, path)):  # type: ignore
         return send_from_directory(public_dir, path)
 
     # check all plugins
@@ -49,11 +49,11 @@ def _deliver(path):
 
         plugin = next((p for p in manager.registry.plugins if p.id == plugin_id), None)
         if plugin:
-            dpath = safe_join(plugin.folder, "/".join(elems))
-            if os.path.exists(dpath):
+            dpath = safe_join(plugin.folder, "/".join(elems))  # type: ignore
+            if os.path.exists(dpath):  # type: ignore
                 # send_static_file will guess the correct MIME type
                 # print 'sending',dpath
-                return send_from_directory(plugin.folder, "/".join(elems))
+                return send_from_directory(plugin.folder, "/".join(elems))  # type: ignore
 
     return "This page does not exist", 404
 
@@ -92,11 +92,11 @@ def _generate_index():
             + "</span></a>"
         )
         text.append('<div class="links">')
-        if app.homepage and app.homepage != "":
-            text.append('<a href="' + app.homepage + '" target="_blank" class="homepage"><span>Visit homepage</span></a>')
+        if app.homepage and app.homepage != "":  # type: ignore
+            text.append('<a href="' + app.homepage + '" target="_blank" class="homepage"><span>Visit homepage</span></a>')  # type: ignore
 
-        if app.repository and app.repository != "":
-            text.append('<a href="' + app.repository + '" target="_blank" class="github"><span>Open repository</span></a>')
+        if app.repository and app.repository != "":  # type: ignore
+            text.append('<a href="' + app.repository + '" target="_blank" class="github"><span>Open repository</span></a>')  # type: ignore
 
         text.append("</div>")
         text.append("</li>")
@@ -119,7 +119,7 @@ def build_info():
 
     dependencies = []
     all_plugins = []
-    build_info = dict(plugins=all_plugins, dependencies=dependencies)
+    build_info = {"plugins": all_plugins, "dependencies": dependencies}
 
     requirements = "requirements.txt"
     if os.path.exists(requirements):
@@ -128,18 +128,18 @@ def build_info():
 
     for p in manager.registry.plugins:
         if p.id == "tdp_core":
-            build_info["name"] = p.name
-            build_info["version"] = p.version
-            build_info["resolved"] = p.resolved
+            build_info["name"] = p.name  # type: ignore
+            build_info["version"] = p.version  # type: ignore
+            build_info["resolved"] = p.resolved  # type: ignore
         else:
-            desc = dict(name=p.name, version=p.version, resolved=p.resolved)
+            desc = {"name": p.name, "version": p.version, "resolved": p.resolved}
             all_plugins.append(desc)
 
     return build_info
 
 
 # health check for docker-compose, kubernetes
-def health():
+async def health():
     return "ok"
 
 

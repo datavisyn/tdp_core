@@ -13,9 +13,9 @@ if TYPE_CHECKING:
     from .settings.model import GlobalSettings
 
 
-db: "DBManager" = None
-db_migration: "DBMigrationManager" = None
-id_mapping: "MappingManager" = None
-security: "SecurityManager" = None
-registry: "Registry" = None
-settings: "GlobalSettings" = None
+db: "DBManager" = None  # type: ignore
+db_migration: "DBMigrationManager" = None  # type: ignore
+id_mapping: "MappingManager" = None  # type: ignore
+security: "SecurityManager" = None  # type: ignore
+registry: "Registry" = None  # type: ignore
+settings: "GlobalSettings" = None  # type: ignore

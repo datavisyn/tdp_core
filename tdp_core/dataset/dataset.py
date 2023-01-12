@@ -1,5 +1,4 @@
 import itertools
-from builtins import str
 
 from .. import manager
 
@@ -41,7 +40,7 @@ def get(dataset_id):
     return None
 
 
-def add(desc, files=[], id=None):
+def add(desc, files=None, id=None):
     """
     adds a new dataset to this storage
     :param desc: the dict description information
@@ -49,6 +48,8 @@ def add(desc, files=[], id=None):
     :param id: optional the unique id to use
     :return: the newly created dataset or None if an error occurred
     """
+    if files is None:
+        files = []
     for p in _providers():
         r = p.upload(desc, files, id)
         if r:
@@ -56,7 +57,7 @@ def add(desc, files=[], id=None):
     return None
 
 
-def update(dataset, desc, files=[]):
+def update(dataset, desc, files=None):
     """
     updates the given dataset
     :param dataset: a dataset or a dataset id
@@ -64,6 +65,8 @@ def update(dataset, desc, files=[]):
     :param files: a list of FileStorage
     :return:
     """
+    if files is None:
+        files = []
     old = get(dataset) if isinstance(dataset, str) else dataset
     if old is None:
         return add(desc, files)
@@ -80,7 +83,4 @@ def remove(dataset):
     old = get(dataset) if isinstance(dataset, str) else dataset
     if old is None:
         return False
-    for p in _providers():
-        if p.remove(old):
-            return True
-    return False
+    return any(p.remove(old) for p in _providers())
