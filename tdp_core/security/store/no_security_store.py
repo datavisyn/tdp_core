@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 from ... import manager
 from ..model import User
@@ -9,7 +8,7 @@ _log = logging.getLogger(__name__)
 
 
 class NoSecurityStore(BaseStore):
-    def __init__(self, user: str, roles: List[str]):
+    def __init__(self, user: str, roles: list[str]):
         self.user = user
         self.roles = roles
 

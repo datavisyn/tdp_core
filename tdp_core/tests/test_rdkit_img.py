@@ -32,11 +32,11 @@ def test_invalid(client: TestClient, structure):
     assert res.status_code == 422
 
 
-@pytest.mark.parametrize("structure, expected", mol_expected.items())
+@pytest.mark.parametrize(("structure", "expected"), mol_expected.items())
 def test_valid(client: TestClient, structure, expected):
     res = client.get("/api/rdkit/", params={"structure": structure})
     assert res.status_code == 200
-    assert res.headers.get("content-type").startswith("image/svg")
+    assert res.headers["content-type"].startswith("image/svg")
     hash_compare(res.content, expected)
 
 
@@ -57,7 +57,7 @@ def test_murcko(client: TestClient):
     hash_compare(res.content, "5ef9373dd8bcf049a3632968774345527bab7ba757da1eaab943bccfe2ce7e32")
 
 
-@pytest.mark.parametrize("mol, ref, expected", similarity_data)
+@pytest.mark.parametrize(("mol", "ref", "expected"), similarity_data)
 def test_similarity(client: TestClient, mol, ref, expected):
     res = client.get("/api/rdkit/similarity/", params={"structure": mol, "reference": ref})
     assert res.status_code == 200
@@ -76,11 +76,11 @@ def test_maximum_common_substructure(client: TestClient):
 def test_maximum_common_substructure_inconsistent(client: TestClient):
     """This method sometimes returns None -> 500 and sometimes a questionmark"""
     res = client.post("/api/rdkit/mcs/", json=["C1COCCO1", "CC(COC)OC", "CC1(OCCO1)C", "CCCCCCCO", "CCCCCCO"])
-    print(res.content)
     if res.status_code == 200:
         hash_compare(res.content, "73e4c61270b280938b647dbad15552167f8cef259f5fc0c6f30a291c787d3b31")
     else:
-        assert res.status_code == 204 and res.content == b"null"
+        assert res.status_code == 204
+        assert res.content == b"null"
 
 
 def test_substructures(client: TestClient):

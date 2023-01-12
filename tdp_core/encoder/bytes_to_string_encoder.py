@@ -4,7 +4,7 @@ This encoder is required to handle this change for the update to Python 3.7 by d
 """
 
 
-class BytesToStringEncoder(object):
+class BytesToStringEncoder:
     def __contains__(self, obj):
         if isinstance(obj, bytes):
             return True

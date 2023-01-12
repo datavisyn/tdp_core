@@ -26,7 +26,6 @@ class DummyStore(BaseStore):
         self._users = [
             DummyUser(
                 id=v["name"],
-                name=v["name"],
                 roles=v["roles"],
                 password=v["password"],
                 salt=v["salt"],
@@ -43,7 +42,9 @@ class DummyStore(BaseStore):
             None,
         )
 
-    def login(self, username, extra_fields={}):
+    def login(self, username, extra_fields=None):
+        if extra_fields is None:
+            extra_fields = {}
         return next(
             (u for u in self._users if u.id == username and u.is_password(extra_fields["password"])),
             None,
@@ -51,8 +52,3 @@ class DummyStore(BaseStore):
 
     def logout(self, user):
         pass
-
-
-def create():
-    _log.info("Creating dummy store")
-    return DummyStore()
