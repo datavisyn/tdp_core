@@ -1,9 +1,7 @@
-from typing import List, Optional
-
 from rdkit.Chem import Mol, TemplateAlign, rdFMCS  # type: ignore
 
 
-def maximum_common_substructure_query_mol(mols: List[Mol]) -> Optional[Mol]:
+def maximum_common_substructure_query_mol(mols: list[Mol]) -> Mol | None:
     """https://www.rdkit.org/docs/GettingStartedInPython.html#maximum-common-substructure"""
     return rdFMCS.FindMCS(mols, matchValences=True, ringMatchesRingOnly=True, completeRingsOnly=True).queryMol
 

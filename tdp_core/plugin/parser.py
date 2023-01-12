@@ -2,7 +2,6 @@ import importlib
 import logging
 from functools import cached_property, lru_cache
 from importlib.metadata import EntryPoint, entry_points
-from typing import Dict, List, Tuple, Type
 
 from pydantic import BaseModel
 
@@ -43,7 +42,7 @@ def is_disabled_extension(extension, extension_type, p):
     return any(map(check, manager.settings.tdp_core.disable.extensions))
 
 
-class EntryPointPlugin(object):
+class EntryPointPlugin:
     def __init__(self, entry_point: EntryPoint):
         self.entry_point = entry_point
         self.id = entry_point.name
@@ -59,14 +58,14 @@ class EntryPointPlugin(object):
 
     @cached_property
     def plugin(self) -> AVisynPlugin:
-        visyn_plugin_clazz: Type[AVisynPlugin] = self.entry_point.load()
+        visyn_plugin_clazz: type[AVisynPlugin] = self.entry_point.load()
 
         if not issubclass(visyn_plugin_clazz, AVisynPlugin):
             raise Exception("Entrypoint plugin {self.id} does not load a proper class extending AVisynPlugin")
 
         return visyn_plugin_clazz()
 
-    @lru_cache
+    @lru_cache  # noqa: B019
     def get_module(self):
         return importlib.import_module(self.id)
 
@@ -79,9 +78,9 @@ def _find_entry_point_plugins():
     return [EntryPointPlugin(entry_point) for entry_point in entry_points(group="visyn.plugin")]
 
 
-def load_all_plugins() -> List[EntryPointPlugin]:
+def load_all_plugins() -> list[EntryPointPlugin]:
     # Load all plugins found via entry points
-    plugins: List[EntryPointPlugin] = [p for p in _find_entry_point_plugins() if not is_disabled_plugin(p)]
+    plugins: list[EntryPointPlugin] = [p for p in _find_entry_point_plugins() if not is_disabled_plugin(p)]
     plugins.sort(key=lambda p: p.id)
 
     _log.info(f"Discovered {len(plugins)} plugin(s): {', '.join([d.id for d in plugins])}")
@@ -89,7 +88,7 @@ def load_all_plugins() -> List[EntryPointPlugin]:
     return plugins
 
 
-def get_extensions_from_plugins(plugins: List[EntryPointPlugin]) -> List:
+def get_extensions_from_plugins(plugins: list[EntryPointPlugin]) -> list:
     server_extensions = []
     for plugin in plugins:
         reg = RegHelper(plugin)
@@ -102,12 +101,12 @@ def get_extensions_from_plugins(plugins: List[EntryPointPlugin]) -> List:
     return server_extensions
 
 
-def get_config_from_plugins(plugins: List[EntryPointPlugin]) -> Tuple[List[Dict[str, Dict]], Dict[str, Type[BaseModel]]]:
+def get_config_from_plugins(plugins: list[EntryPointPlugin]) -> tuple[list[dict[str, dict]], dict[str, type[BaseModel]]]:
     # from ..settings.utils import load_config_file
 
     # With all the plugins, load the corresponding configuration files and add them to the global config
-    files: List[Dict[str, Dict]] = []
-    models: Dict[str, Type[BaseModel]] = {}
+    files: list[dict[str, dict]] = []
+    models: dict[str, type[BaseModel]] = {}
     for plugin in plugins:
         plugin_settings_model = plugin.plugin.setting_class
         if plugin_settings_model:

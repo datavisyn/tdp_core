@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -11,14 +11,14 @@ class Token(BaseModel):
 
 
 class LogoutReturnValue(BaseModel):
-    data: Optional[Dict[Any, Any]] = {}
-    cookies: Optional[List[Dict[Any, Any]]] = []
+    data: dict[Any, Any] | None = {}
+    cookies: list[dict[Any, Any]] | None = []
 
 
 class User(BaseModel):
     id: str
-    roles: List[str] = []
-    access_token: Optional[str] = None
+    roles: list[str] = []
+    access_token: str | None = None
 
     @property
     def name(self):

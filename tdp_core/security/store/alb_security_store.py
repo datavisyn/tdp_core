@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import jwt
 
@@ -11,9 +10,9 @@ _log = logging.getLogger(__name__)
 
 
 class ALBSecurityStore(BaseStore):
-    def __init__(self, cookie_name: Optional[str], signout_url: Optional[str]):
+    def __init__(self, cookie_name: str | None, signout_url: str | None):
         self.cookie_name = cookie_name
-        self.signout_url: Optional[str] = signout_url
+        self.signout_url: str | None = signout_url
 
     def load_from_request(self, req):
         if "X-Amzn-Oidc-Identity" in req.headers and "X-Amzn-Oidc-Accesstoken" in req.headers and "X-Amzn-Oidc-Data" in req.headers:

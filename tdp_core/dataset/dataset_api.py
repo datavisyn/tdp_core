@@ -1,5 +1,4 @@
 import logging
-from builtins import str
 
 from flask import Flask, abort, make_response, request
 from flask.wrappers import Response
@@ -18,7 +17,7 @@ def on_value_error(error):
     _log.error("ValueError: (" + str(error) + ") at " + str(request.environ))
     _log.error(error)
     return (
-        "<strong>{2} - {0}</strong><pre>{1}</pre>".format("ValueError", error, 500),
+        "<strong>{} - {}</strong><pre>{}</pre>".format(500, "ValueError", error),
         500,
     )
 
@@ -28,13 +27,13 @@ def _list_format_json(data):
 
 
 def _list_format_treejson(data):
-    r = dict()
+    r = {}
     for d in data:
         levels = d["fqname"].split("/")
         act = r
         for level in levels[:-1]:
             if level not in act:
-                act[level] = dict()
+                act[level] = {}
             act = act[level]
         act[d["name"]] = d
     return jsonify(r, indent=1)
@@ -96,11 +95,11 @@ def _list_datasets():
             data = data[:limit]
 
         format = request.args.get("format", "json")
-        formats = dict(json=_list_format_json, treejson=_list_format_treejson, csv=_list_format_csv)
+        formats = {"json": _list_format_json, "treejson": _list_format_treejson, "csv": _list_format_csv}
         if format not in formats:
             abort(
                 make_response(
-                    'invalid format: "{0}" possible ones: {1}'.format(format, ",".join(list(formats.keys()))),
+                    'invalid format: "{}" possible ones: {}'.format(format, ",".join(list(formats.keys()))),
                     400,
                 )
             )
@@ -209,11 +208,11 @@ def _remove_dataset(dataset_id):
     r = remove(dataset_id)
     if r:
         return jsonify(
-            dict(
-                state="success",
-                msg="Successfully deleted dataset " + dataset_id,
-                id=dataset_id,
-            ),
+            {
+                "state": "success",
+                "msg": "Successfully deleted dataset " + dataset_id,
+                "id": dataset_id,
+            },
             indent=1,
         )
     return "invalid request", 400

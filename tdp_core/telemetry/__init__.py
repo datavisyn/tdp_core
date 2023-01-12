@@ -1,5 +1,4 @@
 import logging
-from typing import List
 
 import opentelemetry.metrics as metrics
 import opentelemetry.trace as trace
@@ -46,7 +45,7 @@ def init_telemetry(app: FastAPI, app_name: str) -> None:
     if metrics_enabled:
         _log.info("Enabling OpenTelemetry metrics")
 
-        metric_readers: List[MetricReader] = [PrometheusMetricReader()]
+        metric_readers: list[MetricReader] = [PrometheusMetricReader()]
 
         if metrics_export_endpoint:
             metric_readers.append(

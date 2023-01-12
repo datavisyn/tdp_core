@@ -2,7 +2,6 @@ import http
 import logging
 import time
 import traceback
-from typing import Optional
 
 from flask import Flask, jsonify
 from werkzeug.exceptions import HTTPException
@@ -65,7 +64,7 @@ def load_after_server_started_hooks():
         _log.info("Elapsed time for server startup hooks: %d seconds", time.time() - start)
 
 
-def detail_from_exception(e: Exception) -> Optional[str]:
+def detail_from_exception(e: Exception) -> str | None:
     """Returns the full stacktrace in development mode and just the error message in production mode."""
     # Always return full stacktrace in development mode
     if manager.settings.is_development_mode:

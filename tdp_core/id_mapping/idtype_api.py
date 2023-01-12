@@ -12,7 +12,7 @@ _log = logging.getLogger(__name__)
 
 @app_idtype.route("/")
 def _list_idtypes():
-    tmp = dict()
+    tmp = {}
     # TODO: We probably don't want to have these idtypes as "all" idtypes
     # for d in list_datasets():
     #     for idtype in d.to_idtype_descriptions():

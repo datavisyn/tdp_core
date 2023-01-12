@@ -15,7 +15,6 @@ app = Flask("flask_swagger_ui", static_folder="dist", template_folder="templates
 
 
 def _gen():
-    import io
     from os import path
 
     from yaml import safe_load
@@ -27,7 +26,7 @@ def _gen():
     base: dict[str, Any] = yaml_load(files)  # type: ignore
     base["paths"] = OrderedDict(sorted(base["paths"].items(), key=lambda t: t[0]))
 
-    with io.open(path.join(here, "swagger", "view.tmpl.yml"), "r", encoding="utf-8") as f:
+    with open(path.join(here, "swagger", "view.tmpl.yml"), encoding="utf-8") as f:
         template = Template(str(f.read()))
 
     tags = base["tags"]
@@ -46,7 +45,7 @@ def _gen():
         db.resolve(database)  # trigger filling up columns
 
         # add database tag
-        tags.append(dict(name="db_" + database, description=connector.description or ""))
+        tags.append({"name": "db_" + database, "description": connector.description or ""})
 
         for view, dbview in connector.views.items():
             if not dbview.can_access() or dbview.query_type == "private":
@@ -62,14 +61,14 @@ def _gen():
             for arg in dbview.arguments:
                 info = dbview.get_argument_info(arg)
                 args.append(
-                    dict(
-                        name=arg,
-                        type=to_type(info.type),
-                        as_list=info.as_list,
-                        enum_values=None,
-                        description=info.description,
-                        example=info.example,
-                    )
+                    {
+                        "name": arg,
+                        "type": to_type(info.type),
+                        "as_list": info.as_list,
+                        "enum_values": None,
+                        "description": info.description,
+                        "example": info.example,
+                    }
                 )
 
             for arg in (a for a in dbview.replacements if a not in secure_replacements):
@@ -78,23 +77,23 @@ def _gen():
                 enum_values = None
                 if isinstance(extra, list):
                     enum_values = extra
-                if extra == int or extra == float:
+                if extra in (int, float):
                     arg_type = to_type(extra)
                 args.append(
-                    dict(
-                        name=arg,
-                        type=arg_type,
-                        as_list=False,
-                        enum=enum_values,
-                        description="",
-                    )
+                    {
+                        "name": arg,
+                        "type": arg_type,
+                        "as_list": False,
+                        "enum": enum_values,
+                        "description": "",
+                    }
                 )
 
             filters = set()
 
             if "where" in dbview.replacements or "and_where" in dbview.replacements:
                 # filter possible
-                for k in dbview.filters.keys():
+                for k in dbview.filters:
                     filters.add(k)
                 if not filters:
                     for k in list(dbview.columns.keys()):
@@ -104,12 +103,12 @@ def _gen():
                 # score query magic handling
                 agg_score = connector.agg_score
                 args.append(
-                    dict(
-                        name="agg",
-                        type="string",
-                        as_list=False,
-                        enum=agg_score.valid_replacements.get("agg"),
-                    )
+                    {
+                        "name": "agg",
+                        "type": "string",
+                        "as_list": False,
+                        "enum": agg_score.valid_replacements.get("agg"),
+                    }
                 )
 
             props = []
@@ -122,9 +121,9 @@ def _gen():
 
             if dbview.idtype:
                 # assume when id type given then we have ids
-                props.append(dict(name="_id", type="integer"))
+                props.append({"name": "_id", "type": "integer"})
                 if not any((p["name"] == "id" for p in props)):
-                    props.append(dict(name="id", type="string"))
+                    props.append({"name": "id", "type": "string"})
 
             features = {
                 "generic": dbview.query_type in ["generic", "helper", "table"],

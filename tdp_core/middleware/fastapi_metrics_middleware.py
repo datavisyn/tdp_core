@@ -1,5 +1,5 @@
+import contextlib
 import time
-from typing import Tuple
 
 import opentelemetry.metrics as metrics
 import opentelemetry.trace as trace
@@ -53,12 +53,10 @@ class FastAPIMetricsMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
 
-            try:
+            with contextlib.suppress(BaseException):
                 user = manager.security.load_from_request(request)
                 if user:
                     users_counter.add(1, {"user_id": user.id})
-            except BaseException:
-                pass
         except BaseException as e:
             status_code = HTTP_500_INTERNAL_SERVER_ERROR
             exceptions_counter.add(1, {"method": method, "path": path, "exception_type": type(e).__name__, "app_name": self.app_name})
@@ -80,7 +78,7 @@ class FastAPIMetricsMiddleware(BaseHTTPMiddleware):
         return response
 
     @staticmethod
-    def get_path(request: Request) -> Tuple[str, bool]:
+    def get_path(request: Request) -> tuple[str, bool]:
         for route in request.app.routes:
             match, child_scope = route.matches(request.scope)
             if match == Match.FULL:

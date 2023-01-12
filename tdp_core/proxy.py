@@ -15,7 +15,7 @@ def _to_site_url(site):
     proxy_defs = manager.registry.list("tdp_proxy")
     for p in proxy_defs:
         if p.id == site:
-            headers = getattr(p, "headers") if hasattr(p, "headers") else dict()
+            headers = p.headers if hasattr(p, "headers") else {}  # type: ignore
             return p.url.format(**request.args.to_dict()), headers  # type: ignore
     # none matching found
     return None, None

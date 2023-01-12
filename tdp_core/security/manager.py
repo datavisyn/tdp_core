@@ -1,8 +1,9 @@
+import contextlib
 import logging
 from base64 import b64decode
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable
 
 import jwt
 from fastapi import FastAPI, HTTPException, Request, Response, status
@@ -16,7 +17,7 @@ from .store.base_store import BaseStore
 _log = logging.getLogger(__name__)
 
 
-def user_to_access_token(user: User) -> Tuple[str, Dict]:
+def user_to_access_token(user: User) -> tuple[str, dict]:
     # Define access token data
     payload = {}
 
@@ -40,19 +41,19 @@ def user_to_access_token(user: User) -> Tuple[str, Dict]:
     return jwt.encode(payload, manager.settings.secret_key, algorithm=manager.settings.jwt_algorithm), payload
 
 
-def access_token_to_payload(token: str) -> Dict:
+def access_token_to_payload(token: str) -> dict:
     return jwt.decode(token, manager.settings.secret_key, algorithms=[manager.settings.jwt_algorithm])
 
 
-def access_token_to_user(token: str) -> Optional[User]:
+def access_token_to_user(token: str) -> User | None:
     payload = access_token_to_payload(token)
-    username: Optional[str] = payload.get("sub")
+    username: str | None = payload.get("sub")
     if not username:
         return None
     return User(id=username, access_token=token, roles=payload.get("roles", []))
 
 
-def user_to_dict(user: User, access_token: Optional[str] = None, payload: Optional[Dict] = None) -> Dict:
+def user_to_dict(user: User, access_token: str | None = None, payload: dict | None = None) -> dict:
     if not payload and access_token:
         payload = access_token_to_payload(access_token)
 
@@ -80,11 +81,11 @@ def add_access_token_to_response(response: Response, access_token: str) -> Respo
 
 
 class SecurityManager:
-    def __init__(self, user_stores: List[BaseStore]):
-        self.user_stores: List[BaseStore] = user_stores
-        self._additional_jwt_claims_loader: List[Callable[[User], Dict]] = []
+    def __init__(self, user_stores: list[BaseStore]):
+        self.user_stores: list[BaseStore] = user_stores
+        self._additional_jwt_claims_loader: list[Callable[[User], dict]] = []
 
-    def login(self, username, extra_fields=None) -> Optional[User]:
+    def login(self, username, extra_fields=None) -> User | None:
         return self._delegate_stores_until_not_none("login", username, extra_fields or {})
 
     def logout(self):
@@ -117,17 +118,15 @@ class SecurityManager:
                         return value
 
     @property
-    def current_user(self) -> Optional[User]:
+    def current_user(self) -> User | None:
         try:
             r = get_request()
             if r:
                 # Fetch the existing user from the request if there is any
-                try:
+                with contextlib.suppress(KeyError, AttributeError):
                     user = r.state.user
                     if user:
                         return user
-                except (KeyError, AttributeError):
-                    pass
                 # If there is no user, try to load it from the request and store it in the request
                 user = r.state.user = self.load_from_request(r)
                 return user
@@ -166,17 +165,15 @@ class SecurityManager:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    def _load_from_key(self, request: Request) -> Optional[User]:
+    def _load_from_key(self, request: Request) -> User | None:
         # try to login using the api_key url arg
         api_key = request.headers.get("apiKey")
         if not api_key:
             # then, try to login using Basic Auth
             api_key = request.headers.get("Authorization")
             if api_key:
-                try:
+                with contextlib.suppress(Exception):
                     api_key = b64decode(api_key.replace("Basic ", "", 1)).decode("utf-8")
-                except Exception:
-                    pass
         if api_key:
             return self._delegate_stores_until_not_none("load_from_key", api_key)
 
@@ -196,7 +193,8 @@ class SecurityManager:
         @app.middleware("http")
         async def refresh_token_middleware(request: Request, call_next):
             response = await call_next(request)
-            try:
+            # Case where there is not a valid JWT. Just return the original respone
+            with contextlib.suppress(RuntimeError, KeyError, AttributeError):
                 # Use the cached user from the request, to only refresh a token if the user was actually requested. This avoids calling load_from_request for every request.
                 user = request.state.user
                 if user and user.access_token:
@@ -207,13 +205,9 @@ class SecurityManager:
                     if target_timestamp > exp_timestamp:
                         access_token, payload = user_to_access_token(user)
                         add_access_token_to_response(response, access_token)
-            except (RuntimeError, KeyError, AttributeError):
-                # Case where there is not a valid JWT. Just return the original respone
-                pass
-            finally:
-                return response
+            return response
 
-    def jwt_claims_loader(self, callback: Callable[[User], Dict]):
+    def jwt_claims_loader(self, callback: Callable[[User], dict]):
         """
         Register additional jwt claims loaders. These will be called with the current user when a new token is issued.
 

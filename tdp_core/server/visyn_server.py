@@ -2,7 +2,7 @@ import logging
 import logging.config
 import sys
 import threading
-from typing import Any, Dict, Optional
+from typing import Any
 
 import anyio
 from fastapi import FastAPI
@@ -18,7 +18,7 @@ logging.config.dictConfig(default_logging_dict)
 
 
 def create_visyn_server(
-    *, fast_api_args: Dict[str, Any] = {}, start_cmd: Optional[str] = None, workspace_config: Optional[Dict] = None
+    *, fast_api_args: dict[str, Any] | None = None, start_cmd: str | None = None, workspace_config: dict | None = None
 ) -> FastAPI:
     """
     Create a new FastAPI instance while ensuring that the configuration and plugins are loaded, extension points are registered, database migrations are executed, ...
@@ -28,6 +28,8 @@ def create_visyn_server(
     start_cmd: Optional start command for the server, i.e. db-migration exposes commands like `db-migration exec <..> upgrade head`.
     workspace_config: Optional override for the workspace configuration. If nothing is provided `load_workspace_config()` is used instead.
     """
+    if fast_api_args is None:
+        fast_api_args = {}
     from .. import manager
     from ..settings.model import GlobalSettings
     from ..settings.utils import load_workspace_config
@@ -36,6 +38,13 @@ def create_visyn_server(
     workspace_config = workspace_config if isinstance(workspace_config, dict) else load_workspace_config()
     manager.settings = GlobalSettings(**workspace_config)
     logging.config.dictConfig(manager.settings.tdp_core.logging)
+
+    # Filter out the metrics endpoint from the access log
+    class EndpointFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            return "GET /metrics" not in record.getMessage()
+
+    logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
 
     _log = logging.getLogger(__name__)
 

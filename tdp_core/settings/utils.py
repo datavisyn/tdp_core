@@ -1,14 +1,14 @@
 import codecs
 import logging
 import os
-from typing import Any, Dict
+from typing import Any
 
 import jsoncfg
 
 _log = logging.getLogger(__name__)
 
 
-def load_workspace_config() -> Dict[str, Any]:
+def load_workspace_config() -> dict[str, Any]:
     """
     Loads the global config.json placed at `PHOVEA_CONFIG_PATH` (defaults to `config.json`).
     """
@@ -22,7 +22,7 @@ def load_workspace_config() -> Dict[str, Any]:
         return {}
 
 
-def load_config_file(path: str) -> Dict[str, Any]:
+def load_config_file(path: str) -> dict[str, Any]:
     """
     Opens any `*.json` file and loads it via `jsoncfg.loads`.
     """

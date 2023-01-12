@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from flask import abort
 from sqlalchemy.exc import OperationalError
@@ -93,7 +93,7 @@ def to_query(q, supports_array_parameter, parameters):
         subparameters = {(k + str(i)): vi for i, vi in enumerate(v)}
         q = q.replace(
             ":" + k,
-            "({ids})".format(ids=", ".join(":" + p for p in subparameters.keys())),
+            "({ids})".format(ids=", ".join(":" + p for p in subparameters)),
         )
         del parameters[k]  # delete single
         parameters.update(subparameters)  # add sub
@@ -101,7 +101,7 @@ def to_query(q, supports_array_parameter, parameters):
     return sqlalchemy.sql.text(q)
 
 
-class WrappedSession(object):
+class WrappedSession:
     def __init__(self, engine):
         """
         session wrapper of sql alchemy with auto cleanup
@@ -189,9 +189,9 @@ def get_columns(engine, table_name):
     def _normalize_columns(col):
         from sqlalchemy import types
 
-        r = dict(label=col["name"], type="string", column=col["name"])
+        r = {"label": col["name"], "type": "string", "column": col["name"]}
         t = col["type"]
-        if isinstance(t, types.Integer) or isinstance(t, types.Numeric):
+        if isinstance(t, (types.Integer, types.Numeric)):
             r["type"] = "number"
         elif isinstance(t, types.Enum):
             r["type"] = "categorical"
@@ -236,7 +236,7 @@ def _handle_aggregated_score(base_view, config, replacements, args):
     return replacements
 
 
-def prepare_arguments(view, config, replacements=None, arguments: Optional[Dict] = None, extra_sql_argument=None):
+def prepare_arguments(view, config, replacements=None, arguments: dict | None = None, extra_sql_argument=None):
     """
     prepares for the given view the kwargs and replacements based on the given input
     :param view: db view
@@ -268,7 +268,7 @@ def prepare_arguments(view, config, replacements=None, arguments: Optional[Dict]
             parser = info.type if info and info.type is not None else lambda x: x
             try:
                 if info and info.as_list:
-                    vs: List[Any] = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key)  # type: ignore
+                    vs: list[Any] = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key)  # type: ignore
                     value = tuple([parser(v) for v in vs])  # multi values need to be a tuple not a list
                 elif info and info.list_as_tuple:
                     vs = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key, [])  # type: ignore
@@ -300,10 +300,9 @@ def prepare_arguments(view, config, replacements=None, arguments: Optional[Dict]
     if view.replacements is not None:
         for arg in view.replacements:
             fallback = arguments.get(arg, "")
-            if arg in secure_replacements:  # has to be part of the replacements
-                value = replacements.get(arg, "")
-            else:
-                value = replacements.get(arg, fallback)  # if not a secure one fallback with an argument
+            value = (
+                replacements.get(arg, "") if arg in secure_replacements else replacements.get(arg, fallback)
+            )  # if not a secure one fallback with an argument
             if not view.is_valid_replacement(arg, value):
                 _log.warn(
                     'invalid replacement value detected "%s": "%s"="%s"',
@@ -362,9 +361,9 @@ def get_query(database, view_name, replacements=None, arguments=None, extra_sql_
     query = view.query
 
     if callable(query):
-        return dict(query="custom function", args=kwargs)
+        return {"query": "custom function", "args": kwargs}
 
-    return dict(query=clean_query(query.format(**replace)), args=kwargs)
+    return {"query": clean_query(query.format(**replace)), "args": kwargs}
 
 
 def get_filtered_data(database, view_name, args):
@@ -456,9 +455,9 @@ def get_count_query(database, view_name, args):
     ) = _get_count(database, view_name, args)
 
     if callable(count_query):
-        return dict(query="custom function", args=kwargs)
+        return {"query": "custom function", "args": kwargs}
 
-    return dict(query=count_query.format(**replace), args=kwargs)
+    return {"query": count_query.format(**replace), "args": kwargs}
 
 
 def derive_columns(table_name, engine, columns=None):
@@ -503,7 +502,7 @@ def derive_columns(table_name, engine, columns=None):
                     separator = getattr(columns[col], "separator", ";")
                     separated_categories = [category.split(separator) for category in categories]
                     # flatten array
-                    categories = list(set([category for sublist in separated_categories for category in sublist]))
+                    categories = list({category for sublist in separated_categories for category in sublist})
                     categories.sort()  # sort list to avoid random order with each run
                 columns[col]["categories"] = categories
 
@@ -528,7 +527,7 @@ def _lookup(database, view_name, query, page, limit, args):
     arguments["query_start"] = "{}%".format(query)
     arguments["query_match"] = "{}".format(query)
     # add 1 for checking if we have more
-    replacements = dict(limit=limit + 1, offset=offset, offset2=(offset + limit + 1))
+    replacements = {"limit": limit + 1, "offset": offset, "offset2": (offset + limit + 1)}
 
     kwargs, replace = prepare_arguments(view, config, replacements, arguments)
 
@@ -539,9 +538,9 @@ def lookup_query(database, view_name, query, page, limit, args):
     engine, _, sql, replace, kwargs = _lookup(database, view_name, query, page, limit, args)
 
     if callable(sql):
-        return dict(query="custom function", args=kwargs)
+        return {"query": "custom function", "args": kwargs}
 
-    return dict(query=sql.format(**replace), args=kwargs)
+    return {"query": sql.format(**replace), "args": kwargs}
 
 
 def lookup(database, view_name, query, page, limit, args):

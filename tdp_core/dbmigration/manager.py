@@ -2,7 +2,7 @@ import logging
 import re
 from argparse import REMAINDER
 from os import path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import alembic.command
 import alembic.config
@@ -18,7 +18,7 @@ _log = logging.getLogger(__name__)
 alembic_cfg = alembic.config.Config(path.join(path.abspath(path.dirname(__file__)), "dbmigration.ini"))
 
 
-class DBMigration(object):
+class DBMigration:
     """
     DBMigration object stores the required arguments to execute commands using Alembic.
     """
@@ -30,7 +30,7 @@ class DBMigration(object):
         script_location: str,
         *,
         auto_upgrade: bool = False,
-        version_table_schema: Optional[str] = None,
+        version_table_schema: str | None = None,
     ):
         """
         Initializes a new migration object and optionally carries out an upgrade.
@@ -47,8 +47,8 @@ class DBMigration(object):
         self.db_url: str = db_url
         self.script_location: str = script_location
         self.auto_upgrade: bool = auto_upgrade
-        self.version_table_schema: Optional[str] = version_table_schema
-        self.custom_commands: Dict[str, str] = dict()
+        self.version_table_schema: str | None = version_table_schema
+        self.custom_commands: dict[str, str] = {}
 
         # Because we can't easily pass "-1" as npm argument, we add a custom command for that without the space
         self.add_custom_command(r"downgrade-(\d+)", "downgrade -{}")
@@ -84,7 +84,7 @@ class DBMigration(object):
     def remove_custom_command(self, origin: str):
         self.custom_commands.pop(origin, None)
 
-    def get_custom_command(self, arguments: List[str] = []) -> Optional[List[str]]:
+    def get_custom_command(self, arguments: list[str] | None = None) -> list[str] | None:
         """
         Returns the rewritten command if it matches the pattern of a custom command.
         :param List[str] arguments: Argument to rewrite.
@@ -101,13 +101,15 @@ class DBMigration(object):
                     return value.format(*matched.groups()).split(" ")
         return None
 
-    def execute(self, arguments: List[str] = []) -> bool:
+    def execute(self, arguments: list[str] | None = None) -> bool:
         """
         Executes a command on the migration object.
         :param List[str] arguments: Arguments for the underlying Alembic instance. See https://alembic.sqlalchemy.org/en/latest/api/ for details.
 
         Example usage: migration.execute(['upgrade', 'head']) upgrades to the database to head.
         """
+        if arguments is None:
+            arguments = []
         # Rewrite command if possible
         rewritten_arguments = self.get_custom_command(arguments)
         if rewritten_arguments:
@@ -134,7 +136,7 @@ class DBMigration(object):
         return True
 
 
-class DBMigrationManager(object):
+class DBMigrationManager:
     """
     DBMigrationManager retrieves all 'tdp-sql-database-migration' plugins and initializes DBMigration objects.
     The possible configuration keys for this extension point are:
@@ -153,9 +155,11 @@ class DBMigrationManager(object):
     """
 
     def __init__(self):
-        self._migrations: Dict[str, DBMigration] = dict()
+        self._migrations: dict[str, DBMigration] = {}
 
-    def init_app(self, app: FastAPI, plugins: List[AExtensionDesc] = []):
+    def init_app(self, app: FastAPI, plugins: list[AExtensionDesc] | None = None):
+        if plugins is None:
+            plugins = []
         _log.info(f"Initializing DBMigrationManager with {', '.join([p.id for p in plugins]) or 'no plugins'}")
         auto_upgrade_default = manager.settings.tdp_core.migrations.autoUpgrade
 
@@ -236,11 +240,11 @@ class DBMigrationManager(object):
         return len(self._migrations)
 
     @property
-    def ids(self) -> List[str]:
+    def ids(self) -> list[str]:
         return list(self._migrations.keys())
 
     @property
-    def migrations(self) -> List[DBMigration]:
+    def migrations(self) -> list[DBMigration]:
         return list(self._migrations.values())
 
 

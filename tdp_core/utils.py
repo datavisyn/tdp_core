@@ -1,7 +1,5 @@
 import json
 import logging
-from builtins import range
-from typing import Union
 
 from flask import abort, make_response
 from flask.wrappers import Response
@@ -35,7 +33,7 @@ def map_scores(scores, from_idtype, to_idtype):
     mapped_ids = manager.id_mapping(from_idtype, to_idtype, [r["id"] for r in scores])
 
     mapped_scores = []
-    for score, mapped in zip(scores, mapped_ids):
+    for score, mapped in zip(scores, mapped_ids, strict=False):
         if not mapped:
             continue
         for target_id in mapped:
@@ -108,7 +106,7 @@ def random_id(length):
 
     s = string.ascii_lowercase + string.digits
     id = ""
-    for i in range(0, length):
+    for _i in range(0, length):
         id += random.choice(s)
     return id
 
@@ -119,7 +117,7 @@ class JSONExtensibleEncoder(json.JSONEncoder):
     """
 
     def __init__(self, *args, **kwargs):
-        super(JSONExtensibleEncoder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.encoders = [p.load().factory() for p in manager.registry.list("json-encoder")]
 
@@ -127,7 +125,7 @@ class JSONExtensibleEncoder(json.JSONEncoder):
         for encoder in self.encoders:
             if o in encoder:
                 return encoder(o, self)
-        return super(JSONExtensibleEncoder, self).default(o)
+        return super().default(o)
 
 
 def to_json(obj, *args, **kwargs):
@@ -145,12 +143,12 @@ def to_json(obj, *args, **kwargs):
     kwargs["ensure_ascii"] = False
 
     # Pandas JSON module has been deprecated and removed. UJson cannot convert numpy arrays, so it cannot be used here. The JSON used here does not support the `double_precision` keyword.
-    if isinstance(obj, float) or isinstance(obj, dict) or isinstance(obj, list):
+    if isinstance(obj, (float, dict, list)):
         obj = _handle_nan_values(obj)
-    return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
+    return json.dumps(obj, *args, **kwargs, cls=JSONExtensibleEncoder)
 
 
-def _handle_nan_values(obj_to_convert: Union[dict, list, float]) -> Union[dict, list, None]:
+def _handle_nan_values(obj_to_convert: dict | list | float) -> dict | list | None:
     """
     Convert any NaN values in the given object to None. Previously, Pandas was used to encode NaN to null. This feature has been deprecated and removed, therefore
     the standard JSON encoder is used which parses NaN instead of null. A custom JSON encoder does not work for converting these values to None because python's
@@ -169,7 +167,7 @@ def _handle_nan_values(obj_to_convert: Union[dict, list, float]) -> Union[dict, 
     if isinstance(obj_to_convert, dict):
         for k, v in obj_to_convert.items():
             # value is dictionary or list
-            if isinstance(v, dict) or isinstance(v, list):
+            if isinstance(v, (dict, list)):
                 converted_dict[k] = _handle_nan_values(v)
             else:
                 # value is NaN

@@ -42,7 +42,9 @@ class DummyStore(BaseStore):
             None,
         )
 
-    def login(self, username, extra_fields={}):
+    def login(self, username, extra_fields=None):
+        if extra_fields is None:
+            extra_fields = {}
         return next(
             (u for u in self._users if u.id == username and u.is_password(extra_fields["password"])),
             None,
