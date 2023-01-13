@@ -158,6 +158,12 @@ def create_visyn_server(
     # Use starlette-context to store the current request globally, i.e. accessible via context['request']
     app.add_middleware(RawContextMiddleware, plugins=(RequestContextPlugin(),))
 
+    class UvicornAccessLogFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            return 'GET /health HTTP/1.1" 200' not in record.getMessage()
+
+    logging.getLogger("uvicorn.access").addFilter(UvicornAccessLogFilter())
+
     @app.get("/health", tags=["Telemetry"])
     async def health_check():
         """
