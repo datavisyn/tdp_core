@@ -1,6 +1,4 @@
 import logging
-from builtins import object
-from typing import List
 
 from fastapi import FastAPI
 
@@ -9,7 +7,7 @@ from .parser import EntryPointPlugin, get_extensions_from_plugins
 _log = logging.getLogger(__name__)
 
 
-class Extension(object):
+class Extension:
     """
     the loaded plugin instance
     """
@@ -28,10 +26,7 @@ class Extension(object):
 
         m = getattr(self.impl, self.desc.factory)
 
-        if hasattr(m, "__call__"):
-            v = m(*args, **kwargs)
-        else:
-            v = m
+        v = m(*args, **kwargs) if callable(m) else m
         self._cache = v
         return v
 
@@ -39,7 +34,7 @@ class Extension(object):
         return self(*args, **kwargs)
 
 
-class AExtensionDesc(object):
+class AExtensionDesc:
     def __init__(self, desc):
         self.type = desc.get("type", "unknown")
         self.id = desc["id"]
@@ -59,7 +54,7 @@ class ExtensionDesc(AExtensionDesc):
     """
 
     def __init__(self, desc):
-        super(ExtensionDesc, self).__init__(desc)
+        super().__init__(desc)
         self._impl = None
 
         # from js notation to python notation
@@ -74,12 +69,12 @@ class ExtensionDesc(AExtensionDesc):
         return self._impl
 
 
-class Registry(object):
+class Registry:
     def __init__(self):
-        self.plugins: List[EntryPointPlugin] = []
-        self._extensions: List[ExtensionDesc] = []
+        self.plugins: list[EntryPointPlugin] = []
+        self._extensions: list[ExtensionDesc] = []
 
-    def init_app(self, app: FastAPI, plugins: List[EntryPointPlugin]):
+    def init_app(self, app: FastAPI, plugins: list[EntryPointPlugin]):
         self.plugins = plugins
         self._extensions = [ExtensionDesc(p) for p in get_extensions_from_plugins(plugins)]
 
@@ -92,9 +87,7 @@ class Registry(object):
     def __iter__(self):
         return iter(self._extensions)
 
-    def list(self, plugin_type=None):
-        if plugin_type is None:
-            return self
-        if not hasattr(plugin_type, "__call__"):  # not a callable
+    def list(self, plugin_type) -> list[ExtensionDesc]:
+        if not callable(plugin_type):
             return [x for x in self if x.type == plugin_type]
         return [x for x in self if plugin_type(x)]
