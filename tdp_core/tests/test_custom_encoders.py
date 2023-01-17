@@ -11,9 +11,9 @@ def test_nan_values(app):
     # list that contains dictionary
     test_list_nested = [13, 5, 7, 12, test_dict, 22]
     # convert with to_json
-    test_result_simple = to_json(dict(myNum=test_var))
-    test_result_list_simple = to_json(dict(myNum=test_list_simple))
-    test_result_list_nested = to_json(dict(myNum=test_list_nested))
+    test_result_simple = to_json({"myNum": test_var})
+    test_result_list_simple = to_json({"myNum": test_list_simple})
+    test_result_list_nested = to_json({"myNum": test_list_nested})
 
     # make assertions
     assert test_result_simple == '{"myNum": null}'

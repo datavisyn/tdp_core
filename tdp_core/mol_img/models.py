@@ -1,7 +1,5 @@
-from typing import Dict, Optional
-
 from pydantic import BaseModel
-from rdkit.Chem import Mol, MolFromSmarts, MolFromSmiles
+from rdkit.Chem import Mol, MolFromSmarts, MolFromSmiles  # type: ignore
 from starlette.responses import Response
 
 
@@ -20,7 +18,7 @@ class SmilesMolecule(str):
         yield cls.validate
 
     @classmethod
-    def validate(cls, value: Optional[str]) -> "SmilesMolecule":
+    def validate(cls, value: str | None) -> "SmilesMolecule":
         for parser in cls.parsers:
             mol = parser(value)
             if mol:
@@ -42,5 +40,5 @@ class SvgResponse(Response):
 
 
 class SubstructuresResponse(BaseModel):
-    count: Dict[str, int] = dict()
-    valid: Dict[str, bool] = dict()
+    count: dict[str, int] = {}
+    valid: dict[str, bool] = {}

@@ -1,18 +1,26 @@
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.requests import Request
+import contextlib
+
+from fastapi import FastAPI
+
+from .request_context_plugin import get_request
 
 
-class CloseWebSessionsMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        response = await call_next(request)
+# Use basic ASGI middleware instead of BaseHTTPMiddleware as it is significantly faster: https://github.com/tiangolo/fastapi/issues/2696#issuecomment-768224643
+# Raw middlewares are actually quite complex: https://github.com/encode/starlette/blob/048643adc21e75b668567fc6bcdd3650b89044ea/starlette/middleware/errors.py#L147
+class CloseWebSessionsMiddleware:
+    def __init__(self, app: FastAPI):
+        self.app: FastAPI = app
 
-        try:
-            for db_session in request.state.db_sessions:
-                try:
-                    db_session.close()
-                except Exception:
-                    pass
-        except (KeyError, AttributeError):
-            pass
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
 
-        return response
+        await self.app(scope, receive, send)
+
+        r = get_request()
+        if r:
+            with contextlib.suppress(KeyError, AttributeError):
+                for db_session in r.state.db_sessions:
+                    with contextlib.suppress(Exception):
+                        db_session.close()

@@ -1,12 +1,12 @@
 from typing import Callable
 
-from rdkit.Chem import Mol
+from rdkit.Chem import Mol  # type: ignore
 from rdkit.Chem.Draw import SimilarityMaps, rdMolDraw2D
 from rdkit.Chem.Draw.rdMolDraw2D import MolDraw2DSVG
 from rdkit.Chem.Draw.SimilarityMaps import GetSimilarityMapForFingerprint
 
 
-def _draw_wrapper(draw_inner: Callable[[MolDraw2DSVG, ...], None]) -> Callable[..., str]:
+def _draw_wrapper(draw_inner: Callable[[MolDraw2DSVG, ...], None]) -> Callable[..., str]:  # type: ignore
     """Function wrapper for drawing
 
     Can annotate any function that takes a drawer as first arg, ignores its return type

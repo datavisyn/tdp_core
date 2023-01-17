@@ -79,7 +79,7 @@ export function StripVis({
       return null;
     }
 
-    const innerLayout: any = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore
