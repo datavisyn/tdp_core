@@ -1,12 +1,15 @@
-from typing import List, Optional, Set
-
 from fastapi import APIRouter
-from rdkit.Chem import Mol
+from rdkit.Chem import Mol  # type: ignore
 from rdkit.Chem.Scaffolds import MurckoScaffold
 from starlette.responses import Response
 from starlette.status import HTTP_204_NO_CONTENT
 
-from .models import SmilesMolecule, SmilesSmartsMolecule, SubstructuresResponse, SvgResponse
+from .models import (
+    SmilesMolecule,
+    SmilesSmartsMolecule,
+    SubstructuresResponse,
+    SvgResponse,
+)
 from .util.draw import draw, draw_similarity
 from .util.molecule import aligned, maximum_common_substructure_query_mol
 
@@ -14,14 +17,12 @@ app = APIRouter(prefix="/api/rdkit", tags=["images"])
 
 
 @app.get("/", response_class=SvgResponse)
-def draw_smiles(
-    structure: SmilesMolecule, substructure: Optional[SmilesMolecule] = None, align: Optional[SmilesMolecule] = None
-):  # noqa: E1127
+def draw_smiles(structure: SmilesMolecule, substructure: SmilesMolecule | None = None, align: SmilesMolecule | None = None):
     return draw(structure.mol, aligned(structure.mol, align and align.mol) or substructure and substructure.mol)
 
 
 @app.post("/")
-def multiple_images(structures: Set[SmilesMolecule]):
+def multiple_images(structures: set[SmilesMolecule]):
     return {m: draw(m.mol) for m in structures}
 
 
@@ -43,7 +44,7 @@ def draw_molecule_similarity(structure: SmilesMolecule, reference: SmilesMolecul
 
 
 @app.post("/mcs/", response_class=SvgResponse)
-def draw_maximum_common_substructure_molecule(structures: List[SmilesMolecule]):
+def draw_maximum_common_substructure_molecule(structures: list[SmilesMolecule]):
     unique = [m.mol for m in set(structures)]
     mcs = maximum_common_substructure_query_mol(unique)
     if not mcs or not isinstance(mcs, Mol):
@@ -52,7 +53,7 @@ def draw_maximum_common_substructure_molecule(structures: List[SmilesMolecule]):
 
 
 @app.post("/substructures/")
-def substructures_count(structures: Set[SmilesMolecule], substructure: SmilesSmartsMolecule) -> SubstructuresResponse:
+def substructures_count(structures: set[SmilesMolecule], substructure: SmilesSmartsMolecule) -> SubstructuresResponse:
     """Check and return number of possible substructures in a set of structures"""
     ssr = SubstructuresResponse()
     for smiles in set(structures):

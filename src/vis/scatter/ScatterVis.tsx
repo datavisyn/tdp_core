@@ -102,7 +102,7 @@ export function ScatterVis({
       return null;
     }
 
-    const innerLayout: Partial<Layout> = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore

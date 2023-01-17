@@ -84,7 +84,7 @@ export function ViolinVis({
       return null;
     }
 
-    const innerLayout: Partial<Layout> = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore

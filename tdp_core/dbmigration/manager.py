@@ -2,10 +2,11 @@ import logging
 import re
 from argparse import REMAINDER
 from os import path
-from typing import Dict, List, Optional
+from typing import Any
 
 import alembic.command
 import alembic.config
+from alembic.util.exc import CommandError
 from fastapi import FastAPI
 
 from .. import manager
@@ -17,7 +18,7 @@ _log = logging.getLogger(__name__)
 alembic_cfg = alembic.config.Config(path.join(path.abspath(path.dirname(__file__)), "dbmigration.ini"))
 
 
-class DBMigration(object):
+class DBMigration:
     """
     DBMigration object stores the required arguments to execute commands using Alembic.
     """
@@ -29,7 +30,7 @@ class DBMigration(object):
         script_location: str,
         *,
         auto_upgrade: bool = False,
-        version_table_schema: str = None,
+        version_table_schema: str | None = None,
     ):
         """
         Initializes a new migration object and optionally carries out an upgrade.
@@ -46,8 +47,8 @@ class DBMigration(object):
         self.db_url: str = db_url
         self.script_location: str = script_location
         self.auto_upgrade: bool = auto_upgrade
-        self.version_table_schema: Optional[str] = version_table_schema
-        self.custom_commands: Dict[str, str] = dict()
+        self.version_table_schema: str | None = version_table_schema
+        self.custom_commands: dict[str, str] = {}
 
         # Because we can't easily pass "-1" as npm argument, we add a custom command for that without the space
         self.add_custom_command(r"downgrade-(\d+)", "downgrade -{}")
@@ -59,7 +60,7 @@ class DBMigration(object):
                 self.execute(["upgrade", "head"])
                 _log.info(f"Successfully upgraded database {self.id}")
             # As alembic is actually a commandline tool, it sometimes uses sys.exit (https://github.com/sqlalchemy/alembic/blob/master/alembic/util/messaging.py#L63)
-            except (SystemExit, alembic.util.exc.CommandError):
+            except (SystemExit, CommandError):
                 _log.exception(f"Error upgrading database {self.id}")
 
     def __repr__(self) -> str:
@@ -83,30 +84,32 @@ class DBMigration(object):
     def remove_custom_command(self, origin: str):
         self.custom_commands.pop(origin, None)
 
-    def get_custom_command(self, arguments: List[str] = []) -> Optional[List[str]]:
+    def get_custom_command(self, arguments: list[str] | None = None) -> list[str] | None:
         """
         Returns the rewritten command if it matches the pattern of a custom command.
         :param List[str] arguments: Argument to rewrite.
         """
         if arguments:
             # Join the list with spaces
-            arguments = " ".join(arguments)
+            arguments_str = " ".join(arguments)
             # For all the command patterns we have ..
             for key, value in self.custom_commands.items():
                 # .. check if we can match the command pattern with the given string
-                matched = re.match(f"{key}$", arguments)
+                matched = re.match(f"{key}$", arguments_str)
                 if matched:
                     # If we have a match, call format with the captured groups and split by ' '
                     return value.format(*matched.groups()).split(" ")
         return None
 
-    def execute(self, arguments: List[str] = []) -> bool:
+    def execute(self, arguments: list[str] | None = None) -> bool:
         """
         Executes a command on the migration object.
         :param List[str] arguments: Arguments for the underlying Alembic instance. See https://alembic.sqlalchemy.org/en/latest/api/ for details.
 
         Example usage: migration.execute(['upgrade', 'head']) upgrades to the database to head.
         """
+        if arguments is None:
+            arguments = []
         # Rewrite command if possible
         rewritten_arguments = self.get_custom_command(arguments)
         if rewritten_arguments:
@@ -133,7 +136,7 @@ class DBMigration(object):
         return True
 
 
-class DBMigrationManager(object):
+class DBMigrationManager:
     """
     DBMigrationManager retrieves all 'tdp-sql-database-migration' plugins and initializes DBMigration objects.
     The possible configuration keys for this extension point are:
@@ -152,18 +155,22 @@ class DBMigrationManager(object):
     """
 
     def __init__(self):
-        self._migrations: Dict[str, DBMigration] = dict()
+        self._migrations: dict[str, DBMigration] = {}
 
-    def init_app(self, app: FastAPI, plugins: List[AExtensionDesc] = []):
-        _log.info("Initializing DBMigrationManager")
-
+    def init_app(self, app: FastAPI, plugins: list[AExtensionDesc] | None = None):
+        if plugins is None:
+            plugins = []
+        _log.info(f"Initializing DBMigrationManager with {', '.join([p.id for p in plugins]) or 'no plugins'}")
         auto_upgrade_default = manager.settings.tdp_core.migrations.autoUpgrade
 
         for p in plugins:
-            _log.info("DBMigration found: %s", p.id)
+            _log.info(f"Database migration found: {p.id}")
+
+            # TODO: The AExtensionDesc doesn't have any typing information, so we need to cast it to Any here
+            p: Any = p
 
             # Check if configKey is set, otherwise use the plugin configuration
-            config = manager.settings.get_nested(p.configKey, {}) if hasattr(p, "configKey") else {}
+            config: dict = manager.settings.get_nested(p.configKey, {}) if hasattr(p, "configKey") else {}  # type: ignore
 
             # Priority of assignments: Configuration File -> Plugin Definition
             id = config.get("id") or (p.id if hasattr(p, "id") else None)
@@ -211,10 +218,10 @@ class DBMigrationManager(object):
 
             # Create new migration
             migration = DBMigration(
-                id,
-                db_url,
-                script_location,
-                auto_upgrade=auto_upgrade,
+                id,  # type: ignore
+                db_url,  # type: ignore
+                script_location,  # type: ignore
+                auto_upgrade=auto_upgrade,  # type: ignore
                 version_table_schema=version_table_schema,
             )
 
@@ -233,11 +240,11 @@ class DBMigrationManager(object):
         return len(self._migrations)
 
     @property
-    def ids(self) -> List[str]:
+    def ids(self) -> list[str]:
         return list(self._migrations.keys())
 
     @property
-    def migrations(self) -> List[DBMigration]:
+    def migrations(self) -> list[DBMigration]:
         return list(self._migrations.values())
 
 
@@ -276,6 +283,6 @@ def create_migration_command(parser):
 
             # Using REMAINDER as nargs causes the argument to be be optional, but '+' does not work because it also parses additional --attr with the parser which should actually be ignored.
             # Therefore, args.command might be empty and we simply pass None to trigger the error message
-            manager.db_migration[args.id].execute(args.command if len(args.command) > 0 else None)
+            manager.db_migration[args.id].execute(args.command if len(args.command) > 0 else None)  # type: ignore
 
     return lambda args: lambda: execute(args)

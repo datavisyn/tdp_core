@@ -1,7 +1,7 @@
 {
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
-  "version": "16.2.1-SNAPSHOT",
+  "version": "16.2.3-SNAPSHOT",
   "author": {
     "name": "datavisyn GmbH",
     "email": "contact@datavisyn.io",
@@ -45,6 +45,7 @@
     "lint:fix": "visyn_scripts lint --fix",
     "lint": "visyn_scripts lint",
     "predist": "yarn run lint && yarn run test && yarn run build",
+    "start:fast": "visyn_scripts start --env workspace_mode=single fast=true",
     "start": "visyn_scripts start --env workspace_mode=single",
     "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
     "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
@@ -113,8 +114,7 @@
     "@storybook/preset-scss": "^1.0.3",
     "@storybook/react": "^6.5.9",
     "@storybook/testing-library": "0.0.9",
-    "cypress": "^9.5.2",
-    "local-cypress": "^1.2.5"
+    "cypress": "^11.2.0"
   },
   "overrides": {
     "@types/react": "^16.9.23",

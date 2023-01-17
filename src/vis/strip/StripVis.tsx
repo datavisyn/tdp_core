@@ -80,7 +80,7 @@ export function StripVis({
       return null;
     }
 
-    const innerLayout: Partial<Layout> = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         itemclick: false,

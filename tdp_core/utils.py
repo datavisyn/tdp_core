@@ -1,9 +1,8 @@
 import json
 import logging
-from builtins import range
-from typing import Union
 
-from flask import Response, abort, make_response, request
+from flask import abort, make_response
+from flask.wrappers import Response
 
 from . import manager
 
@@ -34,7 +33,7 @@ def map_scores(scores, from_idtype, to_idtype):
     mapped_ids = manager.id_mapping(from_idtype, to_idtype, [r["id"] for r in scores])
 
     mapped_scores = []
-    for score, mapped in zip(scores, mapped_ids):
+    for score, mapped in zip(scores, mapped_ids, strict=False):
         if not mapped:
             continue
         for target_id in mapped:
@@ -83,33 +82,6 @@ def no_cache(f):
     return cache_control("private", "no-cache", "no-store", "max-age=0")(f)
 
 
-def etag(f):
-    """Add entity tag (etag) handling to the decorated route."""
-    import functools
-
-    @functools.wraps(f)
-    def wrapped(*args, **kwargs):
-        if request.method not in ["GET", "HEAD"]:
-            # etags only make sense for request that are cacheable, so only
-            # GET and HEAD requests are allowed
-            return f(*args, **kwargs)
-
-        # invoke the wrapped function and generate a response object from
-        # its result
-        rv = f(*args, **kwargs)
-        rv = make_response(rv)
-
-        # if the response is not a code 200 OK then we let it through
-        # unchanged
-        if rv.status_code != 200 or rv.direct_passthrough or not rv.implicit_sequence_conversion:
-            return rv
-
-        rv.add_etag()
-        return rv.make_conditional(request)
-
-    return wrapped
-
-
 def fix_id(id):
     """
     fixes the id such that is it a resource identifier
@@ -134,7 +106,7 @@ def random_id(length):
 
     s = string.ascii_lowercase + string.digits
     id = ""
-    for i in range(0, length):
+    for _i in range(0, length):
         id += random.choice(s)
     return id
 
@@ -145,7 +117,7 @@ class JSONExtensibleEncoder(json.JSONEncoder):
     """
 
     def __init__(self, *args, **kwargs):
-        super(JSONExtensibleEncoder, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.encoders = [p.load().factory() for p in manager.registry.list("json-encoder")]
 
@@ -153,7 +125,7 @@ class JSONExtensibleEncoder(json.JSONEncoder):
         for encoder in self.encoders:
             if o in encoder:
                 return encoder(o, self)
-        return super(JSONExtensibleEncoder, self).default(o)
+        return super().default(o)
 
 
 def to_json(obj, *args, **kwargs):
@@ -171,12 +143,12 @@ def to_json(obj, *args, **kwargs):
     kwargs["ensure_ascii"] = False
 
     # Pandas JSON module has been deprecated and removed. UJson cannot convert numpy arrays, so it cannot be used here. The JSON used here does not support the `double_precision` keyword.
-    if isinstance(obj, float) or isinstance(obj, dict) or isinstance(obj, list):
+    if isinstance(obj, (float, dict, list)):
         obj = _handle_nan_values(obj)
-    return json.dumps(obj, cls=JSONExtensibleEncoder, *args, **kwargs)
+    return json.dumps(obj, *args, **kwargs, cls=JSONExtensibleEncoder)
 
 
-def _handle_nan_values(obj_to_convert: Union[dict, list, float]) -> Union[dict, list, None]:
+def _handle_nan_values(obj_to_convert: dict | list | float) -> dict | list | None:
     """
     Convert any NaN values in the given object to None. Previously, Pandas was used to encode NaN to null. This feature has been deprecated and removed, therefore
     the standard JSON encoder is used which parses NaN instead of null. A custom JSON encoder does not work for converting these values to None because python's
@@ -195,7 +167,7 @@ def _handle_nan_values(obj_to_convert: Union[dict, list, float]) -> Union[dict, 
     if isinstance(obj_to_convert, dict):
         for k, v in obj_to_convert.items():
             # value is dictionary or list
-            if isinstance(v, dict) or isinstance(v, list):
+            if isinstance(v, (dict, list)):
                 converted_dict[k] = _handle_nan_values(v)
             else:
                 # value is NaN
@@ -227,14 +199,3 @@ def jsonify(obj, *args, **kwargs):
     :return:
     """
     return Response(to_json(obj, *args, **kwargs), mimetype="application/json; charset=utf-8")
-
-
-def glob_recursivly(path, match):
-    import fnmatch
-    import os
-
-    for dirpath, dirnames, files in os.walk(path):
-        if match is None:
-            return None
-        for f in fnmatch.filter(files, match):
-            yield os.path.join(dirpath, f)
