@@ -16,6 +16,8 @@ export const allVisTypes: ESupportedPlotlyVis[] = [
   ESupportedPlotlyVis.HEXBIN,
 ];
 
+export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IHexbinConfig;
+
 export enum EBarDisplayType {
   ABSOLUTE = 'Absolute',
   NORMALIZED = 'Normalized',
@@ -126,8 +128,6 @@ export interface IHexbinConfig {
   dragMode: EScatterSelectSettings;
   hexbinOptions: EHexbinOptions;
 }
-
-export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IHexbinConfig;
 
 type ValueGetter<T> = () => T | Promise<T>;
 
