@@ -90,7 +90,13 @@ const Template: ComponentStory<typeof Vis> = (args) => {
   // @ts-ignore TODO: The pointCount is an injected property, but we are using typeof Vis such that this prop does not exist.
   const columns = React.useMemo(() => fetchData(args.pointCount), [args.pointCount]);
 
-  return <Vis {...args} columns={columns} />;
+  return (
+    <div style={{ height: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ width: '70%', height: '80%' }}>
+        <Vis {...args} columns={columns} />
+      </div>
+    </div>
+  );
 };
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 

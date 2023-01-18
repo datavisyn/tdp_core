@@ -13,6 +13,7 @@ import {
   EViolinOverlay,
   VisColumn,
 } from '../interfaces';
+import { Center } from '@mantine/core';
 
 export function fetchIrisData(): VisColumn[] {
   const dataPromise = import('./irisData').then((m) => m.iris);
@@ -77,7 +78,13 @@ export default {
 // eslint-disable-next-line react/function-component-definition
 const Template: ComponentStory<typeof Vis> = (args) => {
   const columns = React.useMemo(() => fetchIrisData(), []);
-  return <Vis {...args} columns={columns} />;
+  return (
+    <div style={{ height: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ width: '70%', height: '80%' }}>
+        <Vis {...args} columns={columns} />
+      </div>
+    </div>
+  );
 };
 
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
