@@ -55,6 +55,7 @@ import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { WebpackEnv } from '../base';
+import { LineupVisWrapper } from '../vis/LineupVisWrapper';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;
@@ -90,6 +91,7 @@ const defaults: IRankingOptions = {
   itemNamePlural: 'items',
   itemRowHeight: null,
   itemIDType: null,
+  idField: 'id',
   additionalScoreParameter: null,
   additionalComputeScoreParameter: null,
   subType: { key: '', value: '' },
@@ -152,6 +154,7 @@ const defaults: IRankingOptions = {
 export interface IRankingOptions extends IARankingViewOptions {
   mode: EViewMode;
   enableCustomVis: boolean;
+  idField: string;
 }
 
 function suffix(name: string): string {
@@ -424,6 +427,16 @@ export function Ranking({
             }),
           );
 
+      const generalVis = new LineupVisWrapper({
+        provider: providerRef.current,
+        selectionCallback: (ids: string[]) => {
+          // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+          // this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+        },
+        doc: lineupContainerRef.current.ownerDocument,
+        idField: options.idField,
+      });
+
       if (lineupContainerRef.current && taggleRef.current) {
         const luBackdrop = lineupContainerRef.current.querySelector('.lu-backdrop');
         lineupContainerRef.current.parentElement.appendChild(luBackdrop);
@@ -482,9 +495,9 @@ export function Ranking({
         taggleRef.current.zoomIn();
       });
 
-      // TODO: panelRef.current.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-      //     this.generalVis.toggleCustomVis();
-      // });
+      panelRef.current.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+        generalVis.toggleCustomVis();
+      });
 
       if (options.enableOverviewMode) {
         const rule = spaceFillingRule(taggleOptions);
@@ -498,8 +511,13 @@ export function Ranking({
           panelRef.current.fire(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, true);
         }
       }
+
       if (options.enableSidePanel) {
         lineupContainerRef.current.parentElement.appendChild(panelRef.current.node);
+
+        if (options.enableVisPanel) {
+          lineupContainerRef.current.parentElement.appendChild(generalVis.node);
+        }
 
         if (options.enableSidePanel !== 'top') {
           taggleRef.current.pushUpdateAble((ctx) => panelRef.current.panel.update(ctx));
