@@ -33,8 +33,8 @@ def get_login():
     """
 
 
-@jwt_router.post("/login", response_model=Token)
-def post_login(form_data: OAuth2PasswordRequestForm = Depends()):
+@jwt_router.post("/login")
+def post_login(form_data: OAuth2PasswordRequestForm = Depends()) -> Token:
     user = manager.security.login(form_data.username, {"password": form_data.password})
     if not user:
         raise HTTPException(
@@ -51,7 +51,7 @@ def post_login(form_data: OAuth2PasswordRequestForm = Depends()):
 
     # And as cookie (for easier frontend communication)
     add_access_token_to_response(response, access_token)
-    return response
+    return response  # type: ignore
 
 
 @jwt_router.post("/logout")

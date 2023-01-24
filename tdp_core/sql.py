@@ -94,10 +94,7 @@ def get_score_data(database, view_name):
     data_idtype = view.idtype
     target_idtype = request.values.get("target", data_idtype)
 
-    if data_idtype != target_idtype:
-        mapped_scores = map_scores(r, data_idtype, target_idtype)
-    else:
-        mapped_scores = r
+    mapped_scores = map_scores(r, data_idtype, target_idtype) if data_idtype != target_idtype else r
 
     return format(mapped_scores)
 
@@ -148,7 +145,7 @@ def lookup(database, view_name):
 
     r_items, more, view = db.lookup(database, view_name, query, page, limit, request.values)
 
-    return jsonify(dict(items=r_items, more=more))
+    return jsonify({"items": r_items, "more": more})
 
 
 def create():

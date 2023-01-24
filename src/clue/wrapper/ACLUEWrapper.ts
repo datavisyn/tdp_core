@@ -142,7 +142,7 @@ export abstract class ACLUEWrapper extends EventHandler {
       document.body.dataset.clue = newMode.toString();
       // lazy jquery
       import('jquery').then((jquery) => {
-        // $('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
+        // $('nav').css('background-color', d3v3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
         if (newMode.presentation > 0.8) {
           $($right).animate({ width: 'hide' }, 'fast');
         } else {
@@ -167,7 +167,7 @@ export abstract class ACLUEWrapper extends EventHandler {
       // no animation initially
       const mode = ModeWrapper.getInstance().getMode();
       document.body.dataset.clue = mode.toString();
-      // $('nav').css('background-color', d3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
+      // $('nav').css('background-color', d3v3.rgb(255 * new_.exploration, 255 * new_.authoring, 255 * new_.presentation).darker().darker().toString());
       if (mode.presentation > 0.8) {
         $right.style.display = 'none';
       } else {

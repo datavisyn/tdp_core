@@ -58,7 +58,6 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
             autosize: true,
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
-            violingap: 0,
             dragmode: 'select',
         };
         return beautifyLayout(traces, innerLayout);

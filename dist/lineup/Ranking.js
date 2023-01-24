@@ -27,11 +27,14 @@ import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+import { WebpackEnv } from '../base';
+import { LineupVisWrapper } from '../vis/LineupVisWrapper';
 const defaults = {
     itemName: 'item',
     itemNamePlural: 'items',
     itemRowHeight: null,
     itemIDType: null,
+    idField: 'id',
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
     subType: { key: '', value: '' },
@@ -312,6 +315,15 @@ onAddScoreColumn, }) {
                 : new TaggleRenderer(providerRef.current, lineupContainerRef.current, Object.assign(taggleOptions, {
                     violationChanged: (_, violation) => panelRef.current.setViolation(violation),
                 }));
+            const generalVis = new LineupVisWrapper({
+                provider: providerRef.current,
+                selectionCallback: (ids) => {
+                    // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                    // this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+                },
+                doc: lineupContainerRef.current.ownerDocument,
+                idField: options.idField,
+            });
             if (lineupContainerRef.current && taggleRef.current) {
                 const luBackdrop = lineupContainerRef.current.querySelector('.lu-backdrop');
                 lineupContainerRef.current.parentElement.appendChild(luBackdrop);
@@ -331,10 +343,17 @@ onAddScoreColumn, }) {
                 onUpdateEntryPoint?.(namedSet);
             });
             panelRef.current.on(LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN, async (_event, scoreName, scoreId, p) => {
-                const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
                 const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
                 const plugin = await pluginDesc.load();
-                const params = await AttachemntUtils.resolveExternalized(storedParams);
+                let params;
+                // skip attachment utils call when feature flag is enabled
+                if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+                    params = p;
+                }
+                else {
+                    const storedParams = await AttachemntUtils.externalize(p); // TODO: do we need this?
+                    params = await AttachemntUtils.resolveExternalized(storedParams);
+                }
                 const score = plugin.factory(params, pluginDesc);
                 const scores = Array.isArray(score) ? score : [score];
                 const results = await Promise.all(scores.map((s) => addScoreColumn(s)));
@@ -351,9 +370,9 @@ onAddScoreColumn, }) {
             panelRef.current.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
                 taggleRef.current.zoomIn();
             });
-            // TODO: panelRef.current.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-            //     this.generalVis.toggleCustomVis();
-            // });
+            panelRef.current.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+                generalVis.toggleCustomVis();
+            });
             if (options.enableOverviewMode) {
                 const rule = spaceFillingRule(taggleOptions);
                 panelRef.current.on(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, (_event, isOverviewActive) => {
@@ -366,6 +385,9 @@ onAddScoreColumn, }) {
             }
             if (options.enableSidePanel) {
                 lineupContainerRef.current.parentElement.appendChild(panelRef.current.node);
+                if (options.enableVisPanel) {
+                    lineupContainerRef.current.parentElement.appendChild(generalVis.node);
+                }
                 if (options.enableSidePanel !== 'top') {
                     taggleRef.current.pushUpdateAble((ctx) => panelRef.current.panel.update(ctx));
                 }

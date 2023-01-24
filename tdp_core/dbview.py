@@ -1,6 +1,7 @@
 import logging
 import re
 from collections import OrderedDict
+from typing import Any
 
 import sqlalchemy
 from sqlalchemy.engine import Engine
@@ -14,7 +15,7 @@ _log = logging.getLogger(__name__)
 REGEX_TYPE = type(re.compile(""))
 
 
-class ArgumentInfo(object):
+class ArgumentInfo:
     def __init__(
         self,
         type=None,
@@ -32,14 +33,14 @@ class ArgumentInfo(object):
         self.list_as_tuple = list_as_tuple
 
 
-class DBFilterData(object):
+class DBFilterData:
     def __init__(self, group, sub_query, join):
         self.group = group
         self.sub_query = sub_query
         self.join = join
 
 
-class DBView(object):
+class DBView:
     def __init__(self, idtype=None, query=None):
         self.description = ""
         self.summary = ""
@@ -49,7 +50,7 @@ class DBView(object):
         self.query = query
         self.queries = {}
         self.columns = OrderedDict()
-        self.columns_filled_up = None
+        self.columns_filled_up = False
         self.replacements = []
         self.valid_replacements = {}
         self.arguments = []
@@ -65,10 +66,10 @@ class DBView(object):
     def dump(self, name):
         from collections import OrderedDict
 
-        r = OrderedDict(name=name, description=self.description, type=self.query_type)
+        r: OrderedDict[str, Any] = OrderedDict(name=name, description=self.description, type=self.query_type)
         r["idType"] = self.idtype
         r["query"] = clean_query(self.query)
-        args = [a for a in self.arguments]
+        args = list(self.arguments)
         args.extend(self.replacements)
         r["arguments"] = args
         r["columns"] = list(self.columns.values()) if self.columns else []  # some views have no columns -> return empty array
@@ -105,7 +106,7 @@ class DBView(object):
         return None
 
     def filter_groups(self):
-        r = set([v.group for v in list(self.filters.values())])
+        r = {v.group for v in list(self.filters.values())}
         if None in r:
             r.remove(None)
         return r
@@ -162,7 +163,7 @@ class DBView(object):
         return is_logged_in()  # because security is not disabled check if the user is at least logged in
 
 
-class DBViewBuilder(object):
+class DBViewBuilder:
     """
     db view builder pattern implementation
     """
@@ -584,7 +585,7 @@ def add_common_queries(
 default_agg_score = DBViewBuilder().query("{agg}({data_subtype})").replace("agg", ["min", "max", "avg"]).replace("data_subtype").build()
 
 
-class DBMapping(object):
+class DBMapping:
     """
     simple mapping based on a query of the form `select from_id as f, to_id as t from mapping_table where f in :ids`
     """
@@ -596,40 +597,36 @@ class DBMapping(object):
         self.integer_ids = integer_ids
 
 
-class DBConnector(object):
+class DBConnector:
     """
     basic connector object
     """
 
-    def __init__(self, views, agg_score=None, mappings=None):
+    def __init__(self, views=None, agg_score=None, mappings=None):
         """
         :param views: the dict of query views
         :param agg_score: optional specify how aggregation should be handled
         :param mappings: optional database mappings
         """
         self.agg_score = agg_score or default_agg_score
-        self.views = views
-        self.dburl = None
+        self.views = views or {}
+        self.dburl: str = None  # type: ignore
         self.mappings = mappings
         self.statement_timeout = None
-        self.statement_timeout_query = None
+        self.statement_timeout_query: str | None = None
         self.description = ""
 
     def dump(self, name):
         return OrderedDict(name=name, description=self.description)
 
     def create_engine(self, config) -> Engine:
-        engine_options = config.get("engine", {})
-        engine = sqlalchemy.create_engine(self.dburl, **engine_options)
-        # Assuming that gevent monkey patched the builtin
-        # threading library, we're likely good to use
-        # SQLAlchemy's QueuePool, which is the default
-        # pool class.  However, we need to make it use
-        # threadlocal connections
-        # https://github.com/kljensen/async-flask-sqlalchemy-example/blob/master/server.py
-        engine.pool._use_threadlocal = True
-
-        return engine
+        engine_options = {
+            # Increase the pool size to 30 to avoid "too many clients" errors
+            "pool_size": 30,
+            "pool_pre_ping": True,
+        }
+        engine_options.update(config.get("engine", {}))
+        return sqlalchemy.create_engine(self.dburl, **engine_options)
 
     def create_sessionmaker(self, engine) -> sessionmaker:
         return sessionmaker(bind=engine)

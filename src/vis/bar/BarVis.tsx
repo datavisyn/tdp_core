@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3v3';
+import d3v3 from 'd3v3';
 import { merge, uniqueId, difference } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
@@ -160,7 +160,7 @@ export function BarVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -173,7 +173,6 @@ export function BarVis({
       autosize: true,
       grid: { rows: finalTraces.rows, columns: finalTraces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
       barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
       dragmode: false,
     };
@@ -231,9 +230,9 @@ export function BarVis({
             // plotly redraws everything on updates, so you need to reappend title and
             onUpdate={() => {
               for (const p of finalTraces.plots) {
-                d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+                d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
 
-                d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+                d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
               }
             }}
           />
