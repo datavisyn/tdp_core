@@ -154,7 +154,7 @@ const defaults: IRankingOptions = {
 export interface IRankingOptions extends IARankingViewOptions {
   mode: EViewMode;
   enableCustomVis: boolean;
-  idField: string;
+  idField?: string;
 }
 
 function suffix(name: string): string {
