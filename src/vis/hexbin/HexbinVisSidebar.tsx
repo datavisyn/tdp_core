@@ -21,9 +21,6 @@ interface DensityVisSidebarProps {
   };
   columns: VisColumn[];
   setConfig: (config: IVisConfig) => void;
-  selectionCallback?: (ids: string[]) => void;
-  selected?: { [key: string]: boolean };
-  width?: string;
 }
 
 const defaultExtensions = {
@@ -33,15 +30,7 @@ const defaultExtensions = {
   postSidebar: null,
 };
 
-export function HexbinVisSidebar({
-  config,
-  extensions,
-  columns,
-  setConfig,
-  selectionCallback = () => null,
-  selected = {},
-  width = '20rem',
-}: DensityVisSidebarProps) {
+export function HexbinVisSidebar({ config, extensions, columns, setConfig }: DensityVisSidebarProps) {
   const mergedExtensions = useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -74,7 +63,6 @@ export function HexbinVisSidebar({
           <HexSizeSwitch currentValue={config.isSizeScale} callback={(isSizeScale: boolean) => setConfig({ ...config, isSizeScale })} />
           <HexOpacitySwitch currentValue={config.isOpacityScale} callback={(isOpacityScale: boolean) => setConfig({ ...config, isOpacityScale })} />
         </Stack>
-        {/* <HexbinOptionSelect callback={(hexbinOptions: EHexbinOptions) => setConfig({ ...config, hexbinOptions })} currentSelected={config.hexbinOptions} /> */}
         {mergedExtensions.preSidebar}
         {mergedExtensions.postSidebar}
       </Stack>

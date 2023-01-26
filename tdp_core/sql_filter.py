@@ -2,8 +2,6 @@ import logging
 
 from werkzeug.datastructures import MultiDict
 
-from . import manager
-
 _log = logging.getLogger(__name__)
 
 
@@ -33,30 +31,6 @@ def _replace_named_sets_in_ids(v):
     return list(union)
 
 
-def _replace_range_in_ids(v, id_type, target_id_type):
-    union = set()
-
-    def add_range(r):
-        # convert named sets to the primary ids
-        ids = r
-        if id_type != target_id_type:
-            # need to map the ids
-            mapped_ids = manager.id_mapping(id_type, target_id_type, ids)
-            for id in mapped_ids:
-                if id is not None and len(id) > 0:
-                    union.add(id[0])  # just the first one for now
-        else:
-            for id in ids:
-                union.add(id)
-
-    if isinstance(v, list):
-        for vi in v:
-            add_range(vi)
-    else:
-        add_range(v)
-    return list(union)
-
-
 def filter_logic(view, args):
     """
     parses the request arguments for filter
@@ -64,7 +38,7 @@ def filter_logic(view, args):
     :return:
     """
     processed_args = MultiDict()
-    extra_args = dict()
+    extra_args = {}
     where_clause = {}
     for k, v in list(args.lists()):
         if k.endswith("[]"):
@@ -87,9 +61,8 @@ def filter_logic(view, args):
         if k.startswith("rangeOf"):
             del where_clause[k]  # delete value
             id_type_and_key = k[7:]
-            id_type = id_type_and_key[: id_type_and_key.index("4")]
             real_key = id_type_and_key[id_type_and_key.index("4") + 1 :]  # remove the range4 part
-            ids = _replace_range_in_ids(v, id_type, view.idtype)
+            ids = v
             if real_key not in where_clause:
                 where_clause[real_key] = ids
             else:
@@ -201,14 +174,14 @@ def filter_logic(view, args):
         else:
             where_group_clauses[group].append((clause, join))
 
-    replacements = dict()
+    replacements = {}
     replacements["and_where"] = (" AND " + " AND ".join(c for c, _ in where_default_clause)) if where_default_clause else ""
     replacements["where"] = (" WHERE " + " AND ".join(c for c, _ in where_default_clause)) if where_default_clause else ""
     # unique joins
-    replacements["joins"] = " ".join(set(j for _, j in where_default_clause if j is not None))
+    replacements["joins"] = " ".join({j for _, j in where_default_clause if j is not None})
     for group, v in list(where_group_clauses.items()):
         replacements["and_" + group + "_where"] = (" AND " + " AND ".join(c for c, _ in v)) if v else ""
         replacements[group + "_where"] = (" WHERE " + " AND ".join(c for c, _ in v)) if v else ""
-        replacements[group + "_joins"] = " ".join(set(j for _, j in v if j is not None))
+        replacements[group + "_joins"] = " ".join({j for _, j in v if j is not None})
 
     return replacements, processed_args, extra_args, where_clause

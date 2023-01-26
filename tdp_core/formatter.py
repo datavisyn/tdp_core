@@ -1,10 +1,14 @@
-from flask import Response, jsonify, request
+from flask import jsonify, request
+from flask.wrappers import Response
 
 
 def _format_csv(array_of_dicts):
     import io
 
-    import pandas as pd
+    try:
+        import pandas as pd  # type: ignore
+    except ImportError as e:
+        raise ImportError("pandas is required to format as csv") from e
 
     if not array_of_dicts:
         return Response("", mimetype="text/csv")

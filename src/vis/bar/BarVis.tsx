@@ -2,9 +2,10 @@ import * as React from 'react';
 import d3 from 'd3v3';
 import { merge, uniqueId, difference } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
-import { ActionIcon, Container, Space } from '@mantine/core';
+import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { Layout } from 'plotly.js-dist-min';
 import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
@@ -14,6 +15,7 @@ import { createBarTraces } from './utils';
 import { BarVisSidebar } from './BarVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 
 interface BarVisProps {
   config: IBarConfig;
@@ -151,7 +153,7 @@ export function BarVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -170,7 +172,6 @@ export function BarVis({
       autosize: true,
       grid: { rows: finalTraces.rows, columns: finalTraces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
       barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
       dragmode: false,
     };
@@ -187,12 +188,16 @@ export function BarVis({
   }, [finalTraces]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
+    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }} ref={plotlyDivRef}>
+      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
+
       {mergedExtensions.prePlot}
       <Space h="xl" />
-      <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-        <FontAwesomeIcon icon={faGear} />
-      </ActionIcon>
+      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+        <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <FontAwesomeIcon icon={faGear} />
+        </ActionIcon>
+      </Tooltip>
       {traceStatus === 'success' && finalTraces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
@@ -238,7 +243,6 @@ export function BarVis({
         <InvalidCols headerMessage={finalTraces?.errorMessageHeader} bodyMessage={traceError?.message || finalTraces?.errorMessage} />
       ) : null}
       {mergedExtensions.postPlot}
-      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       {!hideSidebar ? (
         <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
           <BarVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />

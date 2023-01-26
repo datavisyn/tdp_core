@@ -1,5 +1,5 @@
 import * as React from 'react';
-import datavisynLogo from './datavisyn_white.svg';
+import datavisynLogo from '../../assets/datavisyn_white.svg';
 
 export function DatavisynLogo() {
   return (

@@ -236,6 +236,7 @@ export async function createScatterTraces(
               showlegend: false,
               text: validCols[0].resolvedValues.map((v) => v.id.toString()),
               // plotly is stupid and doesnt know its own types
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
               selected: {
                 marker: {

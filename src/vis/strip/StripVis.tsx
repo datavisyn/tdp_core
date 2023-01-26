@@ -2,9 +2,10 @@ import * as React from 'react';
 import * as d3v7 from 'd3v7';
 import { merge, uniqueId } from 'lodash';
 import { useMemo, useEffect, useState } from 'react';
-import { ActionIcon, Container, Space } from '@mantine/core';
+import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { Layout } from 'plotly.js-dist-min';
 import { IVisConfig, VisColumn, IStripConfig, Scales } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
@@ -14,6 +15,7 @@ import { useAsync } from '../../hooks';
 import { StripVisSidebar } from './StripVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 
 interface StripVisProps {
   config: IStripConfig;
@@ -78,10 +80,9 @@ export function StripVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
-        // @ts-ignore
         itemclick: false,
         itemdoubleclick: false,
       },
@@ -97,7 +98,6 @@ export function StripVis({
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
       dragmode: 'select',
     };
 
@@ -105,12 +105,15 @@ export function StripVis({
   }, [traces]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%' }} ref={plotlyDivRef}>
+    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', position: 'relative' }} ref={plotlyDivRef}>
       <Space h="xl" />
+      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
 
-      <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-        <FontAwesomeIcon icon={faGear} />
-      </ActionIcon>
+      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+        <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <FontAwesomeIcon icon={faGear} />
+        </ActionIcon>
+      </Tooltip>
       {mergedExtensions.prePlot}
 
       {traceStatus === 'success' && traces?.plots.length > 0 ? (
@@ -137,7 +140,6 @@ export function StripVis({
         <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
       ) : null}
       {mergedExtensions.postPlot}
-      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       {!hideSidebar ? (
         <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
           <StripVisSidebar config={config} extensions={extensions} columns={columns} setConfig={setConfig} />

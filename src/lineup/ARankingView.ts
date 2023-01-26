@@ -248,31 +248,30 @@ export abstract class ARankingView extends AView {
 
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
 
-    this.generalVis = import('../vis').then(() => {
-      const newVis = new LineupVisWrapper({
-        provider: this.provider,
-        selectionCallback: (ids: string[]) => {
-          // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
-          this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
-        },
-        doc: this.node.ownerDocument,
-      });
+    if (this.options.enableVisPanel) {
+      this.generalVis = import('../vis').then(() => {
+        const newVis = new LineupVisWrapper({
+          provider: this.provider,
+          selectionCallback: (ids: string[]) => {
+            // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+            this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+          },
+          doc: this.node.ownerDocument,
+        });
 
-      if (this.options.enableSidePanel) {
         this.node.appendChild(newVis.node);
-      }
 
-      this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel: ISelection) => {
-        newVis.updateCustomVis();
+        this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel: ISelection) => {
+          newVis.updateCustomVis();
+        });
+
+        this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+          newVis.toggleCustomVis();
+        });
+
+        return newVis;
       });
-
-      this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-        newVis.toggleCustomVis();
-      });
-
-      return newVis;
-    });
-
+    }
     // When a new column desc is added to the provider, update the panel chooser
     this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
     // TODO: Include this when the remove event is included: https://github.com/lineupjs/lineupjs/issues/338
@@ -325,16 +324,17 @@ export abstract class ARankingView extends AView {
    */
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return super.init(params, onParameterChange).then(() => {
-      if (!WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-        // inject stats
-        const base = <HTMLElement>params.querySelector('form') || params;
-        base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
-        const container = <HTMLElement>base.lastElementChild!;
-        container.appendChild(this.stats);
-        if (this.options.enableSidePanel === 'top') {
-          container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
-          container.insertAdjacentElement('afterbegin', this.panel.node);
-        }
+      if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
+        return; // do nothing when feature flag is enabled
+      }
+      // inject stats
+      const base = <HTMLElement>params.querySelector('form') || params;
+      base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
+      const container = <HTMLElement>base.lastElementChild!;
+      container.appendChild(this.stats);
+      if (this.options.enableSidePanel === 'top') {
+        container.classList.add('d-flex', 'flex-row', 'align-items-center', 'gap-3');
+        container.insertAdjacentElement('afterbegin', this.panel.node);
       }
     });
   }
@@ -467,7 +467,7 @@ export abstract class ARankingView extends AView {
     }
 
     this.panel.hide();
-    this.generalVis.then((vis) => {
+    this.generalVis?.then((vis) => {
       vis.hide();
     });
 
@@ -637,6 +637,7 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<{col: Column; loaded: Promise<Column>}>}
    */
   async addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn> {
+    // skip provenance impl when feature flag is enabled
     if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
       return this.addScoreColumn(score, position);
     }
@@ -653,6 +654,7 @@ export abstract class ARankingView extends AView {
    * @returns {Promise<boolean>}
    */
   async removeTrackedScoreColumn(columnId: string): Promise<boolean> {
+    // skip provenance impl when feature flag is enabled
     if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
       const column = this.provider.find(columnId);
       return column.removeMe();

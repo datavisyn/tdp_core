@@ -41,7 +41,7 @@ export function VisynLoginForm({ onLogin }: IVisynLoginFormProps) {
       </Stack>
       <Group position="right">
         <Button fullWidth={false} mt="md" type="submit" className="btn btn-primary">
-          Log In
+          {I18nextManager.getInstance().i18n.t('tdp:core.visynApp.loginButton')}
         </Button>
       </Group>
     </form>

@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
-import { ActionIcon, Center, Container, Group, Stack } from '@mantine/core';
+import { ActionIcon, Center, Container, Group, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { Layout } from 'plotly.js-dist-min';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
@@ -14,6 +15,7 @@ import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 
 const defaultExtensions = {
   prePlot: null,
@@ -114,7 +116,7 @@ export function ScatterVis({
       return null;
     }
 
-    const innerLayout: Plotly.Layout = {
+    const innerLayout: Partial<Plotly.Layout> = {
       showlegend: true,
       legend: {
         // @ts-ignore
@@ -137,7 +139,6 @@ export function ScatterVis({
       autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
-      violingap: 0,
       dragmode: config.dragMode,
     };
 
@@ -200,10 +201,14 @@ export function ScatterVis({
   }, [id, plotsWithSelectedPoints, layout, selectedMap, selectionCallback, selectedList, traces?.plots, plotlyData]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%', overflow: 'hidden' }} ref={plotlyDivRef}>
-      <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-        <FontAwesomeIcon icon={faGear} />
-      </ActionIcon>
+    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }} ref={plotlyDivRef}>
+      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+        <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <FontAwesomeIcon icon={faGear} />
+        </ActionIcon>
+      </Tooltip>
+      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
+
       <Stack spacing={0} sx={{ height: '100%' }}>
         <Center>
           <Group mt="lg">
@@ -218,7 +223,6 @@ export function ScatterVis({
         ) : null}
 
         {mergedExtensions.postPlot}
-        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
       </Stack>
       {!hideSidebar ? (
         <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>

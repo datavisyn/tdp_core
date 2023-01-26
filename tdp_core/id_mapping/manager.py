@@ -1,14 +1,13 @@
 import logging
-from builtins import object, set
+from builtins import set
 from itertools import chain
-from typing import List
 
 from .. import manager
 
 _log = logging.getLogger(__name__)
 
 
-class MappingManager(object):
+class MappingManager:
     """
     Mapping manager creating a graph of all available id-2-id mappings, allowing for transitive id-mappings.
     This graph is traversed via shortest path when mapping from one id-(type) to another.
@@ -52,11 +51,13 @@ class MappingManager(object):
                 s.add(to_)
         return s
 
-    def __find_all_paths(self, graph, start, end, path=[]):
+    def __find_all_paths(self, graph, start, end, path=None):
         """
         Returns all possible paths in the graph from start to end
         :return: Array of all possible paths (string arrays) sorted by shortest path first
         """
+        if path is None:
+            path = []
         path = path + [start]
         if start == end:
             return [path]
@@ -70,14 +71,14 @@ class MappingManager(object):
                     paths.append(newpath)
         return sorted(paths, key=len)
 
-    def __resolve_single(self, from_idtype, to_idtype, ids):
+    def __resolve_single(self, from_idtype, to_idtype, ids) -> list:
         from_mappings = self.mappers.get(from_idtype, {})
         to_mappings = from_mappings.get(to_idtype, [])
         if not to_mappings:
             _log.warn("cannot find mapping from %s to %s", from_idtype, to_idtype)
             return [None for _ in ids]
 
-        def apply_mapping(mapper, ids: List[str]):
+        def apply_mapping(mapper, ids: list[str]):
             # Each mapper can define if it preserves the order of the incoming ids.
             if hasattr(mapper, "preserves_order") and mapper.preserves_order:
                 return mapper(ids)
@@ -94,7 +95,7 @@ class MappingManager(object):
         rset = [set() for _ in ids]
         for mapper in to_mappings:
             mapped_ids = apply_mapping(mapper, ids)
-            for mapped_id, rlist, rhash in zip(mapped_ids, r, rset):
+            for mapped_id, rlist, rhash in zip(mapped_ids, r, rset, strict=False):
                 for id in mapped_id:
                     if id not in rhash:
                         rlist.append(id)
@@ -109,7 +110,8 @@ class MappingManager(object):
         """
         if len(lengths) == 0 and len(source) == 0:
             return []
-        assert len(lengths) > 0 and min(lengths) >= 1
+        assert len(lengths) > 0
+        assert min(lengths) >= 1
         assert sum(lengths) == len(source)
         result = []
         i = 0
@@ -125,7 +127,7 @@ class MappingManager(object):
     def maps_to(self, from_idtype):
         return list(self.paths.get(from_idtype, {}).keys())
 
-    def __call__(self, from_idtype, to_idtype, ids):
+    def __call__(self, from_idtype, to_idtype, ids) -> list:
         # If both id types are the same, simply return
         if from_idtype == to_idtype:
             return ids
@@ -162,12 +164,12 @@ class MappingManager(object):
                 return result
 
             # Otherwise, check if every mapping was 1 to 1
-            lengths = [len(x) for x in result]
+            lengths = [len(x) for x in result]  # type: ignore
             # If any result array is longer than 1, we need to flatten and later merge it
             needs_merging = max(lengths, default=0) > 1
             # Flatten result and assign to values
             values = list(chain.from_iterable(result))
-        return result
+        return result  # type: ignore
 
     def search(self, from_idtype, to_idtype, query, max_results=None):
         """
@@ -198,9 +200,9 @@ class MappingManager(object):
 
 
 def create_id_mapping_manager() -> MappingManager:
-    _log.info("Creating mapping_manager")
     # Load mapping providers
     providers = []
     for plugin in manager.registry.list("mapping_provider"):
         providers = providers + list(plugin.load().factory())
+    _log.info(f"Initializing MappingManager with {len(providers)} provider(s)")
     return MappingManager(providers)

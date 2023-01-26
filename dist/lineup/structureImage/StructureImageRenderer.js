@@ -2,7 +2,7 @@ import { ERenderMode, renderMissingDOM, } from 'lineupjs';
 import { abortAble } from 'lineupengine';
 import { StructureImageColumn } from './StructureImageColumn';
 import { I18nextManager } from '../../i18n';
-const template = '<a target="_blank" rel="noopener" style="background-size: contain; background-position: center; background-repeat: no-repeat;"></a>';
+const template = '<div style="background-size: contain; background-position: center; background-repeat: no-repeat;"></div>';
 function getImageURL(structure, substructure = null, align = null) {
     return `/api/rdkit/?structure=${encodeURIComponent(structure)}${substructure ? `&substructure=${encodeURIComponent(substructure)}` : ''}${align ? `&align=${encodeURIComponent(align)}` : ''}`;
 }
@@ -71,7 +71,6 @@ export class StructureImageRenderer {
                         }
                         n.style.backgroundImage = `url('${getImageURL(value, col.getFilter()?.filter, col.getAlign())}')`;
                         n.title = value;
-                        n.href = `https://pubchem.ncbi.nlm.nih.gov/#query=${value}`;
                     });
                 }
                 return null;

@@ -1,11 +1,11 @@
 /// <reference types="react" />
 import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
-    SCATTER = "Scatter Plot",
-    VIOLIN = "Violin Plot",
-    STRIP = "Strip Plot",
-    BAR = "Bar Chart",
-    HEXBIN = "Hexbin Plot"
+    SCATTER = "Scatter plot",
+    VIOLIN = "Violin plot",
+    STRIP = "Strip plot",
+    BAR = "Bar chart",
+    HEXBIN = "Hexbin plot"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
 export declare enum EBarDisplayType {

@@ -38,20 +38,20 @@ export function SingleHex({ hexbinOption, hexData, d3Hexbin, isSizeScale, radius
                 counter += Math.ceil(catMap[key] / hexDivisor);
                 return (React.createElement("g", { key: `${hexData.x},${hexData.y},${key}`, clipPath: isSelected ? `url(#${hexData.x},${hexData.y}Clip)` : null },
                     React.createElement("path", { d: currPath, style: {
-                            fill: `${colorScale ? colorScale(key) : 'black'}`,
+                            fill: `${colorScale ? (isSelected || Object.keys(selected).length === 0 ? colorScale(key) : 'gray') : 'black'}`,
                             transform: `translate(${hexData.x}px, ${hexData.y}px)`,
                             stroke: isSelected ? '#E29609' : 'white',
-                            strokeWidth: isSelected ? 3 : 0,
+                            strokeWidth: isSelected ? 1 : 0,
                             fillOpacity: isOpacityScale ? opacityScale(hexData.length) : '1',
                         } })));
             })
             : null,
         hexbinOption === EHexbinOptions.COLOR || !isCategorySelected ? (React.createElement("g", { clipPath: isSelected ? `url(#${hexData.x},${hexData.y}Clip)` : null },
             React.createElement("path", { d: d3Hexbin.hexagon(isSizeScale ? radiusScale(hexData.length) : hexRadius), style: {
-                    fill: `${colorScale ? colorScale(topCategory) : 'black'}`,
+                    fill: `${colorScale ? (isSelected || Object.keys(selected).length === 0 ? colorScale(topCategory) : 'gray') : 'black'}`,
                     transform: `translate(${hexData.x}px, ${hexData.y}px)`,
                     stroke: isSelected ? '#E29609' : 'white',
-                    strokeWidth: isSelected ? 3 : 0,
+                    strokeWidth: isSelected ? (colorScale ? 1 : 2) : 0,
                     fillOpacity: isOpacityScale ? opacityScale(hexData.length) : '1',
                 } }))) : null,
         hexbinOption === EHexbinOptions.PIE && isCategorySelected ? (React.createElement(React.Fragment, null,
@@ -60,9 +60,10 @@ export function SingleHex({ hexbinOption, hexData, d3Hexbin, isSizeScale, radius
                         fill: `${'black'}`,
                         transform: `translate(${hexData.x}px, ${hexData.y}px)`,
                         stroke: isSelected ? '#E29609' : 'white',
-                        strokeWidth: isSelected ? 3 : 0,
+                        strokeWidth: isSelected ? 1 : 0,
                         fillOpacity: opacityScale(hexData.length),
                     } }))) : null,
-            React.createElement(PieChart, { data: catMapVals, dataCategories: catMapKeys, radius: isSizeScale ? radiusScale(hexData.length) / 2 : hexRadius / 2, transform: `translate(${hexData.x}px, ${hexData.y}px)`, colorScale: colorScale }))) : null));
+            React.createElement("g", { style: { opacity: isSelected || Object.keys(selected).length === 0 ? 1 : 0.2 } },
+                React.createElement(PieChart, { data: catMapVals, dataCategories: catMapKeys, radius: isSizeScale ? radiusScale(hexData.length) / 2 : hexRadius / 2, transform: `translate(${hexData.x}px, ${hexData.y}px)`, colorScale: colorScale })))) : null));
 }
 //# sourceMappingURL=SingleHex.js.map

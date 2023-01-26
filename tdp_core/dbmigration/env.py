@@ -39,7 +39,7 @@ def run_migrations_online():
         additional_configuration["version_table_schema"] = version_table_schema
 
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        config.get_section(config.config_ini_section),  # type: ignore
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )

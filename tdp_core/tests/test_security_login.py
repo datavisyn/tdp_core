@@ -1,5 +1,3 @@
-from typing import Dict
-
 from fastapi.testclient import TestClient
 
 from tdp_core import manager
@@ -36,7 +34,7 @@ def test_jwt_login(client: TestClient):
     # Login with the dummy user
     response = client.post("/login", data={"username": "admin", "password": "admin"})
     assert response.status_code == 200
-    user: Dict = response.json()
+    user: dict = response.json()
     assert user["name"] == "admin"
     assert user["roles"] == ["admin"]
     assert user["payload"]["hello"] == "world"

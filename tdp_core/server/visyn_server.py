@@ -2,12 +2,14 @@ import logging
 import logging.config
 import sys
 import threading
-from typing import Dict, Optional
+from typing import Any
 
+import anyio
 from fastapi import FastAPI
 from fastapi.middleware.wsgi import WSGIMiddleware
 from pydantic import create_model
 from pydantic.utils import deep_update
+from starlette_context.middleware import RawContextMiddleware
 
 from ..settings.constants import default_logging_dict
 
@@ -16,7 +18,7 @@ logging.config.dictConfig(default_logging_dict)
 
 
 def create_visyn_server(
-    *, fast_api_args: Optional[Dict] = {}, start_cmd: Optional[str] = None, workspace_config: Optional[Dict] = None
+    *, fast_api_args: dict[str, Any] | None = None, start_cmd: str | None = None, workspace_config: dict | None = None
 ) -> FastAPI:
     """
     Create a new FastAPI instance while ensuring that the configuration and plugins are loaded, extension points are registered, database migrations are executed, ...
@@ -26,6 +28,8 @@ def create_visyn_server(
     start_cmd: Optional start command for the server, i.e. db-migration exposes commands like `db-migration exec <..> upgrade head`.
     workspace_config: Optional override for the workspace configuration. If nothing is provided `load_workspace_config()` is used instead.
     """
+    if fast_api_args is None:
+        fast_api_args = {}
     from .. import manager
     from ..settings.model import GlobalSettings
     from ..settings.utils import load_workspace_config
@@ -34,8 +38,15 @@ def create_visyn_server(
     workspace_config = workspace_config if isinstance(workspace_config, dict) else load_workspace_config()
     manager.settings = GlobalSettings(**workspace_config)
     logging.config.dictConfig(manager.settings.tdp_core.logging)
+
+    # Filter out the metrics endpoint from the access log
+    class EndpointFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            return "GET /metrics" not in record.getMessage()
+
+    logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
+
     _log = logging.getLogger(__name__)
-    _log.info("Workspace settings successfully loaded")
 
     # Load the initial plugins
     from ..plugin.parser import get_config_from_plugins, load_all_plugins
@@ -46,7 +57,6 @@ def create_visyn_server(
     visyn_server_settings = create_model("VisynServerSettings", __base__=GlobalSettings, **plugin_settings_models)
     # Patch the global settings by instantiating the new settings model with the global config, all config.json(s), and pydantic models
     manager.settings = visyn_server_settings(**deep_update(*plugin_config_files, workspace_config))
-    _log.info("All settings successfully loaded")
 
     app = FastAPI(
         debug=manager.settings.is_development_mode,
@@ -60,7 +70,6 @@ def create_visyn_server(
     )
 
     from ..middleware.exception_handler_middleware import ExceptionHandlerMiddleware
-    from ..middleware.request_context_middleware import RequestContextMiddleware
 
     # TODO: For some reason, a @app.exception_handler(Exception) is not called here. We use a middleware instead.
     app.add_middleware(ExceptionHandlerMiddleware)
@@ -74,8 +83,6 @@ def create_visyn_server(
     app.state.registry = manager.registry = Registry()
     manager.registry.init_app(app, plugins)
 
-    _log.info("Plugin registry successfully initialized")
-
     from ..dbmanager import DBManager
 
     app.state.db = manager.db = DBManager()
@@ -84,7 +91,7 @@ def create_visyn_server(
     from ..dbmigration.manager import DBMigrationManager
 
     app.state.db_migration = manager.db_migration = DBMigrationManager()
-    manager.db_migration.init_app(app, manager.registry.list("tdp-sql-database-migration"))
+    manager.db_migration.init_app(app, manager.registry.list("tdp-sql-database-migration"))  # type: ignore
 
     from ..security.manager import create_security_manager
 
@@ -110,17 +117,20 @@ def create_visyn_server(
     from .utils import init_legacy_app, load_after_server_started_hooks
 
     namespace_plugins = manager.registry.list("namespace")
-    _log.info(f"Registering {len(namespace_plugins)} legacy namespaces via WSGIMiddleware")
+    _log.info(f"Registering {len(namespace_plugins)} legacy namespace(s) via WSGIMiddleware")
     for p in namespace_plugins:
-        _log.info(f"Registering legacy namespace: {p.namespace}")
-        app.mount(p.namespace, WSGIMiddleware(init_legacy_app(p.load().factory())))
+        namespace = p.namespace  # type: ignore
+
+        sub_app = p.load().factory()
+        init_legacy_app(sub_app)
+
+        app.mount(namespace, WSGIMiddleware(sub_app))
 
     # Load all FastAPI apis
     router_plugins = manager.registry.list("fastapi_router")
-    _log.info(f"Registering {len(router_plugins)} API-routers")
+    _log.info(f"Registering {len(router_plugins)} FastAPI router(s)")
     # Load all namespace plugins as WSGIMiddleware plugins
     for p in router_plugins:
-        _log.info(f"Registering router: {p.id}")
         app.include_router(p.load().factory())
 
     # load `after_server_started` extension points which are run immediately after server started,
@@ -138,11 +148,25 @@ def create_visyn_server(
     for p in plugins:
         p.plugin.init_app(app)
 
-    # Add middleware to access Request "outside"
-    app.add_middleware(RequestContextMiddleware)
+    from ..middleware.request_context_plugin import RequestContextPlugin
 
-    # TODO: Move up?
-    app.add_api_route("/health", health)
-    app.add_api_route("/api/buildInfo.json", build_info)
+    # Use starlette-context to store the current request globally, i.e. accessible via context['request']
+    app.add_middleware(RawContextMiddleware, plugins=(RequestContextPlugin(),))
+
+    class UvicornAccessLogFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            return 'GET /health HTTP/1.1" 200' not in record.getMessage()
+
+    logging.getLogger("uvicorn.access").addFilter(UvicornAccessLogFilter())
+
+    app.add_api_route("/health", health)  # type: ignore
+    app.add_api_route("/api/buildInfo.json", build_info)  # type: ignore
+
+    @app.on_event("startup")
+    async def change_anyio_total_tokens():
+        # FastAPI uses anyio threads to handle sync endpoint concurrently.
+        # This is a workaround to increase the number of threads to 100, as the default is only 40.
+        limiter = anyio.to_thread.current_default_thread_limiter()
+        limiter.total_tokens = manager.settings.tdp_core.total_anyio_tokens
 
     return app

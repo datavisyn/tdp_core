@@ -19,7 +19,7 @@ def mapper():
             ("ID6", "ID7", OneToMoreMappingTable("ID6", "ID7")),
         ]
     )
-    yield mapper
+    return mapper
 
 
 def test_merge_2d_arrays(mapper):
@@ -65,16 +65,16 @@ def test_merge_2d_arrays_invalid_length(mapper):
 
 
 def test_known_idtypes(mapper):
-    assert mapper.known_idtypes() == set(["ID1", "ID2", "ID3", "ID4", "ID5", "ID6", "ID7"])
+    assert mapper.known_idtypes() == {"ID1", "ID2", "ID3", "ID4", "ID5", "ID6", "ID7"}
 
 
 def test_maps_to(mapper):
-    assert set(mapper.maps_to("ID1")) == set(["ID2", "ID3", "ID4"])
-    assert set(mapper.maps_to("ID2")) == set(["ID1", "ID3", "ID4"])
-    assert set(mapper.maps_to("ID3")) == set(["ID1", "ID2", "ID4"])
-    assert set(mapper.maps_to("ID4")) == set(["ID1", "ID2", "ID3"])
-    assert set(mapper.maps_to("ID5")) == set(["ID6", "ID7"])
-    assert set(mapper.maps_to("ID6")) == set(["ID7"])
+    assert set(mapper.maps_to("ID1")) == {"ID2", "ID3", "ID4"}
+    assert set(mapper.maps_to("ID2")) == {"ID1", "ID3", "ID4"}
+    assert set(mapper.maps_to("ID3")) == {"ID1", "ID2", "ID4"}
+    assert set(mapper.maps_to("ID4")) == {"ID1", "ID2", "ID3"}
+    assert set(mapper.maps_to("ID5")) == {"ID6", "ID7"}
+    assert set(mapper.maps_to("ID6")) == {"ID7"}
 
 
 def test_single_mapping(mapper):
@@ -102,7 +102,7 @@ def test_transitive_merge_mapping(mapper):
     assert mapper("ID5", "ID7", [2, 4]) == [[2, 4, 6, 4, 8, 12, 6, 12, 18], [4, 8, 12, 8, 16, 24, 12, 24, 36]]
 
 
-class OneToOneMappingTable(object):
+class OneToOneMappingTable:
     def __init__(self, from_idtype, to_idtype):
         self.from_idtype = from_idtype
         self.to_idtype = to_idtype
@@ -111,7 +111,7 @@ class OneToOneMappingTable(object):
         return [[id] for id in ids]
 
 
-class OneToTwoMappingTable(object):
+class OneToTwoMappingTable:
     def __init__(self, from_idtype, to_idtype):
         self.from_idtype = from_idtype
         self.to_idtype = to_idtype
@@ -120,7 +120,7 @@ class OneToTwoMappingTable(object):
         return [[id * 2] for id in ids]
 
 
-class TwoToOneMappingTable(object):
+class TwoToOneMappingTable:
     def __init__(self, from_idtype, to_idtype):
         self.from_idtype = from_idtype
         self.to_idtype = to_idtype
@@ -129,7 +129,7 @@ class TwoToOneMappingTable(object):
         return [[id / 2] for id in ids]
 
 
-class OneToMoreMappingTable(object):
+class OneToMoreMappingTable:
     def __init__(self, from_idtype, to_idtype):
         self.from_idtype = from_idtype
         self.to_idtype = to_idtype

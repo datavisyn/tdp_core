@@ -1,26 +1,25 @@
-from abc import ABC
-from typing import Optional
-
 from fastapi import FastAPI, Request
 
 from ..model import LogoutReturnValue, User
 
 
-class BaseStore(ABC):
+class BaseStore:
     def __init__(self):
-        pass
+        return None
 
     def init_app(self, app: FastAPI):
-        pass
-
-    def load_from_request(self, request: Request) -> Optional[User]:
         return None
 
-    def load_from_key(self, key: str) -> Optional[User]:
+    def load_from_request(self, request: Request) -> User | None:
         return None
 
-    def login(self, username: str, extra_fields={}) -> Optional[User]:
+    def load_from_key(self, key: str) -> User | None:
         return None
 
-    def logout(self, user: User) -> Optional[LogoutReturnValue]:
-        pass
+    def login(self, username: str, extra_fields=None) -> User | None:
+        if extra_fields is None:
+            extra_fields = {}
+        return None
+
+    def logout(self, user: User) -> LogoutReturnValue | None:
+        return None
