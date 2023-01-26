@@ -58,6 +58,8 @@ export function StripVis({
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
+
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createStripTraces, [columns, config, selected, scales]);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
@@ -75,9 +77,9 @@ export function StripVis({
     }
   }, [id, plotlyDivRef]);
 
-  const layout = React.useMemo(() => {
+  React.useMemo(() => {
     if (!traces) {
-      return null;
+      return;
     }
 
     const innerLayout: Partial<Plotly.Layout> = {
@@ -101,7 +103,9 @@ export function StripVis({
       dragmode: 'select',
     };
 
-    return beautifyLayout(traces, innerLayout);
+    setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+    // WARNING: Do not update when layout changes, that would be an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [traces]);
 
   return (

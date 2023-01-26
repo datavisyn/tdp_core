@@ -24,6 +24,7 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
+    const [layout, setLayout] = useState(null);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createStripTraces, [columns, config, selected, scales]);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const id = React.useMemo(() => uniqueId('StripVis'), []);
@@ -36,9 +37,9 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
             ro.observe(plotlyDivRef.current);
         }
     }, [id, plotlyDivRef]);
-    const layout = React.useMemo(() => {
+    React.useMemo(() => {
         if (!traces) {
-            return null;
+            return;
         }
         const innerLayout = {
             showlegend: true,
@@ -60,7 +61,9 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
             shapes: [],
             dragmode: 'select',
         };
-        return beautifyLayout(traces, innerLayout);
+        setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+        // WARNING: Do not update when layout changes, that would be an infinite loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [traces]);
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', position: 'relative' }, ref: plotlyDivRef },
         React.createElement(Space, { h: "xl" }),

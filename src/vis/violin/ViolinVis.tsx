@@ -67,6 +67,8 @@ export function ViolinVis({
   const id = React.useMemo(() => uniqueId('ViolinVis'), []);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
+
   const plotlyDivRef = React.useRef(null);
 
   useEffect(() => {
@@ -79,9 +81,9 @@ export function ViolinVis({
     }
   }, [id, plotlyDivRef]);
 
-  const layout = React.useMemo(() => {
+  React.useEffect(() => {
     if (!traces) {
-      return null;
+      return;
     }
 
     const innerLayout: Partial<Plotly.Layout> = {
@@ -105,7 +107,9 @@ export function ViolinVis({
       shapes: [],
     };
 
-    return beautifyLayout(traces, innerLayout);
+    setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+    // WARNING: Do not update when layout changes, that would be an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [traces]);
 
   return (

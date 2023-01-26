@@ -77,7 +77,7 @@ export function ScatterVis({
   const plotlyDivRef = React.useRef(null);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
-  const [layout, setLayout] = useState<any>(null);
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
 
   console.log('re rendering');
 

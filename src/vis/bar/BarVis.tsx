@@ -85,6 +85,8 @@ export function BarVis({
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
 
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
+
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
   // Make sure selected values is right for each plot.
@@ -148,9 +150,9 @@ export function BarVis({
     }
   }, [id, plotlyDivRef]);
 
-  const layout = React.useMemo(() => {
+  React.useEffect(() => {
     if (!finalTraces) {
-      return null;
+      return;
     }
 
     const innerLayout: Partial<Plotly.Layout> = {
@@ -176,7 +178,9 @@ export function BarVis({
       dragmode: false,
     };
 
-    return beautifyLayout(finalTraces, innerLayout);
+    setLayout({ ...layout, ...beautifyLayout(finalTraces, innerLayout, layout) });
+    // WARNING: Do not update when layout changes, that would be an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalTraces, config.groupType]);
 
   const traceData = useMemo(() => {

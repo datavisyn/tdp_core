@@ -24,6 +24,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
     const plotlyDivRef = React.useRef(null);
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [layout, setLayout] = useState(null);
     console.log('re rendering');
     useEffect(() => {
         const ro = new ResizeObserver(() => {
@@ -49,9 +50,9 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         scales,
         shapes,
     ]);
-    const layout = React.useMemo(() => {
+    React.useEffect(() => {
         if (!traces) {
-            return null;
+            return;
         }
         const innerLayout = {
             showlegend: true,
@@ -78,7 +79,9 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             shapes: [],
             dragmode: config.dragMode,
         };
-        return beautifyLayout(traces, innerLayout);
+        setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+        // WARNING: Do not update when layout changes, that would be an infinite loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [traces, config.dragMode]);
     const plotsWithSelectedPoints = useMemo(() => {
         if (traces) {
@@ -103,7 +106,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     }, [plotsWithSelectedPoints]);
     const plotly = useMemo(() => {
         if (traces?.plots && plotsWithSelectedPoints) {
-            return (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
+            return (React.createElement(PlotlyComponent, { key: id, divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
                     const clickedId = event.points[0].id;
                     if (selectedMap[clickedId]) {
                         selectionCallback(selectedList.filter((s) => s !== clickedId));

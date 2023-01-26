@@ -27,6 +27,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
     const id = React.useMemo(() => uniqueId('ViolinVis'), []);
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [layout, setLayout] = useState(null);
     const plotlyDivRef = React.useRef(null);
     useEffect(() => {
         const ro = new ResizeObserver(() => {
@@ -36,9 +37,9 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             ro.observe(plotlyDivRef.current);
         }
     }, [id, plotlyDivRef]);
-    const layout = React.useMemo(() => {
+    React.useEffect(() => {
         if (!traces) {
-            return null;
+            return;
         }
         const innerLayout = {
             showlegend: true,
@@ -60,7 +61,9 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
         };
-        return beautifyLayout(traces, innerLayout);
+        setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+        // WARNING: Do not update when layout changes, that would be an infinite loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [traces]);
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', position: 'relative' }, ref: plotlyDivRef },
         React.createElement(Space, { h: "xl" }),
