@@ -16,6 +16,8 @@ export class LineupVisWrapper {
 
   private viewable: boolean;
 
+  private idField: string;
+
   constructor(
     protected readonly props: {
       provider: LocalDataProvider;
@@ -25,19 +27,21 @@ export class LineupVisWrapper {
        */
       selectionCallback(visynIds: string[]): void;
       doc: Document;
+      idField?: string;
     },
   ) {
     this.node = props.doc.createElement('div');
     this.node.id = 'customVisDiv';
     this.node.classList.add('custom-vis-panel');
     this.viewable = false;
+    this.idField = props.idField ?? 'id';
     this.PLOTLY_CATEGORICAL_MISSING_VALUE = I18nextManager.getInstance().i18n.t('tdp:core.vis.missingValue');
   }
 
   getSelectedList = (): string[] => {
     const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection()) as IRow[];
 
-    return selectedRows.map((r) => r.id.toString());
+    return selectedRows.map((r) => r[this.idField].toString());
   };
 
   filterCallback = (s: string) => {
@@ -73,7 +77,7 @@ export class LineupVisWrapper {
     };
 
     const mapData = <T extends ValueColumn<number | string>>(innerData: IDataRow[], column: T) => {
-      return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: d.v.id, val: column.getRaw(d) });
+      return innerData.map((d) => <IVisCommonValue<ReturnType<typeof column.getRaw>>>{ id: d.v[this.idField], val: column.getRaw(d) });
     };
 
     const getColumnValue = async <T extends ValueColumn<number | string>>(column: T) => {
