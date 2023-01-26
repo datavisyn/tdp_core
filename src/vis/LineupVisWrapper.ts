@@ -41,7 +41,7 @@ export class LineupVisWrapper {
   getSelectedList = (): string[] => {
     const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection()) as IRow[];
 
-    return selectedRows.map((r) => r.id.toString());
+    return selectedRows.map((r) => r[this.idField].toString());
   };
 
   filterCallback = (s: string) => {

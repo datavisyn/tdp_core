@@ -427,21 +427,45 @@ export function Ranking({
             }),
           );
 
-      const generalVis = new LineupVisWrapper({
-        provider: providerRef.current,
-        selectionCallback: (ids: string[]) => {
-          // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
-          // this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
-        },
-        doc: lineupContainerRef.current.ownerDocument,
-        idField: options.idField,
-      });
-
       if (lineupContainerRef.current && taggleRef.current) {
         const luBackdrop = lineupContainerRef.current.querySelector('.lu-backdrop');
         lineupContainerRef.current.parentElement.appendChild(luBackdrop);
       }
       selectionHelperRef.current = new LineUpSelectionHelper(providerRef.current, () => itemIDType as IDType);
+
+      const generalVis = new LineupVisWrapper({
+        provider: providerRef.current,
+        selectionCallback: (ids: string[]) => {
+          if (!providerRef.current) {
+            return;
+          }
+
+          const old = providerRef.current.getSelection().sort((a, b) => a - b);
+
+          // TODO: Build this uid2index map just once
+          const uid2index = new Map<string, number>();
+          providerRef.current.data.forEach((row, i) => {
+            uid2index.set(row[options.idField], i);
+          });
+
+          const indices: number[] = [];
+          ids.forEach((uid) => {
+            const index = uid2index.get(String(uid));
+            if (typeof index === 'number') {
+              indices.push(index);
+            }
+          });
+          indices.sort((a, b) => a - b);
+
+          if (old.length === indices.length && indices.every((v, j) => old[j] === v)) {
+            return; // no change
+          }
+
+          providerRef.current.setSelection(indices);
+        },
+        doc: lineupContainerRef.current.ownerDocument,
+        idField: options.idField,
+      });
 
       panelRef.current = new LineUpPanelActions(providerRef.current, taggleRef.current.ctx, options, lineupContainerRef.current.ownerDocument);
 
