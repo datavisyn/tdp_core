@@ -92,6 +92,7 @@ export function ScatterVis({
     if (plotlyDivRef) {
       ro.observe(plotlyDivRef.current);
     }
+    return () => ro.disconnect();
   }, [id, hideSidebar, plotlyDivRef]);
 
   const mergedExtensions = React.useMemo(() => {
@@ -221,7 +222,7 @@ export function ScatterVis({
           </Group>
         </Center>
         {mergedExtensions.prePlot}
-        {traceStatus === 'success' && plotsWithSelectedPoints.length > 0 ? (
+        {traceStatus === 'success' && layout && plotsWithSelectedPoints.length > 0 ? (
           plotly
         ) : traceStatus !== 'pending' ? (
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />

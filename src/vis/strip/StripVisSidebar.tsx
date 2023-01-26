@@ -35,22 +35,24 @@ export function StripVisSidebar({
 
   return (
     <Container p={10} fluid sx={{ width: '100%' }}>
-      <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
-      <Divider my="sm" />
-      <Stack spacing="sm">
-        <NumericalColumnSelect
-          callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
-          columns={columns}
-          currentSelected={config.numColumnsSelected || []}
-        />
-        <CategoricalColumnSelect
-          callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
-          columns={columns}
-          currentSelected={config.catColumnsSelected || []}
-        />
+      <Stack spacing={0}>
+        <VisTypeSelect callback={(type: ESupportedPlotlyVis) => setConfig({ ...(config as any), type })} currentSelected={config.type} />
+        <Divider my="sm" />
+        <Stack spacing="sm">
+          <NumericalColumnSelect
+            callback={(numColumnsSelected: ColumnInfo[]) => setConfig({ ...config, numColumnsSelected })}
+            columns={columns}
+            currentSelected={config.numColumnsSelected || []}
+          />
+          <CategoricalColumnSelect
+            callback={(catColumnsSelected: ColumnInfo[]) => setConfig({ ...config, catColumnsSelected })}
+            columns={columns}
+            currentSelected={config.catColumnsSelected || []}
+          />
+        </Stack>
+        {mergedExtensions.preSidebar}
+        {mergedExtensions.postSidebar}
       </Stack>
-      {mergedExtensions.preSidebar}
-      {mergedExtensions.postSidebar}
     </Container>
   );
 }

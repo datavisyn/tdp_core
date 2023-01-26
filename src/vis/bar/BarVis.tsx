@@ -148,6 +148,8 @@ export function BarVis({
     if (plotlyDivRef) {
       ro.observe(plotlyDivRef.current);
     }
+
+    return () => ro.disconnect();
   }, [id, plotlyDivRef]);
 
   React.useEffect(() => {
@@ -202,7 +204,7 @@ export function BarVis({
           <FontAwesomeIcon icon={faGear} />
         </ActionIcon>
       </Tooltip>
-      {traceStatus === 'success' && finalTraces?.plots.length > 0 ? (
+      {traceStatus === 'success' && layout && finalTraces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
           data={traceData}

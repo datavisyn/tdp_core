@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
 import { useMemo, useRef, useState } from 'react';
-import { ActionIcon, Center, Container, Group, SimpleGrid, Stack } from '@mantine/core';
+import { ActionIcon, Center, Container, Group, SimpleGrid, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { VisColumn, IVisConfig, IHexbinConfig, EScatterSelectSettings } from '../interfaces';
@@ -45,11 +45,24 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
 
   const id = React.useMemo(() => uniqueId('PCPVis'), []);
 
+  const sidebarWrapper = useMemo(() => {
+    return !hideSidebar && ref.current ? (
+      <VisSidebarWrapper id={id} target={ref.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+        <HexbinVisSidebar config={config} extensions={extensions} columns={columns} setConfig={setConfig} />
+      </VisSidebarWrapper>
+    ) : null;
+  }, [columns, config, extensions, hideSidebar, id, setConfig, sidebarOpen]);
+
+  console.log(ref, sidebarWrapper);
+
   return (
     <Container p={0} fluid sx={{ flexGrow: 1, height: '100%', overflow: 'hidden', width: '100%', position: 'relative' }} ref={ref}>
-      <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-        <FontAwesomeIcon icon={faGear} />
-      </ActionIcon>
+      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+        <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(!sidebarOpen)}>
+          <FontAwesomeIcon icon={faGear} />
+        </ActionIcon>
+      </Tooltip>
+
       <Stack spacing={0} sx={{ height: '100%' }}>
         <Center>
           <Group mt="lg">
@@ -107,11 +120,7 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
           )}
         </SimpleGrid>
       </Stack>
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id} target={ref.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
-          <HexbinVisSidebar config={config} extensions={extensions} columns={columns} setConfig={setConfig} />
-        </VisSidebarWrapper>
-      ) : null}
+      {sidebarWrapper || null}
     </Container>
   );
 }

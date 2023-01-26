@@ -79,6 +79,8 @@ export function ViolinVis({
     if (plotlyDivRef) {
       ro.observe(plotlyDivRef.current);
     }
+
+    return () => ro.disconnect();
   }, [id, plotlyDivRef]);
 
   React.useEffect(() => {
@@ -124,7 +126,7 @@ export function ViolinVis({
       </Tooltip>
       {mergedExtensions.prePlot}
 
-      {traceStatus === 'success' && traces?.plots.length > 0 ? (
+      {traceStatus === 'success' && layout && traces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
           className="tdpCoreVis"

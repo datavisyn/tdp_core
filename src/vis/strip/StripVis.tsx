@@ -75,6 +75,8 @@ export function StripVis({
     if (plotlyDivRef) {
       ro.observe(plotlyDivRef.current);
     }
+
+    return () => ro.disconnect();
   }, [id, plotlyDivRef]);
 
   React.useMemo(() => {
@@ -120,7 +122,7 @@ export function StripVis({
       </Tooltip>
       {mergedExtensions.prePlot}
 
-      {traceStatus === 'success' && traces?.plots.length > 0 ? (
+      {traceStatus === 'success' && layout && traces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
           data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
