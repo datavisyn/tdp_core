@@ -77,6 +77,8 @@ export function ScatterVis({
   const plotlyDivRef = React.useRef(null);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
+  const [layout, setLayout] = useState<any>(null);
+
   console.log('re rendering');
 
   useEffect(() => {
@@ -111,9 +113,9 @@ export function ScatterVis({
     shapes,
   ]);
 
-  const layout = React.useMemo(() => {
+  React.useEffect(() => {
     if (!traces) {
-      return null;
+      return;
     }
 
     const innerLayout: Partial<Plotly.Layout> = {
@@ -142,7 +144,9 @@ export function ScatterVis({
       dragmode: config.dragMode,
     };
 
-    return beautifyLayout(traces, innerLayout);
+    setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+    // WARNING: Do not update when layout changes, that would be an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [traces, config.dragMode]);
 
   const plotsWithSelectedPoints = useMemo(() => {
@@ -176,6 +180,7 @@ export function ScatterVis({
     if (traces?.plots && plotsWithSelectedPoints) {
       return (
         <PlotlyComponent
+          key={id}
           divId={`plotlyDiv${id}`}
           data={plotlyData}
           layout={layout}

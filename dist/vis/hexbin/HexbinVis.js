@@ -24,7 +24,7 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const ref = useRef();
     const id = React.useMemo(() => uniqueId('PCPVis'), []);
-    return (React.createElement(Container, { p: 0, fluid: true, sx: { flexGrow: 1, height: '100%', overflow: 'hidden' }, ref: ref },
+    return (React.createElement(Container, { p: 0, fluid: true, sx: { flexGrow: 1, height: '100%', overflow: 'hidden', width: '100%', position: 'relative' }, ref: ref },
         React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
             React.createElement(FontAwesomeIcon, { icon: faGear })),
         React.createElement(Stack, { spacing: 0, sx: { height: '100%' } },

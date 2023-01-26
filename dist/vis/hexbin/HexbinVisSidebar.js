@@ -16,7 +16,7 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function HexbinVisSidebar({ config, extensions, columns, setConfig, selectionCallback = () => null, selected = {}, width = '20rem', }) {
+export function HexbinVisSidebar({ config, extensions, columns, setConfig }) {
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);

@@ -8,6 +8,7 @@ export declare enum ESupportedPlotlyVis {
     HEXBIN = "Hexbin plot"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
+export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IHexbinConfig;
 export declare enum EBarDisplayType {
     ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
@@ -103,7 +104,6 @@ export interface IHexbinConfig {
     dragMode: EScatterSelectSettings;
     hexbinOptions: EHexbinOptions;
 }
-export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IHexbinConfig;
 declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**
