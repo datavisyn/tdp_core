@@ -9,7 +9,7 @@ export class LineupVisWrapper {
         this.props = props;
         this.getSelectedList = () => {
             const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection());
-            return selectedRows.map((r) => r.id.toString());
+            return selectedRows.map((r) => r[this.idField].toString());
         };
         this.filterCallback = (s) => {
             const selectedIds = this.props.provider.getSelection();
