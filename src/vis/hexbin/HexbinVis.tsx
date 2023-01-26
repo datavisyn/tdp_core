@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActionIcon, Center, Container, Group, SimpleGrid, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
@@ -39,7 +39,12 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
+
+  // Cheating to open the sidebar after the first render, since it requires the container to be mounted
+  useEffect(() => {
+    setSidebarOpen(true);
+  }, []);
 
   const ref = useRef();
 
