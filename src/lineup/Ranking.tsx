@@ -431,37 +431,15 @@ export function Ranking({
         const luBackdrop = lineupContainerRef.current.querySelector('.lu-backdrop');
         lineupContainerRef.current.parentElement.appendChild(luBackdrop);
       }
-      selectionHelperRef.current = new LineUpSelectionHelper(providerRef.current, () => itemIDType as IDType);
+      selectionHelperRef.current = new LineUpSelectionHelper(providerRef.current, () => itemIDType as IDType, {
+        idField: options.idField,
+      });
 
       const generalVis = new LineupVisWrapper({
         provider: providerRef.current,
         selectionCallback: (ids: string[]) => {
-          if (!providerRef.current) {
-            return;
-          }
-
-          const old = providerRef.current.getSelection().sort((a, b) => a - b);
-
-          // TODO: Build this uid2index map just once
-          const uid2index = new Map<string, number>();
-          providerRef.current.data.forEach((row, i) => {
-            uid2index.set(row[options.idField], i);
-          });
-
-          const indices: number[] = [];
-          ids.forEach((uid) => {
-            const index = uid2index.get(String(uid));
-            if (typeof index === 'number') {
-              indices.push(index);
-            }
-          });
-          indices.sort((a, b) => a - b);
-
-          if (old.length === indices.length && indices.every((v, j) => old[j] === v)) {
-            return; // no change
-          }
-
-          providerRef.current.setSelection(indices);
+          // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+          selectionHelperRef.current.setGeneralVisSelection({ idtype: itemIDType ? IDTypeManager.getInstance().resolveIdType(itemIDType.id) : null, ids });
         },
         doc: lineupContainerRef.current.ownerDocument,
         idField: options.idField,
