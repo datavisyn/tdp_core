@@ -1,9 +1,9 @@
 export var ESupportedPlotlyVis;
 (function (ESupportedPlotlyVis) {
-    ESupportedPlotlyVis["SCATTER"] = "Scatter Plot";
-    ESupportedPlotlyVis["VIOLIN"] = "Violin Plot";
-    ESupportedPlotlyVis["STRIP"] = "Strip Plot";
-    ESupportedPlotlyVis["BAR"] = "Bar Chart";
+    ESupportedPlotlyVis["SCATTER"] = "Scatter plot";
+    ESupportedPlotlyVis["VIOLIN"] = "Violin plot";
+    ESupportedPlotlyVis["STRIP"] = "Strip plot";
+    ESupportedPlotlyVis["BAR"] = "Bar chart";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
 export const allVisTypes = [ESupportedPlotlyVis.SCATTER, ESupportedPlotlyVis.BAR, ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP];
 export var EBarDisplayType;

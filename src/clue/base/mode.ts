@@ -229,11 +229,11 @@ export class ButtonModeSelector {
 //  */
 // export class SliderModeSelector {
 //   private options = {};
-//   private $node:d3.Selection<SliderModeSelector>;
+//   private $node:d3v3.Selection<SliderModeSelector>;
 //
 //   constructor(parent:Element, options:any = {}) {
 //     mixin(this.options, options);
-//     this.$node = d3.select(parent).append('div').classed('clue_modeselector', true).datum(this);
+//     this.$node = d3v3.select(parent).append('div').classed('clue_modeselector', true).datum(this);
 //     this.build(this.$node);
 //
 //     const listener = (event:IEvent, newMode:CLUEMode) => {
@@ -247,7 +247,7 @@ export class ButtonModeSelector {
 //     });
 //   }
 //
-//   private build($parent:d3.Selection<any>) {
+//   private build($parent:d3v3.Selection<any>) {
 //     const $root = $parent.append('div').classed('clue_slidermodeselector', true);
 //     const $modes = $root.selectAll('label').data([modes.Exploration, modes.Authoring, modes.Presentation]);
 //
@@ -300,7 +300,7 @@ export class ButtonModeSelector {
 //      */
 //     offset: 5
 //   };
-//   private $node:d3.Selection<TriangleModeSelector>;
+//   private $node:d3v3.Selection<TriangleModeSelector>;
 //
 //   private e = [0, 30];
 //   private a = [30, 0];
@@ -310,7 +310,7 @@ export class ButtonModeSelector {
 //     mixin(this.options, options);
 //     this.e[1] = this.a[0] = this.p[1] = this.options.height;
 //     this.p[0] = this.options.height * 2;
-//     this.$node = d3.select(parent).append('div').classed('clue_trianglemodeselector', true).datum(this);
+//     this.$node = d3v3.select(parent).append('div').classed('clue_trianglemodeselector', true).datum(this);
 //     this.build(this.$node);
 //
 //     const listener = (event:IEvent, newMode:CLUEMode) => {
@@ -346,15 +346,15 @@ export class ButtonModeSelector {
 //     return mode(e, a, p);
 //   }
 //
-//   private build($parent:d3.Selection<any>) {
+//   private build($parent:d3v3.Selection<any>) {
 //     const $root = $parent.append('svg').classed('clue_trianglemodeselector', true).attr({
 //       width: this.p[0] + this.options.offset,
 //       height: this.p[1] + this.options.offset
 //     });
 //     const that = this;
 //     const $g = $root.append('g').attr('transform', `translate(${this.options.offset / 2},${this.options.offset / 2})`);
-//     $g.append('path').attr('d', d3.svg.line<number[]>().interpolate('linear-closed')([this.e, this.a, this.p])).on('click', function () {
-//       const xy = d3.mouse(this);
+//     $g.append('path').attr('d', d3v3.svg.line<number[]>().interpolate('linear-closed')([this.e, this.a, this.p])).on('click', function () {
+//       const xy = d3v3.mouse(this);
 //       const m = that.fromCoordinates(xy[0], xy[1]);
 //       setMode(m);
 //     });
@@ -363,8 +363,8 @@ export class ButtonModeSelector {
 //       cx: xy[0],
 //       cy: xy[1],
 //       r: 2
-//     }).call(d3.behavior.drag().on('drag', () => {
-//       const m = this.fromCoordinates((<MouseEvent>d3.event).x, (<MouseEvent>d3.event).y);
+//     }).call(d3v3.behavior.drag().on('drag', () => {
+//       const m = this.fromCoordinates((<MouseEvent>d3v3.event).x, (<MouseEvent>d3v3.event).y);
 //       setMode(m);
 //     }));
 //     return $root;

@@ -72,7 +72,9 @@ export default {
 const Template = (args) => {
     // @ts-ignore TODO: The pointCount is an injected property, but we are using typeof Vis such that this prop does not exist.
     const columns = React.useMemo(() => fetchData(args.pointCount), [args.pointCount]);
-    return React.createElement(Vis, { ...args, columns: columns });
+    return (React.createElement("div", { style: { height: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center', flexWrap: 'wrap' } },
+        React.createElement("div", { style: { width: '70%', height: '80%' } },
+            React.createElement(Vis, { ...args, columns: columns }))));
 };
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 export const ScatterPlot = Template.bind({});

@@ -2,7 +2,7 @@ import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
 import { useEffect, useState } from 'react';
-import { ActionIcon, Center, Container, Group, Stack } from '@mantine/core';
+import { ActionIcon, Center, Container, Group, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { InvalidCols } from '../general/InvalidCols';
@@ -14,6 +14,7 @@ import { PlotlyComponent, Plotly } from '../Plot';
 import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 const defaultExtensions = {
     prePlot: null,
     postPlot: null,
@@ -66,14 +67,15 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             autosize: true,
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
-            violingap: 0,
             dragmode: config.dragMode,
         };
         return beautifyLayout(traces, innerLayout);
     }, [traces, config.dragMode]);
-    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', overflow: 'hidden' }, ref: plotlyDivRef },
-        React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
-            React.createElement(FontAwesomeIcon, { icon: faGear })),
+    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }, ref: plotlyDivRef },
+        React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
+            React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
+                React.createElement(FontAwesomeIcon, { icon: faGear }))),
+        showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         React.createElement(Stack, { spacing: 0, sx: { height: '100%' } },
             React.createElement(Center, null,
                 React.createElement(Group, { mt: "lg" },
@@ -103,8 +105,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                         d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces?.errorMessageHeader, bodyMessage: traceError?.message || traces?.errorMessage })) : null,
-            mergedExtensions.postPlot,
-            showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null),
+            mergedExtensions.postPlot),
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
             React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));
 }

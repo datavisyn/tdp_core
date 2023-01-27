@@ -8,6 +8,7 @@ export declare class LineupVisWrapper {
          */
         selectionCallback(visynIds: string[]): void;
         doc: Document;
+        idField?: string;
     };
     /**
      * This string is assigned if a categorical value is missing and rendered by Plotly.
@@ -15,6 +16,7 @@ export declare class LineupVisWrapper {
     private PLOTLY_CATEGORICAL_MISSING_VALUE;
     readonly node: HTMLElement;
     private viewable;
+    private idField;
     constructor(props: {
         provider: LocalDataProvider;
         /**
@@ -23,6 +25,7 @@ export declare class LineupVisWrapper {
          */
         selectionCallback(visynIds: string[]): void;
         doc: Document;
+        idField?: string;
     });
     getSelectedList: () => string[];
     filterCallback: (s: string) => void;
