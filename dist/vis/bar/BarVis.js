@@ -1,5 +1,5 @@
 import * as React from 'react';
-import d3 from 'd3v3';
+import d3v3 from 'd3v3';
 import { merge, uniqueId, difference } from 'lodash';
 import { useEffect, useMemo } from 'react';
 import { EBarGroupingType } from '../interfaces';
@@ -137,8 +137,8 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                 // plotly redraws everything on updates, so you need to reappend title and
                 onUpdate: () => {
                     for (const p of finalTraces.plots) {
-                        d3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
-                        d3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+                        d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+                        d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
                     }
                 } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: finalTraces?.errorMessageHeader, bodyMessage: traceError?.message || finalTraces?.errorMessage })) : null,
             mergedExtensions.postPlot,

@@ -9,6 +9,8 @@ export class LineUpSelectionHelper extends EventHandler {
 
   private _rows: IRow[] = [];
 
+  private idField: string;
+
   /**
    * selected indices ordered by selection order, i.e. the first selected is the 0. item
    * @type {number[]}
@@ -17,16 +19,25 @@ export class LineUpSelectionHelper extends EventHandler {
 
   private uid2index = new Map<string, number>();
 
-  constructor(private readonly provider: LocalDataProvider, private readonly idType: () => IDType) {
+  constructor(
+    private readonly provider: LocalDataProvider,
+    private readonly idType: () => IDType,
+    {
+      idField = 'id',
+    }: {
+      idField?: string;
+    } = {},
+  ) {
     super();
     this.addEventListener();
+    this.idField = idField;
   }
 
   private buildCache() {
     this.uid2index.clear();
     // create lookup cache
     this._rows.forEach((row, i) => {
-      this.uid2index.set(row.id, i);
+      this.uid2index.set(row[this.idField], i);
     });
   }
 
@@ -60,7 +71,7 @@ export class LineUpSelectionHelper extends EventHandler {
       console.warn('no idType defined for this ranking view');
       return;
     }
-    const selection: ISelection = { idtype: idType, ids: this.orderedSelectedIndices.map((i) => this._rows[i].id) };
+    const selection: ISelection = { idtype: idType, ids: this.orderedSelectedIndices.map((i) => this._rows[i][this.idField]) };
     // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
     this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
   }
@@ -78,7 +89,7 @@ export class LineUpSelectionHelper extends EventHandler {
    * gets the rows ids as a set, i.e. the order doesn't mean anything
    */
   rowIdsAsSet(indices: number[]): string[] {
-    return (indices.length === this._rows.length ? this._rows.map((d) => d.id) : indices.map((i) => this._rows[i].id)).sort();
+    return (indices.length === this._rows.length ? this._rows.map((d) => d[this.idField]) : indices.map((i) => this._rows[i][this.idField])).sort();
   }
 
   setItemSelection(sel: ISelection) {

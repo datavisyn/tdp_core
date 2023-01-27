@@ -484,8 +484,8 @@ export class VerticalStoryVis extends AVisInstance {
         });
         /* $toolbar_enter.append('i').attr('class', 'fas fa-camera').attr('title','force update of preview').on('click', (d) => {
          //remove me
-         d3.event.stopPropagation();
-         d3.event.preventDefault();
+         d3v3.event.stopPropagation();
+         d3v3.event.preventDefault();
          this.data.moveSlide(this.data.cloneSingleSlideNode(d), d, false);
          this.update();
          return false;

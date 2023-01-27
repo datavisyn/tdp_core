@@ -9,7 +9,7 @@ export class LineupVisWrapper {
         this.props = props;
         this.getSelectedList = () => {
             const selectedRows = this.props.provider.viewRaw(this.props.provider.getSelection());
-            return selectedRows.map((r) => r.id.toString());
+            return selectedRows.map((r) => r[this.idField].toString());
         };
         this.filterCallback = (s) => {
             const selectedIds = this.props.provider.getSelection();
@@ -36,7 +36,7 @@ export class LineupVisWrapper {
                 };
             };
             const mapData = (innerData, column) => {
-                return innerData.map((d) => ({ id: d.v.id, val: column.getRaw(d) }));
+                return innerData.map((d) => ({ id: d.v[this.idField], val: column.getRaw(d) }));
             };
             const getColumnValue = async (column) => {
                 if (column.isLoaded()) {
@@ -94,6 +94,7 @@ export class LineupVisWrapper {
         this.node.id = 'customVisDiv';
         this.node.classList.add('custom-vis-panel');
         this.viewable = false;
+        this.idField = props.idField ?? 'id';
         this.PLOTLY_CATEGORICAL_MISSING_VALUE = I18nextManager.getInstance().i18n.t('tdp:core.vis.missingValue');
     }
 }

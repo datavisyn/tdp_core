@@ -49,8 +49,7 @@ export class StructureImageFilterDialog extends ADialog {
             return;
         }
         const provider = this.ctx.provider;
-        const data = provider.viewRawRows(new Array(provider.getFirstRanking().length).fill(null).map((_, i) => i));
-        const structures = data.map((d) => this.column.getValue(d));
+        const structures = provider.viewRawRows(provider.data.map((_, i) => i)).map((d) => this.column.getValue(d));
         // empty input field, but missing values checkbox is checked
         if (filter == null && filterMissing) {
             this.column.setFilter({ filter, filterMissing, matching: new Set(structures) }); // pass all structures as set and filter missing values in column.filter()
@@ -100,7 +99,7 @@ export class StructureImageFilterDialog extends ADialog {
         const s = this.ctx.sanitize;
         const bak = this.column.getFilter() || { filter: '', filterMissing: false };
         node.insertAdjacentHTML('beforeend', `<span style="position: relative;">
-         <input type="text" placeholder="Filter ${s(this.column.desc.label)} …" autofocus
+         <input type="text" placeholder="Substructure filter of ${s(this.column.desc.label)} …" autofocus
          value="${bak.filter}" style="width: 100%">
          <i id="${this.dialog.idPrefix}_loading" hidden class="fas fa-circle-notch fa-spin text-muted" style="position: absolute;right: 6px;top: 6px;"></i>
          </span>
