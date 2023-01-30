@@ -157,6 +157,12 @@ export async function createScatterTraces(
         ),
         hoverinfo: 'text',
         text: validCols[0].resolvedValues.map((v) => v.id.toString()),
+
+        marker: {
+          color: colorCol
+            ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
+            : SELECT_COLOR,
+        },
         // plotly is stupid and doesnt know its own types
         // @ts-ignore
         selected: {
@@ -165,9 +171,6 @@ export async function createScatterTraces(
               width: 0,
             },
             symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-            color: colorCol
-              ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
-              : SELECT_COLOR,
             opacity: 1,
             size: 8,
           },
@@ -178,10 +181,8 @@ export async function createScatterTraces(
               width: 0,
             },
             symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-            color: colorCol
-              ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
-              : DEFAULT_COLOR,
-            opacity: colorCol ? 0.2 : alphaSliderVal,
+            color: DEFAULT_COLOR,
+            opacity: alphaSliderVal,
             size: 8,
           },
         },
@@ -235,6 +236,11 @@ export async function createScatterTraces(
               },
               showlegend: false,
               text: validCols[0].resolvedValues.map((v) => v.id.toString()),
+              marker: {
+                color: colorCol
+                  ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
+                  : SELECT_COLOR,
+              },
               // plotly is stupid and doesnt know its own types
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
@@ -244,12 +250,7 @@ export async function createScatterTraces(
                     width: 0,
                   },
                   symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-                  color: colorCol
-                    ? colorCol.resolvedValues.map((v) =>
-                        colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
-                      )
-                    : SELECT_COLOR,
-                  opacity: alphaSliderVal,
+                  opacity: 1,
                   size: 8,
                 },
               },
@@ -259,12 +260,8 @@ export async function createScatterTraces(
                     width: 0,
                   },
                   symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-                  color: colorCol
-                    ? colorCol.resolvedValues.map((v) =>
-                        colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
-                      )
-                    : DEFAULT_COLOR,
-                  opacity: 0.2,
+                  color: DEFAULT_COLOR,
+                  opacity: alphaSliderVal,
                   size: 8,
                 },
               },
@@ -306,7 +303,7 @@ export async function createScatterTraces(
           symbol: 'circle',
           size: 8,
           color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : DEFAULT_COLOR,
-          opacity: alphaSliderVal,
+          opacity: 1,
         },
         transforms: [
           {

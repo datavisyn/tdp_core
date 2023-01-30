@@ -162,19 +162,27 @@ export function ScatterVis({
           const temp = [];
 
           (p.data.ids as any).forEach((currId, index) => {
-            if (selectedMap[currId]) {
+            if (selectedMap[currId] || (selectedList.length === 0 && config.color)) {
               temp.push(index);
             }
           });
 
           p.data.selectedpoints = temp;
+
+          if (selectedList.length === 0 && config.color) {
+            // @ts-ignore
+            p.data.selected.marker.opacity = config.alphaSliderVal;
+          } else {
+            // @ts-ignore
+            p.data.selected.marker.opacity = 1;
+          }
         });
 
       return allPlots;
     }
 
     return [];
-  }, [selectedMap, traces]);
+  }, [selectedMap, traces, selectedList, config.color, config.alphaSliderVal]);
 
   const plotlyData = useMemo(() => {
     if (traces) {
@@ -183,8 +191,6 @@ export function ScatterVis({
 
     return [];
   }, [plotsWithSelectedPoints, traces]);
-
-  console.log(plotlyData)
 
   const plotly = useMemo(() => {
     if (traces?.plots && plotsWithSelectedPoints) {
