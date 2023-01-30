@@ -23,7 +23,6 @@ export function columnNameWithDescription(col: ColumnInfo) {
 export function beautifyLayout(traces: PlotlyInfo, layout: Partial<Plotly.Layout>, oldLayout: Partial<Plotly.Layout>) {
   layout.annotations = [];
   traces.plots.forEach((t, i) => {
-    console.log(t.xLabel);
     layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
       ...oldLayout?.[`xaxis${i > 0 ? i + 1 : ''}`],
       automargin: true,
@@ -156,8 +155,6 @@ export async function resolveSingleColumn(column: VisColumn) {
   if (!column) {
     return null;
   }
-
-  console.log(column);
   return {
     ...column,
     resolvedValues: await column.values(),

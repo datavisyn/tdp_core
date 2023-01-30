@@ -78,8 +78,6 @@ export function ScatterVis({
 
   const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
 
-  console.log('re rendering');
-
   useEffect(() => {
     const ro = new ResizeObserver(() => {
       const plotDiv = document.getElementById(`plotlyDiv${id}`);
@@ -113,8 +111,6 @@ export function ScatterVis({
     shapes,
   ]);
 
-  console.log(traces);
-
   React.useEffect(() => {
     if (!traces) {
       return;
@@ -145,8 +141,6 @@ export function ScatterVis({
       shapes: [],
       dragmode: config.dragMode,
     };
-
-    console.log(traces);
 
     setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
     // WARNING: Do not update when layout changes, that would be an infinite loop.
@@ -194,7 +188,6 @@ export function ScatterVis({
 
   const plotly = useMemo(() => {
     if (traces?.plots && plotsWithSelectedPoints) {
-      console.log(layout, plotlyData);
       return (
         <PlotlyComponent
           key={id}

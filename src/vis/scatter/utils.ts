@@ -278,7 +278,6 @@ export async function createScatterTraces(
 
   // if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
   if (colorCol && colorCol.type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
-    console.log('adding color legend ');
     legendPlots.push({
       data: {
         x: validCols[0].resolvedValues.map((v) => v.val),
@@ -367,8 +366,6 @@ export async function createScatterTraces(
       yLabel: columnNameWithDescription(validCols[0].info),
     });
   }
-
-  console.log(legendPlots);
 
   return {
     plots,
