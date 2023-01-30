@@ -182,7 +182,7 @@ export function BarVis({
 
     console.log(finalTraces);
 
-    setLayout({ ...layout, ...beautifyLayout(finalTraces, innerLayout, layout) });
+    setLayout({ ...layout, ...beautifyLayout(finalTraces, innerLayout, null) });
     // WARNING: Do not update when layout changes, that would be an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalTraces, config.groupType]);
