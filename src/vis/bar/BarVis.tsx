@@ -187,6 +187,8 @@ export function BarVis({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalTraces, config.groupType]);
 
+  console.log(layout)
+
   const traceData = useMemo(() => {
     if (!finalTraces) {
       return null;
