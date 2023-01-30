@@ -114,6 +114,8 @@ export function ScatterVis({
     shapes,
   ]);
 
+  console.log(traces);
+
   React.useEffect(() => {
     if (!traces) {
       return;
@@ -145,6 +147,8 @@ export function ScatterVis({
       dragmode: config.dragMode,
     };
 
+    console.log(traces);
+
     setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
     // WARNING: Do not update when layout changes, that would be an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -174,11 +178,16 @@ export function ScatterVis({
   }, [selectedMap, traces]);
 
   const plotlyData = useMemo(() => {
-    return [...plotsWithSelectedPoints.map((p) => p.data), ...plotsWithSelectedPoints.map((p) => p.data)];
-  }, [plotsWithSelectedPoints]);
+    if (traces) {
+      return [...plotsWithSelectedPoints.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)];
+    }
+
+    return []
+  }, [plotsWithSelectedPoints, traces]);
 
   const plotly = useMemo(() => {
     if (traces?.plots && plotsWithSelectedPoints) {
+      console.log(layout, plotlyData);
       return (
         <PlotlyComponent
           key={id}

@@ -136,6 +136,7 @@ export async function createScatterTraces(
 
   // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
   if (validCols.length === 2) {
+    console.log(colorCol)
     plots.push({
       data: {
         x: validCols[0].resolvedValues.map((v) => v.val),
@@ -185,9 +186,9 @@ export async function createScatterTraces(
             size: 8,
           },
         },
-        xLabel: columnNameWithDescription(validCols[0].info),
-        yLabel: columnNameWithDescription(validCols[1].info),
       },
+      xLabel: columnNameWithDescription(validCols[0].info),
+      yLabel: columnNameWithDescription(validCols[1].info),
     });
   } else {
     for (const yCurr of validCols) {
@@ -281,6 +282,7 @@ export async function createScatterTraces(
 
   // if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
   if (colorCol && colorCol.type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
+    console.log('adding color legend ');
     legendPlots.push({
       data: {
         x: validCols[0].resolvedValues.map((v) => v.val),
@@ -369,6 +371,8 @@ export async function createScatterTraces(
       yLabel: columnNameWithDescription(validCols[0].info),
     });
   }
+
+  console.log(legendPlots);
 
   return {
     plots,
