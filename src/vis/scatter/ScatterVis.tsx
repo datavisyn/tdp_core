@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { ActionIcon, Center, Container, Group, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
-import { Layout } from 'plotly.js-dist-min';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
@@ -182,8 +181,10 @@ export function ScatterVis({
       return [...plotsWithSelectedPoints.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)];
     }
 
-    return []
+    return [];
   }, [plotsWithSelectedPoints, traces]);
+
+  console.log(plotlyData)
 
   const plotly = useMemo(() => {
     if (traces?.plots && plotsWithSelectedPoints) {
