@@ -80,7 +80,7 @@ export default {
     pointCount: { control: 'number' },
   },
   args: {
-    pointCount: 1000,
+    pointCount: 100000,
   },
 } as ComponentMeta<typeof Vis>;
 

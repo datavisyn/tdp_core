@@ -35,7 +35,7 @@ const defaultConfig: IBarConfig = {
   groupType: EBarGroupingType.STACK,
   multiples: null,
   display: EBarDisplayType.ABSOLUTE,
-  direction: EBarDirection.VERTICAL,
+  direction: EBarDirection.HORIZONTAL,
   aggregateColumn: null,
   aggregateType: EAggregateTypes.COUNT,
 };
