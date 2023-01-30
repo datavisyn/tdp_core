@@ -13,7 +13,6 @@ import {
   EViolinOverlay,
   VisColumn,
 } from '../interfaces';
-import { Center } from '@mantine/core';
 
 export function fetchIrisData(): VisColumn[] {
   const dataPromise = import('./irisData').then((m) => m.iris);
