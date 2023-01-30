@@ -136,7 +136,6 @@ export function ScatterVis({
         l: 25,
         b: 25,
       },
-      autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
       dragmode: config.dragMode,
@@ -188,13 +187,14 @@ export function ScatterVis({
 
   const plotly = useMemo(() => {
     if (traces?.plots && plotsWithSelectedPoints) {
+      console.log(layout, plotlyData);
       return (
         <PlotlyComponent
           key={id}
           divId={`plotlyDiv${id}`}
           data={plotlyData}
           layout={layout}
-          config={{ responsive: true, displayModeBar: false }}
+          config={{ responsive: true, displayModeBar: false, scrollZoom: true }}
           useResizeHandler
           style={{ width: '100%', height: '100%' }}
           onClick={(event) => {
@@ -204,6 +204,9 @@ export function ScatterVis({
             } else {
               selectionCallback([...selectedList, clickedId]);
             }
+          }}
+          onRelayout={() => {
+            console.log('here');
           }}
           className="tdpCoreVis"
           onSelected={(sel) => {
