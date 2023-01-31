@@ -36,6 +36,7 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
         if (plotlyDivRef) {
             ro.observe(plotlyDivRef.current);
         }
+        return () => ro.disconnect();
     }, [id, plotlyDivRef]);
     React.useMemo(() => {
         if (!traces) {
@@ -65,6 +66,30 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
         // WARNING: Do not update when layout changes, that would be an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [traces]);
+    const plotsWithSelectedPoints = useMemo(() => {
+        if (traces) {
+            const allPlots = traces.plots;
+            allPlots
+                .filter((trace) => trace.data.type === 'scattergl')
+                .forEach((p) => {
+                const temp = [];
+                p.data.ids.forEach((currId, index) => {
+                    if (selected[currId]) {
+                        temp.push(index);
+                    }
+                });
+                p.data.selectedpoints = temp;
+            });
+            return allPlots;
+        }
+        return [];
+    }, [selected, traces]);
+    const plotlyData = useMemo(() => {
+        if (traces) {
+            return [...plotsWithSelectedPoints.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)];
+        }
+        return [];
+    }, [plotsWithSelectedPoints, traces]);
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', position: 'relative' }, ref: plotlyDivRef },
         React.createElement(Space, { h: "xl" }),
         showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
@@ -72,7 +97,7 @@ export function StripVis({ config, extensions, columns, setConfig, selectionCall
             React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear }))),
         mergedExtensions.prePlot,
-        traceStatus === 'success' && traces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, className: "tdpCoreVis", onSelected: (sel) => {
+        traceStatus === 'success' && layout && traces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, className: "tdpCoreVis", onSelected: (sel) => {
                 selectionCallback(sel ? sel.points.map((d) => d.id) : []);
             }, 
             // plotly redraws everything on updates, so you need to reappend title and

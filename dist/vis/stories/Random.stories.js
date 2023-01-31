@@ -64,7 +64,7 @@ export default {
         pointCount: { control: 'number' },
     },
     args: {
-        pointCount: 1000,
+        pointCount: 100000,
     },
 };
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args

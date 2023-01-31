@@ -25,7 +25,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     const plotlyDivRef = React.useRef(null);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [layout, setLayout] = useState(null);
-    console.log('re rendering');
     useEffect(() => {
         const ro = new ResizeObserver(() => {
             const plotDiv = document.getElementById(`plotlyDiv${id}`);
@@ -36,6 +35,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         if (plotlyDivRef) {
             ro.observe(plotlyDivRef.current);
         }
+        return () => ro.disconnect();
     }, [id, hideSidebar, plotlyDivRef]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
@@ -74,7 +74,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 l: 25,
                 b: 25,
             },
-            autosize: true,
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
             dragmode: config.dragMode,
@@ -91,22 +90,34 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 .forEach((p) => {
                 const temp = [];
                 p.data.ids.forEach((currId, index) => {
-                    if (selectedMap[currId]) {
+                    if (selectedMap[currId] || (selectedList.length === 0 && config.color)) {
                         temp.push(index);
                     }
                 });
                 p.data.selectedpoints = temp;
+                if (selectedList.length === 0 && config.color) {
+                    // @ts-ignore
+                    p.data.selected.marker.opacity = config.alphaSliderVal;
+                }
+                else {
+                    // @ts-ignore
+                    p.data.selected.marker.opacity = 1;
+                }
             });
             return allPlots;
         }
         return [];
-    }, [selectedMap, traces]);
+    }, [selectedMap, traces, selectedList, config.color, config.alphaSliderVal]);
     const plotlyData = useMemo(() => {
-        return [...plotsWithSelectedPoints.map((p) => p.data), ...plotsWithSelectedPoints.map((p) => p.data)];
-    }, [plotsWithSelectedPoints]);
+        if (traces) {
+            return [...plotsWithSelectedPoints.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)];
+        }
+        return [];
+    }, [plotsWithSelectedPoints, traces]);
     const plotly = useMemo(() => {
         if (traces?.plots && plotsWithSelectedPoints) {
-            return (React.createElement(PlotlyComponent, { key: id, divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
+            console.log(layout, plotlyData);
+            return (React.createElement(PlotlyComponent, { key: id, divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false, scrollZoom: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
                     const clickedId = event.points[0].id;
                     if (selectedMap[clickedId]) {
                         selectionCallback(selectedList.filter((s) => s !== clickedId));
@@ -114,6 +125,8 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                     else {
                         selectionCallback([...selectedList, clickedId]);
                     }
+                }, onRelayout: () => {
+                    console.log('here');
                 }, className: "tdpCoreVis", onSelected: (sel) => {
                     selectionCallback(sel ? sel.points.map((d) => d.id) : []);
                 } }));
@@ -130,7 +143,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 React.createElement(Group, { mt: "lg" },
                     React.createElement(BrushOptionButtons, { callback: (dragMode) => setConfig({ ...config, dragMode }), dragMode: config.dragMode }))),
             mergedExtensions.prePlot,
-            traceStatus === 'success' && plotsWithSelectedPoints.length > 0 ? (plotly) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces?.errorMessageHeader, bodyMessage: traceError?.message || traces?.errorMessage })) : null,
+            traceStatus === 'success' && layout && plotsWithSelectedPoints.length > 0 ? (plotly) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces?.errorMessageHeader, bodyMessage: traceError?.message || traces?.errorMessage })) : null,
             mergedExtensions.postPlot),
         !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
             React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));

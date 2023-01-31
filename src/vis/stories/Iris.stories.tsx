@@ -164,28 +164,3 @@ ViolinPlot.args = {
   },
 };
 
-export const StripPlot = Template.bind({}) as typeof Template;
-StripPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.STRIP,
-    numColumnsSelected: [
-      {
-        description: '',
-        id: 'sepalLength',
-        name: 'Sepal Length',
-      },
-      {
-        description: '',
-        id: 'sepalWidth',
-        name: 'Sepal Width',
-      },
-    ],
-    catColumnsSelected: [
-      {
-        description: '',
-        id: 'species',
-        name: 'Species',
-      },
-    ],
-  },
-};

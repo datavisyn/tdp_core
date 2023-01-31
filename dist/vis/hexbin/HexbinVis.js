@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
-import { useMemo, useRef, useState } from 'react';
-import { ActionIcon, Center, Container, Group, SimpleGrid, Stack } from '@mantine/core';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { ActionIcon, Center, Container, Group, SimpleGrid, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { EScatterSelectSettings } from '../interfaces';
@@ -21,12 +21,22 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
     const mergedExtensions = useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    // Cheating to open the sidebar after the first render, since it requires the container to be mounted
+    useEffect(() => {
+        setSidebarOpen(true);
+    }, []);
     const ref = useRef();
     const id = React.useMemo(() => uniqueId('PCPVis'), []);
+    const sidebarWrapper = useMemo(() => {
+        return !hideSidebar && ref.current ? (React.createElement(VisSidebarWrapper, { id: id, target: ref.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
+            React.createElement(HexbinVisSidebar, { config: config, extensions: extensions, columns: columns, setConfig: setConfig }))) : null;
+    }, [columns, config, extensions, hideSidebar, id, setConfig, sidebarOpen]);
+    console.log(ref, sidebarWrapper);
     return (React.createElement(Container, { p: 0, fluid: true, sx: { flexGrow: 1, height: '100%', overflow: 'hidden', width: '100%', position: 'relative' }, ref: ref },
-        React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
-            React.createElement(FontAwesomeIcon, { icon: faGear })),
+        React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
+            React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(!sidebarOpen) },
+                React.createElement(FontAwesomeIcon, { icon: faGear }))),
         React.createElement(Stack, { spacing: 0, sx: { height: '100%' } },
             React.createElement(Center, null,
                 React.createElement(Group, { mt: "lg" },
@@ -49,7 +59,6 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
                         columns.find((col) => col.info.id === config.color?.id),
                     ] })),
                 mergedExtensions.postPlot)))),
-        !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: ref.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
-            React.createElement(HexbinVisSidebar, { config: config, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
+        sidebarWrapper || null));
 }
 //# sourceMappingURL=HexbinVis.js.map

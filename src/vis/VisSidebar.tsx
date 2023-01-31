@@ -3,9 +3,7 @@ import { isBar } from './bar/utils';
 import { isScatter } from './scatter/utils';
 import { IVisConfig, VisColumn, ICommonVisSideBarProps } from './interfaces';
 import { isViolin } from './violin/utils';
-import { isStrip } from './strip/utils';
 import { BarVisSidebar } from './bar/BarVisSidebar';
-import { StripVisSidebar } from './strip/StripVisSidebar';
 import { ViolinVisSidebar } from './violin/ViolinVisSidebar';
 import { ScatterVisSidebar } from './scatter/ScatterVisSidebar';
 
@@ -58,10 +56,6 @@ export function VisSidebar({ columns, filterCallback = () => null, externalConfi
           className={className}
           style={style}
         />
-      ) : null}
-
-      {isStrip(externalConfig) ? (
-        <StripVisSidebar config={externalConfig} setConfig={setExternalConfig} columns={columns} className={className} style={style} />
       ) : null}
 
       {isBar(externalConfig) ? (

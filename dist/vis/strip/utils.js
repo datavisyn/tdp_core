@@ -51,12 +51,6 @@ export async function createStripTraces(columns, config, selected, scales) {
                     name: 'All points',
                     mode: 'none',
                     pointpos: 0,
-                    selectedpoints: numCurr.resolvedValues
-                        .map((v, i) => {
-                        return { index: i, selected: selected[v.id] };
-                    })
-                        .filter((v) => v.selected)
-                        .map((v) => v.index),
                     // @ts-ignore
                     selected: {
                         marker: {

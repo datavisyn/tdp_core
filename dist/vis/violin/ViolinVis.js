@@ -36,6 +36,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         if (plotlyDivRef) {
             ro.observe(plotlyDivRef.current);
         }
+        return () => ro.disconnect();
     }, [id, plotlyDivRef]);
     React.useEffect(() => {
         if (!traces) {
@@ -72,7 +73,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
             React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear }))),
         mergedExtensions.prePlot,
-        traceStatus === 'success' && traces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, className: "tdpCoreVis", data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
+        traceStatus === 'success' && layout && traces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, className: "tdpCoreVis", data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
             // plotly redraws everything on updates, so you need to reappend title and
             onUpdate: () => {
                 for (const p of traces.plots) {
