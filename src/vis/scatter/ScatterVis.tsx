@@ -187,7 +187,6 @@ export function ScatterVis({
 
   const plotly = useMemo(() => {
     if (traces?.plots && plotsWithSelectedPoints) {
-      console.log(layout, plotlyData);
       return (
         <PlotlyComponent
           key={id}
@@ -204,9 +203,6 @@ export function ScatterVis({
             } else {
               selectionCallback([...selectedList, clickedId]);
             }
-          }}
-          onRelayout={() => {
-            console.log('here');
           }}
           className="tdpCoreVis"
           onSelected={(sel) => {
