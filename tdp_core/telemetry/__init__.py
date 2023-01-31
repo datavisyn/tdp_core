@@ -50,7 +50,7 @@ def init_telemetry(app: FastAPI, app_name: str) -> None:
         if metrics_export_endpoint:
             metric_readers.append(
                 PeriodicExportingMetricReader(
-                    OTLPMetricExporter(endpoint=metrics_export_endpoint, timeout=timeout),
+                    exporter=OTLPMetricExporter(endpoint=metrics_export_endpoint, timeout=timeout),
                     export_interval_millis=5_000,
                     export_timeout_millis=timeout * 1_000,
                 )
@@ -115,12 +115,14 @@ def init_telemetry(app: FastAPI, app_name: str) -> None:
         RequestsInstrumentor().instrument(tracer_provider=tracer, meter_provider=meter)
         FastAPIInstrumentor.instrument_app(app, meter_provider=meter, tracer_provider=tracer)
 
-    if manager.settings.tdp_core.telemetry.logs.enabled:
+    logs_settings = manager.settings.tdp_core.telemetry.logs
+    if logs_settings.enabled and logs_settings.export_endpoint:
         _log.info("Enabling Loki logging")
         import logging_loki
 
         loki_handler = logging_loki.LokiHandler(
-            url="http://localhost:3100/loki/api/v1/push",
+            url=logs_settings.export_endpoint,
+            auth=(logs_settings.username, logs_settings.password) if logs_settings.username and logs_settings.password else None,
             tags={"service_name": app_name, "compose_service": app_name},
             version="1",
         )

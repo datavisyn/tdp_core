@@ -3,6 +3,14 @@ receivers:
     protocols:
       grpc:
 
+  prometheus:
+    config:
+      scrape_configs:
+        - job_name: "node-exporter"
+          scrape_interval: 5s
+          static_configs:
+            - targets: ["node-exporter:9100"]
+
 exporters:
   prometheus:
     endpoint: "0.0.0.0:8889"
@@ -10,6 +18,9 @@ exporters:
     #   label1: value1
 
   logging:
+
+  prometheusremotewrite:
+    endpoint:
 
   # loki:
   #   endpoint: http://loki:3100/loki/api/v1/push
@@ -37,9 +48,9 @@ service:
       processors: [batch]
       exporters: [otlp, logging]
     metrics:
-      receivers: [otlp]
+      receivers: [otlp, prometheus]
       processors: [batch]
-      exporters: [logging, prometheus]
+      exporters: [logging, prometheus, prometheusremotewrite]
     # logs:
     #   receivers: [otlp]
     #   processors: [batch]

@@ -1,0 +1,47 @@
+server:
+  log_level: info
+
+metrics:
+  global:
+    scrape_interval: 1m
+    remote_write:
+      - url: http://localhost:9009/api/prom/push
+  configs:
+    - name: default
+      scrape_configs:
+        - job_name: agent
+          static_configs:
+            - targets: ['127.0.0.1:12345']
+
+logs:
+  configs:
+  - name: default
+    positions:
+      filename: /tmp/positions.yaml
+    scrape_configs:
+      - job_name: varlogs
+        static_configs:
+          - targets: [localhost]
+            labels:
+              job: varlogs
+              __path__: /var/log/*log
+    clients:
+      - url: http://localhost:3100/loki/api/v1/push
+
+traces:
+  configs:
+  - name: default
+    receivers:
+      jaeger:
+        protocols:
+          grpc: # listens on the default jaeger grpc port: 14250
+    remote_write:
+      - endpoint: localhost:55680
+        insecure: true  # only add this if TLS is not required
+    batch:
+      timeout: 5s
+      send_batch_size: 100
+
+integrations:
+  node_exporter:
+    enabled: true

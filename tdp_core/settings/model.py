@@ -62,13 +62,17 @@ class TracesTelemetrySettings(BaseTelemetrySettings):
     export_endpoint: AnyHttpUrl | None = None
 
 
-class TelemetrySettings(BaseTelemetrySettings):
-    traces: TracesTelemetrySettings = TracesTelemetrySettings()
-    metrics: MetricsTelemetrySettings = MetricsTelemetrySettings()
+class LogsTelemetrySettings(BaseTelemetrySettings):
+    export_endpoint: AnyHttpUrl | None = None  # could be "http://localhost:3100/loki/api/v1/push"
+    username: str | None = None
+    password: str | None = None
 
-    logs: BaseTelemetrySettings = BaseTelemetrySettings()
-    metrics_middleware: BaseTelemetrySettings = BaseTelemetrySettings()
-    # TODO: More granular settings like loki, ...
+
+class TelemetrySettings(BaseTelemetrySettings):
+    metrics: MetricsTelemetrySettings = MetricsTelemetrySettings()
+    traces: TracesTelemetrySettings = TracesTelemetrySettings()
+    logs: LogsTelemetrySettings = LogsTelemetrySettings()
+    metrics_middleware: BaseTelemetrySettings = BaseTelemetrySettings(enabled=True)
 
 
 class TDPCoreSettings(BaseModel):
