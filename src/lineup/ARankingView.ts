@@ -593,6 +593,7 @@ export abstract class ARankingView extends AView {
               continue;
             } else {
               reject(e);
+              done = true;
             }
           }
         }
