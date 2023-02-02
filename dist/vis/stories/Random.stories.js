@@ -139,23 +139,4 @@ ViolinPlot.args = {
         violinOverlay: EViolinOverlay.NONE,
     },
 };
-export const StripPlot = Template.bind({});
-StripPlot.args = {
-    externalConfig: {
-        type: ESupportedPlotlyVis.STRIP,
-        numColumnsSelected: [
-            {
-                description: '',
-                id: 'pca_x',
-                name: 'pca_x',
-            },
-            {
-                description: '',
-                id: 'pca_y',
-                name: 'pca_y',
-            },
-        ],
-        catColumnsSelected: [],
-    },
-};
 //# sourceMappingURL=Random.stories.js.map

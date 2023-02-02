@@ -32,7 +32,6 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
         return !hideSidebar && ref.current ? (React.createElement(VisSidebarWrapper, { id: id, target: ref.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
             React.createElement(HexbinVisSidebar, { config: config, extensions: extensions, columns: columns, setConfig: setConfig }))) : null;
     }, [columns, config, extensions, hideSidebar, id, setConfig, sidebarOpen]);
-    console.log(ref, sidebarWrapper);
     return (React.createElement(Container, { p: 0, fluid: true, sx: { flexGrow: 1, height: '100%', overflow: 'hidden', width: '100%', position: 'relative' }, ref: ref },
         React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(!sidebarOpen) },

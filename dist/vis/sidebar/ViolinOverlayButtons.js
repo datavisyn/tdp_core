@@ -8,7 +8,6 @@ export function ViolinOverlayButtons({ callback, currentSelected }) {
             React.createElement(SegmentedControl, { value: currentSelected, onChange: callback, data: [
                     { label: EViolinOverlay.NONE, value: EViolinOverlay.NONE },
                     { label: EViolinOverlay.BOX, value: EViolinOverlay.BOX },
-                    { label: EViolinOverlay.STRIP, value: EViolinOverlay.STRIP },
                 ] }))));
 }
 //# sourceMappingURL=ViolinOverlayButtons.js.map

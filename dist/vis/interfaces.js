@@ -2,7 +2,6 @@ export var ESupportedPlotlyVis;
 (function (ESupportedPlotlyVis) {
     ESupportedPlotlyVis["SCATTER"] = "Scatter plot";
     ESupportedPlotlyVis["VIOLIN"] = "Violin plot";
-    ESupportedPlotlyVis["STRIP"] = "Strip plot";
     ESupportedPlotlyVis["BAR"] = "Bar chart";
     ESupportedPlotlyVis["HEXBIN"] = "Hexbin plot";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
@@ -10,7 +9,6 @@ export const allVisTypes = [
     ESupportedPlotlyVis.SCATTER,
     ESupportedPlotlyVis.BAR,
     ESupportedPlotlyVis.VIOLIN,
-    ESupportedPlotlyVis.STRIP,
     ESupportedPlotlyVis.HEXBIN,
 ];
 export var EBarDisplayType;
@@ -32,7 +30,6 @@ export var EBarDirection;
 export var EViolinOverlay;
 (function (EViolinOverlay) {
     EViolinOverlay["NONE"] = "None";
-    EViolinOverlay["STRIP"] = "Strip";
     EViolinOverlay["BOX"] = "Box";
 })(EViolinOverlay || (EViolinOverlay = {}));
 export var EAggregateTypes;

@@ -116,7 +116,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     }, [plotsWithSelectedPoints, traces]);
     const plotly = useMemo(() => {
         if (traces?.plots && plotsWithSelectedPoints) {
-            console.log(layout, plotlyData);
             return (React.createElement(PlotlyComponent, { key: id, divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false, scrollZoom: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
                     const clickedId = event.points[0].id;
                     if (selectedMap[clickedId]) {
@@ -125,8 +124,6 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                     else {
                         selectionCallback([...selectedList, clickedId]);
                     }
-                }, onRelayout: () => {
-                    console.log('here');
                 }, className: "tdpCoreVis", onSelected: (sel) => {
                     selectionCallback(sel ? sel.points.map((d) => d.id) : []);
                 } }));

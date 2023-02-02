@@ -58,7 +58,6 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
     ) : null;
   }, [columns, config, extensions, hideSidebar, id, setConfig, sidebarOpen]);
 
-
   return (
     <Container p={0} fluid sx={{ flexGrow: 1, height: '100%', overflow: 'hidden', width: '100%', position: 'relative' }} ref={ref}>
       <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
