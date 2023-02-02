@@ -17,6 +17,8 @@ services:
     depends_on:
       - prometheus
       - tempo
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   loki:
     image: grafana/loki:2.6.1

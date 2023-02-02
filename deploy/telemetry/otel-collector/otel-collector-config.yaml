@@ -10,6 +10,10 @@ receivers:
           scrape_interval: 5s
           static_configs:
             - targets: ["node-exporter:9100"]
+        - job_name: "postgres-exporter"
+          scrape_interval: 5s
+          static_configs:
+            - targets: ["host.docker.internal:9187"]
 
 exporters:
   prometheus:
@@ -19,8 +23,8 @@ exporters:
 
   logging:
 
-  prometheusremotewrite:
-    endpoint:
+  # prometheusremotewrite:
+  #   endpoint: https://...@prometheus-prod-01-eu-west-0.grafana.net/api/prom/push
 
   # loki:
   #   endpoint: http://loki:3100/loki/api/v1/push
@@ -29,6 +33,11 @@ exporters:
     endpoint: http://tempo:4317
     tls:
       insecure: true
+
+  # otlp:
+  #   endpoint: tempo-eu-west-0.grafana.net:443
+  #   headers:
+  #     authorization: Basic ...
 
 processors:
   batch:
