@@ -86,11 +86,6 @@ export interface IViolinConfig {
   violinOverlay: EViolinOverlay;
 }
 
-// export interface IStripConfig {
-//   type: ESupportedPlotlyVis.STRIP;
-//   numColumnsSelected: ColumnInfo[];
-//   catColumnsSelected: ColumnInfo[];
-// }
 
 export interface IScatterConfig {
   type: ESupportedPlotlyVis.SCATTER;
