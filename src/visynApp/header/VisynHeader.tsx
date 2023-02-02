@@ -1,4 +1,4 @@
-import { Header, Group, createStyles, Title, ActionIcon, TextInput, Transition } from '@mantine/core';
+import { Header, Group, createStyles, Title, ActionIcon, TextInput, Transition, MantineThemeColors } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
@@ -6,10 +6,11 @@ import { useCallback, useState } from 'react';
 import { BurgerButton } from './BurgerButton';
 import { DatavisynLogo } from './DatavisynLogo';
 import { UserAvatar } from './UserAvatar';
+import { VisynAppContext } from '../VisynAppContext';
 
 const HEADER_HEIGHT = 50;
 
-const useStyles = createStyles((theme, { color }: { color: string }) => ({
+const useStyles = createStyles((theme, { color }: { color: keyof MantineThemeColors }) => ({
   grayColor: {
     backgroundColor: theme.colors[color][6],
   },
@@ -31,7 +32,6 @@ const cardTransition = {
 
 /**
  *
- * @param appName Name of application to be displayed
  * @param projectName Optional name of project to be displayed next to app name.
  * @param dvLogo Optional change of default dv logo as JSX element. If not provided, normal logo will be displayed.
  * @param customerLogo Optional customer logo as JSX element. If not provided, nothing displayed
@@ -44,7 +44,6 @@ const cardTransition = {
  * @returns
  */
 export function VisynHeader({
-  appName,
   projectName = null,
   dvLogo = <DatavisynLogo />,
   customerLogo = null,
@@ -56,18 +55,18 @@ export function VisynHeader({
   redoCallback = null,
   searchCallback = null,
 }: {
-  appName: JSX.Element | string;
   projectName?: string;
   dvLogo?: JSX.Element;
   customerLogo?: JSX.Element;
   burgerMenu?: JSX.Element;
   userMenu?: JSX.Element;
   userName?: string;
-  backgroundColor?: string;
+  backgroundColor?: keyof MantineThemeColors;
   undoCallback?: () => void;
   redoCallback?: () => void;
   searchCallback?: (s: string) => void;
 }) {
+  const { appName } = React.useContext(VisynAppContext);
   const { classes } = useStyles({ color: backgroundColor });
 
   const [isSearching, setIsSearching] = useState<boolean>(false);

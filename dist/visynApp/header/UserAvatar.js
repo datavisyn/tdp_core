@@ -1,17 +1,12 @@
-import { Avatar, createStyles, Menu } from '@mantine/core';
+import { Avatar, Menu } from '@mantine/core';
 import React from 'react';
-const useStyles = createStyles(() => ({
-    cursorPointer: {
-        cursor: 'pointer',
-    },
-}));
 export function UserAvatar({ menu, userName, color }) {
-    const { classes } = useStyles();
-    return (React.createElement(Menu, { shadow: "md" },
+    return (React.createElement(Menu, { shadow: "md", "data-testid": "visyn-user-avatar" },
         React.createElement(Menu.Target, null,
-            React.createElement(Avatar, { className: classes.cursorPointer, color: color, radius: "xl" }, userName
+            React.createElement(Avatar, { role: "button", color: color, radius: "xl" }, userName
                 .split(' ')
                 .map((name) => name[0])
+                .slice(0, 3)
                 .join('')
                 .toUpperCase())),
         React.createElement(Menu.Dropdown, null, menu)));

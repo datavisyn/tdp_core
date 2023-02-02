@@ -1,9 +1,11 @@
 import logging
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
+from pydantic import BaseModel
 
 from .. import manager
 from .manager import add_access_token_to_response, user_to_access_token, user_to_dict
@@ -15,6 +17,11 @@ jwt_router = APIRouter(tags=["Security"])
 # TODO: Use schema to allow auto-doc of endpoint
 # from fastapi.security import OAuth2PasswordBearer
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+class SecurityStoreResponse(BaseModel):
+    id: str
+    configuration: dict[str, Any] = {}
 
 
 @jwt_router.get("/login", response_class=HTMLResponse)
@@ -76,3 +83,9 @@ def logout():
 def loggedinas(request: Request):
     user = manager.security.current_user
     return user_to_dict(user, access_token=user.access_token) if user else '"not_yet_logged_in"'
+
+
+@jwt_router.get("/api/security/stores")
+def stores(request: Request) -> list[SecurityStoreResponse]:
+    """Returns a list of activated security stores. Can be used to infer the details of the shown login menu."""
+    return [SecurityStoreResponse(id=s.id, configuration=s.user_configuration(request) or {}) for s in manager.security.user_stores]

@@ -26,6 +26,9 @@ def test_jwt_login(client: TestClient):
     def claims_loader_2(user: User):
         return {"username": user.name}
 
+    stores = client.get("/api/security/stores").json()
+    assert stores == [{"id": "DummyStore", "configuration": {}}]
+
     # Check if we are actually not logged in
     response = client.get("/loggedinas")
     assert response.status_code == 200
@@ -122,6 +125,9 @@ def test_alb_security_store(client: TestClient):
     assert store is not None
 
     manager.security.user_stores = [store]
+
+    stores = client.get("/api/security/stores").json()
+    assert stores == [{"id": "ALBSecurityStore", "configuration": {}}]
 
     # Header created with a random token containing "email"
     headers = {

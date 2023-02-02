@@ -1,7 +1,7 @@
 /// <reference types="react" />
+import { MantineThemeColors } from '@mantine/core';
 /**
  *
- * @param appName Name of application to be displayed
  * @param projectName Optional name of project to be displayed next to app name.
  * @param dvLogo Optional change of default dv logo as JSX element. If not provided, normal logo will be displayed.
  * @param customerLogo Optional customer logo as JSX element. If not provided, nothing displayed
@@ -13,15 +13,14 @@
  * @param searchCallback Optional callback called when the search is changed, passing the current search value. If not given, no search icon is created
  * @returns
  */
-export declare function VisynHeader({ appName, projectName, dvLogo, customerLogo, burgerMenu, userMenu, userName, backgroundColor, undoCallback, redoCallback, searchCallback, }: {
-    appName: JSX.Element | string;
+export declare function VisynHeader({ projectName, dvLogo, customerLogo, burgerMenu, userMenu, userName, backgroundColor, undoCallback, redoCallback, searchCallback, }: {
     projectName?: string;
     dvLogo?: JSX.Element;
     customerLogo?: JSX.Element;
     burgerMenu?: JSX.Element;
     userMenu?: JSX.Element;
     userName?: string;
-    backgroundColor?: string;
+    backgroundColor?: keyof MantineThemeColors;
     undoCallback?: () => void;
     redoCallback?: () => void;
     searchCallback?: (s: string) => void;

@@ -1,3 +1,5 @@
+from typing import Any
+
 from fastapi import FastAPI, Request
 
 from ..model import LogoutReturnValue, User
@@ -6,6 +8,10 @@ from ..model import LogoutReturnValue, User
 class BaseStore:
     def __init__(self):
         return None
+
+    @property
+    def id(self):
+        return type(self).__name__
 
     def init_app(self, app: FastAPI):
         return None
@@ -22,4 +28,8 @@ class BaseStore:
         return None
 
     def logout(self, user: User) -> LogoutReturnValue | None:
+        return None
+
+    def user_configuration(self, request: Request) -> dict[str, Any] | None:
+        """User configuration of the store which is accessible via API."""
         return None

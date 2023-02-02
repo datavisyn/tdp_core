@@ -6,6 +6,7 @@ import { useCallback, useState } from 'react';
 import { BurgerButton } from './BurgerButton';
 import { DatavisynLogo } from './DatavisynLogo';
 import { UserAvatar } from './UserAvatar';
+import { VisynAppContext } from '../VisynAppContext';
 const HEADER_HEIGHT = 50;
 const useStyles = createStyles((theme, { color }) => ({
     grayColor: {
@@ -27,7 +28,6 @@ const cardTransition = {
 };
 /**
  *
- * @param appName Name of application to be displayed
  * @param projectName Optional name of project to be displayed next to app name.
  * @param dvLogo Optional change of default dv logo as JSX element. If not provided, normal logo will be displayed.
  * @param customerLogo Optional customer logo as JSX element. If not provided, nothing displayed
@@ -39,7 +39,8 @@ const cardTransition = {
  * @param searchCallback Optional callback called when the search is changed, passing the current search value. If not given, no search icon is created
  * @returns
  */
-export function VisynHeader({ appName, projectName = null, dvLogo = React.createElement(DatavisynLogo, null), customerLogo = null, burgerMenu = null, userMenu = null, userName = null, backgroundColor = 'gray', undoCallback = null, redoCallback = null, searchCallback = null, }) {
+export function VisynHeader({ projectName = null, dvLogo = React.createElement(DatavisynLogo, null), customerLogo = null, burgerMenu = null, userMenu = null, userName = null, backgroundColor = 'gray', undoCallback = null, redoCallback = null, searchCallback = null, }) {
+    const { appName } = React.useContext(VisynAppContext);
     const { classes } = useStyles({ color: backgroundColor });
     const [isSearching, setIsSearching] = useState(false);
     const [searchString, setSearchString] = useState('');

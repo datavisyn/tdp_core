@@ -38,7 +38,7 @@
     "compile": "visyn_scripts compile",
     "copy": "visyn_scripts copy",
     "cy:open": "cypress open",
-    "cy:run": "cypress run",
+    "cy:run": "cypress run --e2e && cypress run --component",
     "delete-dependencies": "visyn_scripts clean node_modules",
     "dist": "mkdir lib && cd dist && tar cvzf ../lib/tdp_core.tar.gz *",
     "docs": "visyn_scripts docs",
