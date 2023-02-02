@@ -60,11 +60,13 @@ export function HexbinVis({ config, extensions, columns, setConfig, selectionCal
 
   return (
     <Container p={0} fluid sx={{ flexGrow: 1, height: '100%', overflow: 'hidden', width: '100%', position: 'relative' }} ref={ref}>
-      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
-        <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(!sidebarOpen)}>
-          <FontAwesomeIcon icon={faGear} />
-        </ActionIcon>
-      </Tooltip>
+      {!hideSidebar ? (
+        <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+          <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+            <FontAwesomeIcon icon={faGear} />
+          </ActionIcon>
+        </Tooltip>
+      ) : null}
 
       <Stack spacing={0} sx={{ height: '100%' }}>
         <Center>

@@ -199,11 +199,13 @@ export function BarVis({
 
       {mergedExtensions.prePlot}
       <Space h="xl" />
-      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
-        <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-          <FontAwesomeIcon icon={faGear} />
-        </ActionIcon>
-      </Tooltip>
+      {!hideSidebar ? (
+        <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+          <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+            <FontAwesomeIcon icon={faGear} />
+          </ActionIcon>
+        </Tooltip>
+      ) : null}
       {traceStatus === 'success' && layout && finalTraces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
