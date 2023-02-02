@@ -119,7 +119,7 @@ export function VisynLoginMenu({ watch = false }: { watch?: boolean }) {
       </Container>
       <Stack>
         {isOffline ? (
-          <Alert icon={<FontAwesomeIcon icon={faCircleExclamation} />} title="Warning" color="yellow" radius="md">
+          <Alert icon={<FontAwesomeIcon icon={faCircleExclamation} />} color="yellow" radius="md">
             {i18n.t('phovea:security_flask.alertOffline')}
           </Alert>
         ) : null}

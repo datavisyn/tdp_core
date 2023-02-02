@@ -92,7 +92,7 @@ export function VisynLoginMenu({ watch = false }) {
                         appName)),
                 React.createElement(Divider, null))),
         React.createElement(Stack, null,
-            isOffline ? (React.createElement(Alert, { icon: React.createElement(FontAwesomeIcon, { icon: faCircleExclamation }), title: "Warning", color: "yellow", radius: "md" }, i18n.t('phovea:security_flask.alertOffline'))) : null,
+            isOffline ? (React.createElement(Alert, { icon: React.createElement(FontAwesomeIcon, { icon: faCircleExclamation }), color: "yellow", radius: "md" }, i18n.t('phovea:security_flask.alertOffline'))) : null,
             userStoreStatus === 'pending' ? React.createElement(LoadingOverlay, { visible: true }) : null,
             !userStores || isOffline ? null : userStores.length === 0 ? (
             // Use the dummy store as default if no store is found

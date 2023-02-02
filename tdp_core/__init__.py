@@ -92,6 +92,12 @@ class VisynPlugin(AVisynPlugin):
         # phovea_security_flask
         registry.append(
             "user_stores",
+            "dummy_store",
+            "tdp_core.security.store.dummy_store",
+            {},
+        )
+        registry.append(
+            "user_stores",
             "alb_security_store",
             "tdp_core.security.store.alb_security_store",
             {},

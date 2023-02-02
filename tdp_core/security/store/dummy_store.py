@@ -30,7 +30,7 @@ class DummyStore(BaseStore):
                 password=v["password"],
                 salt=v["salt"],
             )
-            for v in manager.settings.tdp_core.users
+            for v in manager.settings.tdp_core.security.store.dummy_store.users
         ]
 
     def load_from_key(self, api_key: str):
@@ -52,3 +52,15 @@ class DummyStore(BaseStore):
 
     def logout(self, user):
         pass
+
+
+def create():
+    # Check if the security store is enabled.
+    # Why do we do this here and not in the __init__.py?
+    # Because the configuration is merged after the registry is loaded,
+    # such that no keys are available (except tdp_core keys).
+    if manager.settings.tdp_core.security.store.dummy_store.enable:
+        _log.info("Adding DummyStore")
+        return DummyStore()
+
+    return None
