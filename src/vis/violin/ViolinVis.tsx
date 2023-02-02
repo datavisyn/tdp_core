@@ -121,7 +121,7 @@ export function ViolinVis({
 
       {!hideSidebar ? (
         <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
-          <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
             <FontAwesomeIcon icon={faGear} />
           </ActionIcon>
         </Tooltip>
