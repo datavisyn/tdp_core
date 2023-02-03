@@ -6,6 +6,9 @@ from ..model import LogoutReturnValue, User
 
 
 class BaseStore:
+    ui: str | None = None
+    """ID of the UI to be shown in the login dialog. If None, no UI will be shown."""
+
     def __init__(self):
         return None
 

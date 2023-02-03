@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Modal, Stack, Title, Text, Center, Divider, Container, LoadingOverlay } from '@mantine/core';
+import { Alert, Modal, Stack, Title, Center, Divider, Container, LoadingOverlay } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../../app/AppContext';
@@ -9,38 +9,10 @@ import { LoginUtils } from '../../base/LoginUtils';
 import { SessionWatcher } from '../../base/watcher';
 import { useAsync } from '../../hooks/useAsync';
 import { I18nextManager } from '../../i18n/I18nextManager';
-import { VisynLoginForm } from './VisynLoginForm';
-import { IUserStore } from '../../security';
 import { useVisynAppContext } from '../VisynAppContext';
-
-interface IUserStoreRenderProps<T extends IUserStore = IUserStore> {
-  setError(error: string | null): void;
-  hasError: boolean;
-  store: T;
-}
+import { DefaultLoginForm, UserStoreUIMap } from './UserStoreUIMap';
 
 const { i18n } = I18nextManager.getInstance();
-
-const userStoreMap: Record<string, (props: IUserStoreRenderProps) => React.ReactElement> = {
-  DummyStore: ({ setError, hasError, store }) => (
-    <VisynLoginForm
-      hasError={hasError}
-      onLogin={async (username: string, password: string) => {
-        setError(null);
-        return LoginUtils.login(username, password).catch((e) => {
-          if (e.response && e.response.status !== 401) {
-            // 401 = Unauthorized
-            // server error
-            setError('not_reachable');
-          } else {
-            setError(e);
-          }
-        });
-      }}
-    />
-  ),
-  ALBSecurityStore: ({ setError, store }) => <Text align="justify">{i18n.t('tdp:core.visynApp.securityStores.ALBSecurityStore.message')}</Text>,
-};
 
 export function VisynLoginMenu({ watch = false }: { watch?: boolean }) {
   const { appName } = useVisynAppContext();
@@ -102,6 +74,7 @@ export function VisynLoginMenu({ watch = false }: { watch?: boolean }) {
 
   useAsync(autoLogin, []);
   const { value: userStores, error: userStoreError, status: userStoreStatus } = useAsync(LoginUtils.getStores, []);
+  const userStoresWithUI = userStores?.filter((store) => store.ui);
   const hasError = error != null && error !== 'not_reachable';
   const isOffline = error === 'not_reachable' || userStoreStatus === 'error';
 
@@ -124,22 +97,23 @@ export function VisynLoginMenu({ watch = false }: { watch?: boolean }) {
           </Alert>
         ) : null}
         {userStoreStatus === 'pending' ? <LoadingOverlay visible /> : null}
-        {!userStores || isOffline ? null : userStores.length === 0 ? (
+        {!userStores || isOffline ? null : userStoresWithUI.length === 0 ? (
           // Use the dummy store as default if no store is found
-          <userStoreMap.DummyStore setError={setError} hasError={hasError} store={{ id: 'DummyStore', configuration: {} }} />
+          <DefaultLoginForm setError={setError} hasError={hasError} store={{ id: 'DummyStore', ui: 'DefaultLoginForm', configuration: {} }} />
         ) : (
           // Render all stores next to eachother
-          userStores.map((store, i, all) => {
-            const ToRender = userStoreMap[store.id];
+          userStoresWithUI.map((store, i, all) => {
+            const ToRender = UserStoreUIMap.get(store.ui);
 
             return (
               <React.Fragment key={store.id}>
-                {
-                  ToRender ? <ToRender key={store.id} setError={setError} hasError={hasError} store={store} /> : null
-                  // <Alert color="yellow" radius="md">
-                  //   No UI found for {store.id}. Contact the site administrator if this issue perists.
-                  // </Alert>
-                }
+                {ToRender ? (
+                  <ToRender key={store.id} setError={setError} hasError={hasError} store={store} />
+                ) : (
+                  <Alert color="yellow" radius="md">
+                    No {store.ui} found for {store.id}. Contact the site administrator if this issue perists.
+                  </Alert>
+                )}
                 {ToRender && i !== all.length - 1 ? <Divider label="Or" labelPosition="center" /> : null}
               </React.Fragment>
             );

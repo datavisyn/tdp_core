@@ -22,6 +22,8 @@ class DummyUser(User):
 
 
 class DummyStore(BaseStore):
+    ui = "DefaultLoginForm"
+
     def __init__(self):
         self._users = [
             DummyUser(

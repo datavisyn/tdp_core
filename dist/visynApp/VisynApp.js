@@ -17,7 +17,7 @@ import { useVisynAppContext } from './VisynAppContext';
 export function VisynApp({ header = null, navbar = null, aside = null, footer = null, appShellProps = null, children, headerHeight = 0, loginMenu = React.createElement(VisynLoginMenu, { watch: true }), }) {
     useVisynAppContext();
     return (React.createElement(AppShell, { styles: { root: { height: '100%' }, body: { height: `calc(100% - ${headerHeight}px)` }, main: { minHeight: '0px' } }, ...appShellProps, navbar: navbar, aside: aside, footer: footer, header: header || React.createElement(VisynHeader, null) },
-        loginMenu,
-        children));
+        children,
+        loginMenu));
 }
 //# sourceMappingURL=VisynApp.js.map

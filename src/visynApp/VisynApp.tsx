@@ -46,8 +46,8 @@ export function VisynApp({
       footer={footer}
       header={header || <VisynHeader />}
     >
-      {loginMenu}
       {children}
+      {loginMenu}
     </AppShell>
   );
 }

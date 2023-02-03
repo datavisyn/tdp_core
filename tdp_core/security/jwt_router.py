@@ -21,6 +21,7 @@ jwt_router = APIRouter(tags=["Security"])
 
 class SecurityStoreResponse(BaseModel):
     id: str
+    ui: str | None
     configuration: dict[str, Any] = {}
 
 
@@ -88,4 +89,6 @@ def loggedinas(request: Request):
 @jwt_router.get("/api/security/stores")
 def stores(request: Request) -> list[SecurityStoreResponse]:
     """Returns a list of activated security stores. Can be used to infer the details of the shown login menu."""
-    return [SecurityStoreResponse(id=s.id, configuration=s.user_configuration(request) or {}) for s in manager.security.user_stores]
+    return [
+        SecurityStoreResponse(id=s.id, ui=s.ui, configuration=s.user_configuration(request) or {}) for s in manager.security.user_stores
+    ]

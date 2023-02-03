@@ -27,7 +27,7 @@ def test_jwt_login(client: TestClient):
         return {"username": user.name}
 
     stores = client.get("/api/security/stores").json()
-    assert stores == [{"id": "DummyStore", "configuration": {}}]
+    assert stores == [{"id": "DummyStore", "ui": "DefaultLoginForm", "configuration": {}}]
 
     # Check if we are actually not logged in
     response = client.get("/loggedinas")
@@ -127,7 +127,7 @@ def test_alb_security_store(client: TestClient):
     manager.security.user_stores = [store]
 
     stores = client.get("/api/security/stores").json()
-    assert stores == [{"id": "ALBSecurityStore", "configuration": {}}]
+    assert stores == [{"id": "ALBSecurityStore", "ui": "AutoLoginForm", "configuration": {}}]
 
     # Header created with a random token containing "email"
     headers = {
