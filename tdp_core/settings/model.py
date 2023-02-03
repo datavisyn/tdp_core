@@ -85,6 +85,10 @@ class TDPCoreSettings(BaseModel):
     # tdp_core
     migrations: DBMigrationSettings = DBMigrationSettings()
 
+    users: list[dict[str, Any]] = Field([])
+    """Deprecated: use tdp_core.security.store.dummy_store.users instead."""
+    alwaysAppendDummyStore: bool = False  # NOQA
+    """Deprecated: use tdp_core.security.store.dummy_store.enable instead."""
     security: SecuritySettings = SecuritySettings()
 
     # tdp_matomo

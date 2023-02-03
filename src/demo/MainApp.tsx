@@ -46,8 +46,8 @@ export function MainApp() {
     <VisynApp
       header={
         <VisynHeader
-          userMenu={
-            user ? (
+          components={{
+            userMenu: user ? (
               <>
                 <Menu.Label>Logged in as {user.name}</Menu.Label>
                 <Menu.Item
@@ -58,8 +58,8 @@ export function MainApp() {
                   Logout
                 </Menu.Item>
               </>
-            ) : null
-          }
+            ) : null,
+          }}
           backgroundColor="dark"
         />
       }

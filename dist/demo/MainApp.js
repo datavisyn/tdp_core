@@ -29,12 +29,14 @@ export function MainApp() {
         dragMode: EScatterSelectSettings.RECTANGLE,
         alphaSliderVal: 1,
     });
-    return (React.createElement(VisynApp, { header: React.createElement(VisynHeader, { userMenu: user ? (React.createElement(React.Fragment, null,
-                React.createElement(Menu.Label, null,
-                    "Logged in as ",
-                    user.name),
-                React.createElement(Menu.Item, { onClick: () => {
-                        LoginUtils.logout();
-                    } }, "Logout"))) : null, backgroundColor: "dark" }), appShellProps: {} }, user ? React.createElement(Vis, { columns: irisData, showSidebarDefault: true, externalConfig: visConfig, setExternalConfig: setVisConfig }) : null));
+    return (React.createElement(VisynApp, { header: React.createElement(VisynHeader, { components: {
+                userMenu: user ? (React.createElement(React.Fragment, null,
+                    React.createElement(Menu.Label, null,
+                        "Logged in as ",
+                        user.name),
+                    React.createElement(Menu.Item, { onClick: () => {
+                            LoginUtils.logout();
+                        } }, "Logout"))) : null,
+            }, backgroundColor: "dark" }), appShellProps: {} }, user ? React.createElement(Vis, { columns: irisData, showSidebarDefault: true, externalConfig: visConfig, setExternalConfig: setVisConfig }) : null));
 }
 //# sourceMappingURL=MainApp.js.map

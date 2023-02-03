@@ -13,8 +13,7 @@ const cardTransition = {
     out: { opacity: 0, width: '0px' },
     transitionProperty: 'opacity, width',
 };
-export function VisynHeader({ burgerMenu = null, userMenu = null, color = 'white', backgroundColor = 'dark', dvLogo = React.createElement(DatavisynLogo, { color: backgroundColor === 'white' ? 'black' : 'white' }), // TODO: Use d3 to determine the better variant
-components, undoCallback = null, redoCallback = null, searchCallback = null, }) {
+export function VisynHeader({ color = 'white', backgroundColor = 'dark', components, undoCallback = null, redoCallback = null, searchCallback = null, }) {
     const { appName } = useVisynAppContext();
     const theme = useMantineTheme();
     const { user } = useVisynAppContext();
@@ -32,7 +31,7 @@ components, undoCallback = null, redoCallback = null, searchCallback = null, }) 
             }, noWrap: true },
             React.createElement(Group, { align: "center", position: "left", noWrap: true },
                 components?.beforeLeft,
-                burgerMenu ? React.createElement(BurgerButton, { menu: burgerMenu }) : null,
+                components?.burgerMenu ? React.createElement(BurgerButton, { menu: components.burgerMenu }) : null,
                 undoCallback ? (React.createElement(ActionIcon, { color: color, variant: "transparent", onClick: undoCallback },
                     React.createElement(FontAwesomeIcon, { icon: faArrowLeft, size: "lg" }))) : null,
                 redoCallback ? (React.createElement(ActionIcon, { color: color, variant: "transparent", onClick: redoCallback },
@@ -44,12 +43,12 @@ components, undoCallback = null, redoCallback = null, searchCallback = null, }) 
                 components?.afterLeft),
             React.createElement(Group, { align: "center", position: "center", noWrap: true },
                 components?.beforeTitle,
-                components?.title !== undefined ? (components?.title) : (React.createElement(Title, { order: 3, weight: 100, color: color, truncate: true }, appName)),
+                components?.title === undefined ? (React.createElement(Title, { order: 3, weight: 100, color: color, truncate: true }, appName)) : (components?.title),
                 components?.afterTitle),
             React.createElement(Group, { align: "center", position: "right", noWrap: true },
                 components?.beforeRight,
-                dvLogo,
-                user ? React.createElement(UserAvatar, { menu: userMenu, user: user.name, color: backgroundColor }) : null,
+                components?.logo === undefined ? React.createElement(DatavisynLogo, { color: backgroundColor === 'white' ? 'black' : 'white' }) : components?.logo,
+                components?.userAvatar === undefined ? (user ? (React.createElement(UserAvatar, { menu: components?.userMenu, user: user.name, color: backgroundColor })) : null) : (components?.userAvatar),
                 components?.afterRight))));
 }
 //# sourceMappingURL=VisynHeader.js.map

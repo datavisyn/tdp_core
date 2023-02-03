@@ -25,6 +25,12 @@ class DummyStore(BaseStore):
     ui = "DefaultLoginForm"
 
     def __init__(self):
+        users = manager.settings.tdp_core.security.store.dummy_store.users
+
+        if manager.settings.tdp_core.users:
+            _log.warn('Using "tdp_core.users" is deprecated and should be replaced by "tdp_core.security.store.dummy_store.users".')
+            users = manager.settings.tdp_core.users
+
         self._users = [
             DummyUser(
                 id=v["name"],
@@ -32,7 +38,7 @@ class DummyStore(BaseStore):
                 password=v["password"],
                 salt=v["salt"],
             )
-            for v in manager.settings.tdp_core.security.store.dummy_store.users
+            for v in users
         ]
 
     def load_from_key(self, api_key: str):
@@ -61,6 +67,12 @@ def create():
     # Why do we do this here and not in the __init__.py?
     # Because the configuration is merged after the registry is loaded,
     # such that no keys are available (except tdp_core keys).
+    if manager.settings.tdp_core.alwaysAppendDummyStore:
+        _log.warn(
+            'Using "tdp_core.alwaysAppendDummyStore" is deprecated and should be replaced by "tdp_core.security.store.dummy_store.enable".'
+        )
+        return DummyStore()
+
     if manager.settings.tdp_core.security.store.dummy_store.enable:
         _log.info("Adding DummyStore")
         return DummyStore()

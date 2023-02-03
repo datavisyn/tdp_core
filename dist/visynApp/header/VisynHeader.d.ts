@@ -1,18 +1,8 @@
 /// <reference types="react" />
 import { MantineColor } from '@mantine/core';
-export declare function VisynHeader({ burgerMenu, userMenu, color, backgroundColor, dvLogo, // TODO: Use d3 to determine the better variant
-components, undoCallback, redoCallback, searchCallback, }: {
+export declare function VisynHeader({ color, backgroundColor, components, undoCallback, redoCallback, searchCallback, }: {
     /**
-     * Optional change of default dv logo as JSX element. If not provided, normal logo will be displayed.
-     */
-    dvLogo?: JSX.Element;
-    /**
-     * Optional JSX Element to be displayed when the burgerMenu is clicked. If not provided, burger menu is hidden.
-     */
-    burgerMenu?: JSX.Element;
-    userMenu?: JSX.Element;
-    /**
-     * Optional color to be used for the background. This color must match an entry in the mantine theme colors array. Uses the 7th element in the mantine color array.
+     * Optional color to be used for the background. If it is part of the mantine colors, it uses the primary shade, otherwise it is interpreted as CSS color.
      */
     backgroundColor?: MantineColor;
     /**
@@ -23,13 +13,17 @@ components, undoCallback, redoCallback, searchCallback, }: {
      * Extension components to be rendered within the header.
      */
     components?: {
+        beforeLeft?: JSX.Element;
+        burgerMenu?: JSX.Element;
+        afterLeft?: JSX.Element;
         beforeTitle?: JSX.Element;
         title?: JSX.Element;
         afterTitle?: JSX.Element;
         beforeRight?: JSX.Element;
+        logo?: JSX.Element;
+        userAvatar?: JSX.Element;
+        userMenu?: JSX.Element;
         afterRight?: JSX.Element;
-        beforeLeft?: JSX.Element;
-        afterLeft?: JSX.Element;
     };
     /**
      * Optional callback functioned which is called when the undo button is clicked. If not given, undo button is not created

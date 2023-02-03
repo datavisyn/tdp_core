@@ -29,86 +29,12 @@
             "selectionTextTwo": "Exactly two {{label}}s are required",
             "selectionTextDefault": "Unknown selector: {{selection}}"
         },
-        "dialog1": "This dialog allows you to save a list entities without any extra data. Afterwards, you can start new analyses using this entity subset by selecting it on the start page.",
-        "dialog2": "However, if you want to save the entire analysis session and not only the list of entities, please use the dialog <i> Analysis Session Management </i> at the top.",
-        "name": "Name",
-        "description": "Description"
-    },
-    "NamedSetList": {
-        "predefinedSets": "Predefined Sets",
-        "mySets": "My Sets",
-        "publicSets": "Public Sets",
-        "namedSet": "Named Set",
-        "edit": "Edit",
-        "delete": "Delete",
-        "dialogText": "The named set <i>{{name}}</i> will be deleted and cannot be restored. Continue?",
-        "deleteSet": "Delete named set",
-        "dashboard": "Dashboard",
-        "status": "Public",
-        "status_private": "Private",
-        "title": "Name: {{name}}\nDescription: {{description}}",
-        "title_extended": "Name: {{name}}\nDescription: {{description}} \nCreator: {{creator}}\nPublic: {{public}}"
-    },
-    "TourManager": {
-        "restartButton": "Restart",
-        "backButton": "Back",
-        "cancelButton": "Cancel",
-        "nextButton": "Next",
-        "finishButton": "Finish",
-        "closeButton": "Close",
-        "helpTours": "Help Tours",
-        "showTour": "show tour",
-        "jumpToStep": "Jump to step {{step}}"
-    },
-    "SessionList": {
-        "delete": "Delete",
-        "deleteSession": "Delete Session",
-        "continue": "Continue",
-        "edit": "Edit",
-        "save": "Save",
-        "editSession": "Edit Session",
-        "continueSession": "Continue Session",
-        "cloneToTemporary": "Clone to Temporary Session",
-        "saveSession": "Save Session",
-        "editSessionDetails": "Edit Session Details",
-        "deleteIt": "Are you sure to delete session: \"{{name}}\"",
-        "session": "Session",
-        "status": "Public (everyone can see it)",
-        "status_private": "Private",
-        "unknown": "Unknown",
-        "loadingText": "Loading &hellip;",
-        "name": "Name",
-        "creator": "Creator",
-        "access": "Access",
-        "date": "Date",
-        "actions": "Actions",
-        "sessionMessage": "A temporary session will only be stored in your local browser cache. It is not possible to share a link to states of this session with others. Only the {{latest}} most recent sessions will be stored.",
-        "paragraphText": "The saved session will be stored on the server. By default, sessions are private, meaning that only the creator has access to it. If the status is set to public, others can also see the session and access certain states by opening a shared link.",
-        "mySessions": "My Sessions",
-        "otherSessions": "Other Sessions"
-    },
-    "vis": {
-        "violinError": "To create a violin plot, please select at least 1 numerical column.",
-        "scatterError": "To create a scatter plot, please select at least 2 numerical columns.",
-        "hexbinError": "To create a hexbin plot, please select at least 2 numerical columns.",
-        "stripError": "To create a strip plot, please select at least 1 numerical column.",
-        "barError": "To create a bar chart, please select 1 categorical column.",
-        "errorHeader": "Invalid settings",
-        "openSettings": "Open settings",
-        "hexbinOptions": "Hexbin options",
-        "missingValue": "n/a"
-    },
-    "lineup": {
-        "cmds": {
-            "addRanking": "Add Ranking",
-            "removeRanking": "Remove Ranking",
-            "changeSortCriteria": "Change Sort Criteria",
-            "changeGroupCriteria": "Change Group Criteria",
-            "setProperty": "Set Property {{prop}}",
-            "addColumn": "Add Column",
-            "removeColumn": "Remove Column",
-            "moveColumn": "Move Column",
-            "changeAggregation": "Change Aggregation"
+        "FormMap": {
+            "badgeTitle": "{{text}} items remaining after filtering",
+            "apply": "Apply",
+            "selectMe": "Select me &hellip;",
+            "select": "Select &hellip;",
+            "remove": "Remove"
         },
         "EditProvenanceMenu": {
             "sessionHeader": "Analysis Session Management",
@@ -237,12 +163,14 @@
             "otherSessions": "Other Sessions"
         },
         "vis": {
-            "violinError": "To create a Violin plot, please select at least 1 numerical column.",
-            "scatterError": "To create a Scatterplot, please select at least 2 numerical columns.",
-            "stripError": "To create a Strip plot, please select at least 1 numerical column.",
-            "barError": "To create a Bar chart, please select 1 categorical column.",
-            "pcpError": "To create a Parallel Coordinates Plot, please select at least 2 numerical or categorical columns.",
-            "errorHeader": "Invalid Settings",
+            "violinError": "To create a violin plot, please select at least 1 numerical column.",
+            "scatterError": "To create a scatter plot, please select at least 2 numerical columns.",
+            "hexbinError": "To create a hexbin plot, please select at least 2 numerical columns.",
+            "stripError": "To create a strip plot, please select at least 1 numerical column.",
+            "barError": "To create a bar chart, please select 1 categorical column.",
+            "errorHeader": "Invalid settings",
+            "openSettings": "Open settings",
+            "hexbinOptions": "Hexbin options",
             "missingValue": "n/a"
         },
         "lineup": {
@@ -374,7 +302,7 @@
             }
         },
         "visynApp": {
-            "welcome": "Welcome to ",
+            "welcome": "Welcome to",
             "login": "Please log in to continue",
             "loginButton": "Log In",
             "securityStores": {
