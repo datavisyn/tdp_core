@@ -1,12 +1,14 @@
 import * as React from 'react';
+import { Alert, Center, Stack } from '@mantine/core';
 
 export function InvalidCols({ headerMessage, bodyMessage }: { headerMessage: string; bodyMessage: string }) {
   return (
-    <div className="card w-25 h-10 justify-content-center">
-      <div className="card-header">{headerMessage}</div>
-      <div className="card-body">
-        <p className="card-text">{bodyMessage}</p>
-      </div>
-    </div>
+    <Stack style={{ height: '100%' }}>
+      <Center style={{ height: '100%', width: '100%' }}>
+        <Alert title={headerMessage} color="yellow">
+          {bodyMessage}
+        </Alert>
+      </Center>
+    </Stack>
   );
 }

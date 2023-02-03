@@ -1,9 +1,8 @@
+import { Select, Stack } from '@mantine/core';
 import * as React from 'react';
-import Select from 'react-select';
 import { ColumnInfo, EBarDisplayType, EBarGroupingType, EColumnTypes, VisColumn } from '../interfaces';
 import { BarDisplayButtons } from './BarDisplayTypeButtons';
 import { BarGroupTypeButtons } from './BarGroupTypeButtons';
-import { formatOptionLabel } from './utils';
 
 interface GroupSelectProps {
   groupColumnSelectCallback: (c: ColumnInfo) => void;
@@ -25,17 +24,14 @@ export function GroupSelect({
   currentSelected,
 }: GroupSelectProps) {
   return (
-    <>
-      <label className="pt-2 pb-1">Group</label>
+    <Stack spacing="sm">
       <Select
-        isClearable
-        onChange={(e) => groupColumnSelectCallback(e)}
-        name="groupSelect"
-        formatOptionLabel={formatOptionLabel}
-        getOptionLabel={(option) => option.name}
-        getOptionValue={(option) => option.id}
-        options={columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info)}
-        value={currentSelected || []}
+        clearable
+        placeholder="Select Column"
+        label="Group"
+        onChange={(e) => groupColumnSelectCallback(columns.find((c) => c.info.id === e)?.info)}
+        data={columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => ({ value: c.info.id, label: c.info.name }))}
+        value={currentSelected?.id}
       />
       {currentSelected ? (
         <BarGroupTypeButtons callback={(newGroupType: EBarGroupingType) => groupTypeSelectCallback(newGroupType)} currentSelected={groupType} />
@@ -43,6 +39,6 @@ export function GroupSelect({
       {currentSelected && groupType === EBarGroupingType.STACK ? (
         <BarDisplayButtons callback={(display: EBarDisplayType) => groupDisplaySelectCallback(display)} currentSelected={displayType} />
       ) : null}
-    </>
+    </Stack>
   );
 }

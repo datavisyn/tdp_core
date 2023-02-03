@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Scales, VisColumn, IVisConfig, IBarConfig } from '../interfaces';
-interface BarVisProps {
+export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, selectionCallback, selectedMap, selectedList, enableSidebar, showSidebar, setShowSidebar, showCloseButton, closeButtonCallback, }: {
     config: IBarConfig;
     optionsConfig?: {
         group?: {
@@ -40,8 +40,8 @@ interface BarVisProps {
     selectedList: string[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
-    hideSidebar?: boolean;
-}
-export declare function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, selectionCallback, selectedMap, selectedList, hideSidebar, showCloseButton, closeButtonCallback, }: BarVisProps): JSX.Element;
-export {};
+    showSidebar?: boolean;
+    setShowSidebar?(show: boolean): void;
+    enableSidebar?: boolean;
+}): JSX.Element;
 //# sourceMappingURL=BarVis.d.ts.map
