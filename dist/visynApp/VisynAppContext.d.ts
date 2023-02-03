@@ -1,11 +1,14 @@
 import * as React from 'react';
-import { IUser } from '../security';
+import type { ITDPClientConfig } from '../base/clientConfig';
+import type { IUser } from '../security';
 export declare const VisynAppContext: React.Context<{
     user: IUser | null;
     appName: JSX.Element | string;
+    clientConfig: ITDPClientConfig;
 }>;
-export declare function VisynAppProvider({ children, appName }: {
-    children?: React.ReactNode;
-    appName: JSX.Element | string;
-}): JSX.Element;
+export declare function useVisynAppContext(): {
+    user: IUser;
+    appName: string | JSX.Element;
+    clientConfig: ITDPClientConfig;
+};
 //# sourceMappingURL=VisynAppContext.d.ts.map

@@ -18,7 +18,7 @@ import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '
 import { debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
-import { LineupVisWrapper } from '../vis';
+import { LineupVisWrapper } from '../vis/LineupVisWrapper';
 import { WebpackEnv } from '../base/WebpackEnv';
 /**
  * base class for views based on LineUp

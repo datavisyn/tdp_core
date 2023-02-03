@@ -2,7 +2,7 @@ import { AppShell } from '@mantine/core';
 import * as React from 'react';
 import { VisynHeader } from './header/VisynHeader';
 import { VisynLoginMenu } from './login/VisynLoginMenu';
-import { useInitVisynApp } from './hooks/useInitVisynApp';
+import { useVisynAppContext } from './VisynAppContext';
 /**
  *
  * @param header Optional custom header to be passed to the AppShell. If not provided, will use an empty VisynHeader.
@@ -15,9 +15,9 @@ import { useInitVisynApp } from './hooks/useInitVisynApp';
  * @returns
  */
 export function VisynApp({ header = null, navbar = null, aside = null, footer = null, appShellProps = null, children, headerHeight = 0, loginMenu = React.createElement(VisynLoginMenu, { watch: true }), }) {
-    const { status } = useInitVisynApp();
-    return status === 'success' ? (React.createElement(AppShell, { styles: { root: { height: '100%' }, body: { height: `calc(100% - ${headerHeight}px)` }, main: { minHeight: '0px' } }, ...appShellProps, navbar: navbar, aside: aside, footer: footer, header: header || React.createElement(VisynHeader, null) },
+    useVisynAppContext();
+    return (React.createElement(AppShell, { styles: { root: { height: '100%' }, body: { height: `calc(100% - ${headerHeight}px)` }, main: { minHeight: '0px' } }, ...appShellProps, navbar: navbar, aside: aside, footer: footer, header: header || React.createElement(VisynHeader, null) },
         loginMenu,
-        children)) : null;
+        children));
 }
 //# sourceMappingURL=VisynApp.js.map

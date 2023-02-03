@@ -1,5 +1,5 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Vis } from '../Vis';
+import { Vis } from '../LazyVis';
 import { VisColumn } from '../interfaces';
 export declare function fetchIrisData(): VisColumn[];
 declare const _default: ComponentMeta<typeof Vis>;

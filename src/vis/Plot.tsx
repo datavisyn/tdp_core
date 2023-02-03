@@ -6,14 +6,26 @@ if (typeof window.URL.createObjectURL === 'undefined') {
   };
 }
 
-// Use minified bundle: https://github.com/plotly/react-plotly.js#customizing-the-plotlyjs-bundle
 import * as React from 'react';
-import Plotly from 'plotly.js-dist-min';
-import createPlotlyComponent from 'react-plotly.js/factory';
-import { PlotParams } from 'react-plotly.js';
+import type { PlotParams } from 'react-plotly.js';
+import type { Plotly as PlotlyTypes } from '../plotly';
 
-// Use the minified version for our own `Plotly` object
-export const PlotlyComponent: React.ComponentType<PlotParams> = createPlotlyComponent(Plotly);
+// Lazily load plotly.js-dist-min to allow code-splitting to occur, otherwise plotly is loaded everytime tdp_core is imported.
+const LazyPlotlyComponent = React.lazy(() =>
+  Promise.all([import('plotly.js-dist-min'), import('react-plotly.js/factory')]).then(([plotly, createPlotlyComponent]) => ({
+    // Use the minified version for our own `Plotly` object
+    default: createPlotlyComponent.default(plotly),
+  })),
+);
 
-// Reexport the minified plotly with proper typings
-export { Plotly };
+// The actually exported plotly component is wrapped in Suspense to allow lazy loading
+export function PlotlyComponent(props: PlotParams) {
+  return (
+    <React.Suspense fallback={null}>
+      <LazyPlotlyComponent {...props} />
+    </React.Suspense>
+  );
+}
+
+// Reexport only the plotly typings
+export { PlotlyTypes };

@@ -38,7 +38,7 @@ const DEFAULT_COLORS = [
 
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
 
-export function Vis({
+export function EagerVis({
   columns,
   selected = [],
   colors = DEFAULT_COLORS,

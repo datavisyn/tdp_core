@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { Plotly } from './Plot';
+import { PlotlyTypes } from './Plot';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter Plot",
     PCP = "Parallel Coordinates Plot",
@@ -126,7 +126,7 @@ export declare type PlotlyInfo = {
     errorMessageHeader: string;
 };
 export declare type PlotlyData = {
-    data: Partial<Plotly.PlotData>;
+    data: Partial<PlotlyTypes.PlotData>;
     xLabel: string;
     yLabel: string;
     xTicks?: string[];

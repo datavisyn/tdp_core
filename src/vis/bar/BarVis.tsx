@@ -1,9 +1,10 @@
 import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId, difference } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../Plot';
+import { Plotly } from '../../plotly';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';

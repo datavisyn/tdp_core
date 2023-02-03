@@ -1,5 +1,5 @@
 import React from 'react';
-import { Vis } from '../Vis';
+import { Vis } from '../LazyVis';
 import { EAggregateTypes, EBarDirection, EBarDisplayType, EBarGroupingType, EColumnTypes, ENumericalColorScaleType, EScatterSelectSettings, ESupportedPlotlyVis, EViolinOverlay, } from '../interfaces';
 function fetchData(numberOfPoints) {
     const dataGetter = async () => ({

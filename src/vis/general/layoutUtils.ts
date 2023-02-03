@@ -1,5 +1,5 @@
 import { ColumnInfo, PlotlyInfo, VisColumn } from '../interfaces';
-import { Plotly } from '../Plot';
+import { PlotlyTypes } from '../Plot';
 
 /**
  * Truncate long texts (e.g., to use as axes title)
@@ -20,7 +20,7 @@ export function columnNameWithDescription(col: ColumnInfo) {
  * @param layout the current layout to be changed. Typed to any because the plotly types complain.p
  * @returns the changed layout
  */
-export function beautifyLayout(traces: PlotlyInfo, layout: Partial<Plotly.Layout>) {
+export function beautifyLayout(traces: PlotlyInfo, layout: Partial<PlotlyTypes.Layout>) {
   const layoutEdit = layout;
   layoutEdit.annotations = [];
   traces.plots.forEach((t, i) => {

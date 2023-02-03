@@ -6,7 +6,7 @@ import { useCallback, useState } from 'react';
 import { BurgerButton } from './BurgerButton';
 import { DatavisynLogo } from './DatavisynLogo';
 import { UserAvatar } from './UserAvatar';
-import { VisynAppContext } from '../VisynAppContext';
+import { useVisynAppContext } from '../VisynAppContext';
 const HEADER_HEIGHT = 50;
 const useStyles = createStyles((theme, { color }) => ({
     grayColor: {
@@ -40,7 +40,7 @@ const cardTransition = {
  * @returns
  */
 export function VisynHeader({ projectName = null, dvLogo = React.createElement(DatavisynLogo, null), customerLogo = null, burgerMenu = null, userMenu = null, userName = null, backgroundColor = 'gray', undoCallback = null, redoCallback = null, searchCallback = null, }) {
-    const { appName } = React.useContext(VisynAppContext);
+    const { appName } = useVisynAppContext();
     const { classes } = useStyles({ color: backgroundColor });
     const [isSearching, setIsSearching] = useState(false);
     const [searchString, setSearchString] = useState('');

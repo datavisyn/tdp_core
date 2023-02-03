@@ -1,12 +1,10 @@
 import * as React from 'react';
-import { useVisynUser } from './hooks';
 export const VisynAppContext = React.createContext(null);
-export function VisynAppProvider({ children, appName }) {
-    const user = useVisynUser();
-    const context = React.useMemo(() => ({
-        user,
-        appName,
-    }), [user, appName]);
-    return React.createElement(VisynAppContext.Provider, { value: context }, children);
+export function useVisynAppContext() {
+    const context = React.useContext(VisynAppContext);
+    if (!context) {
+        throw Error('VisynApp can only be used as child of VisynAppProvider.');
+    }
+    return context;
 }
 //# sourceMappingURL=VisynAppContext.js.map

@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { uniqueId } from 'lodash';
-import { VisSidebar, Vis, EColumnTypes } from '../../../vis';
+import { EColumnTypes } from '../../../vis/interfaces';
+import { Vis } from '../../../vis';
+import { VisSidebar } from '../../../vis/VisSidebar';
 function fetchData(numberOfPoints) {
     const dataGetter = async () => {
         await new Promise((resolve) => {

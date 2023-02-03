@@ -10,7 +10,7 @@ import { SessionWatcher } from '../../base/watcher';
 import { useAsync } from '../../hooks/useAsync';
 import { I18nextManager } from '../../i18n/I18nextManager';
 import { VisynLoginForm } from './VisynLoginForm';
-import { VisynAppContext } from '../VisynAppContext';
+import { useVisynAppContext } from '../VisynAppContext';
 const { i18n } = I18nextManager.getInstance();
 const userStoreMap = {
     DummyStore: ({ setError, hasError, store }) => (React.createElement(VisynLoginForm, { hasError: hasError, onLogin: async (username, password) => {
@@ -29,7 +29,7 @@ const userStoreMap = {
     ALBSecurityStore: ({ setError, store }) => React.createElement(Text, { align: "justify" }, i18n.t('tdp:core.visynApp.securityStores.ALBSecurityStore.message')),
 };
 export function VisynLoginMenu({ watch = false }) {
-    const { appName } = React.useContext(VisynAppContext);
+    const { appName } = useVisynAppContext();
     const [loggedInAs, setLoggedInAs] = React.useState(null);
     const [show, setShow] = useState(false);
     const [error, setError] = useState(null);

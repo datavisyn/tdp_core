@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
 import { useMemo, useEffect } from 'react';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../Plot';
+import { Plotly } from '../../plotly';
 import { InvalidCols } from '../general';
 import { createPCPTraces } from './utils';
 import { useAsync } from '../../hooks';

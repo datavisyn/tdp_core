@@ -6,7 +6,7 @@ import { useCallback, useState } from 'react';
 import { BurgerButton } from './BurgerButton';
 import { DatavisynLogo } from './DatavisynLogo';
 import { UserAvatar } from './UserAvatar';
-import { VisynAppContext } from '../VisynAppContext';
+import { useVisynAppContext } from '../VisynAppContext';
 
 const HEADER_HEIGHT = 50;
 
@@ -66,7 +66,7 @@ export function VisynHeader({
   redoCallback?: () => void;
   searchCallback?: (s: string) => void;
 }) {
-  const { appName } = React.useContext(VisynAppContext);
+  const { appName } = useVisynAppContext();
   const { classes } = useStyles({ color: backgroundColor });
 
   const [isSearching, setIsSearching] = useState<boolean>(false);

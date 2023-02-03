@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Vis } from '../Vis';
+import { Vis } from '../LazyVis';
 import {
   EAggregateTypes,
   EBarDirection,

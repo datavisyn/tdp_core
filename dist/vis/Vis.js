@@ -22,7 +22,7 @@ const DEFAULT_COLORS = [
     getCssValue('visyn-c10'),
 ];
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
-export function Vis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, hideSidebar = false, }) {
+export function EagerVis({ columns, selected = [], colors = DEFAULT_COLORS, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, hideSidebar = false, }) {
     // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
     // To ensure that we never render an incosistent config, keep a consistent and a current in the config. Always render the consistent.
     // eslint-disable-next-line @typescript-eslint/naming-convention

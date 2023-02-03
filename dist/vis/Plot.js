@@ -5,10 +5,15 @@ if (typeof window.URL.createObjectURL === 'undefined') {
         // Mock this function for mapbox-gl to work
     };
 }
-import Plotly from 'plotly.js-dist-min';
-import createPlotlyComponent from 'react-plotly.js/factory';
-// Use the minified version for our own `Plotly` object
-export const PlotlyComponent = createPlotlyComponent(Plotly);
-// Reexport the minified plotly with proper typings
-export { Plotly };
+import * as React from 'react';
+// Lazily load plotly.js-dist-min to allow code-splitting to occur, otherwise plotly is loaded everytime tdp_core is imported.
+const LazyPlotlyComponent = React.lazy(() => Promise.all([import('plotly.js-dist-min'), import('react-plotly.js/factory')]).then(([plotly, createPlotlyComponent]) => ({
+    // Use the minified version for our own `Plotly` object
+    default: createPlotlyComponent.default(plotly),
+})));
+// The actually exported plotly component is wrapped in Suspense to allow lazy loading
+export function PlotlyComponent(props) {
+    return (React.createElement(React.Suspense, { fallback: null },
+        React.createElement(LazyPlotlyComponent, { ...props })));
+}
 //# sourceMappingURL=Plot.js.map

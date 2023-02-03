@@ -11,7 +11,7 @@ import { useAsync } from '../../hooks/useAsync';
 import { I18nextManager } from '../../i18n/I18nextManager';
 import { VisynLoginForm } from './VisynLoginForm';
 import { IUserStore } from '../../security';
-import { VisynAppContext } from '../VisynAppContext';
+import { useVisynAppContext } from '../VisynAppContext';
 
 interface IUserStoreRenderProps<T extends IUserStore = IUserStore> {
   setError(error: string | null): void;
@@ -43,7 +43,7 @@ const userStoreMap: Record<string, (props: IUserStoreRenderProps) => React.React
 };
 
 export function VisynLoginMenu({ watch = false }: { watch?: boolean }) {
-  const { appName } = React.useContext(VisynAppContext);
+  const { appName } = useVisynAppContext();
   const [loggedInAs, setLoggedInAs] = React.useState<string>(null);
   const [show, setShow] = useState(false);
   const [error, setError] = useState<string>(null);

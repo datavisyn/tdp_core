@@ -3,7 +3,7 @@ import * as React from 'react';
 import { JSXElementConstructor, ReactElement } from 'react';
 import { VisynHeader } from './header/VisynHeader';
 import { VisynLoginMenu } from './login/VisynLoginMenu';
-import { useInitVisynApp } from './hooks/useInitVisynApp';
+import { useVisynAppContext } from './VisynAppContext';
 
 /**
  *
@@ -35,8 +35,9 @@ export function VisynApp({
   children?: React.ReactChild;
   headerHeight?: number;
 }) {
-  const { status } = useInitVisynApp();
-  return status === 'success' ? (
+  useVisynAppContext();
+
+  return (
     <AppShell
       styles={{ root: { height: '100%' }, body: { height: `calc(100% - ${headerHeight}px)` }, main: { minHeight: '0px' } }}
       {...appShellProps}
@@ -48,5 +49,5 @@ export function VisynApp({
       {loginMenu}
       {children}
     </AppShell>
-  ) : null;
+  );
 }
