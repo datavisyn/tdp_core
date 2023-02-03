@@ -5,7 +5,6 @@ import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirect
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
-import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { getCssValue } from '../utils';
 import { useSyncedRef } from '../hooks/useSyncedRef';
 import { hexinbMergeDefaultConfig, isHexbin } from './hexbin/utils';
@@ -67,10 +66,6 @@ export function Vis({ columns, selected = [], colors = null, shapes = DEFAULT_SH
             const newConfig = violinMergeDefaultConfig(columns, inconsistentVisConfig);
             _setVisConfig({ current: newConfig, consistent: newConfig });
         }
-        if (isStrip(inconsistentVisConfig)) {
-            const newConfig = stripMergeDefaultConfig(columns, inconsistentVisConfig);
-            _setVisConfig({ current: newConfig, consistent: newConfig });
-        }
         if (isBar(inconsistentVisConfig)) {
             const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
             _setVisConfig({ current: newConfig, consistent: newConfig });
@@ -128,7 +123,6 @@ export function Vis({ columns, selected = [], colors = null, shapes = DEFAULT_SH
                     enable: true,
                 },
             }, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
-        isStrip(visConfig) ? (React.createElement(StripVis, { config: visConfig, selectionCallback: selectionCallback, setConfig: setVisConfig, selected: selectedMap, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
         isBar(visConfig) ? (React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, selectionCallback: selectionCallback, selectedMap: selectedMap, selectedList: selected, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
         isHexbin(visConfig) ? (React.createElement(HexbinVis, { config: visConfig, selected: selectedMap, setConfig: setVisConfig, selectionCallback: selectionCallback, columns: columns, hideSidebar: hideSidebar })) : null));
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { Center } from '@mantine/core';
 import { Vis } from '../Vis';
 import {
   EAggregateTypes,
@@ -160,31 +161,5 @@ ViolinPlot.args = {
       },
     ],
     violinOverlay: EViolinOverlay.NONE,
-  },
-};
-
-export const StripPlot = Template.bind({}) as typeof Template;
-StripPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.STRIP,
-    numColumnsSelected: [
-      {
-        description: '',
-        id: 'sepalLength',
-        name: 'Sepal Length',
-      },
-      {
-        description: '',
-        id: 'sepalWidth',
-        name: 'Sepal Width',
-      },
-    ],
-    catColumnsSelected: [
-      {
-        description: '',
-        id: 'species',
-        name: 'Species',
-      },
-    ],
   },
 };

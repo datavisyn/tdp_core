@@ -72,7 +72,7 @@ export async function createViolinTraces(columns: VisColumn[], config: IViolinCo
           jitter: 0.3,
           // @ts-ignore
           hoveron: 'violins',
-          points: config.violinOverlay === EViolinOverlay.STRIP ? 'all' : false,
+          points: false,
           box: {
             visible: config.violinOverlay === EViolinOverlay.BOX,
           },
@@ -110,7 +110,7 @@ export async function createViolinTraces(columns: VisColumn[], config: IViolinCo
           scalemode: 'width',
           pointpos: 0,
           jitter: 0.3,
-          points: config.violinOverlay === EViolinOverlay.STRIP ? 'all' : false,
+          points: false,
           box: {
             visible: config.violinOverlay === EViolinOverlay.BOX,
           },

@@ -3,7 +3,6 @@ import { Plotly } from './Plot';
 export enum ESupportedPlotlyVis {
   SCATTER = 'Scatter plot',
   VIOLIN = 'Violin plot',
-  STRIP = 'Strip plot',
   BAR = 'Bar chart',
   HEXBIN = 'Hexbin plot',
 }
@@ -12,11 +11,10 @@ export const allVisTypes: ESupportedPlotlyVis[] = [
   ESupportedPlotlyVis.SCATTER,
   ESupportedPlotlyVis.BAR,
   ESupportedPlotlyVis.VIOLIN,
-  ESupportedPlotlyVis.STRIP,
   ESupportedPlotlyVis.HEXBIN,
 ];
 
-export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IHexbinConfig;
+export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IHexbinConfig;
 
 export enum EBarDisplayType {
   ABSOLUTE = 'Absolute',
@@ -36,7 +34,6 @@ export enum EBarDirection {
 
 export enum EViolinOverlay {
   NONE = 'None',
-  STRIP = 'Strip',
   BOX = 'Box',
 }
 
@@ -87,12 +84,6 @@ export interface IViolinConfig {
   numColumnsSelected: ColumnInfo[];
   catColumnsSelected: ColumnInfo[];
   violinOverlay: EViolinOverlay;
-}
-
-export interface IStripConfig {
-  type: ESupportedPlotlyVis.STRIP;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
 }
 
 export interface IScatterConfig {

@@ -7,5 +7,4 @@ export default _default;
 export declare const ScatterPlot: ComponentStory<typeof Vis>;
 export declare const BarChart: ComponentStory<typeof Vis>;
 export declare const ViolinPlot: ComponentStory<typeof Vis>;
-export declare const StripPlot: ComponentStory<typeof Vis>;
 //# sourceMappingURL=Iris.stories.d.ts.map

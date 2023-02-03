@@ -85,6 +85,8 @@ export function BarVis({
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
 
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
+
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
   // Make sure selected values is right for each plot.
@@ -146,11 +148,13 @@ export function BarVis({
     if (plotlyDivRef) {
       ro.observe(plotlyDivRef.current);
     }
+
+    return () => ro.disconnect();
   }, [id, plotlyDivRef]);
 
-  const layout = React.useMemo(() => {
+  React.useEffect(() => {
     if (!finalTraces) {
-      return null;
+      return;
     }
 
     const innerLayout: Partial<Plotly.Layout> = {
@@ -176,7 +180,9 @@ export function BarVis({
       dragmode: false,
     };
 
-    return beautifyLayout(finalTraces, innerLayout);
+    setLayout({ ...layout, ...beautifyLayout(finalTraces, innerLayout, null) });
+    // WARNING: Do not update when layout changes, that would be an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalTraces, config.groupType]);
 
   const traceData = useMemo(() => {
@@ -193,12 +199,14 @@ export function BarVis({
 
       {mergedExtensions.prePlot}
       <Space h="xl" />
-      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
-        <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-          <FontAwesomeIcon icon={faGear} />
-        </ActionIcon>
-      </Tooltip>
-      {traceStatus === 'success' && finalTraces?.plots.length > 0 ? (
+      {!hideSidebar ? (
+        <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+            <FontAwesomeIcon icon={faGear} />
+          </ActionIcon>
+        </Tooltip>
+      ) : null}
+      {traceStatus === 'success' && layout && finalTraces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
           data={traceData}

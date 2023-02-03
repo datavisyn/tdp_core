@@ -67,6 +67,8 @@ export function ViolinVis({
   const id = React.useMemo(() => uniqueId('ViolinVis'), []);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
+
   const plotlyDivRef = React.useRef(null);
 
   useEffect(() => {
@@ -77,11 +79,13 @@ export function ViolinVis({
     if (plotlyDivRef) {
       ro.observe(plotlyDivRef.current);
     }
+
+    return () => ro.disconnect();
   }, [id, plotlyDivRef]);
 
-  const layout = React.useMemo(() => {
+  React.useEffect(() => {
     if (!traces) {
-      return null;
+      return;
     }
 
     const innerLayout: Partial<Plotly.Layout> = {
@@ -105,7 +109,9 @@ export function ViolinVis({
       shapes: [],
     };
 
-    return beautifyLayout(traces, innerLayout);
+    setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+    // WARNING: Do not update when layout changes, that would be an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [traces]);
 
   return (
@@ -113,14 +119,16 @@ export function ViolinVis({
       <Space h="xl" />
       {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
 
-      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
-        <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-          <FontAwesomeIcon icon={faGear} />
-        </ActionIcon>
-      </Tooltip>
+      {!hideSidebar ? (
+        <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+            <FontAwesomeIcon icon={faGear} />
+          </ActionIcon>
+        </Tooltip>
+      ) : null}
       {mergedExtensions.prePlot}
 
-      {traceStatus === 'success' && traces?.plots.length > 0 ? (
+      {traceStatus === 'success' && layout && traces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
           className="tdpCoreVis"
