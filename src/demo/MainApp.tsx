@@ -60,7 +60,6 @@ export function MainApp() {
               </>
             ) : null
           }
-          userName={user ? user.name : null}
           backgroundColor="dark"
         />
       }

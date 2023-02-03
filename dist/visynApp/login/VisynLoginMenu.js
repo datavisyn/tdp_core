@@ -71,7 +71,7 @@ export function VisynLoginMenu({ watch = false }) {
         React.createElement(Container, { fluid: true },
             React.createElement(Stack, { mb: "lg" },
                 React.createElement(Center, null,
-                    React.createElement(Title, { order: 4 },
+                    React.createElement(Title, { order: 4, truncate: true },
                         i18n.t('tdp:core.visynApp.welcome'),
                         " ",
                         appName)),

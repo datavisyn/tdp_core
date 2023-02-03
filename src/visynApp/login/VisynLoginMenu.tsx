@@ -83,7 +83,7 @@ export function VisynLoginMenu({ watch = false }: { watch?: boolean }) {
       <Container fluid>
         <Stack mb="lg">
           <Center>
-            <Title order={4}>
+            <Title order={4} truncate>
               {i18n.t('tdp:core.visynApp.welcome')} {appName}
             </Title>
           </Center>

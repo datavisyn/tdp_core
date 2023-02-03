@@ -19,7 +19,7 @@ export declare function VisynApp({ header, navbar, aside, footer, appShellProps,
     footer?: ReactElement<unknown, string | JSXElementConstructor<unknown>>;
     appShellProps?: Partial<AppShellProps & React.RefAttributes<HTMLDivElement>>;
     loginMenu?: JSX.Element;
-    children?: React.ReactChild;
+    children?: React.ReactNode;
     headerHeight?: number;
 }): JSX.Element;
 //# sourceMappingURL=VisynApp.d.ts.map

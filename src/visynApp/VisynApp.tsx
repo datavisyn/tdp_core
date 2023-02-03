@@ -32,7 +32,7 @@ export function VisynApp({
   footer?: ReactElement<unknown, string | JSXElementConstructor<unknown>>;
   appShellProps?: Partial<AppShellProps & React.RefAttributes<HTMLDivElement>>;
   loginMenu?: JSX.Element;
-  children?: React.ReactChild;
+  children?: React.ReactNode;
   headerHeight?: number;
 }) {
   useVisynAppContext();

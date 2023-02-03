@@ -300,7 +300,7 @@
           }
       },
       "visynApp": {
-          "welcome": "Welcome to {{appName}}",
+          "welcome": "Welcome to ",
           "login": "Please log in to continue",
           "loginButton": "Log In",
           "securityStores": {
