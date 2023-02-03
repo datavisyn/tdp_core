@@ -1,7 +1,10 @@
 import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId, difference } from 'lodash';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
 import { PlotlyComponent } from '../Plot';
 import { Plotly } from '../../plotly';
@@ -12,8 +15,31 @@ import { createBarTraces } from './utils';
 import { BarVisSidebar } from './BarVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 
-interface BarVisProps {
+const defaultExtensions = {
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
+};
+
+export function BarVis({
+  config,
+  optionsConfig,
+  extensions,
+  columns,
+  setConfig,
+  scales,
+  selectionCallback = () => null,
+  selectedMap = {},
+  selectedList = [],
+  enableSidebar,
+  showSidebar,
+  setShowSidebar,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
+}: {
   config: IBarConfig;
   optionsConfig?: {
     group?: {
@@ -51,35 +77,17 @@ interface BarVisProps {
   selectedList: string[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
-  hideSidebar?: boolean;
-}
-
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
-export function BarVis({
-  config,
-  optionsConfig,
-  extensions,
-  columns,
-  setConfig,
-  scales,
-  selectionCallback = () => null,
-  selectedMap = {},
-  selectedList = [],
-  hideSidebar = false,
-  showCloseButton = false,
-  closeButtonCallback = () => null,
-}: BarVisProps) {
+  showSidebar?: boolean;
+  setShowSidebar?(show: boolean): void;
+  enableSidebar?: boolean;
+}) {
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
+
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
 
   // Make sure selected values is right for each plot.
   const finalTraces = useMemo(() => {
@@ -141,24 +149,12 @@ export function BarVis({
       ro.observe(plotlyDivRef.current);
     }
 
-    if (hideSidebar) {
-      return;
-    }
+    return () => ro.disconnect();
+  }, [id, plotlyDivRef]);
 
-    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-
-    menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-  }, [id, hideSidebar, plotlyDivRef]);
-
-  const layout = React.useMemo(() => {
+  React.useEffect(() => {
     if (!finalTraces) {
-      return null;
+      return;
     }
 
     const innerLayout: Partial<Plotly.Layout> = {
@@ -171,6 +167,12 @@ export function BarVis({
       font: {
         family: 'Roboto, sans-serif',
       },
+      margin: {
+        t: 25,
+        r: 25,
+        l: 25,
+        b: 25,
+      },
       autosize: true,
       grid: { rows: finalTraces.rows, columns: finalTraces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
@@ -178,7 +180,9 @@ export function BarVis({
       dragmode: false,
     };
 
-    return beautifyLayout(finalTraces, innerLayout);
+    setLayout({ ...layout, ...beautifyLayout(finalTraces, innerLayout, null) });
+    // WARNING: Do not update when layout changes, that would be an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finalTraces, config.groupType]);
 
   const traceData = useMemo(() => {
@@ -190,64 +194,81 @@ export function BarVis({
   }, [finalTraces]);
 
   return (
-    <div ref={plotlyDivRef} className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
-      <div
-        className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
-          traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
-        }`}
-      >
-        {mergedExtensions.prePlot}
-        {traceStatus === 'success' && finalTraces?.plots.length > 0 ? (
-          <PlotlyComponent
-            divId={`plotlyDiv${id}`}
-            data={traceData}
-            layout={layout}
-            config={{ responsive: true, displayModeBar: false }}
-            useResizeHandler
-            style={{ width: '100%', height: '100%' }}
-            onClick={(e) => {
-              // plotly types here are just wrong. So have to convert to unknown first.
-              const selectedPoints: string[] = e.points[0].customdata as unknown as string[];
+    <Container
+      fluid
+      sx={{
+        flexGrow: 1,
+        height: '100%',
+        width: '100%',
+        overflow: 'hidden',
+        position: 'relative',
+        // Disable plotly crosshair cursor
+        '.nsewdrag': {
+          cursor: 'pointer !important',
+        },
+      }}
+      ref={plotlyDivRef}
+    >
+      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
 
-              let removeSelectionFlag = true;
+      {mergedExtensions.prePlot}
+      <Space h="xl" />
+      {enableSidebar ? (
+        <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setShowSidebar(true)}>
+            <FontAwesomeIcon icon={faGear} />
+          </ActionIcon>
+        </Tooltip>
+      ) : null}
+      {traceStatus === 'success' && layout && finalTraces?.plots.length > 0 ? (
+        <PlotlyComponent
+          divId={`plotlyDiv${id}`}
+          data={traceData}
+          layout={layout}
+          config={{ responsive: true, displayModeBar: false }}
+          useResizeHandler
+          style={{ width: '100%', height: '100%' }}
+          onClick={(e) => {
+            // plotly types here are just wrong. So have to convert to unknown first.
+            const selectedPoints: string[] = e.points[0].customdata as unknown as string[];
 
-              for (const pointId of selectedPoints) {
-                if (!selectedMap[pointId]) {
-                  removeSelectionFlag = false;
-                  break;
-                }
+            let removeSelectionFlag = true;
+
+            for (const pointId of selectedPoints) {
+              if (!selectedMap[pointId]) {
+                removeSelectionFlag = false;
+                break;
               }
+            }
 
-              if (removeSelectionFlag) {
-                const newList = difference(selectedList, selectedPoints);
-                selectionCallback(newList);
-              } else if (e.event.ctrlKey) {
-                const newList = Array.from(new Set([...selectedList, ...selectedPoints]));
-                selectionCallback(newList);
-              } else {
-                selectionCallback(selectedPoints);
-              }
-            }}
-            // plotly redraws everything on updates, so you need to reappend title and
-            onUpdate={() => {
-              for (const p of finalTraces.plots) {
-                d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+            if (removeSelectionFlag) {
+              const newList = difference(selectedList, selectedPoints);
+              selectionCallback(newList);
+            } else if (e.event.ctrlKey) {
+              const newList = Array.from(new Set([...selectedList, ...selectedPoints]));
+              selectionCallback(newList);
+            } else {
+              selectionCallback(selectedPoints);
+            }
+          }}
+          // plotly redraws everything on updates, so you need to reappend title and
+          onUpdate={() => {
+            for (const p of finalTraces.plots) {
+              d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
 
-                d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
-              }
-            }}
-          />
-        ) : traceStatus !== 'pending' ? (
-          <InvalidCols headerMessage={finalTraces?.errorMessageHeader} bodyMessage={traceError?.message || finalTraces?.errorMessage} />
-        ) : null}
-        {mergedExtensions.postPlot}
-        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
-      </div>
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id}>
+              d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+            }
+          }}
+        />
+      ) : traceStatus !== 'pending' ? (
+        <InvalidCols headerMessage={finalTraces?.errorMessageHeader} bodyMessage={traceError?.message || finalTraces?.errorMessage} />
+      ) : null}
+      {mergedExtensions.postPlot}
+      {showSidebar ? (
+        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={showSidebar} onClose={() => setShowSidebar(false)}>
           <BarVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}
-    </div>
+    </Container>
   );
 }

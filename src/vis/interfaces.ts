@@ -1,24 +1,30 @@
 import { PlotlyTypes } from './Plot';
 
 export enum ESupportedPlotlyVis {
-  SCATTER = 'Scatter Plot',
-  PCP = 'Parallel Coordinates Plot',
-  VIOLIN = 'Violin Plot',
-  STRIP = 'Strip Plot',
-  BAR = 'Bar Chart',
+  SCATTER = 'Scatter plot',
+  VIOLIN = 'Violin plot',
+  BAR = 'Bar chart',
+  HEXBIN = 'Hexbin plot',
 }
 
 export const allVisTypes: ESupportedPlotlyVis[] = [
   ESupportedPlotlyVis.SCATTER,
   ESupportedPlotlyVis.BAR,
   ESupportedPlotlyVis.VIOLIN,
-  ESupportedPlotlyVis.STRIP,
-  ESupportedPlotlyVis.PCP,
+  ESupportedPlotlyVis.HEXBIN,
 ];
+
+export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IHexbinConfig;
 
 export enum EBarDisplayType {
   ABSOLUTE = 'Absolute',
   NORMALIZED = 'Normalized',
+}
+
+export enum EHexbinOptions {
+  COLOR = 'Color',
+  PIE = 'Pie',
+  BINS = 'Bins',
 }
 
 export enum EBarDirection {
@@ -28,7 +34,6 @@ export enum EBarDirection {
 
 export enum EViolinOverlay {
   NONE = 'None',
-  STRIP = 'Strip',
   BOX = 'Box',
 }
 
@@ -57,8 +62,8 @@ export enum EGeneralFormType {
 }
 
 export enum EFilterOptions {
-  IN = 'Filter In',
-  OUT = 'Filter Out',
+  IN = 'Filter in',
+  OUT = 'Filter out',
   CLEAR = 'Clear',
 }
 
@@ -79,12 +84,6 @@ export interface IViolinConfig {
   numColumnsSelected: ColumnInfo[];
   catColumnsSelected: ColumnInfo[];
   violinOverlay: EViolinOverlay;
-}
-
-export interface IStripConfig {
-  type: ESupportedPlotlyVis.STRIP;
-  numColumnsSelected: ColumnInfo[];
-  catColumnsSelected: ColumnInfo[];
 }
 
 export interface IScatterConfig {
@@ -110,12 +109,16 @@ export interface IBarConfig {
   aggregateColumn: ColumnInfo | null;
 }
 
-export interface IPCPConfig {
-  type: ESupportedPlotlyVis.PCP;
-  allColumnsSelected: ColumnInfo[];
+export interface IHexbinConfig {
+  type: ESupportedPlotlyVis.HEXBIN;
+  numColumnsSelected: ColumnInfo[];
+  color: ColumnInfo | null;
+  hexRadius: number;
+  isOpacityScale: boolean;
+  isSizeScale: boolean;
+  dragMode: EScatterSelectSettings;
+  hexbinOptions: EHexbinOptions;
 }
-
-export type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 
 type ValueGetter<T> = () => T | Promise<T>;
 

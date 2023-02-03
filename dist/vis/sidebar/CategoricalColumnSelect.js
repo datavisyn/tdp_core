@@ -1,13 +1,10 @@
+import { MultiSelect } from '@mantine/core';
 import * as React from 'react';
-import Select from 'react-select';
 import { EColumnTypes } from '../interfaces';
-import { formatOptionLabel } from './utils';
 export function CategoricalColumnSelect({ callback, columns, currentSelected }) {
     const selectCatOptions = React.useMemo(() => {
-        return columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => c.info);
+        return columns.filter((c) => c.type === EColumnTypes.CATEGORICAL).map((c) => ({ value: c.info.id, label: c.info.name }));
     }, [columns]);
-    return (React.createElement(React.Fragment, null,
-        React.createElement("label", { className: "pt-2 pb-1" }, "Categorical Columns"),
-        React.createElement(Select, { closeMenuOnSelect: false, isMulti: true, formatOptionLabel: formatOptionLabel, getOptionLabel: (option) => option.name, getOptionValue: (option) => option.id, onChange: (e) => callback(e.map((c) => c)), name: "numColumns", options: selectCatOptions, value: selectCatOptions.filter((c) => currentSelected.filter((d) => d.id === c.id).length > 0) })));
+    return (React.createElement(MultiSelect, { placeholder: "Select Column", label: "Categorical columns", clearable: true, onChange: (e) => callback(columns.filter((c) => e.includes(c.info.id)).map((c) => c.info)), name: "numColumns", data: selectCatOptions, value: selectCatOptions.filter((c) => currentSelected.filter((d) => d.id === c.value).length > 0).map((c) => c.value) }));
 }
 //# sourceMappingURL=CategoricalColumnSelect.js.map

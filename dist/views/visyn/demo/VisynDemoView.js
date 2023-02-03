@@ -72,7 +72,7 @@ export function VisynDemoView({ desc, parameters, onParametersChanged }) {
     }, [parameters?.dataLength, onParametersChanged]);
     return (React.createElement(React.Fragment, null,
         desc.helpText,
-        parameters.columns ? (React.createElement(Vis, { columns: parameters.columns, externalConfig: parameters.config, hideSidebar: true, setExternalConfig: (config) => {
+        parameters.columns ? (React.createElement(Vis, { columns: parameters.columns, externalConfig: parameters.config, setExternalConfig: (config) => {
                 onParametersChanged((p) => ({
                     ...p,
                     config,

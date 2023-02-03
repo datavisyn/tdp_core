@@ -65,7 +65,7 @@ export function MainApp() {
       }
       appShellProps={{}}
     >
-      {user ? <Vis columns={irisData} externalConfig={visConfig} setExternalConfig={setVisConfig} /> : null}
+      {user ? <Vis columns={irisData} showSidebarDefault externalConfig={visConfig} setExternalConfig={setVisConfig} /> : null}
     </VisynApp>
   );
 }

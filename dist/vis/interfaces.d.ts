@@ -1,16 +1,21 @@
 /// <reference types="react" />
 import { PlotlyTypes } from './Plot';
 export declare enum ESupportedPlotlyVis {
-    SCATTER = "Scatter Plot",
-    PCP = "Parallel Coordinates Plot",
-    VIOLIN = "Violin Plot",
-    STRIP = "Strip Plot",
-    BAR = "Bar Chart"
+    SCATTER = "Scatter plot",
+    VIOLIN = "Violin plot",
+    BAR = "Bar chart",
+    HEXBIN = "Hexbin plot"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
+export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IHexbinConfig;
 export declare enum EBarDisplayType {
     ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
+}
+export declare enum EHexbinOptions {
+    COLOR = "Color",
+    PIE = "Pie",
+    BINS = "Bins"
 }
 export declare enum EBarDirection {
     VERTICAL = "Vertical",
@@ -18,7 +23,6 @@ export declare enum EBarDirection {
 }
 export declare enum EViolinOverlay {
     NONE = "None",
-    STRIP = "Strip",
     BOX = "Box"
 }
 export declare enum EAggregateTypes {
@@ -42,8 +46,8 @@ export declare enum EGeneralFormType {
     SLIDER = "Slider"
 }
 export declare enum EFilterOptions {
-    IN = "Filter In",
-    OUT = "Filter Out",
+    IN = "Filter in",
+    OUT = "Filter out",
     CLEAR = "Clear"
 }
 export declare enum ENumericalColorScaleType {
@@ -61,11 +65,6 @@ export interface IViolinConfig {
     numColumnsSelected: ColumnInfo[];
     catColumnsSelected: ColumnInfo[];
     violinOverlay: EViolinOverlay;
-}
-export interface IStripConfig {
-    type: ESupportedPlotlyVis.STRIP;
-    numColumnsSelected: ColumnInfo[];
-    catColumnsSelected: ColumnInfo[];
 }
 export interface IScatterConfig {
     type: ESupportedPlotlyVis.SCATTER;
@@ -88,11 +87,16 @@ export interface IBarConfig {
     aggregateType: EAggregateTypes;
     aggregateColumn: ColumnInfo | null;
 }
-export interface IPCPConfig {
-    type: ESupportedPlotlyVis.PCP;
-    allColumnsSelected: ColumnInfo[];
+export interface IHexbinConfig {
+    type: ESupportedPlotlyVis.HEXBIN;
+    numColumnsSelected: ColumnInfo[];
+    color: ColumnInfo | null;
+    hexRadius: number;
+    isOpacityScale: boolean;
+    isSizeScale: boolean;
+    dragMode: EScatterSelectSettings;
+    hexbinOptions: EHexbinOptions;
 }
-export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig | IPCPConfig;
 declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**

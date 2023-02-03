@@ -61,7 +61,9 @@ export default {
 // eslint-disable-next-line react/function-component-definition
 const Template = (args) => {
     const columns = React.useMemo(() => fetchIrisData(), []);
-    return React.createElement(Vis, { ...args, columns: columns });
+    return (React.createElement("div", { style: { height: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center', flexWrap: 'wrap' } },
+        React.createElement("div", { style: { width: '70%', height: '80%' } },
+            React.createElement(Vis, { ...args, columns: columns }))));
 };
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 export const ScatterPlot = Template.bind({});
@@ -134,49 +136,6 @@ ViolinPlot.args = {
             },
         ],
         violinOverlay: EViolinOverlay.NONE,
-    },
-};
-export const StripPlot = Template.bind({});
-StripPlot.args = {
-    externalConfig: {
-        type: ESupportedPlotlyVis.STRIP,
-        numColumnsSelected: [
-            {
-                description: '',
-                id: 'sepalLength',
-                name: 'Sepal Length',
-            },
-            {
-                description: '',
-                id: 'sepalWidth',
-                name: 'Sepal Width',
-            },
-        ],
-        catColumnsSelected: [
-            {
-                description: '',
-                id: 'species',
-                name: 'Species',
-            },
-        ],
-    },
-};
-export const ParallelCoordinatesPlot = Template.bind({});
-ParallelCoordinatesPlot.args = {
-    externalConfig: {
-        type: ESupportedPlotlyVis.PCP,
-        allColumnsSelected: [
-            {
-                description: '',
-                id: 'sepalLength',
-                name: 'Sepal Length',
-            },
-            {
-                description: '',
-                id: 'sepalWidth',
-                name: 'Sepal Width',
-            },
-        ],
     },
 };
 //# sourceMappingURL=Iris.stories.js.map

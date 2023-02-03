@@ -35,6 +35,6 @@ export function MainApp() {
                     user.name),
                 React.createElement(Menu.Item, { onClick: () => {
                         LoginUtils.logout();
-                    } }, "Logout"))) : null, backgroundColor: "dark" }), appShellProps: {} }, user ? React.createElement(Vis, { columns: irisData, externalConfig: visConfig, setExternalConfig: setVisConfig }) : null));
+                    } }, "Logout"))) : null, backgroundColor: "dark" }), appShellProps: {} }, user ? React.createElement(Vis, { columns: irisData, showSidebarDefault: true, externalConfig: visConfig, setExternalConfig: setVisConfig }) : null));
 }
 //# sourceMappingURL=MainApp.js.map
