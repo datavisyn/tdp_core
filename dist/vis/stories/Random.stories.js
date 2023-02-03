@@ -64,7 +64,7 @@ export default {
         pointCount: { control: 'number' },
     },
     args: {
-        pointCount: 1000,
+        pointCount: 100000,
     },
 };
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
@@ -137,25 +137,6 @@ ViolinPlot.args = {
         ],
         catColumnsSelected: [],
         violinOverlay: EViolinOverlay.NONE,
-    },
-};
-export const StripPlot = Template.bind({});
-StripPlot.args = {
-    externalConfig: {
-        type: ESupportedPlotlyVis.STRIP,
-        numColumnsSelected: [
-            {
-                description: '',
-                id: 'pca_x',
-                name: 'pca_x',
-            },
-            {
-                description: '',
-                id: 'pca_y',
-                name: 'pca_y',
-            },
-        ],
-        catColumnsSelected: [],
     },
 };
 //# sourceMappingURL=Random.stories.js.map

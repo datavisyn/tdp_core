@@ -20,7 +20,6 @@ export function ViolinOverlayButtons({ callback, currentSelected }: ViolinOverla
           data={[
             { label: EViolinOverlay.NONE, value: EViolinOverlay.NONE },
             { label: EViolinOverlay.BOX, value: EViolinOverlay.BOX },
-            { label: EViolinOverlay.STRIP, value: EViolinOverlay.STRIP },
           ]}
         />
       </Stack>

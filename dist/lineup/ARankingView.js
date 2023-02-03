@@ -180,16 +180,23 @@ export class ARankingView extends AView {
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
         if (this.options.enableVisPanel) {
-            this.generalVis = new LineupVisWrapper({
-                provider: this.provider,
-                selectionCallback: (ids) => {
-                    // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
-                    this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
-                },
-                doc: this.node.ownerDocument,
-            });
-            this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-                this.generalVis.toggleCustomVis();
+            this.generalVis = import('../vis').then(() => {
+                const newVis = new LineupVisWrapper({
+                    provider: this.provider,
+                    selectionCallback: (ids) => {
+                        // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                        this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+                    },
+                    doc: this.node.ownerDocument,
+                });
+                this.node.appendChild(newVis.node);
+                this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
+                    newVis.updateCustomVis();
+                });
+                this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+                    newVis.toggleCustomVis();
+                });
+                return newVis;
             });
         }
         // When a new column desc is added to the provider, update the panel chooser
@@ -223,18 +230,12 @@ export class ARankingView extends AView {
         }
         if (this.options.enableSidePanel) {
             this.node.appendChild(this.panel.node);
-            if (options.enableVisPanel) {
-                this.node.appendChild(this.generalVis.node);
-            }
             if (this.options.enableSidePanel !== 'top') {
                 this.taggle.pushUpdateAble((ctx) => this.panel.panel.update(ctx));
             }
         }
         this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
             this.setItemSelection(sel);
-            if (options.enableVisPanel) {
-                this.generalVis.updateCustomVis();
-            }
         });
         this.selectionAdapter = this.createSelectionAdapter();
     }
@@ -372,9 +373,9 @@ export class ARankingView extends AView {
             return;
         }
         this.panel.hide();
-        if (this.options.enableVisPanel) {
-            this.generalVis.hide();
-        }
+        this.generalVis?.then((vis) => {
+            vis.hide();
+        });
         if (this.dump !== null) {
             return;
         }

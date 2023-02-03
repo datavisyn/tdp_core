@@ -3,13 +3,19 @@ import { Plotly } from './Plot';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter plot",
     VIOLIN = "Violin plot",
-    STRIP = "Strip plot",
-    BAR = "Bar chart"
+    BAR = "Bar chart",
+    HEXBIN = "Hexbin plot"
 }
 export declare const allVisTypes: ESupportedPlotlyVis[];
+export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IHexbinConfig;
 export declare enum EBarDisplayType {
     ABSOLUTE = "Absolute",
     NORMALIZED = "Normalized"
+}
+export declare enum EHexbinOptions {
+    COLOR = "Color",
+    PIE = "Pie",
+    BINS = "Bins"
 }
 export declare enum EBarDirection {
     VERTICAL = "Vertical",
@@ -17,7 +23,6 @@ export declare enum EBarDirection {
 }
 export declare enum EViolinOverlay {
     NONE = "None",
-    STRIP = "Strip",
     BOX = "Box"
 }
 export declare enum EAggregateTypes {
@@ -61,11 +66,6 @@ export interface IViolinConfig {
     catColumnsSelected: ColumnInfo[];
     violinOverlay: EViolinOverlay;
 }
-export interface IStripConfig {
-    type: ESupportedPlotlyVis.STRIP;
-    numColumnsSelected: ColumnInfo[];
-    catColumnsSelected: ColumnInfo[];
-}
 export interface IScatterConfig {
     type: ESupportedPlotlyVis.SCATTER;
     numColumnsSelected: ColumnInfo[];
@@ -87,7 +87,16 @@ export interface IBarConfig {
     aggregateType: EAggregateTypes;
     aggregateColumn: ColumnInfo | null;
 }
-export declare type IVisConfig = IScatterConfig | IViolinConfig | IBarConfig | IStripConfig;
+export interface IHexbinConfig {
+    type: ESupportedPlotlyVis.HEXBIN;
+    numColumnsSelected: ColumnInfo[];
+    color: ColumnInfo | null;
+    hexRadius: number;
+    isOpacityScale: boolean;
+    isSizeScale: boolean;
+    dragMode: EScatterSelectSettings;
+    hexbinOptions: EHexbinOptions;
+}
 declare type ValueGetter<T> = () => T | Promise<T>;
 export interface IVisCommonValue<Type extends number | string> {
     /**

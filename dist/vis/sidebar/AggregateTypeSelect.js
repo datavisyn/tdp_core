@@ -17,7 +17,7 @@ export function AggregateTypeSelect({ aggregateTypeSelectCallback, aggregateColu
         ];
     }, [hasNumCols]);
     return (React.createElement(React.Fragment, null,
-        React.createElement(Select, { label: "Aggregate Type", onChange: (option) => aggregateTypeSelectCallback(option), name: "numColumns", data: selectOptions || [], value: currentSelected || '' }),
+        React.createElement(Select, { label: "Aggregate type", onChange: (option) => aggregateTypeSelectCallback(option), name: "numColumns", data: selectOptions || [], value: currentSelected || '' }),
         currentSelected !== EAggregateTypes.COUNT ? (React.createElement(SingleColumnSelect, { type: [EColumnTypes.NUMERICAL], label: "Aggregate Column", callback: (c) => aggregateColumnSelectCallback(c), columns: columns, currentSelected: aggregateColumn })) : null));
 }
 //# sourceMappingURL=AggregateTypeSelect.js.map

@@ -5,9 +5,10 @@ import { ESupportedPlotlyVis, ENumericalColorScaleType, EColumnTypes, EBarDirect
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
-import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { getCssValue } from '../utils';
 import { useSyncedRef } from '../hooks/useSyncedRef';
+import { hexinbMergeDefaultConfig, isHexbin } from './hexbin/utils';
+import { HexbinVis } from './hexbin/HexbinVis';
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
 export function Vis({ columns, selected = [], colors = null, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, hideSidebar = false, }) {
     // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
@@ -65,12 +66,12 @@ export function Vis({ columns, selected = [], colors = null, shapes = DEFAULT_SH
             const newConfig = violinMergeDefaultConfig(columns, inconsistentVisConfig);
             _setVisConfig({ current: newConfig, consistent: newConfig });
         }
-        if (isStrip(inconsistentVisConfig)) {
-            const newConfig = stripMergeDefaultConfig(columns, inconsistentVisConfig);
-            _setVisConfig({ current: newConfig, consistent: newConfig });
-        }
         if (isBar(inconsistentVisConfig)) {
             const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
+            _setVisConfig({ current: newConfig, consistent: newConfig });
+        }
+        if (isHexbin(inconsistentVisConfig)) {
+            const newConfig = hexinbMergeDefaultConfig(columns, inconsistentVisConfig);
             _setVisConfig({ current: newConfig, consistent: newConfig });
         }
         // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
@@ -122,7 +123,7 @@ export function Vis({ columns, selected = [], colors = null, shapes = DEFAULT_SH
                     enable: true,
                 },
             }, setConfig: setVisConfig, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
-        isStrip(visConfig) ? (React.createElement(StripVis, { config: visConfig, selectionCallback: selectionCallback, setConfig: setVisConfig, selected: selectedMap, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
-        isBar(visConfig) ? (React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, selectionCallback: selectionCallback, selectedMap: selectedMap, selectedList: selected, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null));
+        isBar(visConfig) ? (React.createElement(BarVis, { config: visConfig, setConfig: setVisConfig, selectionCallback: selectionCallback, selectedMap: selectedMap, selectedList: selected, columns: columns, scales: scales, hideSidebar: hideSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback })) : null,
+        isHexbin(visConfig) ? (React.createElement(HexbinVis, { config: visConfig, selected: selectedMap, setConfig: setVisConfig, selectionCallback: selectionCallback, columns: columns, hideSidebar: hideSidebar })) : null));
 }
 //# sourceMappingURL=Vis.js.map

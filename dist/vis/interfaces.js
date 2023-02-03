@@ -2,15 +2,26 @@ export var ESupportedPlotlyVis;
 (function (ESupportedPlotlyVis) {
     ESupportedPlotlyVis["SCATTER"] = "Scatter plot";
     ESupportedPlotlyVis["VIOLIN"] = "Violin plot";
-    ESupportedPlotlyVis["STRIP"] = "Strip plot";
     ESupportedPlotlyVis["BAR"] = "Bar chart";
+    ESupportedPlotlyVis["HEXBIN"] = "Hexbin plot";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
-export const allVisTypes = [ESupportedPlotlyVis.SCATTER, ESupportedPlotlyVis.BAR, ESupportedPlotlyVis.VIOLIN, ESupportedPlotlyVis.STRIP];
+export const allVisTypes = [
+    ESupportedPlotlyVis.SCATTER,
+    ESupportedPlotlyVis.BAR,
+    ESupportedPlotlyVis.VIOLIN,
+    ESupportedPlotlyVis.HEXBIN,
+];
 export var EBarDisplayType;
 (function (EBarDisplayType) {
     EBarDisplayType["ABSOLUTE"] = "Absolute";
     EBarDisplayType["NORMALIZED"] = "Normalized";
 })(EBarDisplayType || (EBarDisplayType = {}));
+export var EHexbinOptions;
+(function (EHexbinOptions) {
+    EHexbinOptions["COLOR"] = "Color";
+    EHexbinOptions["PIE"] = "Pie";
+    EHexbinOptions["BINS"] = "Bins";
+})(EHexbinOptions || (EHexbinOptions = {}));
 export var EBarDirection;
 (function (EBarDirection) {
     EBarDirection["VERTICAL"] = "Vertical";
@@ -19,7 +30,6 @@ export var EBarDirection;
 export var EViolinOverlay;
 (function (EViolinOverlay) {
     EViolinOverlay["NONE"] = "None";
-    EViolinOverlay["STRIP"] = "Strip";
     EViolinOverlay["BOX"] = "Box";
 })(EViolinOverlay || (EViolinOverlay = {}));
 export var EAggregateTypes;

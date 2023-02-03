@@ -18,9 +18,10 @@ import {
 import { isScatter, scatterMergeDefaultConfig, ScatterVis } from './scatter';
 import { barMergeDefaultConfig, isBar, BarVis } from './bar';
 import { isViolin, violinMergeDefaultConfig, ViolinVis } from './violin';
-import { isStrip, stripMergeDefaultConfig, StripVis } from './strip';
 import { getCssValue } from '../utils';
 import { useSyncedRef } from '../hooks/useSyncedRef';
+import { hexinbMergeDefaultConfig, isHexbin } from './hexbin/utils';
+import { HexbinVis } from './hexbin/HexbinVis';
 
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
 
@@ -130,12 +131,12 @@ export function Vis({
       const newConfig = violinMergeDefaultConfig(columns, inconsistentVisConfig);
       _setVisConfig({ current: newConfig, consistent: newConfig });
     }
-    if (isStrip(inconsistentVisConfig)) {
-      const newConfig = stripMergeDefaultConfig(columns, inconsistentVisConfig);
-      _setVisConfig({ current: newConfig, consistent: newConfig });
-    }
     if (isBar(inconsistentVisConfig)) {
       const newConfig = barMergeDefaultConfig(columns, inconsistentVisConfig);
+      _setVisConfig({ current: newConfig, consistent: newConfig });
+    }
+    if (isHexbin(inconsistentVisConfig)) {
+      const newConfig = hexinbMergeDefaultConfig(columns, inconsistentVisConfig);
       _setVisConfig({ current: newConfig, consistent: newConfig });
     }
     // DANGER:: this useEffect should only occur when the visConfig.type changes. adding visconfig into the dep array will cause an infinite loop.
@@ -226,21 +227,6 @@ export function Vis({
           closeButtonCallback={closeCallback}
         />
       ) : null}
-
-      {isStrip(visConfig) ? (
-        <StripVis
-          config={visConfig}
-          selectionCallback={selectionCallback}
-          setConfig={setVisConfig}
-          selected={selectedMap}
-          columns={columns}
-          scales={scales}
-          hideSidebar={hideSidebar}
-          showCloseButton={showCloseButton}
-          closeButtonCallback={closeCallback}
-        />
-      ) : null}
-
       {isBar(visConfig) ? (
         <BarVis
           config={visConfig}
@@ -253,6 +239,17 @@ export function Vis({
           hideSidebar={hideSidebar}
           showCloseButton={showCloseButton}
           closeButtonCallback={closeCallback}
+        />
+      ) : null}
+
+      {isHexbin(visConfig) ? (
+        <HexbinVis
+          config={visConfig}
+          selected={selectedMap}
+          setConfig={setVisConfig}
+          selectionCallback={selectionCallback}
+          columns={columns}
+          hideSidebar={hideSidebar}
         />
       ) : null}
     </>

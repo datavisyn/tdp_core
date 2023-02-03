@@ -1,7 +1,6 @@
 import * as React from 'react';
-import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { ActionIcon, Center, Container, Group, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
@@ -77,6 +76,8 @@ export function ScatterVis({
   const plotlyDivRef = React.useRef(null);
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
+
   useEffect(() => {
     const ro = new ResizeObserver(() => {
       const plotDiv = document.getElementById(`plotlyDiv${id}`);
@@ -88,17 +89,31 @@ export function ScatterVis({
     if (plotlyDivRef) {
       ro.observe(plotlyDivRef.current);
     }
+    return () => ro.disconnect();
   }, [id, hideSidebar, plotlyDivRef]);
 
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
-  const { value: traces, status: traceStatus, error: traceError } = useAsync(createScatterTraces, [columns, selectedMap, config, scales, shapes]);
+  const {
+    value: traces,
+    status: traceStatus,
+    error: traceError,
+  } = useAsync(createScatterTraces, [
+    columns,
+    config.numColumnsSelected,
+    config.shape,
+    config.color,
+    config.alphaSliderVal,
+    config.numColorScaleType,
+    scales,
+    shapes,
+  ]);
 
-  const layout = React.useMemo(() => {
+  React.useEffect(() => {
     if (!traces) {
-      return null;
+      return;
     }
 
     const innerLayout: Partial<Plotly.Layout> = {
@@ -121,22 +136,93 @@ export function ScatterVis({
         l: 25,
         b: 25,
       },
-      autosize: true,
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
       dragmode: config.dragMode,
     };
 
-    return beautifyLayout(traces, innerLayout);
+    setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+    // WARNING: Do not update when layout changes, that would be an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [traces, config.dragMode]);
+
+  const plotsWithSelectedPoints = useMemo(() => {
+    if (traces) {
+      const allPlots = traces.plots;
+      allPlots
+        .filter((trace) => trace.data.type === 'scattergl')
+        .forEach((p) => {
+          const temp = [];
+
+          (p.data.ids as any).forEach((currId, index) => {
+            if (selectedMap[currId] || (selectedList.length === 0 && config.color)) {
+              temp.push(index);
+            }
+          });
+
+          p.data.selectedpoints = temp;
+
+          if (selectedList.length === 0 && config.color) {
+            // @ts-ignore
+            p.data.selected.marker.opacity = config.alphaSliderVal;
+          } else {
+            // @ts-ignore
+            p.data.selected.marker.opacity = 1;
+          }
+        });
+
+      return allPlots;
+    }
+
+    return [];
+  }, [selectedMap, traces, selectedList, config.color, config.alphaSliderVal]);
+
+  const plotlyData = useMemo(() => {
+    if (traces) {
+      return [...plotsWithSelectedPoints.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)];
+    }
+
+    return [];
+  }, [plotsWithSelectedPoints, traces]);
+
+  const plotly = useMemo(() => {
+    if (traces?.plots && plotsWithSelectedPoints) {
+      return (
+        <PlotlyComponent
+          key={id}
+          divId={`plotlyDiv${id}`}
+          data={plotlyData}
+          layout={layout}
+          config={{ responsive: true, displayModeBar: false, scrollZoom: true }}
+          useResizeHandler
+          style={{ width: '100%', height: '100%' }}
+          onClick={(event) => {
+            const clickedId = (event.points[0] as any).id;
+            if (selectedMap[clickedId]) {
+              selectionCallback(selectedList.filter((s) => s !== clickedId));
+            } else {
+              selectionCallback([...selectedList, clickedId]);
+            }
+          }}
+          className="tdpCoreVis"
+          onSelected={(sel) => {
+            selectionCallback(sel ? sel.points.map((d) => (d as any).id) : []);
+          }}
+        />
+      );
+    }
+    return null;
+  }, [id, plotsWithSelectedPoints, layout, selectedMap, selectionCallback, selectedList, traces?.plots, plotlyData]);
 
   return (
     <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }} ref={plotlyDivRef}>
-      <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
-        <ActionIcon sx={{ position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
-          <FontAwesomeIcon icon={faGear} />
-        </ActionIcon>
-      </Tooltip>
+      {!hideSidebar ? (
+        <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+            <FontAwesomeIcon icon={faGear} />
+          </ActionIcon>
+        </Tooltip>
+      ) : null}
       {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
 
       <Stack spacing={0} sx={{ height: '100%' }}>
@@ -146,43 +232,8 @@ export function ScatterVis({
           </Group>
         </Center>
         {mergedExtensions.prePlot}
-        {traceStatus === 'success' && traces?.plots.length > 0 ? (
-          <PlotlyComponent
-            divId={`plotlyDiv${id}`}
-            data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-            layout={layout}
-            config={{ responsive: true, displayModeBar: false }}
-            useResizeHandler
-            style={{ width: '100%', height: '100%' }}
-            onClick={(event) => {
-              const clickedId = (event.points[0] as any).id;
-              if (selectedMap[clickedId]) {
-                selectionCallback(selectedList.filter((s) => s !== clickedId));
-              } else {
-                selectionCallback([...selectedList, clickedId]);
-              }
-            }}
-            className="tdpCoreVis"
-            onSelected={(sel) => {
-              selectionCallback(sel ? sel.points.map((d) => (d as any).id) : []);
-            }}
-            // plotly redraws everything on updates, so you need to reappend title and
-            // change opacity on update, instead of just in a use effect
-            onInitialized={() => {
-              d3v3.selectAll('g .traces').style('opacity', 1);
-              d3v3.selectAll('.scatterpts').style('opacity', selectedList.length > 0 ? 1 : config.alphaSliderVal);
-            }}
-            onUpdate={() => {
-              d3v3.selectAll('g .traces').style('opacity', 1);
-              d3v3.selectAll('.scatterpts').style('opacity', selectedList.length > 0 ? 1 : config.alphaSliderVal);
-
-              for (const p of traces.plots) {
-                d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
-
-                d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
-              }
-            }}
-          />
+        {traceStatus === 'success' && layout && plotsWithSelectedPoints.length > 0 ? (
+          plotly
         ) : traceStatus !== 'pending' ? (
           <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
         ) : null}

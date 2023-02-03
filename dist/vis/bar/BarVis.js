@@ -26,6 +26,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
+    const [layout, setLayout] = useState(null);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     // Make sure selected values is right for each plot.
     const finalTraces = useMemo(() => {
@@ -75,10 +76,11 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         if (plotlyDivRef) {
             ro.observe(plotlyDivRef.current);
         }
+        return () => ro.disconnect();
     }, [id, plotlyDivRef]);
-    const layout = React.useMemo(() => {
+    React.useEffect(() => {
         if (!finalTraces) {
-            return null;
+            return;
         }
         const innerLayout = {
             showlegend: true,
@@ -102,7 +104,9 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
             barmode: config.groupType === EBarGroupingType.STACK ? 'stack' : 'group',
             dragmode: false,
         };
-        return beautifyLayout(finalTraces, innerLayout);
+        setLayout({ ...layout, ...beautifyLayout(finalTraces, innerLayout, null) });
+        // WARNING: Do not update when layout changes, that would be an infinite loop.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [finalTraces, config.groupType]);
     const traceData = useMemo(() => {
         if (!finalTraces) {
@@ -117,7 +121,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear }))),
-        traceStatus === 'success' && finalTraces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, className: "tdpCoreVis", onClick: (e) => {
+        traceStatus === 'success' && layout && finalTraces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, className: "tdpCoreVis", onClick: (e) => {
                 // plotly types here are just wrong. So have to convert to unknown first.
                 const selectedPoints = e.points[0].customdata;
                 let removeSelectionFlag = true;

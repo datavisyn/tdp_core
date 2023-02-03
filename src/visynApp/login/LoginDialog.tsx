@@ -2,9 +2,9 @@ import { Alert, Modal, Stack, Title, Text, Center, Divider, Container } from '@m
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-import { VisynLoginForm } from './VisynLoginForm';
 import { I18nextManager } from '../../i18n/I18nextManager';
 import { LoginUtils } from '../../base/LoginUtils';
+import { VisynLoginForm } from './VisynLoginForm';
 
 /**
  * Basic login dialog

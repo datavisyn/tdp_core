@@ -3,7 +3,7 @@ import { faPaintBrush, faSquare, faSearchPlus, faArrowsAlt } from '@fortawesome/
 import { SegmentedControl, Tooltip } from '@mantine/core';
 import * as React from 'react';
 import { EScatterSelectSettings } from '../interfaces';
-export function BrushOptionButtons({ callback, dragMode }) {
+export function BrushOptionButtons({ callback, dragMode, options = [EScatterSelectSettings.RECTANGLE, EScatterSelectSettings.LASSO, EScatterSelectSettings.PAN, EScatterSelectSettings.ZOOM], }) {
     return (React.createElement(SegmentedControl, { value: dragMode, onChange: callback, data: [
             {
                 label: (React.createElement(Tooltip, { withinPortal: true, withArrow: true, arrowSize: 6, label: "Rectangular brush" },
@@ -25,6 +25,6 @@ export function BrushOptionButtons({ callback, dragMode }) {
                     React.createElement(FontAwesomeIcon, { icon: faSearchPlus }))),
                 value: EScatterSelectSettings.ZOOM,
             },
-        ] }));
+        ].filter((d) => options.includes(d.value)) }));
 }
 //# sourceMappingURL=BrushOptionButtons.js.map

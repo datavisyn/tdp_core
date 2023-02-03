@@ -14,6 +14,7 @@ import {
   VisCategoricalValue,
   VisNumericalValue,
   EScatterSelectSettings,
+  ColumnInfo,
 } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
@@ -68,8 +69,11 @@ export function moveSelectedToFront(
 
 export async function createScatterTraces(
   columns: VisColumn[],
-  selected: { [key: string]: boolean },
-  config: IScatterConfig,
+  numColumnsSelected: ColumnInfo[],
+  shape: ColumnInfo,
+  color: ColumnInfo,
+  alphaSliderVal: number,
+  colorScaleType: ENumericalColorScaleType,
   scales: Scales,
   shapes: string[] | null,
 ): Promise<PlotlyInfo> {
@@ -86,28 +90,18 @@ export async function createScatterTraces(
     formList: ['color', 'shape', 'bubble', 'opacity'],
   };
 
-  if (!config.numColumnsSelected) {
+  if (!numColumnsSelected) {
     return emptyVal;
   }
 
-  const hasSelected = Object.values(selected).includes(true);
-
-  const numCols: VisNumericalColumn[] = config.numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
+  const numCols: VisNumericalColumn[] = numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
   const plots: PlotlyData[] = [];
 
   const validCols = await resolveColumnValues(numCols);
-  const shapeCol = await resolveSingleColumn(getCol(columns, config.shape));
-  const colorCol = await resolveSingleColumn(getCol(columns, config.color));
+  const shapeCol = await resolveSingleColumn(getCol(columns, shape));
+  const colorCol = await resolveSingleColumn(getCol(columns, color));
 
-  validCols.forEach((c) => {
-    c.resolvedValues = moveSelectedToFront(c.resolvedValues, selected);
-  });
-
-  if (colorCol) {
-    colorCol.resolvedValues = moveSelectedToFront(colorCol.resolvedValues, selected);
-  }
-
-  const shapeScale = config.shape
+  const shapeScale = shape
     ? d3v3.scale
         .ordinal<string>()
         .domain([...new Set(shapeCol.resolvedValues.map((v) => v.val))] as string[])
@@ -117,17 +111,17 @@ export async function createScatterTraces(
   let min = 0;
   let max = 0;
 
-  if (config.color) {
+  if (color) {
     min = d3v3.min(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
     max = d3v3.max(colorCol.resolvedValues.map((v) => +v.val).filter((v) => v !== null));
   }
 
-  const numericalColorScale = config.color
+  const numericalColorScale = color
     ? d3v3.scale
         .linear<string, number>()
         .domain([max, (max + min) / 2, min])
         .range(
-          config.numColorScaleType === ENumericalColorScaleType.SEQUENTIAL
+          colorScaleType === ENumericalColorScaleType.SEQUENTIAL
             ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')]
             : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')],
         )
@@ -163,20 +157,34 @@ export async function createScatterTraces(
         ),
         hoverinfo: 'text',
         text: validCols[0].resolvedValues.map((v) => v.id.toString()),
+
         marker: {
-          line: {
-            width: 0,
-          },
-          symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
           color: colorCol
-            ? hasSelected
-              ? colorCol.resolvedValues.map((v) =>
-                  selected[v.id] ? (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)) : DEFAULT_COLOR,
-                )
-              : colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
-            : validCols[0].resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
-          opacity: validCols[0].resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
-          size: 8,
+            ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
+            : SELECT_COLOR,
+        },
+        // plotly is stupid and doesnt know its own types
+        // @ts-ignore
+        selected: {
+          marker: {
+            line: {
+              width: 0,
+            },
+            symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+            opacity: 1,
+            size: 8,
+          },
+        },
+        unselected: {
+          marker: {
+            line: {
+              width: 0,
+            },
+            symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+            color: DEFAULT_COLOR,
+            opacity: alphaSliderVal,
+            size: 8,
+          },
         },
       },
       xLabel: columnNameWithDescription(validCols[0].info),
@@ -200,7 +208,7 @@ export async function createScatterTraces(
               marker: {
                 color: DEFAULT_COLOR,
               },
-              opacity: config.alphaSliderVal,
+              opacity: alphaSliderVal,
             },
             xLabel: columnNameWithDescription(xCurr.info),
             yLabel: columnNameWithDescription(yCurr.info),
@@ -229,25 +237,33 @@ export async function createScatterTraces(
               showlegend: false,
               text: validCols[0].resolvedValues.map((v) => v.id.toString()),
               marker: {
-                line: {
-                  width: 0,
-                },
-                symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
                 color: colorCol
-                  ? hasSelected
-                    ? colorCol.resolvedValues.map((v) =>
-                        selected[v.id]
-                          ? colorCol.type === EColumnTypes.NUMERICAL
-                            ? numericalColorScale(v.val as number)
-                            : scales.color(v.val)
-                          : DEFAULT_COLOR,
-                      )
-                    : colorCol.resolvedValues.map((v) =>
-                        colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val),
-                      )
-                  : xCurr.resolvedValues.map((v) => (selected[v.id] ? SELECT_COLOR : DEFAULT_COLOR)),
-                opacity: xCurr.resolvedValues.map((v) => (selected[v.id] ? 1 : config.alphaSliderVal)),
-                size: 8,
+                  ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
+                  : SELECT_COLOR,
+              },
+              // plotly is stupid and doesnt know its own types
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              selected: {
+                marker: {
+                  line: {
+                    width: 0,
+                  },
+                  symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+                  opacity: 1,
+                  size: 8,
+                },
+              },
+              unselected: {
+                marker: {
+                  line: {
+                    width: 0,
+                  },
+                  symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+                  color: DEFAULT_COLOR,
+                  opacity: alphaSliderVal,
+                  size: 8,
+                },
               },
             },
             xLabel: columnNameWithDescription(xCurr.info),
@@ -273,6 +289,8 @@ export async function createScatterTraces(
         mode: 'markers',
         visible: 'legendonly',
         legendgroup: 'color',
+        hoverinfo: 'skip',
+
         // @ts-ignore
         legendgrouptitle: {
           text: columnNameWithDescription(colorCol.info),
@@ -284,7 +302,7 @@ export async function createScatterTraces(
           symbol: 'circle',
           size: 8,
           color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : DEFAULT_COLOR,
-          opacity: config.alphaSliderVal,
+          opacity: 1,
         },
         transforms: [
           {
@@ -317,6 +335,8 @@ export async function createScatterTraces(
         visible: 'legendonly',
         showlegend: true,
         legendgroup: 'shape',
+        hoverinfo: 'skip',
+
         // @ts-ignore
         legendgrouptitle: {
           text: columnNameWithDescription(shapeCol.info),
@@ -325,7 +345,7 @@ export async function createScatterTraces(
           line: {
             width: 0,
           },
-          opacity: config.alphaSliderVal,
+          opacity: alphaSliderVal,
           size: 8,
           symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
           color: DEFAULT_COLOR,

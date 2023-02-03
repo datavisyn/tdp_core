@@ -4,7 +4,7 @@
  * @param maxLength Maximum text length (default: 50)
  */
 export function truncateText(text, maxLength = 50) {
-    return text.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
+    return text?.length > maxLength ? `${text.substring(0, maxLength)}\u2026` : text;
 }
 export function columnNameWithDescription(col) {
     return col.description ? `${col.name}: ${col.description}` : col.name;
@@ -15,12 +15,13 @@ export function columnNameWithDescription(col) {
  * @param layout the current layout to be changed. Typed to any because the plotly types complain.p
  * @returns the changed layout
  */
-export function beautifyLayout(traces, layout) {
-    const layoutEdit = layout;
-    layoutEdit.annotations = [];
+export function beautifyLayout(traces, layout, oldLayout) {
+    layout.annotations = [];
     traces.plots.forEach((t, i) => {
-        layoutEdit[`xaxis${i > 0 ? i + 1 : ''}`] = {
+        layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
+            ...oldLayout?.[`xaxis${i > 0 ? i + 1 : ''}`],
             automargin: true,
+            // rangemode: 'tozero',
             tickvals: t.xTicks,
             ticktext: t.xTickLabels,
             text: t.xTicks,
@@ -38,8 +39,10 @@ export function beautifyLayout(traces, layout) {
                 },
             },
         };
-        layoutEdit[`yaxis${i > 0 ? i + 1 : ''}`] = {
+        layout[`yaxis${i > 0 ? i + 1 : ''}`] = {
+            ...oldLayout?.[`yaxis${i > 0 ? i + 1 : ''}`],
             automargin: true,
+            // rangemode: 'tozero',
             tickvals: t.yTicks,
             ticktext: t.yTickLabels,
             text: t.yTicks,
@@ -57,7 +60,7 @@ export function beautifyLayout(traces, layout) {
                 },
             },
         };
-        layoutEdit.shapes.push({
+        layout.shapes.push({
             type: 'line',
             // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
@@ -75,7 +78,7 @@ export function beautifyLayout(traces, layout) {
             row: 2,
             col: 2,
         });
-        layoutEdit.shapes.push({
+        layout.shapes.push({
             type: 'line',
             // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
@@ -93,7 +96,7 @@ export function beautifyLayout(traces, layout) {
             row: 2,
             col: 2,
         });
-        layoutEdit.shapes.push({
+        layout.shapes.push({
             type: 'line',
             // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
@@ -111,7 +114,7 @@ export function beautifyLayout(traces, layout) {
             row: 2,
             col: 2,
         });
-        layoutEdit.shapes.push({
+        layout.shapes.push({
             type: 'line',
             // @ts-ignore
             xref: `x${i > 0 ? i + 1 : ''} domain`,
@@ -130,7 +133,7 @@ export function beautifyLayout(traces, layout) {
             col: 2,
         });
     });
-    return layoutEdit;
+    return layout;
 }
 export function resolveColumnValues(columns) {
     return Promise.all(columns.map(async (col) => ({ ...col, resolvedValues: await col.values() })));

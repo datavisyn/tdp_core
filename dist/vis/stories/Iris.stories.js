@@ -138,29 +138,4 @@ ViolinPlot.args = {
         violinOverlay: EViolinOverlay.NONE,
     },
 };
-export const StripPlot = Template.bind({});
-StripPlot.args = {
-    externalConfig: {
-        type: ESupportedPlotlyVis.STRIP,
-        numColumnsSelected: [
-            {
-                description: '',
-                id: 'sepalLength',
-                name: 'Sepal Length',
-            },
-            {
-                description: '',
-                id: 'sepalWidth',
-                name: 'Sepal Width',
-            },
-        ],
-        catColumnsSelected: [
-            {
-                description: '',
-                id: 'species',
-                name: 'Species',
-            },
-        ],
-    },
-};
 //# sourceMappingURL=Iris.stories.js.map

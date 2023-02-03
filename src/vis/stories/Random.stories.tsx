@@ -80,7 +80,7 @@ export default {
     pointCount: { control: 'number' },
   },
   args: {
-    pointCount: 1000,
+    pointCount: 100000,
   },
 } as ComponentMeta<typeof Vis>;
 
@@ -162,25 +162,5 @@ ViolinPlot.args = {
     ],
     catColumnsSelected: [],
     violinOverlay: EViolinOverlay.NONE,
-  },
-};
-
-export const StripPlot = Template.bind({}) as typeof Template;
-StripPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.STRIP,
-    numColumnsSelected: [
-      {
-        description: '',
-        id: 'pca_x',
-        name: 'pca_x',
-      },
-      {
-        description: '',
-        id: 'pca_y',
-        name: 'pca_y',
-      },
-    ],
-    catColumnsSelected: [],
   },
 };

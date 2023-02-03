@@ -58,7 +58,7 @@ export class LineUpOrderedRowIndicies extends EventHandler {
             // NOTE: the `indices` does not reflect the sorting of the (first) ranking, instead the ids are always ordered ascending
             if (provider.getFirstRanking() != null) {
                 const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
-                this._selected = this.sortValues(provider.getSelection(), order);
+                this._selected = this.sortValues(provider.getSelection(), Object.fromEntries(order.map((o, i) => [o, i])));
                 this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
             }
         });
@@ -88,7 +88,7 @@ export class LineUpOrderedRowIndicies extends EventHandler {
                 // update sorting of selected rows
                 if (dirtyReason.indexOf(EDirtyReason.SORT_CRITERIA_CHANGED) > -1) {
                     const order = Array.from(provider.getFirstRanking().getOrder()); // use order of the first ranking
-                    this._selected = this.sortValues(provider.getSelection(), order);
+                    this._selected = this.sortValues(provider.getSelection(), Object.fromEntries(order.map((o, i) => [o, i])));
                     this.fire(LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED, this._selected);
                 }
             });
@@ -103,8 +103,8 @@ export class LineUpOrderedRowIndicies extends EventHandler {
     }
     sortValues(values, order) {
         return values.sort((a, b) => {
-            const aIndex = order.indexOf(a);
-            const bIndex = order.indexOf(b);
+            const aIndex = order[a];
+            const bIndex = order[b];
             return (aIndex > -1 ? aIndex : Infinity) - (bIndex > -1 ? bIndex : Infinity); // sort missing values in the order array to the end
         });
     }

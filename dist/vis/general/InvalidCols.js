@@ -1,8 +1,8 @@
 import * as React from 'react';
+import { Alert, Center, Stack } from '@mantine/core';
 export function InvalidCols({ headerMessage, bodyMessage }) {
-    return (React.createElement("div", { className: "card w-25 h-10 justify-content-center" },
-        React.createElement("div", { className: "card-header" }, headerMessage),
-        React.createElement("div", { className: "card-body" },
-            React.createElement("p", { className: "card-text" }, bodyMessage))));
+    return (React.createElement(Stack, { style: { height: '100%' } },
+        React.createElement(Center, { style: { height: '100%', width: '100%' } },
+            React.createElement(Alert, { title: headerMessage, color: "yellow" }, bodyMessage))));
 }
 //# sourceMappingURL=InvalidCols.js.map
