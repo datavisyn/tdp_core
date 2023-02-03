@@ -82,7 +82,6 @@ export function VisynDemoView({ desc, parameters, onParametersChanged }: DemoVis
         <Vis
           columns={parameters.columns}
           externalConfig={parameters.config}
-          hideSidebar
           setExternalConfig={(config) => {
             onParametersChanged((p) => ({
               ...p,

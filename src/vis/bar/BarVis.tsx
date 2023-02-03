@@ -17,7 +17,29 @@ import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 import { I18nextManager } from '../../i18n';
 
-interface BarVisProps {
+const defaultExtensions = {
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
+};
+
+export function BarVis({
+  config,
+  optionsConfig,
+  extensions,
+  columns,
+  setConfig,
+  scales,
+  selectionCallback = () => null,
+  selectedMap = {},
+  selectedList = [],
+  enableSidebar,
+  showSidebar,
+  setShowSidebar,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
+}: {
   config: IBarConfig;
   optionsConfig?: {
     group?: {
@@ -55,30 +77,10 @@ interface BarVisProps {
   selectedList: string[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
-  hideSidebar?: boolean;
-}
-
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
-export function BarVis({
-  config,
-  optionsConfig,
-  extensions,
-  columns,
-  setConfig,
-  scales,
-  selectionCallback = () => null,
-  selectedMap = {},
-  selectedList = [],
-  hideSidebar = false,
-  showCloseButton = false,
-  closeButtonCallback = () => null,
-}: BarVisProps) {
+  showSidebar?: boolean;
+  setShowSidebar?(show: boolean): void;
+  enableSidebar?: boolean;
+}) {
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -86,8 +88,6 @@ export function BarVis({
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
 
   const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
-
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
   // Make sure selected values is right for each plot.
   const finalTraces = useMemo(() => {
@@ -199,9 +199,9 @@ export function BarVis({
 
       {mergedExtensions.prePlot}
       <Space h="xl" />
-      {!hideSidebar ? (
+      {enableSidebar ? (
         <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
-          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setShowSidebar(true)}>
             <FontAwesomeIcon icon={faGear} />
           </ActionIcon>
         </Tooltip>
@@ -251,8 +251,8 @@ export function BarVis({
         <InvalidCols headerMessage={finalTraces?.errorMessageHeader} bodyMessage={traceError?.message || finalTraces?.errorMessage} />
       ) : null}
       {mergedExtensions.postPlot}
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+      {showSidebar ? (
+        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={showSidebar} onClose={() => setShowSidebar(false)}>
           <BarVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}

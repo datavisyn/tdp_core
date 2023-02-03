@@ -46,8 +46,8 @@ export declare enum EGeneralFormType {
     SLIDER = "Slider"
 }
 export declare enum EFilterOptions {
-    IN = "Filter In",
-    OUT = "Filter Out",
+    IN = "Filter in",
+    OUT = "Filter out",
     CLEAR = "Clear"
 }
 export declare enum ENumericalColorScaleType {

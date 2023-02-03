@@ -20,10 +20,9 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, scales, }) {
+export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, enableSidebar, setShowSidebar, showSidebar, showCloseButton = false, closeButtonCallback = () => null, scales, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
     const plotlyDivRef = React.useRef(null);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
     const [layout, setLayout] = useState(null);
     useEffect(() => {
         const ro = new ResizeObserver(() => {
@@ -36,7 +35,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             ro.observe(plotlyDivRef.current);
         }
         return () => ro.disconnect();
-    }, [id, hideSidebar, plotlyDivRef]);
+    }, [id, plotlyDivRef]);
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
@@ -131,9 +130,9 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         return null;
     }, [id, plotsWithSelectedPoints, layout, selectedMap, selectionCallback, selectedList, traces?.plots, plotlyData]);
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }, ref: plotlyDivRef },
-        React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
-            React.createElement(ActionIcon, { sx: { position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
-                React.createElement(FontAwesomeIcon, { icon: faGear }))),
+        enableSidebar ? (React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
+            React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setShowSidebar(true) },
+                React.createElement(FontAwesomeIcon, { icon: faGear })))) : null,
         showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         React.createElement(Stack, { spacing: 0, sx: { height: '100%' } },
             React.createElement(Center, null,
@@ -142,7 +141,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             mergedExtensions.prePlot,
             traceStatus === 'success' && layout && plotsWithSelectedPoints.length > 0 ? (plotly) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces?.errorMessageHeader, bodyMessage: traceError?.message || traces?.errorMessage })) : null,
             mergedExtensions.postPlot),
-        !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
+        showSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: showSidebar, onClose: () => setShowSidebar(false) },
             React.createElement(ScatterVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, filterCallback: filterCallback, setConfig: setConfig }))) : null));
 }
 //# sourceMappingURL=ScatterVis.js.map

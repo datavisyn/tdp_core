@@ -1,6 +1,7 @@
 import * as React from 'react';
 import d3v3 from 'd3v3';
 import { useMemo, useEffect } from 'react';
+import { useUncontrolled } from '@mantine/hooks';
 import {
   ESupportedPlotlyVis,
   IVisConfig,
@@ -36,7 +37,10 @@ export function Vis({
   closeCallback = () => null,
   showCloseButton = false,
   externalConfig = null,
-  hideSidebar = false,
+  enableSidebar = true,
+  showSidebar: internalShowSidebar,
+  setShowSidebar: internalSetShowSidebar,
+  showSidebarDefault = false,
 }: {
   /**
    * Required data columns which are displayed.
@@ -66,8 +70,18 @@ export function Vis({
   closeCallback?: () => void;
   showCloseButton?: boolean;
   externalConfig?: IVisConfig;
-  hideSidebar?: boolean;
+  enableSidebar?: boolean;
+  showSidebar?: boolean;
+  setShowSidebar?(show: boolean): void;
+  showSidebarDefault?: boolean;
 }) {
+  const [showSidebar, setShowSidebar] = useUncontrolled<boolean>({
+    value: internalShowSidebar,
+    defaultValue: showSidebarDefault,
+    finalValue: false,
+    onChange: internalSetShowSidebar,
+  });
+
   // Each time you switch between vis config types, there is one render where the config is inconsistent with the type before the merge functions in the useEffect below can be called.
   // To ensure that we never render an incosistent config, keep a consistent and a current in the config. Always render the consistent.
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -187,6 +201,12 @@ export function Vis({
     return <div className="tdp-busy" />;
   }
 
+  const commonProps = {
+    showSidebar,
+    setShowSidebar,
+    enableSidebar,
+  };
+
   return (
     <>
       {isScatter(visConfig) ? (
@@ -205,9 +225,10 @@ export function Vis({
           selectedList={selected}
           columns={columns}
           scales={scales}
-          hideSidebar={hideSidebar}
+          showSidebar={showSidebar}
           showCloseButton={showCloseButton}
           closeButtonCallback={closeCallback}
+          {...commonProps}
         />
       ) : null}
 
@@ -222,9 +243,9 @@ export function Vis({
           setConfig={setVisConfig}
           columns={columns}
           scales={scales}
-          hideSidebar={hideSidebar}
           showCloseButton={showCloseButton}
           closeButtonCallback={closeCallback}
+          {...commonProps}
         />
       ) : null}
       {isBar(visConfig) ? (
@@ -236,9 +257,9 @@ export function Vis({
           selectedList={selected}
           columns={columns}
           scales={scales}
-          hideSidebar={hideSidebar}
           showCloseButton={showCloseButton}
           closeButtonCallback={closeCallback}
+          {...commonProps}
         />
       ) : null}
 
@@ -249,7 +270,7 @@ export function Vis({
           setConfig={setVisConfig}
           selectionCallback={selectionCallback}
           columns={columns}
-          hideSidebar={hideSidebar}
+          {...commonProps}
         />
       ) : null}
     </>

@@ -58,8 +58,8 @@ export var EGeneralFormType;
 })(EGeneralFormType || (EGeneralFormType = {}));
 export var EFilterOptions;
 (function (EFilterOptions) {
-    EFilterOptions["IN"] = "Filter In";
-    EFilterOptions["OUT"] = "Filter Out";
+    EFilterOptions["IN"] = "Filter in";
+    EFilterOptions["OUT"] = "Filter out";
     EFilterOptions["CLEAR"] = "Clear";
 })(EFilterOptions || (EFilterOptions = {}));
 export var ENumericalColorScaleType;

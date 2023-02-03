@@ -20,13 +20,12 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, }) {
+export function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, showSidebar, setShowSidebar, enableSidebar, showCloseButton = false, closeButtonCallback = () => null, }) {
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
     const id = React.useMemo(() => uniqueId('ViolinVis'), []);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
     const [layout, setLayout] = useState(null);
     const plotlyDivRef = React.useRef(null);
     useEffect(() => {
@@ -69,9 +68,9 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
     return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', position: 'relative' }, ref: plotlyDivRef },
         React.createElement(Space, { h: "xl" }),
         showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
-        React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
-            React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
-                React.createElement(FontAwesomeIcon, { icon: faGear }))),
+        enableSidebar ? (React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
+            React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setShowSidebar(true) },
+                React.createElement(FontAwesomeIcon, { icon: faGear })))) : null,
         mergedExtensions.prePlot,
         traceStatus === 'success' && layout && traces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, className: "tdpCoreVis", data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
             // plotly redraws everything on updates, so you need to reappend title and
@@ -82,7 +81,7 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
                 }
             } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: traces?.errorMessageHeader, bodyMessage: traceError?.message || traces?.errorMessage })) : null,
         mergedExtensions.postPlot,
-        !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
+        showSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: showSidebar, onClose: () => setShowSidebar(false) },
             React.createElement(ViolinVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
 }
 //# sourceMappingURL=ViolinVis.js.map
