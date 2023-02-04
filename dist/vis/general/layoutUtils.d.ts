@@ -1,5 +1,5 @@
 import { ColumnInfo, PlotlyInfo, VisColumn } from '../interfaces';
-import { PlotlyTypes } from '../Plot';
+import { PlotlyTypes } from '../../plotly';
 /**
  * Truncate long texts (e.g., to use as axes title)
  * @param text Input text to be truncated

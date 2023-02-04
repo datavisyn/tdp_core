@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { PlotlyTypes } from './Plot';
+import type { PlotlyTypes } from '../plotly';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter plot",
     VIOLIN = "Violin plot",

@@ -13,6 +13,7 @@ export * from './import';
 export * from './initialize';
 export * from './layout';
 export * from './lineup';
+export * from './plotly';
 export * from './public';
 export * from './security';
 export * from './storage';
