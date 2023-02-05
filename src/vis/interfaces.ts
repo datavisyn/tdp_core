@@ -144,6 +144,7 @@ export interface VisCommonColumn {
 
 export interface VisNumericalColumn extends VisCommonColumn {
   type: EColumnTypes.NUMERICAL;
+  domain?: [number, number];
 }
 
 export interface VisCategoricalColumn extends VisCommonColumn {
@@ -169,6 +170,9 @@ export type PlotlyData = {
   xTickLabels?: string[];
   yTicks?: string[];
   yTickLabels?: string[];
+  xDomain?: [number, number];
+  yDomain?: [number, number];
+
 };
 
 export type ColumnInfo = {

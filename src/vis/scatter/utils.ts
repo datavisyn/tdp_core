@@ -189,6 +189,8 @@ export async function createScatterTraces(
       },
       xLabel: columnNameWithDescription(validCols[0].info),
       yLabel: columnNameWithDescription(validCols[1].info),
+      xDomain: (validCols[0] as VisNumericalColumn).domain,
+      yDomain: (validCols[1] as VisNumericalColumn).domain,
     });
   } else {
     for (const yCurr of validCols) {
@@ -268,6 +270,8 @@ export async function createScatterTraces(
             },
             xLabel: columnNameWithDescription(xCurr.info),
             yLabel: columnNameWithDescription(yCurr.info),
+            xDomain: (xCurr as VisNumericalColumn).domain,
+            yDomain: (yCurr as VisNumericalColumn).domain,
           });
         }
 

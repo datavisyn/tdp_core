@@ -24,6 +24,7 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Partial<Plotly.Layout
   layout.annotations = [];
   traces.plots.forEach((t, i) => {
     layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
+      range: t.xDomain ? t.xDomain : null,
       ...oldLayout?.[`xaxis${i > 0 ? i + 1 : ''}`],
       automargin: true,
       // rangemode: 'tozero',
@@ -46,6 +47,7 @@ export function beautifyLayout(traces: PlotlyInfo, layout: Partial<Plotly.Layout
     };
 
     layout[`yaxis${i > 0 ? i + 1 : ''}`] = {
+      range: t.yDomain ? t.yDomain : null,
       ...oldLayout?.[`yaxis${i > 0 ? i + 1 : ''}`],
       automargin: true,
       // rangemode: 'tozero',
