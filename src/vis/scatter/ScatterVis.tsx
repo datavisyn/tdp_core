@@ -99,6 +99,10 @@ export function ScatterVis({
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
 
+  useEffect(() => {
+    setLayout(null);
+  }, [config.numColumnsSelected.length]);
+
   const {
     value: traces,
     status: traceStatus,
@@ -189,7 +193,7 @@ export function ScatterVis({
   }, [plotsWithSelectedPoints, traces]);
 
   const plotly = useMemo(() => {
-    if (traces?.plots && plotsWithSelectedPoints) {
+    if (traces?.plots && plotsWithSelectedPoints && layout) {
       return (
         <PlotlyComponent
           key={id}
