@@ -27,7 +27,7 @@ export function isScatter(s: IVisConfig): s is IScatterConfig {
 }
 
 function calculateDomain(domain: [number | undefined, number | undefined], vals: number[]): [number, number] {
-  if (domain[0] && domain[1]) {
+  if (!domain || (domain[0] !== undefined && domain[1] !== undefined)) {
     return domain;
   }
   const min = Math.min(...(vals as number[]));
@@ -154,10 +154,11 @@ export async function createScatterTraces(
 
     const calcXDomain = calculateDomain((validCols[0] as VisNumericalColumn).domain, xDataVals as number[]);
     const calcYDomain = calculateDomain((validCols[1] as VisNumericalColumn).domain, yDataVals as number[]);
+
     plots.push({
       data: {
-        x: validCols[0].resolvedValues.map((v) => v.val),
-        y: validCols[1].resolvedValues.map((v) => v.val),
+        x: xDataVals,
+        y: yDataVals,
         ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
         xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
         yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
