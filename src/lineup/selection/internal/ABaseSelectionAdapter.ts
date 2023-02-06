@@ -1,3 +1,4 @@
+import { LocalDataProvider } from 'lineupjs';
 import { difference } from 'lodash';
 import { IAdditionalColumnDesc } from '../../../base/interfaces';
 import { ISelectionColumn, IContext, ISelectionAdapter } from '../ISelectionAdapter';
@@ -5,6 +6,8 @@ import { ISelectionColumn, IContext, ISelectionAdapter } from '../ISelectionAdap
 export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
   protected async addDynamicColumns(context: IContext, ids: string[]): Promise<void> {
     const columns = await Promise.all(ids.map((id) => this.createColumnsFor(context, id)));
+
+    // console.log(columns);
 
     // sort new columns to insert them in the correct order
     const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
@@ -15,6 +18,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
       }
       return b.position - a.position; // sort descending by default
     });
+    // console.log(flattenedColumns);
     return context.add(flattenedColumns.map((d) => d.d));
   }
 
@@ -35,8 +39,8 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void> {
-    return this.selectionChangedImpl(context, onContextChanged);
+  selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void, provider?: LocalDataProvider): Promise<void | IContext> {
+    return this.selectionChangedImpl(context, onContextChanged, provider);
   }
 
   /**
@@ -44,8 +48,8 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void> {
-    return this.parameterChangedImpl(context, onContextChanged);
+  parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void, provider?: LocalDataProvider): Promise<IContext | void> {
+    return this.parameterChangedImpl(context, onContextChanged, provider);
   }
 
   // TODO test at run-time if we really need the following promises or if it can be removed. it might be necessary when replaying the a CLUE provenence graph. if we need it, a queue might be the better solution.
@@ -96,14 +100,20 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
   //     }));
   // }
 
-  protected abstract parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
+  protected abstract parameterChangedImpl(
+    context: IContext,
+    onContextChanged?: (context: IContext) => void,
+    provider?: LocalDataProvider,
+  ): Promise<void | IContext>;
 
-  protected async selectionChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void> {
+  protected async selectionChangedImpl(
+    context: IContext,
+    onContextChanged?: (context: IContext) => void,
+    provider?: LocalDataProvider,
+  ): Promise<void | IContext> {
     const selectedIds = context.selection.ids;
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
-
-    console.log('selection changed')
 
     // compute the difference
     const diffAdded = difference(selectedIds, lineupColIds);
@@ -118,7 +128,13 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
       await this.addDynamicColumns(context, diffAdded);
     }
 
-    return onContextChanged?.(context);
+    if (provider?.getLastRanking()) {
+      context = { ...context, columns: provider?.getLastRanking()?.flatColumns };
+    }
+
+    console.log(context);
+
+    return context;
   }
 
   /**

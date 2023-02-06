@@ -1,5 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { isEqual } from 'lodash';
+import { LocalDataProvider } from 'lineupjs';
 import type { IRankingProps } from './Ranking';
 // eslint-disable-next-line import/no-cycle
 import { Ranking } from './Ranking';
@@ -20,6 +21,7 @@ export interface IRankingViewComponentProps extends IRankingProps {
    * Selection of the previous view
    */
   selection?: ISelection;
+  provider: LocalDataProvider;
   parameters: any[];
   selectionAdapter?: ISelectionAdapter;
   authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
@@ -31,6 +33,7 @@ export function RankingViewComponent({
   itemSelection = { idtype: null, ids: [] },
   columnDesc = [],
   parameters = null,
+  provider,
   selectionAdapter = null,
   options = {},
   authorization = null,
@@ -52,6 +55,8 @@ export function RankingViewComponent({
 
   const [selectionAdapterContext, setSelectionAdapterContext] = React.useState<Omit<IContext, 'selection'>>(null);
   const viewRef = React.useRef<HTMLDivElement | null>(null);
+
+  const currPromise = useRef<Promise<any>>(null);
 
   const runAuthorizations = useCallback(async (): Promise<void> => {
     await TDPTokenManager.runAuthorizations(authorization, {
@@ -124,6 +129,7 @@ export function RankingViewComponent({
    * onInputSelectionChanged
    */
   React.useEffect(() => {
+    console.log('on input selection effect', selections, inputSelection);
     if (status === 'success') {
       const name = AView.DEFAULT_SELECTION_NAME;
       const current = selections.get(name);
@@ -133,27 +139,45 @@ export function RankingViewComponent({
       selections.set(name, inputSelection);
       if (name === AView.DEFAULT_SELECTION_NAME) {
         if (selectionAdapter) {
-          selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
+          if (currPromise.current) {
+            currPromise.current = currPromise.current.then((context: IContext) => {
+              console.log(context);
+              return selectionAdapter.selectionChanged({ ...context, selection: inputSelection }, onContextChangedCallback, provider);
+            });
+          } else {
+            currPromise.current = selectionAdapter.selectionChanged(
+              { ...selectionAdapterContext, selection: inputSelection },
+              onContextChangedCallback,
+              provider,
+            );
+          }
         }
       }
     }
-  }, [status, inputSelection, selectionAdapterContext, selections, selectionAdapter, onContextChangedCallback]);
+  }, [status, selections, inputSelection]);
 
   /**
    * onParametersChanged
    */
   React.useEffect(() => {
+    console.log('on parameters changed effect', parameters, prevParameters, status, inputSelection, currPromise.current);
     if (isEqual(parameters, prevParameters)) {
       return;
     }
 
     if (status === 'success') {
       if (selectionAdapter) {
-        selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
+        if (currPromise.current) {
+          currPromise.current = currPromise.current.then((context: IContext) => {
+            return selectionAdapter.parameterChanged({ ...context, selection: inputSelection }, onContextChangedCallback, provider);
+          });
+        } else {
+          currPromise.current = selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
+        }
         setPrevParameters(parameters);
       }
     }
-  }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters, onContextChangedCallback]);
+  }, [status, parameters]);
 
   return (
     <div ref={viewRef} className={`h-100 ${status !== 'success' && 'tdp-busy'}`}>

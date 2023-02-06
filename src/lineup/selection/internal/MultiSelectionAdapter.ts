@@ -1,4 +1,5 @@
 import { difference, isFunction } from 'lodash';
+import { LocalDataProvider } from 'lineupjs';
 import { IContext, ISelectionColumn } from '../ISelectionAdapter';
 import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
@@ -55,14 +56,25 @@ export class MultiSelectionAdapter<T = string> extends ABaseSelectionAdapter {
    * @param context selection adapter context
    * @returns A promise to wait until all new columns have been added
    */
-  protected async parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void> {
+  protected async parameterChangedImpl(
+    context: IContext,
+    onContextChanged?: (context: IContext) => void,
+    provider?: LocalDataProvider,
+  ): Promise<IContext | void> {
     const selectedIds = context.selection.ids;
-    console.log(context);
+    // console.log(selectedIds);
     await this.removePartialDynamicColumns(context, selectedIds);
+    // console.log(context)
     await this.addDynamicColumns(context, selectedIds);
+    // console.log(context);
+    // console.log(this.adapter.getSelectedSubTypes())
     onContextChanged?.(context);
 
-    console.log('parameter changed');
+    if (provider?.getLastRanking()) {
+      context = { ...context, columns: provider?.getLastRanking()?.flatColumns };
+    }
+
+    return context;
   }
 
   /**

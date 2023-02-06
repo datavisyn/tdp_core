@@ -1,4 +1,4 @@
-import { Column } from 'lineupjs';
+import { Column, LocalDataProvider } from 'lineupjs';
 import { ISelection, IScoreRow, IAdditionalColumnDesc } from '../../base/interfaces';
 
 export interface ISelectionColumn {
@@ -15,12 +15,12 @@ export interface IContext {
   /**
    * list of currently visible columns
    */
-  readonly columns: Column[];
+  columns: Column[];
 
   /**
    * the current input selection
    */
-  readonly selection: ISelection;
+  selection: ISelection;
 
   /**
    * add multiple columns to LineUp
@@ -49,11 +49,11 @@ export interface ISelectionAdapter {
    * called when a parameter has changed
    * @param {IContext} context
    */
-  parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
+  parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void, provider?: LocalDataProvider): Promise<IContext | void>;
 
   /**
    * called when the input selection has changed
    * @param {IContext} context
    */
-  selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
+  selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void, provider?: LocalDataProvider): Promise<void | IContext>;
 }
