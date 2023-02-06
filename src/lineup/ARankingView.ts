@@ -521,7 +521,7 @@ export abstract class ARankingView extends AView {
     const columnPromise: Promise<Column> = new Promise((resolve) => {
       columnResolve = resolve;
     });
-    const data: Promise<IScoreRow<any>[]> = new Promise((resolve) => {
+    const data: Promise<IScoreRow<any>[]> = new Promise((resolve, reject) => {
       (async () => {
         // Wait for the column to be initialized
         const col = await columnPromise;
@@ -594,7 +594,8 @@ export abstract class ARankingView extends AView {
               }
               continue;
             } else {
-              throw e;
+              reject(e);
+              done = true;
             }
           }
         }

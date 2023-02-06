@@ -34,7 +34,9 @@ export function ScatterVis({
   selectedMap = {},
   selectedList = [],
   setConfig,
-  hideSidebar = false,
+  enableSidebar,
+  setShowSidebar,
+  showSidebar,
   showCloseButton = false,
   closeButtonCallback = () => null,
   scales,
@@ -69,7 +71,9 @@ export function ScatterVis({
   selectedList: string[];
   setConfig: (config: IVisConfig) => void;
   scales: Scales;
-  hideSidebar?: boolean;
+  showSidebar?: boolean;
+  setShowSidebar?(show: boolean): void;
+  enableSidebar?: boolean;
   showCloseButton?: boolean;
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
@@ -90,7 +94,7 @@ export function ScatterVis({
       ro.observe(plotlyDivRef.current);
     }
     return () => ro.disconnect();
-  }, [id, hideSidebar, plotlyDivRef]);
+  }, [id, plotlyDivRef]);
 
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
@@ -216,9 +220,9 @@ export function ScatterVis({
 
   return (
     <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }} ref={plotlyDivRef}>
-      {!hideSidebar ? (
+      {enableSidebar ? (
         <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
-          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setShowSidebar(true)}>
             <FontAwesomeIcon icon={faGear} />
           </ActionIcon>
         </Tooltip>
@@ -240,8 +244,8 @@ export function ScatterVis({
 
         {mergedExtensions.postPlot}
       </Stack>
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+      {showSidebar ? (
+        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={showSidebar} onClose={() => setShowSidebar(false)}>
           <ScatterVisSidebar
             config={config}
             optionsConfig={optionsConfig}

@@ -62,8 +62,8 @@ export enum EGeneralFormType {
 }
 
 export enum EFilterOptions {
-  IN = 'Filter In',
-  OUT = 'Filter Out',
+  IN = 'Filter in',
+  OUT = 'Filter out',
   CLEAR = 'Clear',
 }
 

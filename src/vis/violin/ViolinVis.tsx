@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
-import { Layout } from 'plotly.js-dist-min';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
@@ -17,7 +16,26 @@ import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
 import { I18nextManager } from '../../i18n';
 
-interface ViolinVisProps {
+const defaultExtensions = {
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
+};
+
+export function ViolinVis({
+  config,
+  optionsConfig,
+  extensions,
+  columns,
+  setConfig,
+  scales,
+  showSidebar,
+  setShowSidebar,
+  enableSidebar,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
+}: {
   config: IViolinConfig;
   optionsConfig?: {
     overlay?: {
@@ -36,28 +54,11 @@ interface ViolinVisProps {
   closeButtonCallback?: () => void;
 
   scales: Scales;
-  hideSidebar?: boolean;
+  showSidebar?: boolean;
+  setShowSidebar?(show: boolean): void;
+  enableSidebar?: boolean;
   showCloseButton?: boolean;
-}
-
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
-export function ViolinVis({
-  config,
-  optionsConfig,
-  extensions,
-  columns,
-  setConfig,
-  scales,
-  hideSidebar = false,
-  showCloseButton = false,
-  closeButtonCallback = () => null,
-}: ViolinVisProps) {
+}) {
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -119,9 +120,9 @@ export function ViolinVis({
       <Space h="xl" />
       {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
 
-      {!hideSidebar ? (
+      {enableSidebar ? (
         <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
-          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setSidebarOpen(true)}>
+          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setShowSidebar(true)}>
             <FontAwesomeIcon icon={faGear} />
           </ActionIcon>
         </Tooltip>
@@ -150,8 +151,8 @@ export function ViolinVis({
         <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
       ) : null}
       {mergedExtensions.postPlot}
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={sidebarOpen} onClose={() => setSidebarOpen(false)}>
+      {showSidebar ? (
+        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={showSidebar} onClose={() => setShowSidebar(false)}>
           <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}
