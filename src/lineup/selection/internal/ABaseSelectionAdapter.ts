@@ -103,6 +103,8 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
 
+    console.log('selection changed')
+
     // compute the difference
     const diffAdded = difference(selectedIds, lineupColIds);
     const diffRemoved = difference(lineupColIds, selectedIds);

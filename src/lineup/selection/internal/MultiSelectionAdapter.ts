@@ -57,9 +57,12 @@ export class MultiSelectionAdapter<T = string> extends ABaseSelectionAdapter {
    */
   protected async parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void> {
     const selectedIds = context.selection.ids;
+    console.log(context);
     await this.removePartialDynamicColumns(context, selectedIds);
     await this.addDynamicColumns(context, selectedIds);
     onContextChanged?.(context);
+
+    console.log('parameter changed');
   }
 
   /**
