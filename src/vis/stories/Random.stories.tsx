@@ -40,7 +40,7 @@ function fetchData(numberOfPoints: number): VisColumn[] {
         name: 'pca_x',
       },
       type: EColumnTypes.NUMERICAL,
-      domain: [0, 100],
+      domain: [0, undefined],
       values: () => dataPromise.then((data) => data.pca_x.map((val, i) => ({ id: i.toString(), val }))),
     },
     {
@@ -50,7 +50,7 @@ function fetchData(numberOfPoints: number): VisColumn[] {
         name: 'pca_y',
       },
       type: EColumnTypes.NUMERICAL,
-      domain: [0, 100],
+      domain: [0, undefined],
       values: () => dataPromise.then((data) => data.pca_y.map((val, i) => ({ id: i.toString(), val }))),
     },
     {

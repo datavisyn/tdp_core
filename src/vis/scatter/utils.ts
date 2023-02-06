@@ -26,6 +26,18 @@ export function isScatter(s: IVisConfig): s is IScatterConfig {
   return s.type === ESupportedPlotlyVis.SCATTER;
 }
 
+function calculateDomain(domain: [number | undefined, number | undefined], vals: number[]): [number, number] {
+  if (domain[0] && domain[1]) {
+    return domain;
+  }
+  const min = Math.min(...(vals as number[]));
+  const max = Math.max(...(vals as number[]));
+
+  const calcDomain: [number, number] = [domain[0] ? domain[0] : min, domain[1] ? domain[1] : max + max / 20];
+
+  return calcDomain;
+}
+
 const defaultConfig: IScatterConfig = {
   type: ESupportedPlotlyVis.SCATTER,
   numColumnsSelected: [],
@@ -136,6 +148,12 @@ export async function createScatterTraces(
 
   // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
   if (validCols.length === 2) {
+    const xDataVals = validCols[0].resolvedValues.map((v) => v.val);
+
+    const yDataVals = validCols[1].resolvedValues.map((v) => v.val);
+
+    const calcXDomain = calculateDomain((validCols[0] as VisNumericalColumn).domain, xDataVals as number[]);
+    const calcYDomain = calculateDomain((validCols[1] as VisNumericalColumn).domain, yDataVals as number[]);
     plots.push({
       data: {
         x: validCols[0].resolvedValues.map((v) => v.val),
@@ -189,8 +207,8 @@ export async function createScatterTraces(
       },
       xLabel: columnNameWithDescription(validCols[0].info),
       yLabel: columnNameWithDescription(validCols[1].info),
-      xDomain: (validCols[0] as VisNumericalColumn).domain,
-      yDomain: (validCols[1] as VisNumericalColumn).domain,
+      xDomain: calcXDomain,
+      yDomain: calcYDomain,
     });
   } else {
     for (const yCurr of validCols) {
@@ -217,10 +235,17 @@ export async function createScatterTraces(
           });
           // otherwise, make a scatterplot
         } else {
+          const xDataVals = xCurr.resolvedValues.map((v) => v.val);
+
+          const yDataVals = yCurr.resolvedValues.map((v) => v.val);
+
+          const calcXDomain = calculateDomain((xCurr as VisNumericalColumn).domain, xDataVals as number[]);
+          const calcYDomain = calculateDomain((yCurr as VisNumericalColumn).domain, yDataVals as number[]);
+
           plots.push({
             data: {
-              x: xCurr.resolvedValues.map((v) => v.val),
-              y: yCurr.resolvedValues.map((v) => v.val),
+              x: xDataVals,
+              y: yDataVals,
               ids: xCurr.resolvedValues.map((v) => v.id.toString()),
               xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
               yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -270,8 +295,8 @@ export async function createScatterTraces(
             },
             xLabel: columnNameWithDescription(xCurr.info),
             yLabel: columnNameWithDescription(yCurr.info),
-            xDomain: (xCurr as VisNumericalColumn).domain,
-            yDomain: (yCurr as VisNumericalColumn).domain,
+            xDomain: calcXDomain,
+            yDomain: calcYDomain,
           });
         }
 
