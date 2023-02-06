@@ -78,7 +78,6 @@ export function ScatterVis({
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
   const plotlyDivRef = React.useRef(null);
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
   const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
 

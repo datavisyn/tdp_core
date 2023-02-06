@@ -66,7 +66,6 @@ export function ViolinVis({
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
 
   const id = React.useMemo(() => uniqueId('ViolinVis'), []);
-  const [sidebarOpen, setSidebarOpen] = useState<boolean>(true);
 
   const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
 

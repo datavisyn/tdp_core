@@ -273,17 +273,6 @@ export function Vis({
           {...commonProps}
         />
       ) : null}
-
-      {isHexbin(visConfig) ? (
-        <HexbinVis
-          config={visConfig}
-          selected={selectedMap}
-          setConfig={setVisConfig}
-          selectionCallback={selectionCallback}
-          columns={columns}
-          hideSidebar={hideSidebar}
-        />
-      ) : null}
     </>
   );
 }
