@@ -136,15 +136,15 @@ export function ScatterVis({
       margin: {
         t: 25,
         r: 25,
-        l: 25,
-        b: 25,
+        l: 100,
+        b: 100,
       },
       grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
       shapes: [],
       dragmode: config.dragMode,
     };
 
-    setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+    setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout, false) });
     // WARNING: Do not update when layout changes, that would be an infinite loop.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [traces, config.dragMode]);
