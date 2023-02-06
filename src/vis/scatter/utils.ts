@@ -27,7 +27,8 @@ export function isScatter(s: IVisConfig): s is IScatterConfig {
 }
 
 function calculateDomain(domain: [number | undefined, number | undefined], vals: number[]): [number, number] {
-  if (!domain || (domain[0] !== undefined && domain[1] !== undefined)) {
+  if (!domain) return null;
+  if (domain[0] !== undefined && domain[1] !== undefined) {
     return [domain[0], domain[1]];
   }
   const min = Math.min(...(vals as number[]));
