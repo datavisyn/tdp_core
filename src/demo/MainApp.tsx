@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useAsync } from '../hooks';
 import { initializeLibrary } from '../initialize';
-import { fetchIrisData } from '../vis/stories/Iris.stories';
+import { fetchIrisData } from '../vis/stories/fetchIrisData';
 import { Vis } from '../vis/Vis';
 
 const irisData = fetchIrisData();
