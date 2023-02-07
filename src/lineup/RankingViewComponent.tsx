@@ -56,7 +56,12 @@ export function RankingViewComponent({
   const [selectionAdapterContext, setSelectionAdapterContext] = React.useState<Omit<IContext, 'selection'>>(null);
   const viewRef = React.useRef<HTMLDivElement | null>(null);
 
-  const currPromise = useRef<Promise<any>>(null);
+  // Some convoluted stuff here to solve a race case issue. Keep a reference to a promise.
+  // Below, when we update the columns, create a new promise which is attached to the currPromise .then, and then set the currPromise to that new promise.
+  // The currpromise essentially becomes a pointer to the back of a queue of promises, adding onto the end any time a new call comes in.
+  // This solves the race case, and ensures that return values from one promise to the next stay consistent.
+
+  const currPromise = useRef<Promise<IContext | void>>(null);
 
   const runAuthorizations = useCallback(async (): Promise<void> => {
     await TDPTokenManager.runAuthorizations(authorization, {
@@ -150,6 +155,7 @@ export function RankingViewComponent({
       if (name === AView.DEFAULT_SELECTION_NAME) {
         if (selectionAdapter) {
           if (currPromise.current) {
+            // See comment where currPromise is created for details
             currPromise.current = currPromise.current.then((context: IContext) => {
               return selectionAdapter.selectionChanged({ ...context, selection: inputSelection }, selectionAdapterCallback);
             });
@@ -159,7 +165,8 @@ export function RankingViewComponent({
         }
       }
     }
-    5;
+    // Hacky fix, but don't want to call this when selectionAdapterContext changes. You could, it wouldn't break, but would be slow.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, selections, inputSelection]);
 
   /**
@@ -173,6 +180,7 @@ export function RankingViewComponent({
     if (status === 'success') {
       if (selectionAdapter) {
         if (currPromise.current) {
+          // See comment where currPromise is created for details
           currPromise.current = currPromise.current.then((context: IContext) => {
             return selectionAdapter.parameterChanged({ ...context, selection: inputSelection }, selectionAdapterCallback);
           });
@@ -182,6 +190,8 @@ export function RankingViewComponent({
         setPrevParameters(parameters);
       }
     }
+    // Hacky fix, but don't want to call this when selectionAdapterContext changes. You could, it wouldn't break, but would be slow.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, parameters]);
 
   return (
