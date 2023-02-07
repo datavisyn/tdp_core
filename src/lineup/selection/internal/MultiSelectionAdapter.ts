@@ -1,5 +1,4 @@
 import { difference, isFunction } from 'lodash';
-import { LocalDataProvider } from 'lineupjs';
 import { IContext, ISelectionColumn } from '../ISelectionAdapter';
 import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';

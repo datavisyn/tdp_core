@@ -1,4 +1,4 @@
-import { Column, LocalDataProvider } from 'lineupjs';
+import { Column } from 'lineupjs';
 import { ISelection, IScoreRow, IAdditionalColumnDesc } from '../../base/interfaces';
 
 export interface ISelectionColumn {
