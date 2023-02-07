@@ -64,11 +64,12 @@ export class MultiSelectionAdapter<T = string> extends ABaseSelectionAdapter {
     const selectedIds = context.selection.ids;
     await this.removePartialDynamicColumns(context, selectedIds);
     await this.addDynamicColumns(context, selectedIds);
-    onContextChanged?.(context);
 
     if (provider?.getLastRanking()) {
       context = { ...context, columns: provider?.getLastRanking()?.flatColumns };
     }
+
+    return onContextChanged?.(context);
 
     return context;
   }

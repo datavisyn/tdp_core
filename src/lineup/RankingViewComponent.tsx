@@ -129,7 +129,6 @@ export function RankingViewComponent({
    * onInputSelectionChanged
    */
   React.useEffect(() => {
-    console.log('on input selection effect', selections, inputSelection);
     if (status === 'success') {
       const name = AView.DEFAULT_SELECTION_NAME;
       const current = selections.get(name);
@@ -141,7 +140,6 @@ export function RankingViewComponent({
         if (selectionAdapter) {
           if (currPromise.current) {
             currPromise.current = currPromise.current.then((context: IContext) => {
-              console.log(context);
               return selectionAdapter.selectionChanged({ ...context, selection: inputSelection }, onContextChangedCallback, provider);
             });
           } else {
@@ -153,14 +151,13 @@ export function RankingViewComponent({
           }
         }
       }
-    }
+    }5
   }, [status, selections, inputSelection]);
 
   /**
    * onParametersChanged
    */
   React.useEffect(() => {
-    console.log('on parameters changed effect', parameters, prevParameters, status, inputSelection, currPromise.current);
     if (isEqual(parameters, prevParameters)) {
       return;
     }
