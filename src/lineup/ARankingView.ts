@@ -387,7 +387,7 @@ export abstract class ARankingView extends AView {
     super.parameterChanged(name);
     if (this.selectionAdapter) {
       await this.built;
-      return this.selectionAdapter.parameterChanged(this.createSelectionAdapterContext());
+      return this.selectionAdapter.parameterChanged(this.createSelectionAdapterContext()) as Promise<void>;
     }
     return Promise.resolve();
   }
@@ -410,7 +410,7 @@ export abstract class ARankingView extends AView {
   protected async selectionChanged(): Promise<void> {
     if (this.selectionAdapter) {
       await this.built;
-      return this.selectionAdapter.selectionChanged(this.createSelectionAdapterContext());
+      return this.selectionAdapter.selectionChanged(this.createSelectionAdapterContext()) as Promise<void>;
     }
     return Promise.resolve();
   }
