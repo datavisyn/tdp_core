@@ -35,7 +35,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void | IContext> {
+  selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<void | IContext> {
     return this.selectionChangedImpl(context, onContextChanged);
   }
 
@@ -44,7 +44,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
    * @param context selection adapter context
    * @returns A promise that can waited for until the columns have been changed.
    */
-  parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<IContext | void> {
+  parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<IContext | void> {
     return this.parameterChangedImpl(context, onContextChanged);
   }
 
@@ -98,7 +98,7 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
 
   protected abstract parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<void | IContext>;
 
-  protected async selectionChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void | IContext> {
+  protected async selectionChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<void | IContext> {
     const selectedIds = context.selection.ids;
     const usedCols = context.columns.filter((d) => (<IAdditionalColumnDesc>d.desc).selectedId != null);
     const lineupColIds = usedCols.map((d) => (<IAdditionalColumnDesc>d.desc).selectedId);
