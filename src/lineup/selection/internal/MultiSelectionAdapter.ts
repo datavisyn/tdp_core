@@ -62,12 +62,8 @@ export class MultiSelectionAdapter<T = string> extends ABaseSelectionAdapter {
     provider?: LocalDataProvider,
   ): Promise<IContext | void> {
     const selectedIds = context.selection.ids;
-    // console.log(selectedIds);
     await this.removePartialDynamicColumns(context, selectedIds);
-    // console.log(context)
     await this.addDynamicColumns(context, selectedIds);
-    // console.log(context);
-    // console.log(this.adapter.getSelectedSubTypes())
     onContextChanged?.(context);
 
     if (provider?.getLastRanking()) {

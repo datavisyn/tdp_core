@@ -595,7 +595,7 @@ export function Ranking({
         columns,
         freeColor: (id: string) => colorsRef.current.freeColumnColor(id),
         // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
-        add: (columns: ISelectionColumn[]) => Promise.all(columns.map((col) => addColumn(col.desc, col.data, col.id, col.position))),
+        add: (columns: ISelectionColumn[]) => Promise.resolve(columns.forEach((col) => addColumn(col.desc, col.data, col.id, col.position))),
         // TODO The promise as return value can be removed once `ARankingView` and CLUE are gone; the promise as return value was required by CLUE
         remove: (columns: Column[]) => Promise.resolve(columns.forEach((c) => c.removeMe())),
       };

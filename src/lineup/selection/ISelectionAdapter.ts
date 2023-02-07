@@ -15,12 +15,12 @@ export interface IContext {
   /**
    * list of currently visible columns
    */
-  columns: Column[];
+  readonly columns: Column[];
 
   /**
    * the current input selection
    */
-  selection: ISelection;
+  readonly selection: ISelection;
 
   /**
    * add multiple columns to LineUp

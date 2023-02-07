@@ -7,8 +7,6 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
   protected async addDynamicColumns(context: IContext, ids: string[]): Promise<void> {
     const columns = await Promise.all(ids.map((id) => this.createColumnsFor(context, id)));
 
-    // console.log(columns);
-
     // sort new columns to insert them in the correct order
     const flattenedColumns = [].concat(...columns).map((d, i) => ({ d, i }));
     flattenedColumns.sort(({ d: a, i: ai }, { d: b, i: bi }) => {
@@ -18,7 +16,6 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
       }
       return b.position - a.position; // sort descending by default
     });
-    // console.log(flattenedColumns);
     return context.add(flattenedColumns.map((d) => d.d));
   }
 
@@ -120,7 +117,6 @@ export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     const diffRemoved = difference(lineupColIds, selectedIds);
     // remove deselected columns
     if (diffRemoved.length > 0) {
-      // console.log('remove columns', diffRemoved);
       await this.removeDynamicColumns(context, diffRemoved);
     }
     // add new columns to the end
