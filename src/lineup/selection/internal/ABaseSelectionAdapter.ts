@@ -1,4 +1,3 @@
-import { LocalDataProvider } from 'lineupjs';
 import { difference } from 'lodash';
 import { IAdditionalColumnDesc } from '../../../base/interfaces';
 import { ISelectionColumn, IContext, ISelectionAdapter } from '../ISelectionAdapter';
