@@ -125,6 +125,17 @@ export function RankingViewComponent({
     setSelectionAdapterContext(newContext);
   }, []);
 
+  const selectionAdapterCallback = useCallback(
+    (context: IContext) => {
+      if (provider?.getLastRanking()) {
+        context = { ...context, columns: provider?.getLastRanking()?.flatColumns };
+      }
+
+      return context;
+    },
+    [provider],
+  );
+
   /**
    * onInputSelectionChanged
    */
@@ -140,18 +151,15 @@ export function RankingViewComponent({
         if (selectionAdapter) {
           if (currPromise.current) {
             currPromise.current = currPromise.current.then((context: IContext) => {
-              return selectionAdapter.selectionChanged({ ...context, selection: inputSelection }, onContextChangedCallback, provider);
+              return selectionAdapter.selectionChanged({ ...context, selection: inputSelection }, selectionAdapterCallback);
             });
           } else {
-            currPromise.current = selectionAdapter.selectionChanged(
-              { ...selectionAdapterContext, selection: inputSelection },
-              onContextChangedCallback,
-              provider,
-            );
+            currPromise.current = selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection }, selectionAdapterCallback);
           }
         }
       }
-    }5
+    }
+    5;
   }, [status, selections, inputSelection]);
 
   /**
@@ -166,10 +174,10 @@ export function RankingViewComponent({
       if (selectionAdapter) {
         if (currPromise.current) {
           currPromise.current = currPromise.current.then((context: IContext) => {
-            return selectionAdapter.parameterChanged({ ...context, selection: inputSelection }, onContextChangedCallback, provider);
+            return selectionAdapter.parameterChanged({ ...context, selection: inputSelection }, selectionAdapterCallback);
           });
         } else {
-          currPromise.current = selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
+          currPromise.current = selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection }, selectionAdapterCallback);
         }
         setPrevParameters(parameters);
       }

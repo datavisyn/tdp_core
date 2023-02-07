@@ -49,11 +49,11 @@ export interface ISelectionAdapter {
    * called when a parameter has changed
    * @param {IContext} context
    */
-  parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void, provider?: LocalDataProvider): Promise<IContext | void>;
+  parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<IContext | void>;
 
   /**
    * called when the input selection has changed
    * @param {IContext} context
    */
-  selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void, provider?: LocalDataProvider): Promise<void | IContext>;
+  selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<void | IContext>;
 }
