@@ -1,13 +1,13 @@
 import logging
 import shlex
-from typing import Callable, Optional, Union
+from typing import Callable
 
 from .. import manager
 
 _log = logging.getLogger(__name__)
 
 
-def parse_command_string(cmd: Optional[str]) -> Union[Callable, None]:
+def parse_command_string(cmd: str | None) -> Callable | None:
     """
     Parses an application command.
     Example using cmd entrypoint:

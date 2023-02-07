@@ -1,5 +1,6 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
+import { Center } from '@mantine/core';
 import { Vis } from '../Vis';
 import {
   EAggregateTypes,
@@ -77,7 +78,13 @@ export default {
 // eslint-disable-next-line react/function-component-definition
 const Template: ComponentStory<typeof Vis> = (args) => {
   const columns = React.useMemo(() => fetchIrisData(), []);
-  return <Vis {...args} columns={columns} />;
+  return (
+    <div style={{ height: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ width: '70%', height: '80%' }}>
+        <Vis {...args} columns={columns} />
+      </div>
+    </div>
+  );
 };
 
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
@@ -154,50 +161,5 @@ ViolinPlot.args = {
       },
     ],
     violinOverlay: EViolinOverlay.NONE,
-  },
-};
-
-export const StripPlot = Template.bind({}) as typeof Template;
-StripPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.STRIP,
-    numColumnsSelected: [
-      {
-        description: '',
-        id: 'sepalLength',
-        name: 'Sepal Length',
-      },
-      {
-        description: '',
-        id: 'sepalWidth',
-        name: 'Sepal Width',
-      },
-    ],
-    catColumnsSelected: [
-      {
-        description: '',
-        id: 'species',
-        name: 'Species',
-      },
-    ],
-  },
-};
-
-export const ParallelCoordinatesPlot = Template.bind({}) as typeof Template;
-ParallelCoordinatesPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.PCP,
-    allColumnsSelected: [
-      {
-        description: '',
-        id: 'sepalLength',
-        name: 'Sepal Length',
-      },
-      {
-        description: '',
-        id: 'sepalWidth',
-        name: 'Sepal Width',
-      },
-    ],
   },
 };

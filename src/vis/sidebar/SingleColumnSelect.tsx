@@ -1,7 +1,6 @@
+import { Select } from '@mantine/core';
 import * as React from 'react';
-import Select from 'react-select';
 import { ColumnInfo, EColumnTypes, VisColumn } from '../interfaces';
-import { formatOptionLabel } from './utils';
 
 interface SingleColumnSelectProps {
   callback: (s: ColumnInfo) => void;
@@ -12,23 +11,19 @@ interface SingleColumnSelectProps {
 }
 
 export function SingleColumnSelect({ callback, columns, currentSelected, label, type }: SingleColumnSelectProps) {
-  const selectCatOptions = React.useMemo(() => {
-    return columns.filter((c) => type.includes(c.type)).map((c) => c.info);
+  const filteredColumnsByType = React.useMemo(() => {
+    return columns.filter((c) => type.includes(c.type)).map((c) => ({ value: c.info.id, label: c.info.name }));
   }, [columns, type]);
 
   return (
-    <>
-      <label className="pt-2 pb-1">{label}</label>
-      <Select
-        closeMenuOnSelect
-        formatOptionLabel={formatOptionLabel}
-        getOptionLabel={(option) => option.name}
-        getOptionValue={(option) => option.id}
-        onChange={(e) => callback(e)}
-        name="numColumns"
-        options={selectCatOptions}
-        value={selectCatOptions.filter((c) => currentSelected?.id === c.id)}
-      />
-    </>
+    <Select
+      clearable
+      placeholder="Select column"
+      label={label}
+      onChange={(e) => callback(columns.find((c) => c.info.id === e)?.info)}
+      name="numColumns"
+      data={filteredColumnsByType}
+      value={currentSelected?.id}
+    />
   );
 }

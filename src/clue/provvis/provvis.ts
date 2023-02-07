@@ -733,16 +733,16 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     $inner.append('span').classed('icon', true);
     /* $states_enter.append('span').attr('class','fas fa-star').on('click', (d) => {
       d.s.setAttr('starred',!d.s.getAttr('starred',false));
-      d3.event.stopPropagation();
-      d3.event.preventDefault();
+      d3v3.event.stopPropagation();
+      d3v3.event.preventDefault();
     });
     $states_enter.append('span').attr('class','fas fa-tags').on('click', (d) => {
       var tags = d.s.getAttr('tags',[]).join(' ');
       dialogs.prompt(tags, 'Tags').then((new_) => {
         d.s.setAttr('tags', new_.split(' '));
       });
-      d3.event.stopPropagation();
-      d3.event.preventDefault();
+      d3v3.event.stopPropagation();
+      d3v3.event.preventDefault();
     }); */
     $inner.append('span').classed('slabel', true);
     $inner.append('div').classed('sthumbnail', true);
@@ -787,7 +787,7 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     //      const id = +$icon.data('popoup');
     //      clearTimeout(id);
     //      $icon.removeData('popup');
-    //      const d:StateRepr = d3.select(this).datum();
+    //      const d:StateRepr = d3v3.select(this).datum();
     //      if (d && $icon.has('textarea')) {
     //        const val = $(this).find<HTMLElement>('textarea').val();
     //        d.s.setAttr('tags', extractTags(val));

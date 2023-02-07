@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn } from '../interfaces';
-export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selectedMap, selectedList, setConfig, hideSidebar, showCloseButton, closeButtonCallback, scales, }: {
+export declare function ScatterVis({ config, optionsConfig, extensions, columns, shapes, filterCallback, selectionCallback, selectedMap, selectedList, setConfig, enableSidebar, setShowSidebar, showSidebar, showCloseButton, closeButtonCallback, scales, }: {
     config: IScatterConfig;
     optionsConfig?: {
         color?: {
@@ -33,7 +33,9 @@ export declare function ScatterVis({ config, optionsConfig, extensions, columns,
     selectedList: string[];
     setConfig: (config: IVisConfig) => void;
     scales: Scales;
-    hideSidebar?: boolean;
+    showSidebar?: boolean;
+    setShowSidebar?(show: boolean): void;
+    enableSidebar?: boolean;
     showCloseButton?: boolean;
 }): JSX.Element;
 //# sourceMappingURL=ScatterVis.d.ts.map

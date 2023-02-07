@@ -1,6 +1,9 @@
 import logging
+from typing import Any
 
 from flask import abort
+from sqlalchemy.exc import OperationalError
+from sqlalchemy.orm import Session
 from werkzeug.datastructures import MultiDict
 
 from . import manager
@@ -90,7 +93,7 @@ def to_query(q, supports_array_parameter, parameters):
         subparameters = {(k + str(i)): vi for i, vi in enumerate(v)}
         q = q.replace(
             ":" + k,
-            "({ids})".format(ids=", ".join(":" + p for p in subparameters.keys())),
+            "({ids})".format(ids=", ".join(":" + p for p in subparameters)),
         )
         del parameters[k]  # delete single
         parameters.update(subparameters)  # add sub
@@ -98,14 +101,14 @@ def to_query(q, supports_array_parameter, parameters):
     return sqlalchemy.sql.text(q)
 
 
-class WrappedSession(object):
+class WrappedSession:
     def __init__(self, engine):
         """
         session wrapper of sql alchemy with auto cleanup
         :param engine:
         """
         _log.info("creating session")
-        self._session = manager.db.create_session(engine)
+        self._session: Session = manager.db.create_session(engine)
         self._supports_array_parameter = _supports_sql_parameters(engine.name)
 
     def execute(self, sql, **kwargs):
@@ -115,13 +118,11 @@ class WrappedSession(object):
         :param kwargs: additional args to replace
         :return: the session result
         """
-        import sqlalchemy
-
         parsed = to_query(sql, self._supports_array_parameter, kwargs)
         _log.info("%s (%s)", parsed, kwargs)
         try:
             return self._session.execute(parsed, kwargs)
-        except sqlalchemy.exc.OperationalError as error:
+        except OperationalError as error:
             abort(408, error)
 
     def run(self, sql, **kwargs):
@@ -154,7 +155,7 @@ class WrappedSession(object):
         if self._session:
             _log.info("removing session again")
             self._session.close()
-            self._session = None
+            self._session = None  # type: ignore
 
     def __del__(self):
         self._destroy()
@@ -188,13 +189,13 @@ def get_columns(engine, table_name):
     def _normalize_columns(col):
         from sqlalchemy import types
 
-        r = dict(label=col["name"], type="string", column=col["name"])
+        r = {"label": col["name"], "type": "string", "column": col["name"]}
         t = col["type"]
-        if isinstance(t, types.Integer) or isinstance(t, types.Numeric):
+        if isinstance(t, (types.Integer, types.Numeric)):
             r["type"] = "number"
         elif isinstance(t, types.Enum):
             r["type"] = "categorical"
-            r["categories"] = sorted(t.enums, key=lambda s: s.lower())
+            r["categories"] = sorted(t.enums, key=lambda s: s.lower())  # type: ignore
         return r
 
     return map(_normalize_columns, columns)
@@ -235,7 +236,7 @@ def _handle_aggregated_score(base_view, config, replacements, args):
     return replacements
 
 
-def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql_argument=None):
+def prepare_arguments(view, config, replacements=None, arguments: dict | None = None, extra_sql_argument=None):
     """
     prepares for the given view the kwargs and replacements based on the given input
     :param view: db view
@@ -267,10 +268,10 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
             parser = info.type if info and info.type is not None else lambda x: x
             try:
                 if info and info.as_list:
-                    vs = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key)
+                    vs: list[Any] = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key)  # type: ignore
                     value = tuple([parser(v) for v in vs])  # multi values need to be a tuple not a list
                 elif info and info.list_as_tuple:
-                    vs = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key, [])
+                    vs = arguments.getlist(lookup_key) if hasattr(arguments, "getlist") else arguments.get(lookup_key, [])  # type: ignore
                     if len(vs) == 0:
                         value = "(1, null)"
                     else:
@@ -299,10 +300,9 @@ def prepare_arguments(view, config, replacements=None, arguments=None, extra_sql
     if view.replacements is not None:
         for arg in view.replacements:
             fallback = arguments.get(arg, "")
-            if arg in secure_replacements:  # has to be part of the replacements
-                value = replacements.get(arg, "")
-            else:
-                value = replacements.get(arg, fallback)  # if not a secure one fallback with an argument
+            value = (
+                replacements.get(arg, "") if arg in secure_replacements else replacements.get(arg, fallback)
+            )  # if not a secure one fallback with an argument
             if not view.is_valid_replacement(arg, value):
                 _log.warn(
                     'invalid replacement value detected "%s": "%s"="%s"',
@@ -346,7 +346,7 @@ def get_data(
         return query(engine, arguments, filters), view
 
     with session(engine) as sess:
-        if config.statement_timeout is not None:
+        if config.statement_timeout and config.statement_timeout_query:
             _log.info("set statement_timeout to {}".format(config.statement_timeout))
             sess.execute(config.statement_timeout_query.format(config.statement_timeout))
         r = sess.run(query.format(**replace), **kwargs)
@@ -361,9 +361,9 @@ def get_query(database, view_name, replacements=None, arguments=None, extra_sql_
     query = view.query
 
     if callable(query):
-        return dict(query="custom function", args=kwargs)
+        return {"query": "custom function", "args": kwargs}
 
-    return dict(query=clean_query(query.format(**replace)), args=kwargs)
+    return {"query": clean_query(query.format(**replace)), "args": kwargs}
 
 
 def get_filtered_data(database, view_name, args):
@@ -434,7 +434,7 @@ def get_count(database, view_name, args):
         return count_query(engine, processed_args, where_clause)
 
     with session(engine) as sess:
-        if config.statement_timeout is not None:
+        if config.statement_timeout and config.statement_timeout_query:
             _log.info("set statement_timeout to {}".format(config.statement_timeout))
             sess.execute(config.statement_timeout_query.format(config.statement_timeout))
         r = sess.run(count_query.format(**replace), **kwargs)
@@ -455,9 +455,9 @@ def get_count_query(database, view_name, args):
     ) = _get_count(database, view_name, args)
 
     if callable(count_query):
-        return dict(query="custom function", args=kwargs)
+        return {"query": "custom function", "args": kwargs}
 
-    return dict(query=count_query.format(**replace), args=kwargs)
+    return {"query": count_query.format(**replace), "args": kwargs}
 
 
 def derive_columns(table_name, engine, columns=None):
@@ -502,7 +502,7 @@ def derive_columns(table_name, engine, columns=None):
                     separator = getattr(columns[col], "separator", ";")
                     separated_categories = [category.split(separator) for category in categories]
                     # flatten array
-                    categories = list(set([category for sublist in separated_categories for category in sublist]))
+                    categories = list({category for sublist in separated_categories for category in sublist})
                     categories.sort()  # sort list to avoid random order with each run
                 columns[col]["categories"] = categories
 
@@ -527,7 +527,7 @@ def _lookup(database, view_name, query, page, limit, args):
     arguments["query_start"] = "{}%".format(query)
     arguments["query_match"] = "{}".format(query)
     # add 1 for checking if we have more
-    replacements = dict(limit=limit + 1, offset=offset, offset2=(offset + limit + 1))
+    replacements = {"limit": limit + 1, "offset": offset, "offset2": (offset + limit + 1)}
 
     kwargs, replace = prepare_arguments(view, config, replacements, arguments)
 
@@ -538,9 +538,9 @@ def lookup_query(database, view_name, query, page, limit, args):
     engine, _, sql, replace, kwargs = _lookup(database, view_name, query, page, limit, args)
 
     if callable(sql):
-        return dict(query="custom function", args=kwargs)
+        return {"query": "custom function", "args": kwargs}
 
-    return dict(query=sql.format(**replace), args=kwargs)
+    return {"query": sql.format(**replace), "args": kwargs}
 
 
 def lookup(database, view_name, query, page, limit, args):

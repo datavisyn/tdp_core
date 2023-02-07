@@ -1,8 +1,19 @@
 name: build
 
-on: [push, workflow_dispatch]
+on:
+  workflow_dispatch:
+    inputs:
+      cypress:
+        description: 'Run cypress'
+        required: false
+        type: boolean
+        default: false
+  push:
 
 jobs:
   build:
-    uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@main
-    secrets: inherit 
+    uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@new_deployment
+    secrets: inherit
+    with:
+      cypress_enable: true
+      cypress_run_because_flag: ${{ inputs.cypress == true }}

@@ -1,10 +1,10 @@
 import logging
-from builtins import str
 
-from flask import Flask, Response, abort, make_response, request
+from flask import Flask, abort, make_response, request
+from flask.wrappers import Response
 
 from .. import manager
-from ..utils import etag, jsonify, to_json
+from ..utils import jsonify, to_json
 from .dataset import add, get, iter, list_datasets, remove
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ def on_value_error(error):
     _log.error("ValueError: (" + str(error) + ") at " + str(request.environ))
     _log.error(error)
     return (
-        "<strong>{2} - {0}</strong><pre>{1}</pre>".format("ValueError", error, 500),
+        "<strong>{} - {}</strong><pre>{}</pre>".format(500, "ValueError", error),
         500,
     )
 
@@ -27,13 +27,13 @@ def _list_format_json(data):
 
 
 def _list_format_treejson(data):
-    r = dict()
+    r = {}
     for d in data:
         levels = d["fqname"].split("/")
         act = r
         for level in levels[:-1]:
             if level not in act:
-                act[level] = dict()
+                act[level] = {}
             act = act[level]
         act[d["name"]] = d
     return jsonify(r, indent=1)
@@ -85,22 +85,21 @@ def _to_query(query):
 
 
 @app.route("/", methods=["GET", "POST"])
-@etag
 def _list_datasets():
     if request.method == "GET":
         query = _to_query(request.values)
         data = [d.to_description() for d in iter() if query(d)]
 
         limit = request.values.get("limit", -1)
-        if 0 < limit < len(data):
+        if 0 < int(limit) < len(data):
             data = data[:limit]
 
         format = request.args.get("format", "json")
-        formats = dict(json=_list_format_json, treejson=_list_format_treejson, csv=_list_format_csv)
+        formats = {"json": _list_format_json, "treejson": _list_format_treejson, "csv": _list_format_csv}
         if format not in formats:
             abort(
                 make_response(
-                    'invalid format: "{0}" possible ones: {1}'.format(format, ",".join(list(formats.keys()))),
+                    'invalid format: "{}" possible ones: {}'.format(format, ",".join(list(formats.keys()))),
                     400,
                 )
             )
@@ -110,7 +109,6 @@ def _list_datasets():
 
 
 @app.route("/<dataset_id>", methods=["PUT", "GET", "DELETE", "POST"])
-@etag
 def _get_dataset(dataset_id):
     if request.method == "PUT":
         return _update_dataset(dataset_id, request)
@@ -127,7 +125,6 @@ def _get_dataset(dataset_id):
 
 
 @app.route("/<dataset_id>/desc")
-@etag
 def _get_dataset_desc(dataset_id):
     d = get(dataset_id)
     if not d:
@@ -211,11 +208,11 @@ def _remove_dataset(dataset_id):
     r = remove(dataset_id)
     if r:
         return jsonify(
-            dict(
-                state="success",
-                msg="Successfully deleted dataset " + dataset_id,
-                id=dataset_id,
-            ),
+            {
+                "state": "success",
+                "msg": "Successfully deleted dataset " + dataset_id,
+                "id": dataset_id,
+            },
             indent=1,
         )
     return "invalid request", 400

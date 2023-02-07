@@ -1,21 +1,20 @@
 import abc
-from builtins import object
 
 from ... import manager
 from ..dataset_def import ADataSetEntry
 
 
-class GraphNode(object):
+class GraphNode:
     def __init__(self, t, id, attrs=None):
         self.type = t
         self.id = id
         self.attrs = {} if attrs is None else attrs
 
     def asjson(self):
-        return dict(type=self.type, id=self.id, attrs=self.attrs)
+        return {"type": self.type, "id": self.id, "attrs": self.attrs}
 
 
-class GraphEdge(object):
+class GraphEdge:
     def __init__(self, t, id, source=None, target=None, attrs=None):
         self.type = t
         self.id = id
@@ -24,18 +23,18 @@ class GraphEdge(object):
         self.attrs = {} if attrs is None else attrs
 
     def asjson(self):
-        return dict(
-            type=self.type,
-            id=self.id,
-            source=self.source,
-            target=self.target,
-            attrs=self.attrs,
-        )
+        return {
+            "type": self.type,
+            "id": self.id,
+            "source": self.source,
+            "target": self.target,
+            "attrs": self.attrs,
+        }
 
 
 class AGraph(ADataSetEntry, metaclass=abc.ABCMeta):
     def __init__(self, name, project, id=None, attrs=None):
-        super(AGraph, self).__init__(name, project, "graph", id)
+        super().__init__(name, project, "graph", id)
         self.attrs = {} if attrs is None else attrs
 
     @abc.abstractmethod
@@ -55,7 +54,7 @@ class AGraph(ADataSetEntry, metaclass=abc.ABCMeta):
         return len(self.edges())
 
     def to_description(self):
-        r = super(AGraph, self).to_description()
+        r = super().to_description()
         r["size"] = [self.nnodes, self.nedges]
         r["attrs"] = self.attrs
         return r
@@ -64,7 +63,7 @@ class AGraph(ADataSetEntry, metaclass=abc.ABCMeta):
         nodes = [a.asjson() for a in self.nodes()]
         edges = [a.asjson() for a in self.edges()]
 
-        r = dict(nodes=nodes, edges=edges)
+        r = {"nodes": nodes, "edges": edges}
         return r
 
     def add_node(self, data):
@@ -112,7 +111,7 @@ class AGraph(ADataSetEntry, metaclass=abc.ABCMeta):
 
 def _resolve_parser(format):
     for p in manager.registry.list("graph-parser"):
-        if p.format == format:
+        if p.format == format:  # type: ignore
             return p.load()
 
 
