@@ -7,12 +7,12 @@ describe('Health check for Cypress e2e test', () => {
     cy.get('input[name="password"]').type('admin');
     cy.get('button[type="submit"]').click();
     // Assert the content is now visible
-    cy.get('body').should('include.text', 'Visualization Type');
+    cy.get('body').should('include.text', 'Visualization type');
     // Check the user avatar, and then log out again
     cy.get('[data-testid="visyn-user-avatar"]').should('include.text', 'A').click().parent().contains('Logout').click();
     // Assert the login modal to be shown again
     cy.get('[data-testid="visyn-login-modal"]').should('be.visible');
     // Assert the content to be invisible again
-    cy.get('body').should('not.include.text', 'Visualization Type');
+    cy.get('body').should('not.include.text', 'Visualization type');
   });
 });
