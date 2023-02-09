@@ -266,8 +266,13 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
             brush.on('end', null);
         };
     }, [width, height, id, hexes, selectionCallback, config.dragMode, xScale, yScale, margin]);
-    return (React.createElement(Container, { ref: ref, fluid: true, sx: { width: '100%' } },
-        React.createElement("svg", { className: "hexbinSvg", id: id, width: width + margin.left + margin.right, height: height + margin.top + margin.bottom },
+    return (React.createElement(Container, { ref: ref, fluid: true, sx: {
+            width: '100%',
+            '.overlay': {
+                cursor: 'default !important',
+            },
+        } },
+        React.createElement("svg", { id: id, width: width + margin.left + margin.right, height: height + margin.top + margin.bottom },
             React.createElement("defs", null,
                 React.createElement("clipPath", { id: "clip" },
                     React.createElement("rect", { style: { transform: `translate(${margin.left}px, ${margin.top}px)` }, width: width, height: height }))),

@@ -6,7 +6,8 @@ import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../../plotly';
+import { Plotly } from '../../plotly/full';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { createViolinTraces } from './utils';
@@ -115,7 +116,20 @@ export function ViolinVis({
   }, [traces]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', position: 'relative' }} ref={plotlyDivRef}>
+    <Container
+      fluid
+      sx={{
+        flexGrow: 1,
+        height: '100%',
+        width: '100%',
+        position: 'relative',
+        // Disable plotly crosshair cursor
+        '.nsewdrag': {
+          cursor: 'pointer !important',
+        },
+      }}
+      ref={plotlyDivRef}
+    >
       <Space h="xl" />
       {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
 
@@ -131,7 +145,6 @@ export function ViolinVis({
       {traceStatus === 'success' && layout && traces?.plots.length > 0 ? (
         <PlotlyComponent
           divId={`plotlyDiv${id}`}
-          className="tdpCoreVis"
           data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
           layout={layout}
           config={{ responsive: true, displayModeBar: false }}

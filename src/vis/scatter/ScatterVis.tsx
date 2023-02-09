@@ -10,7 +10,8 @@ import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../general/layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../../plotly';
+import { Plotly } from '../../plotly/full';
 import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
@@ -207,7 +208,6 @@ export function ScatterVis({
               selectionCallback([...selectedList, clickedId]);
             }
           }}
-          className="tdpCoreVis"
           onSelected={(sel) => {
             selectionCallback(sel ? sel.points.map((d) => (d as any).id) : []);
           }}
@@ -218,7 +218,21 @@ export function ScatterVis({
   }, [id, plotsWithSelectedPoints, layout, selectedMap, selectionCallback, selectedList, traces?.plots, plotlyData]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }} ref={plotlyDivRef}>
+    <Container
+      fluid
+      sx={{
+        flexGrow: 1,
+        height: '100%',
+        width: '100%',
+        overflow: 'hidden',
+        position: 'relative',
+        // Disable plotly crosshair cursor
+        '.nsewdrag': {
+          cursor: 'pointer !important',
+        },
+      }}
+      ref={plotlyDivRef}
+    >
       {enableSidebar ? (
         <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
           <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setShowSidebar(true)}>

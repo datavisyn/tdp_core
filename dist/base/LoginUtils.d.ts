@@ -1,4 +1,4 @@
-import { IUser } from '../security';
+import { IUser, IUserStore } from '../security';
 export declare class LoginUtils {
     static defaultLoginForm: () => string;
     /**
@@ -14,7 +14,8 @@ export declare class LoginUtils {
      * @return {Promise<any>} when done also from the server side
      */
     static logout(): Promise<any>;
-    static loggedInAs(): Promise<any>;
+    static loggedInAs(): Promise<IUser>;
+    static getStores(): Promise<IUserStore[]>;
     /**
      * helper to bind to a login form, assuming that fields `login_username`, `login_password` exists
      * @param {HTMLFormElement} form

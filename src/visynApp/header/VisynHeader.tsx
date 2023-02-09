@@ -1,4 +1,4 @@
-import { Header, Group, createStyles, Title, ActionIcon, TextInput, Transition } from '@mantine/core';
+import { Header, Group, Title, ActionIcon, TextInput, Transition, useMantineTheme, MantineColor } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
@@ -6,22 +6,9 @@ import { useCallback, useState } from 'react';
 import { BurgerButton } from './BurgerButton';
 import { DatavisynLogo } from './DatavisynLogo';
 import { UserAvatar } from './UserAvatar';
+import { useVisynAppContext } from '../VisynAppContext';
 
 const HEADER_HEIGHT = 50;
-
-const useStyles = createStyles((theme, { color }: { color: string }) => ({
-  grayColor: {
-    backgroundColor: theme.colors[color][6],
-  },
-  inner: {
-    height: HEADER_HEIGHT,
-    display: 'flex',
-    justifyContent: 'space-between',
-  },
-  colorWhite: {
-    color: 'white',
-  },
-}));
 
 const cardTransition = {
   in: { opacity: 1, width: '200px' },
@@ -29,52 +16,61 @@ const cardTransition = {
   transitionProperty: 'opacity, width',
 };
 
-/**
- *
- * @param appName Name of application to be displayed
- * @param projectName Optional name of project to be displayed next to app name.
- * @param dvLogo Optional change of default dv logo as JSX element. If not provided, normal logo will be displayed.
- * @param customerLogo Optional customer logo as JSX element. If not provided, nothing displayed
- * @param burgerMenu Optional JSX Element to be displayed when the burgerMenu is clicked. If not provided, burger menu is hidden.
- * @param userName Optional name to be displayed in a username avatar. Expects a space between names.
- * @param backgroundColor Optional color to be used for the background. This color must match an entry in the mantine theme colors array. Uses the 7th element in the mantine color array
- * @param undoCallback Optional callback functioned which is called when the undo button is clicked. If not given, undo button is not created
- * @param redoCallback Optional callback functioned which is called when the redo button is clicked. If not given, redo button is not created
- * @param searchCallback Optional callback called when the search is changed, passing the current search value. If not given, no search icon is created
- * @returns
- */
 export function VisynHeader({
-  appName,
-  projectName = null,
-  dvLogo = <DatavisynLogo />,
-  customerLogo = null,
-  burgerMenu = null,
-  userMenu = null,
-  userName = null,
-  backgroundColor = 'gray',
+  color = 'white',
+  backgroundColor = 'dark',
+  components,
   undoCallback = null,
   redoCallback = null,
   searchCallback = null,
 }: {
-  appName: JSX.Element | string;
-  projectName?: string;
-  dvLogo?: JSX.Element;
-  customerLogo?: JSX.Element;
-  burgerMenu?: JSX.Element;
-  userMenu?: JSX.Element;
-  userName?: string;
-  backgroundColor?: string;
+  /**
+   * Optional color to be used for the background. If it is part of the mantine colors, it uses the primary shade, otherwise it is interpreted as CSS color.
+   */
+  backgroundColor?: MantineColor;
+  /**
+   * Optional color to be used for the text. This must be in contrast with the given `backgroundColor`.
+   */
+  color?: MantineColor;
+  /**
+   * Extension components to be rendered within the header.
+   */
+  components?: {
+    beforeLeft?: JSX.Element;
+    burgerMenu?: JSX.Element;
+    afterLeft?: JSX.Element;
+    beforeTitle?: JSX.Element;
+    title?: JSX.Element;
+    afterTitle?: JSX.Element;
+    beforeRight?: JSX.Element;
+    logo?: JSX.Element;
+    userAvatar?: JSX.Element;
+    userMenu?: JSX.Element;
+    afterRight?: JSX.Element;
+  };
+  /**
+   * Optional callback functioned which is called when the undo button is clicked. If not given, undo button is not created
+   */
   undoCallback?: () => void;
+  /**
+   * Optional callback functioned which is called when the redo button is clicked. If not given, redo button is not created
+   */
   redoCallback?: () => void;
+  /**
+   * Optional callback called when the search is changed, passing the current search value. If not given, no search icon is created
+   * @param s Search string.
+   */
   searchCallback?: (s: string) => void;
 }) {
-  const { classes } = useStyles({ color: backgroundColor });
+  const { appName } = useVisynAppContext();
+  const theme = useMantineTheme();
+  const { user } = useVisynAppContext();
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchString, setSearchString] = useState<string>('');
 
   const onSearch = useCallback(
-    (event) => {
+    (event: React.ChangeEvent<HTMLInputElement>) => {
       setSearchString(event.currentTarget.value);
       searchCallback(event.currentTarget.value);
     },
@@ -82,23 +78,34 @@ export function VisynHeader({
   );
 
   return (
-    <Header height={HEADER_HEIGHT} className={classes.grayColor}>
-      <Group grow pl={10} pr={10} className={classes.inner}>
-        <Group>
-          {burgerMenu ? <BurgerButton menu={burgerMenu} /> : null}
+    <Header height={HEADER_HEIGHT} style={{ backgroundColor: theme.colors[backgroundColor]?.[theme.fn.primaryShade()] || backgroundColor }}>
+      <Group
+        grow
+        pl="sm"
+        pr="sm"
+        sx={{
+          height: HEADER_HEIGHT,
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+        noWrap
+      >
+        <Group align="center" position="left" noWrap>
+          {components?.beforeLeft}
+          {components?.burgerMenu ? <BurgerButton menu={components.burgerMenu} /> : null}
           {undoCallback ? (
-            <ActionIcon className={classes.colorWhite} variant="transparent" onClick={undoCallback}>
+            <ActionIcon color={color} variant="transparent" onClick={undoCallback}>
               <FontAwesomeIcon icon={faArrowLeft} size="lg" />
             </ActionIcon>
           ) : null}
           {redoCallback ? (
-            <ActionIcon className={classes.colorWhite} variant="transparent" onClick={redoCallback}>
+            <ActionIcon color={color} variant="transparent" onClick={redoCallback}>
               <FontAwesomeIcon icon={faArrowRight} size="lg" />
             </ActionIcon>
           ) : null}
           {searchCallback ? (
             <>
-              <ActionIcon className={classes.colorWhite} variant="transparent" onClick={() => setIsSearching(!isSearching)}>
+              <ActionIcon color={color} variant="transparent" onClick={() => setIsSearching(!isSearching)}>
                 <FontAwesomeIcon icon={faMagnifyingGlass} size="lg" />
               </ActionIcon>
               <Transition mounted={isSearching} transition={cardTransition} duration={400} timingFunction="ease">
@@ -106,20 +113,31 @@ export function VisynHeader({
               </Transition>
             </>
           ) : null}
+          {components?.afterLeft}
         </Group>
-        <Group position="center">
-          <Title order={3} className={classes.colorWhite}>
-            {appName}
-          </Title>
-          <Title order={6} className={classes.colorWhite}>
-            {projectName}
-          </Title>
+        <Group align="center" position="center" noWrap>
+          {components?.beforeTitle}
+          {components?.title === undefined ? (
+            <Title order={3} weight={100} color={color} truncate>
+              {appName}
+            </Title>
+          ) : (
+            components?.title
+          )}
+          {components?.afterTitle}
         </Group>
 
-        <Group position="right">
-          {customerLogo || null}
-          {dvLogo}
-          {userName ? <UserAvatar menu={userMenu} userName={userName} color={backgroundColor} /> : null}
+        <Group align="center" position="right" noWrap>
+          {components?.beforeRight}
+          {components?.logo === undefined ? <DatavisynLogo color={backgroundColor === 'white' ? 'black' : 'white'} /> : components?.logo}
+          {components?.userAvatar === undefined ? (
+            user ? (
+              <UserAvatar menu={components?.userMenu} user={user.name} color={backgroundColor} />
+            ) : null
+          ) : (
+            components?.userAvatar
+          )}
+          {components?.afterRight}
         </Group>
       </Group>
     </Header>

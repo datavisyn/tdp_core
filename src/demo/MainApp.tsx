@@ -1,15 +1,71 @@
+import { Menu } from '@mantine/core';
 import * as React from 'react';
-import { useAsync } from '../hooks';
-import { initializeLibrary } from '../initialize';
+import {
+  Vis,
+  LoginUtils,
+  VisynHeader,
+  VisynApp,
+  useVisynAppContext,
+  ESupportedPlotlyVis,
+  ENumericalColorScaleType,
+  EScatterSelectSettings,
+  IVisConfig,
+} from '..';
 import { fetchIrisData } from '../vis/stories/Iris.stories';
-import { Vis } from '../vis/Vis';
 
 const irisData = fetchIrisData();
 
 export function MainApp() {
-  const { status } = useAsync(initializeLibrary, []);
+  const { user } = useVisynAppContext();
+  const [visConfig, setVisConfig] = React.useState<IVisConfig>({
+    type: ESupportedPlotlyVis.SCATTER,
+    numColumnsSelected: [
+      {
+        description: '',
+        id: 'sepalLength',
+        name: 'Sepal Length',
+      },
+      {
+        description: '',
+        id: 'sepalWidth',
+        name: 'Sepal Width',
+      },
+    ],
+    color: {
+      description: '',
+      id: 'species',
+      name: 'Species',
+    },
+    numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+    shape: null,
+    dragMode: EScatterSelectSettings.RECTANGLE,
+    alphaSliderVal: 1,
+  });
 
-  const [show, setShow] = React.useState<boolean>(false);
-
-  return <div style={{ width: '100vw', height: '100vh', overflow: 'auto' }}>{status === 'success' ? <Vis columns={irisData} showSidebarDefault /> : null}</div>;
+  return (
+    <VisynApp
+      header={
+        <VisynHeader
+          components={{
+            userMenu: user ? (
+              <>
+                <Menu.Label>Logged in as {user.name}</Menu.Label>
+                <Menu.Item
+                  onClick={() => {
+                    LoginUtils.logout();
+                  }}
+                >
+                  Logout
+                </Menu.Item>
+              </>
+            ) : null,
+          }}
+          backgroundColor="dark"
+        />
+      }
+      appShellProps={{}}
+    >
+      {user ? <Vis columns={irisData} showSidebarDefault externalConfig={visConfig} setExternalConfig={setVisConfig} /> : null}
+    </VisynApp>
+  );
 }

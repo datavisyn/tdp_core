@@ -27,6 +27,24 @@ class DisableSettings(BaseModel):
     extensions: list[str] = []
 
 
+class DummyStoreSettings(BaseModel):
+    enable: bool = False
+    users: list[dict[str, Any]] = [
+        {
+            "name": "admin",
+            "salt": "dcf46ce914154a44b1557eba91c1f50d",
+            "password": "e464485eeeca97927191bd77e38137cc5870c53efb05c8ec027faa8d47f0c0ee23e733ea5e494cb045ca46b0f3b6f695b7261a34f46ba3797cde67724d78522a",
+            "roles": ["admin"],
+        },
+        {
+            "name": "sam",
+            "salt": "2338b858597b4937ad1c5db4b524f56d",
+            "password": "814cbf874d3da7c01327b50c96bedf7db26357e0b4be25623242a33b33861651c3efd90d5c1a6410a646f356c73adf2de473611dee158672e8ee073767dc88f2",
+            "roles": ["sam"],
+        },
+    ]
+
+
 class AlbSecurityStoreSettings(BaseModel):
     enable: bool = False
     cookie_name: str | None = None
@@ -40,6 +58,8 @@ class NoSecurityStoreSettings(BaseModel):
 
 
 class SecurityStoreSettings(BaseModel):
+    dummy_store: DummyStoreSettings = DummyStoreSettings()
+    """Settings for the dummy security store"""
     alb_security_store: AlbSecurityStoreSettings = AlbSecurityStoreSettings()
     """Settings for the ALB security store"""
     no_security_store: NoSecurityStoreSettings = NoSecurityStoreSettings()
@@ -65,24 +85,10 @@ class TDPCoreSettings(BaseModel):
     # tdp_core
     migrations: DBMigrationSettings = DBMigrationSettings()
 
-    # phovea_security_flask
-    users: list[dict[str, Any]] = Field(
-        [
-            {
-                "name": "admin",
-                "salt": "dcf46ce914154a44b1557eba91c1f50d",
-                "password": "e464485eeeca97927191bd77e38137cc5870c53efb05c8ec027faa8d47f0c0ee23e733ea5e494cb045ca46b0f3b6f695b7261a34f46ba3797cde67724d78522a",
-                "roles": ["admin"],
-            },
-            {
-                "name": "sam",
-                "salt": "2338b858597b4937ad1c5db4b524f56d",
-                "password": "814cbf874d3da7c01327b50c96bedf7db26357e0b4be25623242a33b33861651c3efd90d5c1a6410a646f356c73adf2de473611dee158672e8ee073767dc88f2",
-                "roles": ["sam"],
-            },
-        ]
-    )
+    users: list[dict[str, Any]] = Field([])
+    """Deprecated: use tdp_core.security.store.dummy_store.users instead."""
     alwaysAppendDummyStore: bool = False  # NOQA
+    """Deprecated: use tdp_core.security.store.dummy_store.enable instead."""
     security: SecuritySettings = SecuritySettings()
 
     # tdp_matomo
