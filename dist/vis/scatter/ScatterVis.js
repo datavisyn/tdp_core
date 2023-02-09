@@ -40,6 +40,9 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
+    useEffect(() => {
+        setLayout(null);
+    }, [config.numColumnsSelected.length]);
     const { value: traces, status: traceStatus, error: traceError, } = useAsync(createScatterTraces, [
         columns,
         config.numColumnsSelected,
@@ -115,7 +118,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         return [];
     }, [plotsWithSelectedPoints, traces]);
     const plotly = useMemo(() => {
-        if (traces?.plots && plotsWithSelectedPoints) {
+        if (traces?.plots && plotsWithSelectedPoints && layout) {
             return (React.createElement(PlotlyComponent, { key: id, divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false, scrollZoom: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
                     const clickedId = event.points[0].id;
                     if (selectedMap[clickedId]) {

@@ -19,6 +19,7 @@ export function beautifyLayout(traces, layout, oldLayout, automargin = true) {
     layout.annotations = [];
     traces.plots.forEach((t, i) => {
         layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
+            range: t.xDomain ? t.xDomain : null,
             ...oldLayout?.[`xaxis${i > 0 ? i + 1 : ''}`],
             automargin,
             // rangemode: 'tozero',
@@ -40,6 +41,7 @@ export function beautifyLayout(traces, layout, oldLayout, automargin = true) {
             },
         };
         layout[`yaxis${i > 0 ? i + 1 : ''}`] = {
+            range: t.yDomain ? t.yDomain : null,
             ...oldLayout?.[`yaxis${i > 0 ? i + 1 : ''}`],
             automargin,
             // rangemode: 'tozero',

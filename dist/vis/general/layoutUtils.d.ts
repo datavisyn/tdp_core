@@ -17,6 +17,7 @@ export declare function beautifyLayout(traces: PlotlyInfo, layout: Partial<Plotl
 export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
     resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
     type: import("../interfaces").EColumnTypes.NUMERICAL;
+    domain?: [number, number];
     info: ColumnInfo;
     values: () => (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[] | Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
 } | {
@@ -28,6 +29,7 @@ export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
 export declare function resolveSingleColumn(column: VisColumn): Promise<{
     resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
     type: import("../interfaces").EColumnTypes.NUMERICAL;
+    domain?: [number, number];
     info: ColumnInfo;
     values: () => (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[] | Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
 } | {
