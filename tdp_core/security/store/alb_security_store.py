@@ -10,6 +10,8 @@ _log = logging.getLogger(__name__)
 
 
 class ALBSecurityStore(BaseStore):
+    ui = "AutoLoginForm"
+
     def __init__(self, cookie_name: str | None, signout_url: str | None):
         self.cookie_name = cookie_name
         self.signout_url: str | None = signout_url

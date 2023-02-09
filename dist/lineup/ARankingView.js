@@ -18,7 +18,7 @@ import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '
 import { debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
-import { LineupVisWrapper } from '../vis';
+import { LineupVisWrapper } from '../vis/LineupVisWrapper';
 import { WebpackEnv } from '../base/WebpackEnv';
 /**
  * base class for views based on LineUp
@@ -419,7 +419,7 @@ export class ARankingView extends AView {
         const columnPromise = new Promise((resolve) => {
             columnResolve = resolve;
         });
-        const data = new Promise((resolve) => {
+        const data = new Promise((resolve, reject) => {
             (async () => {
                 // Wait for the column to be initialized
                 const col = await columnPromise;
@@ -490,7 +490,8 @@ export class ARankingView extends AView {
                             continue;
                         }
                         else {
-                            throw e;
+                            reject(e);
+                            done = true;
                         }
                     }
                 }

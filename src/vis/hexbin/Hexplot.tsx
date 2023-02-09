@@ -379,8 +379,17 @@ export function Hexplot({ config, columns, selectionCallback = () => null, selec
   }, [width, height, id, hexes, selectionCallback, config.dragMode, xScale, yScale, margin]);
 
   return (
-    <Container ref={ref} fluid sx={{ width: '100%' }}>
-      <svg className="hexbinSvg" id={id} width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
+    <Container
+      ref={ref}
+      fluid
+      sx={{
+        width: '100%',
+        '.overlay': {
+          cursor: 'default !important',
+        },
+      }}
+    >
+      <svg id={id} width={width + margin.left + margin.right} height={height + margin.top + margin.bottom}>
         <defs>
           <clipPath id="clip">
             <rect style={{ transform: `translate(${margin.left}px, ${margin.top}px)` }} width={width} height={height} />

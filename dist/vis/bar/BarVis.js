@@ -6,7 +6,8 @@ import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { EBarGroupingType } from '../interfaces';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../../plotly';
+import { Plotly } from '../../plotly/full';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';
@@ -21,13 +22,12 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, selectionCallback = () => null, selectedMap = {}, selectedList = [], hideSidebar = false, showCloseButton = false, closeButtonCallback = () => null, }) {
+export function BarVis({ config, optionsConfig, extensions, columns, setConfig, scales, selectionCallback = () => null, selectedMap = {}, selectedList = [], enableSidebar, showSidebar, setShowSidebar, showCloseButton = false, closeButtonCallback = () => null, }) {
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
     const { value: traces, status: traceStatus, error: traceError } = useAsync(createBarTraces, [columns, config, scales]);
     const [layout, setLayout] = useState(null);
-    const [sidebarOpen, setSidebarOpen] = useState(true);
     // Make sure selected values is right for each plot.
     const finalTraces = useMemo(() => {
         if (!traces) {
@@ -114,14 +114,24 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         }
         return [...finalTraces.plots.map((p) => p.data), ...finalTraces.legendPlots.map((p) => p.data)];
     }, [finalTraces]);
-    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }, ref: plotlyDivRef },
+    return (React.createElement(Container, { fluid: true, sx: {
+            flexGrow: 1,
+            height: '100%',
+            width: '100%',
+            overflow: 'hidden',
+            position: 'relative',
+            // Disable plotly crosshair cursor
+            '.nsewdrag': {
+                cursor: 'pointer !important',
+            },
+        }, ref: plotlyDivRef },
         showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         mergedExtensions.prePlot,
         React.createElement(Space, { h: "xl" }),
-        React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
-            React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setSidebarOpen(true) },
-                React.createElement(FontAwesomeIcon, { icon: faGear }))),
-        traceStatus === 'success' && layout && finalTraces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, className: "tdpCoreVis", onClick: (e) => {
+        enableSidebar ? (React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
+            React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setShowSidebar(true) },
+                React.createElement(FontAwesomeIcon, { icon: faGear })))) : null,
+        traceStatus === 'success' && layout && finalTraces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (e) => {
                 // plotly types here are just wrong. So have to convert to unknown first.
                 const selectedPoints = e.points[0].customdata;
                 let removeSelectionFlag = true;
@@ -151,7 +161,7 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
                 }
             } })) : traceStatus !== 'pending' ? (React.createElement(InvalidCols, { headerMessage: finalTraces?.errorMessageHeader, bodyMessage: traceError?.message || finalTraces?.errorMessage })) : null,
         mergedExtensions.postPlot,
-        !hideSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: sidebarOpen, onClose: () => setSidebarOpen(false) },
+        showSidebar ? (React.createElement(VisSidebarWrapper, { id: id, target: plotlyDivRef.current, open: showSidebar, onClose: () => setShowSidebar(false) },
             React.createElement(BarVisSidebar, { config: config, optionsConfig: optionsConfig, extensions: extensions, columns: columns, setConfig: setConfig }))) : null));
 }
 //# sourceMappingURL=BarVis.js.map

@@ -9,7 +9,7 @@ import { TourManager } from './tour/TourManager';
 import { TemporarySessionList, ButtonModeSelector, CLUEGraphManager } from './clue';
 import { TDPTokenManager } from './auth';
 import { ACLUEWrapper } from './clue/wrapper';
-import { LoginMenu, Ajax } from './base';
+import { LoginMenu, loadClientConfig } from './base';
 import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';
 import { MixedStorageProvenanceGraphManager } from './clue/provenance';
@@ -71,15 +71,6 @@ export class ATDPApplication extends ACLUEWrapper {
         }
     }
     /**
-     * Loads the client config from '/clientConfig.json' and parses it.
-     */
-    static async loadClientConfig() {
-        return Ajax.getJSON('/clientConfig.json').catch((e) => {
-            console.error('Error parsing clientConfig.json', e);
-            return null;
-        });
-    }
-    /**
      * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
      * @param options Options where the client config should be merged into.
      */
@@ -89,7 +80,7 @@ export class ATDPApplication extends ACLUEWrapper {
             return null;
         }
         // Otherwise, load and merge the configuration into the existing one.
-        const parsedConfig = await ATDPApplication.loadClientConfig();
+        const parsedConfig = await loadClientConfig();
         options.clientConfig = merge(options?.clientConfig || {}, parsedConfig || {});
         return options;
     }

@@ -1,7 +1,7 @@
 /// <reference types="react" />
-export declare function UserAvatar({ menu, userName, color }: {
+export declare function UserAvatar({ menu, user, color }: {
     menu: JSX.Element;
-    userName: string;
+    user: string;
     color: string;
 }): JSX.Element;
 //# sourceMappingURL=UserAvatar.d.ts.map

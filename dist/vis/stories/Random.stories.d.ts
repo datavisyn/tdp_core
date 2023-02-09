@@ -1,5 +1,5 @@
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Vis } from '../Vis';
+import { Vis } from '../LazyVis';
 declare const _default: ComponentMeta<typeof Vis>;
 export default _default;
 export declare const ScatterPlot: ComponentStory<typeof Vis>;

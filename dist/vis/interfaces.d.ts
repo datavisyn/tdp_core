@@ -1,5 +1,5 @@
 /// <reference types="react" />
-import { Plotly } from './Plot';
+import type { PlotlyTypes } from '../plotly';
 export declare enum ESupportedPlotlyVis {
     SCATTER = "Scatter plot",
     VIOLIN = "Violin plot",
@@ -46,8 +46,8 @@ export declare enum EGeneralFormType {
     SLIDER = "Slider"
 }
 export declare enum EFilterOptions {
-    IN = "Filter In",
-    OUT = "Filter Out",
+    IN = "Filter in",
+    OUT = "Filter out",
     CLEAR = "Clear"
 }
 export declare enum ENumericalColorScaleType {
@@ -116,6 +116,7 @@ export interface VisCommonColumn {
 }
 export interface VisNumericalColumn extends VisCommonColumn {
     type: EColumnTypes.NUMERICAL;
+    domain?: [number | undefined, number | undefined];
 }
 export interface VisCategoricalColumn extends VisCommonColumn {
     type: EColumnTypes.CATEGORICAL;
@@ -130,13 +131,15 @@ export declare type PlotlyInfo = {
     errorMessageHeader: string;
 };
 export declare type PlotlyData = {
-    data: Partial<Plotly.PlotData>;
+    data: Partial<PlotlyTypes.PlotData>;
     xLabel: string;
     yLabel: string;
     xTicks?: string[];
     xTickLabels?: string[];
     yTicks?: string[];
     yTickLabels?: string[];
+    xDomain?: [number | undefined, number | undefined];
+    yDomain?: [number | undefined, number | undefined];
 };
 export declare type ColumnInfo = {
     name: string;

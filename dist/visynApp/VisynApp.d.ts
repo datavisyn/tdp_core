@@ -10,18 +10,16 @@ import { JSXElementConstructor, ReactElement } from 'react';
  * @param appShellProps Optional props to be passed directly to AppShell
  * @param loginMenu Optional custom login menu. If not passed, will default to the VisynLoginMenu.
  * @param headerHeight Optional height for the header, so that you can properly use 100% inside of your application. Does not set the height of the header, just calculates height elsewhere based on this number
- * @param appName Name of application. Used in default login menu and header.
  * @returns
  */
-export declare function VisynApp({ header, navbar, aside, footer, appShellProps, children, appName, headerHeight, loginMenu, }: {
+export declare function VisynApp({ header, navbar, aside, footer, appShellProps, children, headerHeight, loginMenu, }: {
     header?: ReactElement<unknown, string | JSXElementConstructor<unknown>>;
     navbar?: ReactElement<unknown, string | JSXElementConstructor<unknown>>;
     aside?: ReactElement<unknown, string | JSXElementConstructor<unknown>>;
     footer?: ReactElement<unknown, string | JSXElementConstructor<unknown>>;
     appShellProps?: Partial<AppShellProps & React.RefAttributes<HTMLDivElement>>;
     loginMenu?: JSX.Element;
-    children?: React.ReactChild;
+    children?: React.ReactNode;
     headerHeight?: number;
-    appName: string;
 }): JSX.Element;
 //# sourceMappingURL=VisynApp.d.ts.map

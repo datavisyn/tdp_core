@@ -1,6 +1,7 @@
 export * from './extensions';
 export * from './NotificationHandler';
 export * from './ErrorAlertHandler';
+export * from './clientConfig';
 export * from './ValueCache';
 export * from './interfaces';
 export * from './rest';

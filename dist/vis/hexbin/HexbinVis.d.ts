@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { VisColumn, IVisConfig, IHexbinConfig } from '../interfaces';
-interface DensityVisProps {
+export declare function HexbinVis({ config, extensions, columns, setConfig, selectionCallback, selected, enableSidebar, setShowSidebar, showSidebar, }: {
     config: IHexbinConfig;
     extensions?: {
         prePlot?: React.ReactNode;
@@ -14,8 +14,8 @@ interface DensityVisProps {
     selected?: {
         [key: string]: boolean;
     };
-    hideSidebar?: boolean;
-}
-export declare function HexbinVis({ config, extensions, columns, setConfig, selectionCallback, selected, hideSidebar }: DensityVisProps): JSX.Element;
-export {};
+    showSidebar?: boolean;
+    setShowSidebar?(show: boolean): void;
+    enableSidebar?: boolean;
+}): JSX.Element;
 //# sourceMappingURL=HexbinVis.d.ts.map
