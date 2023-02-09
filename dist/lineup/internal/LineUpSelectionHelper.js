@@ -2,7 +2,7 @@ import { LocalDataProvider } from 'lineupjs';
 import { difference } from 'lodash';
 import { EventHandler } from '../../base';
 export class LineUpSelectionHelper extends EventHandler {
-    constructor(provider, idType) {
+    constructor(provider, idType, { idField = 'id', } = {}) {
         super();
         this.provider = provider;
         this.idType = idType;
@@ -14,12 +14,13 @@ export class LineUpSelectionHelper extends EventHandler {
         this.orderedSelectedIndices = [];
         this.uid2index = new Map();
         this.addEventListener();
+        this.idField = idField;
     }
     buildCache() {
         this.uid2index.clear();
         // create lookup cache
         this._rows.forEach((row, i) => {
-            this.uid2index.set(row.id, i);
+            this.uid2index.set(row[this.idField], i);
         });
     }
     addEventListener() {
@@ -47,7 +48,7 @@ export class LineUpSelectionHelper extends EventHandler {
             console.warn('no idType defined for this ranking view');
             return;
         }
-        const selection = { idtype: idType, ids: this.orderedSelectedIndices.map((i) => this._rows[i].id) };
+        const selection = { idtype: idType, ids: this.orderedSelectedIndices.map((i) => this._rows[i][this.idField]) };
         // Note: listener of that event calls LineUpSelectionHelper.setItemSelection()
         this.fire(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, selection);
     }
@@ -62,7 +63,7 @@ export class LineUpSelectionHelper extends EventHandler {
      * gets the rows ids as a set, i.e. the order doesn't mean anything
      */
     rowIdsAsSet(indices) {
-        return (indices.length === this._rows.length ? this._rows.map((d) => d.id) : indices.map((i) => this._rows[i].id)).sort();
+        return (indices.length === this._rows.length ? this._rows.map((d) => d[this.idField]) : indices.map((i) => this._rows[i][this.idField])).sort();
     }
     setItemSelection(sel) {
         if (!this.provider) {

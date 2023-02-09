@@ -28,11 +28,13 @@ import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { WebpackEnv } from '../base';
+import { LineupVisWrapper } from '../vis/LineupVisWrapper';
 const defaults = {
     itemName: 'item',
     itemNamePlural: 'items',
     itemRowHeight: null,
     itemIDType: null,
+    idField: 'id',
     additionalScoreParameter: null,
     additionalComputeScoreParameter: null,
     subType: { key: '', value: '' },
@@ -317,7 +319,18 @@ onAddScoreColumn, }) {
                 const luBackdrop = lineupContainerRef.current.querySelector('.lu-backdrop');
                 lineupContainerRef.current.parentElement.appendChild(luBackdrop);
             }
-            selectionHelperRef.current = new LineUpSelectionHelper(providerRef.current, () => itemIDType);
+            selectionHelperRef.current = new LineUpSelectionHelper(providerRef.current, () => itemIDType, {
+                idField: options.idField,
+            });
+            const generalVis = new LineupVisWrapper({
+                provider: providerRef.current,
+                selectionCallback: (ids) => {
+                    // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                    selectionHelperRef.current.setGeneralVisSelection({ idtype: itemIDType ? IDTypeManager.getInstance().resolveIdType(itemIDType.id) : null, ids });
+                },
+                doc: lineupContainerRef.current.ownerDocument,
+                idField: options.idField,
+            });
             panelRef.current = new LineUpPanelActions(providerRef.current, taggleRef.current.ctx, options, lineupContainerRef.current.ownerDocument);
             // TODO: should we hardcode the generalVis since it is a separate view
             // generalVisRef=new GeneralVisWrapper(providerRef.current, this, this.selectionHelper, this.node.ownerDocument);
@@ -359,9 +372,9 @@ onAddScoreColumn, }) {
             panelRef.current.on(LineUpPanelActions.EVENT_ZOOM_IN, () => {
                 taggleRef.current.zoomIn();
             });
-            // TODO: panelRef.current.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-            //     this.generalVis.toggleCustomVis();
-            // });
+            panelRef.current.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+                generalVis.toggleCustomVis();
+            });
             if (options.enableOverviewMode) {
                 const rule = spaceFillingRule(taggleOptions);
                 panelRef.current.on(LineUpPanelActions.EVENT_TOGGLE_OVERVIEW, (_event, isOverviewActive) => {
@@ -374,6 +387,9 @@ onAddScoreColumn, }) {
             }
             if (options.enableSidePanel) {
                 lineupContainerRef.current.parentElement.appendChild(panelRef.current.node);
+                if (options.enableVisPanel) {
+                    lineupContainerRef.current.parentElement.appendChild(generalVis.node);
+                }
                 if (options.enableSidePanel !== 'top') {
                     taggleRef.current.pushUpdateAble((ctx) => panelRef.current.panel.update(ctx));
                 }

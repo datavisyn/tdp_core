@@ -80,7 +80,7 @@ export default {
     pointCount: { control: 'number' },
   },
   args: {
-    pointCount: 1000,
+    pointCount: 100000,
   },
 } as ComponentMeta<typeof Vis>;
 
@@ -90,7 +90,13 @@ const Template: ComponentStory<typeof Vis> = (args) => {
   // @ts-ignore TODO: The pointCount is an injected property, but we are using typeof Vis such that this prop does not exist.
   const columns = React.useMemo(() => fetchData(args.pointCount), [args.pointCount]);
 
-  return <Vis {...args} columns={columns} />;
+  return (
+    <div style={{ height: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ width: '70%', height: '80%' }}>
+        <Vis {...args} columns={columns} />
+      </div>
+    </div>
+  );
 };
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 
@@ -156,44 +162,5 @@ ViolinPlot.args = {
     ],
     catColumnsSelected: [],
     violinOverlay: EViolinOverlay.NONE,
-  },
-};
-
-export const StripPlot = Template.bind({}) as typeof Template;
-StripPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.STRIP,
-    numColumnsSelected: [
-      {
-        description: '',
-        id: 'pca_x',
-        name: 'pca_x',
-      },
-      {
-        description: '',
-        id: 'pca_y',
-        name: 'pca_y',
-      },
-    ],
-    catColumnsSelected: [],
-  },
-};
-
-export const ParallelCoordinatesPlot = Template.bind({}) as typeof Template;
-ParallelCoordinatesPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.PCP,
-    allColumnsSelected: [
-      {
-        description: '',
-        id: 'pca_x',
-        name: 'pca_x',
-      },
-      {
-        description: '',
-        id: 'pca_y',
-        name: 'pca_y',
-      },
-    ],
   },
 };

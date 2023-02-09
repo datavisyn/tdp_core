@@ -1,3 +1,4 @@
+import { Container, SegmentedControl, Stack, Text } from '@mantine/core';
 import * as React from 'react';
 import { EBarDirection } from '../interfaces';
 
@@ -7,31 +8,21 @@ interface BarDirectionProps {
 }
 
 export function BarDirectionButtons({ callback, currentSelected }: BarDirectionProps) {
-  const options = [EBarDirection.VERTICAL, EBarDirection.HORIZONTAL];
   return (
-    <>
-      <label className="pt-2 pb-1">Direction</label>
-
-      <div key="barDirectionGroup" className="btn-group w-100" role="group" aria-label="Bar Direction Chooser">
-        {options.map((opt) => {
-          return (
-            <React.Fragment key={`radioButtonsFilter${opt}`}>
-              <input
-                checked={currentSelected === opt}
-                onChange={(e) => callback(e.currentTarget.value as EBarDirection)}
-                value={opt}
-                type="checkbox"
-                className="btn-check"
-                id={`formButton${opt}`}
-                autoComplete="off"
-              />
-              <label style={{ zIndex: 0 }} className="btn btn-outline-primary w-100" htmlFor={`formButton${opt}`}>
-                {opt}
-              </label>
-            </React.Fragment>
-          );
-        })}
-      </div>
-    </>
+    <Container p={0} fluid sx={{ width: '100%' }}>
+      <Stack spacing={0}>
+        <Text weight={500} size={14}>
+          Direction
+        </Text>
+        <SegmentedControl
+          value={currentSelected}
+          onChange={callback}
+          data={[
+            { label: EBarDirection.VERTICAL, value: EBarDirection.VERTICAL },
+            { label: EBarDirection.HORIZONTAL, value: EBarDirection.HORIZONTAL },
+          ]}
+        />
+      </Stack>
+    </Container>
   );
 }

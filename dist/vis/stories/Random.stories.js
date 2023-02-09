@@ -64,7 +64,7 @@ export default {
         pointCount: { control: 'number' },
     },
     args: {
-        pointCount: 1000,
+        pointCount: 100000,
     },
 };
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
@@ -72,7 +72,9 @@ export default {
 const Template = (args) => {
     // @ts-ignore TODO: The pointCount is an injected property, but we are using typeof Vis such that this prop does not exist.
     const columns = React.useMemo(() => fetchData(args.pointCount), [args.pointCount]);
-    return React.createElement(Vis, { ...args, columns: columns });
+    return (React.createElement("div", { style: { height: '100vh', width: '100%', display: 'flex', justifyContent: 'center', alignContent: 'center', flexWrap: 'wrap' } },
+        React.createElement("div", { style: { width: '70%', height: '80%' } },
+            React.createElement(Vis, { ...args, columns: columns }))));
 };
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 export const ScatterPlot = Template.bind({});
@@ -135,43 +137,6 @@ ViolinPlot.args = {
         ],
         catColumnsSelected: [],
         violinOverlay: EViolinOverlay.NONE,
-    },
-};
-export const StripPlot = Template.bind({});
-StripPlot.args = {
-    externalConfig: {
-        type: ESupportedPlotlyVis.STRIP,
-        numColumnsSelected: [
-            {
-                description: '',
-                id: 'pca_x',
-                name: 'pca_x',
-            },
-            {
-                description: '',
-                id: 'pca_y',
-                name: 'pca_y',
-            },
-        ],
-        catColumnsSelected: [],
-    },
-};
-export const ParallelCoordinatesPlot = Template.bind({});
-ParallelCoordinatesPlot.args = {
-    externalConfig: {
-        type: ESupportedPlotlyVis.PCP,
-        allColumnsSelected: [
-            {
-                description: '',
-                id: 'pca_x',
-                name: 'pca_x',
-            },
-            {
-                description: '',
-                id: 'pca_y',
-                name: 'pca_y',
-            },
-        ],
     },
 };
 //# sourceMappingURL=Random.stories.js.map

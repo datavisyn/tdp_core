@@ -1,7 +1,10 @@
 import * as React from 'react';
 import d3v3 from 'd3v3';
 import { merge, uniqueId } from 'lodash';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
 import { PlotlyComponent, Plotly } from '../Plot';
 import { InvalidCols } from '../general';
@@ -11,8 +14,28 @@ import { useAsync } from '../../hooks';
 import { ViolinVisSidebar } from './ViolinVisSidebar';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
+import { I18nextManager } from '../../i18n';
 
-interface ViolinVisProps {
+const defaultExtensions = {
+  prePlot: null,
+  postPlot: null,
+  preSidebar: null,
+  postSidebar: null,
+};
+
+export function ViolinVis({
+  config,
+  optionsConfig,
+  extensions,
+  columns,
+  setConfig,
+  scales,
+  showSidebar,
+  setShowSidebar,
+  enableSidebar,
+  showCloseButton = false,
+  closeButtonCallback = () => null,
+}: {
   config: IViolinConfig;
   optionsConfig?: {
     overlay?: {
@@ -31,28 +54,11 @@ interface ViolinVisProps {
   closeButtonCallback?: () => void;
 
   scales: Scales;
-  hideSidebar?: boolean;
+  showSidebar?: boolean;
+  setShowSidebar?(show: boolean): void;
+  enableSidebar?: boolean;
   showCloseButton?: boolean;
-}
-
-const defaultExtensions = {
-  prePlot: null,
-  postPlot: null,
-  preSidebar: null,
-  postSidebar: null,
-};
-
-export function ViolinVis({
-  config,
-  optionsConfig,
-  extensions,
-  columns,
-  setConfig,
-  scales,
-  hideSidebar = false,
-  showCloseButton = false,
-  closeButtonCallback = () => null,
-}: ViolinVisProps) {
+}) {
   const mergedExtensions = React.useMemo(() => {
     return merge({}, defaultExtensions, extensions);
   }, [extensions]);
@@ -60,6 +66,8 @@ export function ViolinVis({
   const { value: traces, status: traceStatus, error: traceError } = useAsync(createViolinTraces, [columns, config, scales]);
 
   const id = React.useMemo(() => uniqueId('ViolinVis'), []);
+
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
 
   const plotlyDivRef = React.useRef(null);
 
@@ -72,24 +80,12 @@ export function ViolinVis({
       ro.observe(plotlyDivRef.current);
     }
 
-    if (hideSidebar) {
-      return;
-    }
+    return () => ro.disconnect();
+  }, [id, plotlyDivRef]);
 
-    const menu = document.getElementById(`generalVisBurgerMenu${id}`);
-
-    menu.addEventListener('hidden.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-
-    menu.addEventListener('shown.bs.collapse', () => {
-      Plotly.Plots.resize(document.getElementById(`plotlyDiv${id}`));
-    });
-  }, [id, hideSidebar, plotlyDivRef]);
-
-  const layout = React.useMemo(() => {
+  React.useEffect(() => {
     if (!traces) {
-      return null;
+      return;
     }
 
     const innerLayout: Partial<Plotly.Layout> = {
@@ -99,6 +95,12 @@ export function ViolinVis({
         itemclick: false,
         itemdoubleclick: false,
       },
+      margin: {
+        t: 25,
+        r: 25,
+        l: 25,
+        b: 25,
+      },
       font: {
         family: 'Roboto, sans-serif',
       },
@@ -107,46 +109,52 @@ export function ViolinVis({
       shapes: [],
     };
 
-    return beautifyLayout(traces, innerLayout);
+    setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+    // WARNING: Do not update when layout changes, that would be an infinite loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [traces]);
 
   return (
-    <div ref={plotlyDivRef} className="d-flex flex-row w-100 h-100" style={{ minHeight: '0px' }}>
-      <div
-        className={`position-relative d-flex justify-content-center align-items-center flex-grow-1 ${
-          traceStatus === 'pending' ? 'tdp-busy-partial-overlay' : ''
-        }`}
-      >
-        {mergedExtensions.prePlot}
+    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', position: 'relative' }} ref={plotlyDivRef}>
+      <Space h="xl" />
+      {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
 
-        {traceStatus === 'success' && traces?.plots.length > 0 ? (
-          <PlotlyComponent
-            divId={`plotlyDiv${id}`}
-            data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
-            layout={layout}
-            config={{ responsive: true, displayModeBar: false }}
-            useResizeHandler
-            style={{ width: '100%', height: '100%' }}
-            // plotly redraws everything on updates, so you need to reappend title and
-            onUpdate={() => {
-              for (const p of traces.plots) {
-                d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+      {enableSidebar ? (
+        <Tooltip withinPortal label={I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings')}>
+          <ActionIcon sx={{ zIndex: 10, position: 'absolute', top: '10px', right: '10px' }} onClick={() => setShowSidebar(true)}>
+            <FontAwesomeIcon icon={faGear} />
+          </ActionIcon>
+        </Tooltip>
+      ) : null}
+      {mergedExtensions.prePlot}
 
-                d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
-              }
-            }}
-          />
-        ) : traceStatus !== 'pending' ? (
-          <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
-        ) : null}
-        {mergedExtensions.postPlot}
-        {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
-      </div>
-      {!hideSidebar ? (
-        <VisSidebarWrapper id={id}>
+      {traceStatus === 'success' && layout && traces?.plots.length > 0 ? (
+        <PlotlyComponent
+          divId={`plotlyDiv${id}`}
+          className="tdpCoreVis"
+          data={[...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)]}
+          layout={layout}
+          config={{ responsive: true, displayModeBar: false }}
+          useResizeHandler
+          style={{ width: '100%', height: '100%' }}
+          // plotly redraws everything on updates, so you need to reappend title and
+          onUpdate={() => {
+            for (const p of traces.plots) {
+              d3v3.select(`g .${p.data.xaxis}title`).style('pointer-events', 'all').append('title').text(p.xLabel);
+
+              d3v3.select(`g .${p.data.yaxis}title`).style('pointer-events', 'all').append('title').text(p.yLabel);
+            }
+          }}
+        />
+      ) : traceStatus !== 'pending' ? (
+        <InvalidCols headerMessage={traces?.errorMessageHeader} bodyMessage={traceError?.message || traces?.errorMessage} />
+      ) : null}
+      {mergedExtensions.postPlot}
+      {showSidebar ? (
+        <VisSidebarWrapper id={id} target={plotlyDivRef.current} open={showSidebar} onClose={() => setShowSidebar(false)}>
           <ViolinVisSidebar config={config} optionsConfig={optionsConfig} extensions={extensions} columns={columns} setConfig={setConfig} />
         </VisSidebarWrapper>
       ) : null}
-    </div>
+    </Container>
   );
 }

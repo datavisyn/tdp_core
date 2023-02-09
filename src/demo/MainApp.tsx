@@ -9,5 +9,7 @@ const irisData = fetchIrisData();
 export function MainApp() {
   const { status } = useAsync(initializeLibrary, []);
 
-  return <div style={{ width: '100vw', height: '100vh', overflow: 'auto' }}>{status === 'success' ? <Vis columns={irisData} /> : null}</div>;
+  const [show, setShow] = React.useState<boolean>(false);
+
+  return <div style={{ width: '100vw', height: '100vh', overflow: 'auto' }}>{status === 'success' ? <Vis columns={irisData} showSidebarDefault /> : null}</div>;
 }

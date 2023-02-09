@@ -1,23 +1,27 @@
 export var ESupportedPlotlyVis;
 (function (ESupportedPlotlyVis) {
-    ESupportedPlotlyVis["SCATTER"] = "Scatter Plot";
-    ESupportedPlotlyVis["PCP"] = "Parallel Coordinates Plot";
-    ESupportedPlotlyVis["VIOLIN"] = "Violin Plot";
-    ESupportedPlotlyVis["STRIP"] = "Strip Plot";
-    ESupportedPlotlyVis["BAR"] = "Bar Chart";
+    ESupportedPlotlyVis["SCATTER"] = "Scatter plot";
+    ESupportedPlotlyVis["VIOLIN"] = "Violin plot";
+    ESupportedPlotlyVis["BAR"] = "Bar chart";
+    ESupportedPlotlyVis["HEXBIN"] = "Hexbin plot";
 })(ESupportedPlotlyVis || (ESupportedPlotlyVis = {}));
 export const allVisTypes = [
     ESupportedPlotlyVis.SCATTER,
     ESupportedPlotlyVis.BAR,
     ESupportedPlotlyVis.VIOLIN,
-    ESupportedPlotlyVis.STRIP,
-    ESupportedPlotlyVis.PCP,
+    ESupportedPlotlyVis.HEXBIN,
 ];
 export var EBarDisplayType;
 (function (EBarDisplayType) {
     EBarDisplayType["ABSOLUTE"] = "Absolute";
     EBarDisplayType["NORMALIZED"] = "Normalized";
 })(EBarDisplayType || (EBarDisplayType = {}));
+export var EHexbinOptions;
+(function (EHexbinOptions) {
+    EHexbinOptions["COLOR"] = "Color";
+    EHexbinOptions["PIE"] = "Pie";
+    EHexbinOptions["BINS"] = "Bins";
+})(EHexbinOptions || (EHexbinOptions = {}));
 export var EBarDirection;
 (function (EBarDirection) {
     EBarDirection["VERTICAL"] = "Vertical";
@@ -26,7 +30,6 @@ export var EBarDirection;
 export var EViolinOverlay;
 (function (EViolinOverlay) {
     EViolinOverlay["NONE"] = "None";
-    EViolinOverlay["STRIP"] = "Strip";
     EViolinOverlay["BOX"] = "Box";
 })(EViolinOverlay || (EViolinOverlay = {}));
 export var EAggregateTypes;
@@ -55,8 +58,8 @@ export var EGeneralFormType;
 })(EGeneralFormType || (EGeneralFormType = {}));
 export var EFilterOptions;
 (function (EFilterOptions) {
-    EFilterOptions["IN"] = "Filter In";
-    EFilterOptions["OUT"] = "Filter Out";
+    EFilterOptions["IN"] = "Filter in";
+    EFilterOptions["OUT"] = "Filter out";
     EFilterOptions["CLEAR"] = "Clear";
 })(EFilterOptions || (EFilterOptions = {}));
 export var ENumericalColorScaleType;

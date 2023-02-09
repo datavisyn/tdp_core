@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Scales, VisColumn, IVisConfig, IViolinConfig } from '../interfaces';
-interface ViolinVisProps {
+export declare function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, showSidebar, setShowSidebar, enableSidebar, showCloseButton, closeButtonCallback, }: {
     config: IViolinConfig;
     optionsConfig?: {
         overlay?: {
@@ -18,9 +18,9 @@ interface ViolinVisProps {
     setConfig: (config: IVisConfig) => void;
     closeButtonCallback?: () => void;
     scales: Scales;
-    hideSidebar?: boolean;
+    showSidebar?: boolean;
+    setShowSidebar?(show: boolean): void;
+    enableSidebar?: boolean;
     showCloseButton?: boolean;
-}
-export declare function ViolinVis({ config, optionsConfig, extensions, columns, setConfig, scales, hideSidebar, showCloseButton, closeButtonCallback, }: ViolinVisProps): JSX.Element;
-export {};
+}): JSX.Element;
 //# sourceMappingURL=ViolinVis.d.ts.map

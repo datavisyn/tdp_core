@@ -1,5 +1,5 @@
+import { Select } from '@mantine/core';
 import * as React from 'react';
-import Select from 'react-select';
 import { allVisTypes, ESupportedPlotlyVis } from '../interfaces';
 
 interface VisTypeSelectProps {
@@ -9,21 +9,18 @@ interface VisTypeSelectProps {
 
 export function VisTypeSelect({ callback, currentSelected }: VisTypeSelectProps) {
   return (
-    <>
-      <label className="pt-2 pb-1">Visualization Type</label>
-      <Select
-        closeMenuOnSelect
-        // components={{Option: optionLayout}}
-        onChange={(e) => callback(e.value)}
-        name="visTypes"
-        options={allVisTypes.map((t) => {
-          return {
-            value: t,
-            label: t,
-          };
-        })}
-        value={{ value: currentSelected, label: currentSelected }}
-      />
-    </>
+    <Select
+      label="Visualization type"
+      // components={{Option: optionLayout}}
+      onChange={(e) => callback(e as ESupportedPlotlyVis)}
+      name="visTypes"
+      data={allVisTypes.map((t) => {
+        return {
+          value: t,
+          label: t,
+        };
+      })}
+      value={currentSelected}
+    />
   );
 }

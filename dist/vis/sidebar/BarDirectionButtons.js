@@ -1,13 +1,13 @@
+import { Container, SegmentedControl, Stack, Text } from '@mantine/core';
 import * as React from 'react';
 import { EBarDirection } from '../interfaces';
 export function BarDirectionButtons({ callback, currentSelected }) {
-    const options = [EBarDirection.VERTICAL, EBarDirection.HORIZONTAL];
-    return (React.createElement(React.Fragment, null,
-        React.createElement("label", { className: "pt-2 pb-1" }, "Direction"),
-        React.createElement("div", { key: "barDirectionGroup", className: "btn-group w-100", role: "group", "aria-label": "Bar Direction Chooser" }, options.map((opt) => {
-            return (React.createElement(React.Fragment, { key: `radioButtonsFilter${opt}` },
-                React.createElement("input", { checked: currentSelected === opt, onChange: (e) => callback(e.currentTarget.value), value: opt, type: "checkbox", className: "btn-check", id: `formButton${opt}`, autoComplete: "off" }),
-                React.createElement("label", { style: { zIndex: 0 }, className: "btn btn-outline-primary w-100", htmlFor: `formButton${opt}` }, opt)));
-        }))));
+    return (React.createElement(Container, { p: 0, fluid: true, sx: { width: '100%' } },
+        React.createElement(Stack, { spacing: 0 },
+            React.createElement(Text, { weight: 500, size: 14 }, "Direction"),
+            React.createElement(SegmentedControl, { value: currentSelected, onChange: callback, data: [
+                    { label: EBarDirection.VERTICAL, value: EBarDirection.VERTICAL },
+                    { label: EBarDirection.HORIZONTAL, value: EBarDirection.HORIZONTAL },
+                ] }))));
 }
 //# sourceMappingURL=BarDirectionButtons.js.map
