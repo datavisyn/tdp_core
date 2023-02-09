@@ -1,5 +1,7 @@
 import { merge } from 'lodash';
 import d3v3 from 'd3v3';
+import { EChartsOption } from 'echarts';
+import { config } from '@fortawesome/fontawesome-svg-core';
 import {
   PlotlyInfo,
   PlotlyData,
@@ -15,6 +17,7 @@ import {
   VisNumericalValue,
   EScatterSelectSettings,
   ColumnInfo,
+  EChartsInfo,
 } from '../interfaces';
 import { getCol } from '../sidebar';
 import { getCssValue } from '../../utils';
@@ -76,9 +79,7 @@ export async function createScatterTraces(
   colorScaleType: ENumericalColorScaleType,
   scales: Scales,
   shapes: string[] | null,
-): Promise<PlotlyInfo> {
-  let plotCounter = 1;
-
+): Promise<EChartsInfo> {
   const emptyVal = {
     plots: [],
     legendPlots: [],
@@ -95,7 +96,7 @@ export async function createScatterTraces(
   }
 
   const numCols: VisNumericalColumn[] = numColumnsSelected.map((c) => columns.find((col) => col.info.id === c.id) as VisNumericalColumn);
-  const plots: PlotlyData[] = [];
+  const plots: EChartsOption[] = [];
 
   const validCols = await resolveColumnValues(numCols);
   const shapeCol = await resolveSingleColumn(getCol(columns, shape));
@@ -137,235 +138,238 @@ export async function createScatterTraces(
   // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
   if (validCols.length === 2) {
     plots.push({
-      data: {
-        x: validCols[0].resolvedValues.map((v) => v.val),
-        y: validCols[1].resolvedValues.map((v) => v.val),
-        ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
-        xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
-        yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-        type: 'scattergl',
-        mode: 'markers',
-        showlegend: false,
-        hoverlabel: {
-          bgcolor: 'black',
-        },
-        hovertext: validCols[0].resolvedValues.map(
-          (v, i) =>
-            `${v.id}<br>x: ${v.val}<br>y: ${validCols[1].resolvedValues[i].val}<br>${
-              colorCol ? `${columnNameWithDescription(colorCol.info)}: ${colorCol.resolvedValues[i].val}` : ''
-            }`,
-        ),
-        hoverinfo: 'text',
-        text: validCols[0].resolvedValues.map((v) => v.id.toString()),
-
-        marker: {
-          color: colorCol
-            ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
-            : SELECT_COLOR,
-        },
-        // plotly is stupid and doesnt know its own types
-        // @ts-ignore
-        selected: {
-          marker: {
-            line: {
-              width: 0,
-            },
-            symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-            opacity: 1,
-            size: 8,
-          },
-        },
-        unselected: {
-          marker: {
-            line: {
-              width: 0,
-            },
-            symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-            color: DEFAULT_COLOR,
-            opacity: alphaSliderVal,
-            size: 8,
-          },
+      title: {
+        text: ``,
+      },
+      tooltip: {},
+      toolbox: {
+        left: 'center',
+        feature: {
+          dataZoom: {},
         },
       },
-      xLabel: columnNameWithDescription(validCols[0].info),
-      yLabel: columnNameWithDescription(validCols[1].info),
-    });
-  } else {
-    for (const yCurr of validCols) {
-      for (const xCurr of validCols) {
-        // if on the diagonal, make a histogram.
-        if (xCurr.info.id === yCurr.info.id) {
-          plots.push({
-            data: {
-              x: xCurr.resolvedValues.map((v) => v.val),
-              xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
-              yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-              type: 'histogram',
-              hoverlabel: {
-                namelength: 5,
-              },
-              showlegend: false,
-              marker: {
-                color: DEFAULT_COLOR,
-              },
-              opacity: alphaSliderVal,
-            },
-            xLabel: columnNameWithDescription(xCurr.info),
-            yLabel: columnNameWithDescription(yCurr.info),
-          });
-          // otherwise, make a scatterplot
-        } else {
-          plots.push({
-            data: {
-              x: xCurr.resolvedValues.map((v) => v.val),
-              y: yCurr.resolvedValues.map((v) => v.val),
-              ids: xCurr.resolvedValues.map((v) => v.id.toString()),
-              xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
-              yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
-              type: 'scattergl',
-              mode: 'markers',
-              hovertext: xCurr.resolvedValues.map(
-                (v, i) =>
-                  `${v.id}<br>x: ${v.val}<br>y: ${yCurr.resolvedValues[i].val}<br>${
-                    colorCol ? `${columnNameWithDescription(colorCol.info)}: ${colorCol.resolvedValues[i].val}` : ''
-                  }`,
-              ),
-              hoverinfo: 'text',
-              hoverlabel: {
-                bgcolor: 'black',
-              },
-              showlegend: false,
-              text: validCols[0].resolvedValues.map((v) => v.id.toString()),
-              marker: {
-                color: colorCol
-                  ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
-                  : SELECT_COLOR,
-              },
-              // plotly is stupid and doesnt know its own types
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              selected: {
-                marker: {
-                  line: {
-                    width: 0,
-                  },
-                  symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-                  opacity: 1,
-                  size: 8,
-                },
-              },
-              unselected: {
-                marker: {
-                  line: {
-                    width: 0,
-                  },
-                  symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-                  color: DEFAULT_COLOR,
-                  opacity: alphaSliderVal,
-                  size: 8,
-                },
-              },
-            },
-            xLabel: columnNameWithDescription(xCurr.info),
-            yLabel: columnNameWithDescription(yCurr.info),
-          });
-        }
-
-        plotCounter += 1;
-      }
-    }
-  }
-
-  // if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
-  if (colorCol && colorCol.type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
-    legendPlots.push({
-      data: {
-        x: validCols[0].resolvedValues.map((v) => v.val),
-        y: validCols[0].resolvedValues.map((v) => v.val),
-        ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
-        xaxis: 'x',
-        yaxis: 'y',
-        type: 'scattergl',
-        mode: 'markers',
-        visible: 'legendonly',
-        legendgroup: 'color',
-        hoverinfo: 'skip',
-
-        // @ts-ignore
-        legendgrouptitle: {
-          text: columnNameWithDescription(colorCol.info),
-        },
-        marker: {
-          line: {
-            width: 0,
-          },
-          symbol: 'circle',
-          size: 8,
-          color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : DEFAULT_COLOR,
-          opacity: 1,
-        },
-        transforms: [
-          {
-            type: 'groupby',
-            groups: colorCol.resolvedValues.map((v) => v.val as string),
-            styles: [
-              ...[...new Set<string>(colorCol.resolvedValues.map((v) => v.val) as string[])].map((c) => {
-                return { target: c, value: { name: c } };
-              }),
-            ],
-          },
-        ],
+      legend: {
+        orient: 'vertical',
+        right: 10,
       },
-      xLabel: columnNameWithDescription(validCols[0].info),
-      yLabel: columnNameWithDescription(validCols[0].info),
+      xAxis: [{ type: 'value' }],
+      yAxis: [{ type: 'value' }],
+      visualMap: colorCol
+        ? {
+            min: 0,
+            max: 5,
+            dimension: 1,
+            type: 'continuous',
+            orient: 'vertical',
+            right: 10,
+            top: 'center',
+            text: ['HIGH', 'LOW'],
+            calculable: true,
+            inRange: {
+              color: ['#f2c31a', '#24b7f2'],
+            },
+          }
+        : null,
+      dataZoom: [
+        {
+          type: 'inside',
+        },
+        {
+          type: 'slider',
+        },
+      ],
+      animation: false,
+      series: [
+        {
+          name: 'A',
+          type: 'scatter',
+          data: validCols[0].resolvedValues.map((d, i) => [d.val, validCols[1].resolvedValues[i].val]),
+          dimensions: ['x', 'y'],
+          symbolSize: 10,
+          // itemStyle: {
+          //   opacity: alphaSliderVal,
+          // },
+          large: true,
+        },
+      ],
     });
   }
+  // } else {
+  //   for (const yCurr of validCols) {
+  //     for (const xCurr of validCols) {
+  //       // if on the diagonal, make a histogram.
+  //       if (xCurr.info.id === yCurr.info.id) {
+  //         plots.push({
+  //           data: {
+  //             x: xCurr.resolvedValues.map((v) => v.val),
+  //             xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+  //             yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+  //             type: 'histogram',
+  //             hoverlabel: {
+  //               namelength: 5,
+  //             },
+  //             showlegend: false,
+  //             marker: {
+  //               color: DEFAULT_COLOR,
+  //             },
+  //             opacity: alphaSliderVal,
+  //           },
+  //           xLabel: columnNameWithDescription(xCurr.info),
+  //           yLabel: columnNameWithDescription(yCurr.info),
+  //         });
+  //         // otherwise, make a scatterplot
+  //       } else {
+  //         plots.push({
+  //           data: {
+  //             x: xCurr.resolvedValues.map((v) => v.val),
+  //             y: yCurr.resolvedValues.map((v) => v.val),
+  //             ids: xCurr.resolvedValues.map((v) => v.id.toString()),
+  //             xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
+  //             yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
+  //             type: 'scattergl',
+  //             mode: 'markers',
+  //             hovertext: xCurr.resolvedValues.map(
+  //               (v, i) =>
+  //                 `${v.id}<br>x: ${v.val}<br>y: ${yCurr.resolvedValues[i].val}<br>${
+  //                   colorCol ? `${columnNameWithDescription(colorCol.info)}: ${colorCol.resolvedValues[i].val}` : ''
+  //                 }`,
+  //             ),
+  //             hoverinfo: 'text',
+  //             hoverlabel: {
+  //               bgcolor: 'black',
+  //             },
+  //             showlegend: false,
+  //             text: validCols[0].resolvedValues.map((v) => v.id.toString()),
+  //             marker: {
+  //               color: colorCol
+  //                 ? colorCol.resolvedValues.map((v) => (colorCol.type === EColumnTypes.NUMERICAL ? numericalColorScale(v.val as number) : scales.color(v.val)))
+  //                 : SELECT_COLOR,
+  //             },
+  //             // plotly is stupid and doesnt know its own types
+  //             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //             // @ts-ignore
+  //             selected: {
+  //               marker: {
+  //                 line: {
+  //                   width: 0,
+  //                 },
+  //                 symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+  //                 opacity: 1,
+  //                 size: 8,
+  //               },
+  //             },
+  //             unselected: {
+  //               marker: {
+  //                 line: {
+  //                   width: 0,
+  //                 },
+  //                 symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+  //                 color: DEFAULT_COLOR,
+  //                 opacity: alphaSliderVal,
+  //                 size: 8,
+  //               },
+  //             },
+  //           },
+  //           xLabel: columnNameWithDescription(xCurr.info),
+  //           yLabel: columnNameWithDescription(yCurr.info),
+  //         });
+  //       }
 
-  // if we have a column for the shape, add a legendPlot that creates a legend.
-  if (shapeCol) {
-    legendPlots.push({
-      data: {
-        x: validCols[0].resolvedValues.map((v) => v.val),
-        y: validCols[0].resolvedValues.map((v) => v.val),
-        ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
-        xaxis: 'x',
-        yaxis: 'y',
-        type: 'scattergl',
-        mode: 'markers',
-        visible: 'legendonly',
-        showlegend: true,
-        legendgroup: 'shape',
-        hoverinfo: 'skip',
+  //       plotCounter += 1;
+  //     }
+  //   }
+  // }
 
-        // @ts-ignore
-        legendgrouptitle: {
-          text: columnNameWithDescription(shapeCol.info),
-        },
-        marker: {
-          line: {
-            width: 0,
-          },
-          opacity: alphaSliderVal,
-          size: 8,
-          symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
-          color: DEFAULT_COLOR,
-        },
-        transforms: [
-          {
-            type: 'groupby',
-            groups: shapeCol.resolvedValues.map((v) => v.val as string),
-            styles: [
-              ...[...new Set<string>(shapeCol.resolvedValues.map((v) => v.val) as string[])].map((c) => {
-                return { target: c, value: { name: c } };
-              }),
-            ],
-          },
-        ],
-      },
-      xLabel: columnNameWithDescription(validCols[0].info),
-      yLabel: columnNameWithDescription(validCols[0].info),
-    });
-  }
+  // // if we have a column for the color, and its a categorical column, add a legendPlot that creates a legend.
+  // if (colorCol && colorCol.type === EColumnTypes.CATEGORICAL && validCols.length > 0) {
+  //   legendPlots.push({
+  //     data: {
+  //       x: validCols[0].resolvedValues.map((v) => v.val),
+  //       y: validCols[0].resolvedValues.map((v) => v.val),
+  //       ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
+  //       xaxis: 'x',
+  //       yaxis: 'y',
+  //       type: 'scattergl',
+  //       mode: 'markers',
+  //       visible: 'legendonly',
+  //       legendgroup: 'color',
+  //       hoverinfo: 'skip',
+
+  //       // @ts-ignore
+  //       legendgrouptitle: {
+  //         text: columnNameWithDescription(colorCol.info),
+  //       },
+  //       marker: {
+  //         line: {
+  //           width: 0,
+  //         },
+  //         symbol: 'circle',
+  //         size: 8,
+  //         color: colorCol ? colorCol.resolvedValues.map((v) => scales.color(v.val)) : DEFAULT_COLOR,
+  //         opacity: 1,
+  //       },
+  //       transforms: [
+  //         {
+  //           type: 'groupby',
+  //           groups: colorCol.resolvedValues.map((v) => v.val as string),
+  //           styles: [
+  //             ...[...new Set<string>(colorCol.resolvedValues.map((v) => v.val) as string[])].map((c) => {
+  //               return { target: c, value: { name: c } };
+  //             }),
+  //           ],
+  //         },
+  //       ],
+  //     },
+  //     xLabel: columnNameWithDescription(validCols[0].info),
+  //     yLabel: columnNameWithDescription(validCols[0].info),
+  //   });
+  // }
+
+  // // if we have a column for the shape, add a legendPlot that creates a legend.
+  // if (shapeCol) {
+  //   legendPlots.push({
+  //     data: {
+  //       x: validCols[0].resolvedValues.map((v) => v.val),
+  //       y: validCols[0].resolvedValues.map((v) => v.val),
+  //       ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
+  //       xaxis: 'x',
+  //       yaxis: 'y',
+  //       type: 'scattergl',
+  //       mode: 'markers',
+  //       visible: 'legendonly',
+  //       showlegend: true,
+  //       legendgroup: 'shape',
+  //       hoverinfo: 'skip',
+
+  //       // @ts-ignore
+  //       legendgrouptitle: {
+  //         text: columnNameWithDescription(shapeCol.info),
+  //       },
+  //       marker: {
+  //         line: {
+  //           width: 0,
+  //         },
+  //         opacity: alphaSliderVal,
+  //         size: 8,
+  //         symbol: shapeCol ? shapeCol.resolvedValues.map((v) => shapeScale(v.val as string)) : 'circle',
+  //         color: DEFAULT_COLOR,
+  //       },
+  //       transforms: [
+  //         {
+  //           type: 'groupby',
+  //           groups: shapeCol.resolvedValues.map((v) => v.val as string),
+  //           styles: [
+  //             ...[...new Set<string>(shapeCol.resolvedValues.map((v) => v.val) as string[])].map((c) => {
+  //               return { target: c, value: { name: c } };
+  //             }),
+  //           ],
+  //         },
+  //       ],
+  //     },
+  //     xLabel: columnNameWithDescription(validCols[0].info),
+  //     yLabel: columnNameWithDescription(validCols[0].info),
+  //   });
+  // }
 
   return {
     plots,

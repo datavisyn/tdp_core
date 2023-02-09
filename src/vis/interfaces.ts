@@ -1,3 +1,4 @@
+import {EChartsOption} from 'echarts';
 import { Plotly } from './Plot';
 
 export enum ESupportedPlotlyVis {
@@ -154,6 +155,15 @@ export type VisColumn = VisNumericalColumn | VisCategoricalColumn;
 
 export type PlotlyInfo = {
   plots: PlotlyData[];
+  legendPlots: PlotlyData[];
+  rows: number;
+  cols: number;
+  errorMessage: string;
+  errorMessageHeader: string;
+};
+
+export type EChartsInfo = {
+  plots: EChartsOption[];
   legendPlots: PlotlyData[];
   rows: number;
   cols: number;
