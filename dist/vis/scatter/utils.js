@@ -9,6 +9,17 @@ import { DEFAULT_COLOR, SELECT_COLOR } from '../general/constants';
 export function isScatter(s) {
     return s.type === ESupportedPlotlyVis.SCATTER;
 }
+function calculateDomain(domain, vals) {
+    if (!domain)
+        return null;
+    if (domain[0] !== undefined && domain[1] !== undefined) {
+        return [domain[0], domain[1]];
+    }
+    const min = Math.min(...vals);
+    const max = Math.max(...vals);
+    const calcDomain = [domain[0] ? domain[0] : min, domain[1] ? domain[1] : max + max / 20];
+    return calcDomain;
+}
 const defaultConfig = {
     type: ESupportedPlotlyVis.SCATTER,
     numColumnsSelected: [],
@@ -87,10 +98,14 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
     }
     // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
     if (validCols.length === 2) {
+        const xDataVals = validCols[0].resolvedValues.map((v) => v.val);
+        const yDataVals = validCols[1].resolvedValues.map((v) => v.val);
+        const calcXDomain = calculateDomain(validCols[0].domain, xDataVals);
+        const calcYDomain = calculateDomain(validCols[1].domain, yDataVals);
         plots.push({
             data: {
-                x: validCols[0].resolvedValues.map((v) => v.val),
-                y: validCols[1].resolvedValues.map((v) => v.val),
+                x: xDataVals,
+                y: yDataVals,
                 ids: validCols[0].resolvedValues.map((v) => v.id.toString()),
                 xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
                 yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -134,6 +149,8 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
             },
             xLabel: columnNameWithDescription(validCols[0].info),
             yLabel: columnNameWithDescription(validCols[1].info),
+            xDomain: calcXDomain,
+            yDomain: calcYDomain,
         });
     }
     else {
@@ -162,10 +179,14 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
                     // otherwise, make a scatterplot
                 }
                 else {
+                    const xDataVals = xCurr.resolvedValues.map((v) => v.val);
+                    const yDataVals = yCurr.resolvedValues.map((v) => v.val);
+                    const calcXDomain = calculateDomain(xCurr.domain, xDataVals);
+                    const calcYDomain = calculateDomain(yCurr.domain, yDataVals);
                     plots.push({
                         data: {
-                            x: xCurr.resolvedValues.map((v) => v.val),
-                            y: yCurr.resolvedValues.map((v) => v.val),
+                            x: xDataVals,
+                            y: yDataVals,
                             ids: xCurr.resolvedValues.map((v) => v.id.toString()),
                             xaxis: plotCounter === 1 ? 'x' : `x${plotCounter}`,
                             yaxis: plotCounter === 1 ? 'y' : `y${plotCounter}`,
@@ -210,6 +231,8 @@ export async function createScatterTraces(columns, numColumnsSelected, shape, co
                         },
                         xLabel: columnNameWithDescription(xCurr.info),
                         yLabel: columnNameWithDescription(yCurr.info),
+                        xDomain: calcXDomain,
+                        yDomain: calcYDomain,
                     });
                 }
                 plotCounter += 1;

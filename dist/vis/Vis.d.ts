@@ -1,6 +1,6 @@
 /// <reference types="react" />
 import { IVisConfig, VisColumn, EFilterOptions } from './interfaces';
-export declare function Vis({ columns, selected, colors, shapes, selectionCallback, filterCallback, setExternalConfig, closeCallback, showCloseButton, externalConfig, enableSidebar, showSidebar: internalShowSidebar, setShowSidebar: internalSetShowSidebar, showSidebarDefault, }: {
+export declare function EagerVis({ columns, selected, colors, shapes, selectionCallback, filterCallback, setExternalConfig, closeCallback, showCloseButton, externalConfig, enableSidebar, showSidebar: internalShowSidebar, setShowSidebar: internalSetShowSidebar, showSidebarDefault, }: {
     /**
      * Required data columns which are displayed.
      */

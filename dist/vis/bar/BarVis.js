@@ -6,7 +6,8 @@ import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import { EBarGroupingType } from '../interfaces';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../../plotly';
+import { Plotly } from '../../plotly/full';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';
@@ -113,14 +114,24 @@ export function BarVis({ config, optionsConfig, extensions, columns, setConfig, 
         }
         return [...finalTraces.plots.map((p) => p.data), ...finalTraces.legendPlots.map((p) => p.data)];
     }, [finalTraces]);
-    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }, ref: plotlyDivRef },
+    return (React.createElement(Container, { fluid: true, sx: {
+            flexGrow: 1,
+            height: '100%',
+            width: '100%',
+            overflow: 'hidden',
+            position: 'relative',
+            // Disable plotly crosshair cursor
+            '.nsewdrag': {
+                cursor: 'pointer !important',
+            },
+        }, ref: plotlyDivRef },
         showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         mergedExtensions.prePlot,
         React.createElement(Space, { h: "xl" }),
         enableSidebar ? (React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setShowSidebar(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear })))) : null,
-        traceStatus === 'success' && layout && finalTraces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, className: "tdpCoreVis", onClick: (e) => {
+        traceStatus === 'success' && layout && finalTraces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: traceData, layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (e) => {
                 // plotly types here are just wrong. So have to convert to unknown first.
                 const selectedPoints = e.points[0].customdata;
                 let removeSelectionFlag = true;

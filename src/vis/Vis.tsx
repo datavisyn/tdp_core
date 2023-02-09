@@ -26,7 +26,7 @@ import { HexbinVis } from './hexbin/HexbinVis';
 
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
 
-export function Vis({
+export function EagerVis({
   columns,
   selected = [],
   colors = null,

@@ -15,12 +15,13 @@ export function columnNameWithDescription(col) {
  * @param layout the current layout to be changed. Typed to any because the plotly types complain.p
  * @returns the changed layout
  */
-export function beautifyLayout(traces, layout, oldLayout) {
+export function beautifyLayout(traces, layout, oldLayout, automargin = true) {
     layout.annotations = [];
     traces.plots.forEach((t, i) => {
         layout[`xaxis${i > 0 ? i + 1 : ''}`] = {
+            range: t.xDomain ? t.xDomain : null,
             ...oldLayout?.[`xaxis${i > 0 ? i + 1 : ''}`],
-            automargin: true,
+            automargin,
             // rangemode: 'tozero',
             tickvals: t.xTicks,
             ticktext: t.xTickLabels,
@@ -40,8 +41,9 @@ export function beautifyLayout(traces, layout, oldLayout) {
             },
         };
         layout[`yaxis${i > 0 ? i + 1 : ''}`] = {
+            range: t.yDomain ? t.yDomain : null,
             ...oldLayout?.[`yaxis${i > 0 ? i + 1 : ''}`],
-            automargin: true,
+            automargin,
             // rangemode: 'tozero',
             tickvals: t.yTicks,
             ticktext: t.yTickLabels,

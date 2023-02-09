@@ -11,7 +11,7 @@ import { useSyncedRef } from '../hooks/useSyncedRef';
 import { hexinbMergeDefaultConfig, isHexbin } from './hexbin/utils';
 import { HexbinVis } from './hexbin/HexbinVis';
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
-export function Vis({ columns, selected = [], colors = null, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, enableSidebar = true, showSidebar: internalShowSidebar, setShowSidebar: internalSetShowSidebar, showSidebarDefault = false, }) {
+export function EagerVis({ columns, selected = [], colors = null, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, enableSidebar = true, showSidebar: internalShowSidebar, setShowSidebar: internalSetShowSidebar, showSidebarDefault = false, }) {
     const [showSidebar, setShowSidebar] = useUncontrolled({
         value: internalShowSidebar,
         defaultValue: showSidebarDefault,

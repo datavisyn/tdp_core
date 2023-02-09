@@ -1,6 +1,5 @@
 {
   "core": {
-
     "initializeSession": "Initialize Session",
     "setParameter": "Set Parameter \"{{name}}\"",
 
@@ -67,7 +66,7 @@
       "upload": "Upload",
       "fileToUpload": "Select File to Upload",
       "editSessionDetails": "Edit Session Details",
-      "save":"Save",
+      "save": "Save",
       "isPublicMessage": "Please ensure when publishing a session that associated datasets (i.e. uploaded datasets) are also public.",
       "name": "Name",
       "description": "Description",
@@ -189,7 +188,6 @@
     },
 
     "lineup": {
-
       "cmds": {
         "addRanking": "Add Ranking",
         "removeRanking": "Remove Ranking",
@@ -199,7 +197,7 @@
         "addColumn": "Add Column",
         "removeColumn": "Remove Column",
         "moveColumn": "Move Column",
-        "changeAggregation":"Change Aggregation"
+        "changeAggregation": "Change Aggregation"
       },
 
       "export": {
@@ -273,7 +271,6 @@
         "remove": "Remove {{scoreName}}"
       },
 
-
       "OverviewDetailRanking": {
         "overview": "Overview",
         "detailTable": "Detail Table"
@@ -327,7 +324,7 @@
       }
     },
     "visynApp": {
-      "welcome": "Welcome to {{appName}}",
+      "welcome": "Welcome to",
       "login": "Please log in to continue",
       "loginButton": "Log In"
     }
