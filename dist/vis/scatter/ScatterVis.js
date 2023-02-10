@@ -9,7 +9,8 @@ import { createScatterTraces } from './utils';
 import { beautifyLayout } from '../general/layoutUtils';
 import { BrushOptionButtons } from '../sidebar/BrushOptionButtons';
 import { ScatterVisSidebar } from './ScatterVisSidebar';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../../plotly';
+import { Plotly } from '../../plotly/full';
 import { useAsync } from '../../hooks';
 import { VisSidebarWrapper } from '../VisSidebarWrapper';
 import { CloseButton } from '../sidebar/CloseButton';
@@ -39,6 +40,9 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
+    useEffect(() => {
+        setLayout(null);
+    }, [config.numColumnsSelected.length]);
     const { value: traces, status: traceStatus, error: traceError, } = useAsync(createScatterTraces, [
         columns,
         config.numColumnsSelected,
@@ -70,14 +74,14 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             margin: {
                 t: 25,
                 r: 25,
-                l: 25,
-                b: 25,
+                l: 100,
+                b: 100,
             },
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
             dragmode: config.dragMode,
         };
-        setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+        setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout, false) });
         // WARNING: Do not update when layout changes, that would be an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [traces, config.dragMode]);
@@ -114,7 +118,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         return [];
     }, [plotsWithSelectedPoints, traces]);
     const plotly = useMemo(() => {
-        if (traces?.plots && plotsWithSelectedPoints) {
+        if (traces?.plots && plotsWithSelectedPoints && layout) {
             return (React.createElement(PlotlyComponent, { key: id, divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false, scrollZoom: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
                     const clickedId = event.points[0].id;
                     if (selectedMap[clickedId]) {
@@ -123,13 +127,23 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                     else {
                         selectionCallback([...selectedList, clickedId]);
                     }
-                }, className: "tdpCoreVis", onSelected: (sel) => {
+                }, onSelected: (sel) => {
                     selectionCallback(sel ? sel.points.map((d) => d.id) : []);
                 } }));
         }
         return null;
     }, [id, plotsWithSelectedPoints, layout, selectedMap, selectionCallback, selectedList, traces?.plots, plotlyData]);
-    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }, ref: plotlyDivRef },
+    return (React.createElement(Container, { fluid: true, sx: {
+            flexGrow: 1,
+            height: '100%',
+            width: '100%',
+            overflow: 'hidden',
+            position: 'relative',
+            // Disable plotly crosshair cursor
+            '.nsewdrag': {
+                cursor: 'pointer !important',
+            },
+        }, ref: plotlyDivRef },
         enableSidebar ? (React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setShowSidebar(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear })))) : null,

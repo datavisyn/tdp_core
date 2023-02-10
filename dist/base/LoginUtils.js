@@ -46,11 +46,14 @@ export class LoginUtils {
     }
     static loggedInAs() {
         return Ajax.send('/loggedinas', {}, 'POST').then((user) => {
-            if (user !== 'not_yet_logged_in' && user.name) {
+            if (typeof user !== 'string' && user.name) {
                 return user;
             }
             return Promise.reject('invalid');
         });
+    }
+    static getStores() {
+        return Ajax.send('/api/security/stores', {}, 'GET');
     }
     /**
      * helper to bind to a login form, assuming that fields `login_username`, `login_password` exists

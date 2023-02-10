@@ -1,5 +1,5 @@
 import { ColumnInfo, PlotlyInfo, VisColumn } from '../interfaces';
-import { Plotly } from '../Plot';
+import { PlotlyTypes } from '../../plotly';
 /**
  * Truncate long texts (e.g., to use as axes title)
  * @param text Input text to be truncated
@@ -13,10 +13,11 @@ export declare function columnNameWithDescription(col: ColumnInfo): string;
  * @param layout the current layout to be changed. Typed to any because the plotly types complain.p
  * @returns the changed layout
  */
-export declare function beautifyLayout(traces: PlotlyInfo, layout: Partial<Plotly.Layout>, oldLayout: Partial<Plotly.Layout>): Partial<Plotly.Layout>;
+export declare function beautifyLayout(traces: PlotlyInfo, layout: Partial<PlotlyTypes.Layout>, oldLayout: Partial<PlotlyTypes.Layout>, automargin?: boolean): Partial<PlotlyTypes.Layout>;
 export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
     resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
     type: import("../interfaces").EColumnTypes.NUMERICAL;
+    domain?: [number, number];
     info: ColumnInfo;
     values: () => (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[] | Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
 } | {
@@ -28,6 +29,7 @@ export declare function resolveColumnValues(columns: VisColumn[]): Promise<({
 export declare function resolveSingleColumn(column: VisColumn): Promise<{
     resolvedValues: (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[];
     type: import("../interfaces").EColumnTypes.NUMERICAL;
+    domain?: [number, number];
     info: ColumnInfo;
     values: () => (import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[] | Promise<(import("../interfaces").VisNumericalValue | import("../interfaces").VisCategoricalValue)[]>;
 } | {
