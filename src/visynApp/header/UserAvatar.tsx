@@ -1,4 +1,4 @@
-import { Avatar, createStyles, Menu } from '@mantine/core';
+import { Avatar, Menu } from '@mantine/core';
 import React from 'react';
 import { LoginUtils } from '../../base/LoginUtils';
 import { useVisynAppContext } from '../VisynAppContext';

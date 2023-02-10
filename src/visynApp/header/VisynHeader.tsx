@@ -51,7 +51,6 @@ export function VisynHeader({
     afterTitle?: JSX.Element;
     beforeRight?: JSX.Element;
     logo?: JSX.Element;
-    customerLogo?: JSX.Element;
     userAvatar?: JSX.Element;
     userMenu?: JSX.Element;
     afterRight?: JSX.Element;
