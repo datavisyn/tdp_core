@@ -1,4 +1,4 @@
-import { Menu } from '@mantine/core';
+import { Text } from '@mantine/core';
 import * as React from 'react';
 import {
   Vis,
@@ -47,20 +47,10 @@ export function MainApp() {
       header={
         <VisynHeader
           components={{
-            userMenu: user ? (
-              <>
-                <Menu.Label>Logged in as {user.name}</Menu.Label>
-                <Menu.Item
-                  onClick={() => {
-                    LoginUtils.logout();
-                  }}
-                >
-                  Logout
-                </Menu.Item>
-              </>
-            ) : null,
+            aboutAppModal: {
+              content: <Text>This is the demo app for tdp core.</Text>,
+            },
           }}
-          backgroundColor="dark"
         />
       }
       appShellProps={{}}

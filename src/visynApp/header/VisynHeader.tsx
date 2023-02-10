@@ -1,4 +1,4 @@
-import { Header, Group, Title, ActionIcon, TextInput, Transition, useMantineTheme, MantineColor } from '@mantine/core';
+import { Header, Group, Title, ActionIcon, TextInput, Transition, useMantineTheme, MantineColor, Modal } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
@@ -7,6 +7,7 @@ import { BurgerButton } from './BurgerButton';
 import { DatavisynLogo } from './DatavisynLogo';
 import { UserAvatar } from './UserAvatar';
 import { useVisynAppContext } from '../VisynAppContext';
+import { IAboutAppModalConfig } from './AboutAppModal';
 
 const HEADER_HEIGHT = 50;
 
@@ -18,23 +19,16 @@ const cardTransition = {
 
 export function VisynHeader({
   color = 'white',
-  backgroundColor = 'dark',
+  backgroundColor = 'gray',
   components,
   undoCallback = null,
   redoCallback = null,
   searchCallback = null,
 }: {
-  /**
-   * Optional color to be used for the background. If it is part of the mantine colors, it uses the primary shade, otherwise it is interpreted as CSS color.
-   */
   backgroundColor?: MantineColor;
-  /**
-   * Optional color to be used for the text. This must be in contrast with the given `backgroundColor`.
-   */
+
   color?: MantineColor;
-  /**
-   * Extension components to be rendered within the header.
-   */
+
   components?: {
     beforeLeft?: JSX.Element;
     burgerMenu?: JSX.Element;
@@ -44,27 +38,21 @@ export function VisynHeader({
     afterTitle?: JSX.Element;
     beforeRight?: JSX.Element;
     logo?: JSX.Element;
+    customerLogo?: JSX.Element;
     userAvatar?: JSX.Element;
     userMenu?: JSX.Element;
     afterRight?: JSX.Element;
+    aboutAppModal?: JSX.Element | IAboutAppModalConfig;
   };
-  /**
-   * Optional callback functioned which is called when the undo button is clicked. If not given, undo button is not created
-   */
+
   undoCallback?: () => void;
-  /**
-   * Optional callback functioned which is called when the redo button is clicked. If not given, redo button is not created
-   */
+
   redoCallback?: () => void;
-  /**
-   * Optional callback called when the search is changed, passing the current search value. If not given, no search icon is created
-   * @param s Search string.
-   */
+
   searchCallback?: (s: string) => void;
 }) {
-  const { appName } = useVisynAppContext();
+  const { appName, user } = useVisynAppContext();
   const theme = useMantineTheme();
-  const { user } = useVisynAppContext();
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchString, setSearchString] = useState<string>('');
@@ -78,7 +66,7 @@ export function VisynHeader({
   );
 
   return (
-    <Header height={HEADER_HEIGHT} style={{ backgroundColor: theme.colors[backgroundColor]?.[theme.fn.primaryShade()] || backgroundColor }}>
+    <Header height={HEADER_HEIGHT} style={{ backgroundColor: theme.colors[backgroundColor][7] || backgroundColor }}>
       <Group
         grow
         pl="sm"
@@ -132,7 +120,13 @@ export function VisynHeader({
           {components?.logo === undefined ? <DatavisynLogo color={backgroundColor === 'white' ? 'black' : 'white'} /> : components?.logo}
           {components?.userAvatar === undefined ? (
             user ? (
-              <UserAvatar menu={components?.userMenu} user={user.name} color={backgroundColor} />
+              <UserAvatar
+                menu={components?.userMenu}
+                user={user.name}
+                color={backgroundColor}
+                dvLogo={components?.logo === undefined ? <DatavisynLogo color="color" /> : components?.logo}
+                aboutAppModal={components?.aboutAppModal}
+              />
             ) : null
           ) : (
             components?.userAvatar
