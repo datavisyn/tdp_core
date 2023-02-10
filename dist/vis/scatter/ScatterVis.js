@@ -40,6 +40,9 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     const mergedExtensions = React.useMemo(() => {
         return merge({}, defaultExtensions, extensions);
     }, [extensions]);
+    useEffect(() => {
+        setLayout(null);
+    }, [config.numColumnsSelected.length]);
     const { value: traces, status: traceStatus, error: traceError, } = useAsync(createScatterTraces, [
         columns,
         config.numColumnsSelected,
@@ -71,14 +74,14 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
             margin: {
                 t: 25,
                 r: 25,
-                l: 25,
-                b: 25,
+                l: 100,
+                b: 100,
             },
             grid: { rows: traces.rows, columns: traces.cols, xgap: 0.3, pattern: 'independent' },
             shapes: [],
             dragmode: config.dragMode,
         };
-        setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout) });
+        setLayout({ ...layout, ...beautifyLayout(traces, innerLayout, layout, false) });
         // WARNING: Do not update when layout changes, that would be an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [traces, config.dragMode]);
@@ -115,7 +118,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
         return [];
     }, [plotsWithSelectedPoints, traces]);
     const plotly = useMemo(() => {
-        if (traces?.plots && plotsWithSelectedPoints) {
+        if (traces?.plots && plotsWithSelectedPoints && layout) {
             return (React.createElement(PlotlyComponent, { key: id, divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false, scrollZoom: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
                     const clickedId = event.points[0].id;
                     if (selectedMap[clickedId]) {

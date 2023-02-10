@@ -26,7 +26,6 @@ const customerLogo = React.createElement("img", { src: caleydoAsCustomerLogo, al
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 // eslint-disable-next-line react/function-component-definition
 const Template = (args) => {
-    const { classes } = useStyles();
     const visynAppContextValue = React.useMemo(() => ({
         user,
         appName: (React.createElement(Text, { component: "a", href: "#" }, "Demo Application")),

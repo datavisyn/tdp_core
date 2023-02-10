@@ -65,7 +65,7 @@ export function VisynLoginMenu({ watch = false }) {
     useAsync(autoLogin, []);
     const { value: userStores, error: userStoreError, status: userStoreStatus } = useAsync(LoginUtils.getStores, []);
     const userStoresWithUI = userStores?.filter((store) => store.ui);
-    const hasError = error != null && error !== 'not_reachable';
+    const hasError = error && error !== 'not_reachable';
     const isOffline = error === 'not_reachable' || userStoreStatus === 'error';
     return (React.createElement(Modal, { withCloseButton: false, opened: show, onClose: () => null, title: null, "data-testid": "visyn-login-modal" },
         React.createElement(Container, { fluid: true },
@@ -78,15 +78,16 @@ export function VisynLoginMenu({ watch = false }) {
                 React.createElement(Divider, null))),
         React.createElement(Stack, null,
             isOffline ? (React.createElement(Alert, { icon: React.createElement(FontAwesomeIcon, { icon: faCircleExclamation }), color: "yellow", radius: "md" }, i18n.t('phovea:security_flask.alertOffline'))) : null,
+            hasError ? (React.createElement(Alert, { icon: React.createElement(FontAwesomeIcon, { icon: faCircleExclamation }), color: "red", radius: "md" }, error)) : null,
             userStoreStatus === 'pending' ? React.createElement(LoadingOverlay, { visible: true }) : null,
             !userStores || isOffline ? null : userStoresWithUI.length === 0 ? (
             // Use the dummy store as default if no store is found
-            React.createElement(DefaultLoginForm, { setError: setError, hasError: hasError, store: { id: 'DummyStore', ui: 'DefaultLoginForm', configuration: {} } })) : (
+            React.createElement(DefaultLoginForm, { setError: setError, store: { id: 'DummyStore', ui: 'DefaultLoginForm', configuration: {} } })) : (
             // Render all stores next to eachother
             userStoresWithUI.map((store, i, all) => {
                 const ToRender = UserStoreUIMap.get(store.ui);
                 return (React.createElement(React.Fragment, { key: store.id },
-                    ToRender ? (React.createElement(ToRender, { key: store.id, setError: setError, hasError: hasError, store: store })) : (React.createElement(Alert, { color: "yellow", radius: "md" },
+                    ToRender ? (React.createElement(ToRender, { key: store.id, setError: setError, store: store })) : (React.createElement(Alert, { color: "yellow", radius: "md" },
                         "No ",
                         store.ui,
                         " found for ",
