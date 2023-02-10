@@ -33,7 +33,6 @@ const customerLogo = <img src={caleydoAsCustomerLogo} alt="customer-logo" style=
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 // eslint-disable-next-line react/function-component-definition
 const Template: ComponentStory<typeof VisynHeader> = (args) => {
-  const { classes } = useStyles();
   const visynAppContextValue = React.useMemo(
     () => ({
       user,

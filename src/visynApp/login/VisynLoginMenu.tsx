@@ -75,7 +75,7 @@ export function VisynLoginMenu({ watch = false }: { watch?: boolean }) {
   useAsync(autoLogin, []);
   const { value: userStores, error: userStoreError, status: userStoreStatus } = useAsync(LoginUtils.getStores, []);
   const userStoresWithUI = userStores?.filter((store) => store.ui);
-  const hasError = error != null && error !== 'not_reachable';
+  const hasError = error && error !== 'not_reachable';
   const isOffline = error === 'not_reachable' || userStoreStatus === 'error';
 
   return (
@@ -96,10 +96,15 @@ export function VisynLoginMenu({ watch = false }: { watch?: boolean }) {
             {i18n.t('phovea:security_flask.alertOffline')}
           </Alert>
         ) : null}
+        {hasError ? (
+          <Alert icon={<FontAwesomeIcon icon={faCircleExclamation} />} color="red" radius="md">
+            {error}
+          </Alert>
+        ) : null}
         {userStoreStatus === 'pending' ? <LoadingOverlay visible /> : null}
         {!userStores || isOffline ? null : userStoresWithUI.length === 0 ? (
           // Use the dummy store as default if no store is found
-          <DefaultLoginForm setError={setError} hasError={hasError} store={{ id: 'DummyStore', ui: 'DefaultLoginForm', configuration: {} }} />
+          <DefaultLoginForm setError={setError} store={{ id: 'DummyStore', ui: 'DefaultLoginForm', configuration: {} }} />
         ) : (
           // Render all stores next to eachother
           userStoresWithUI.map((store, i, all) => {
@@ -108,7 +113,7 @@ export function VisynLoginMenu({ watch = false }: { watch?: boolean }) {
             return (
               <React.Fragment key={store.id}>
                 {ToRender ? (
-                  <ToRender key={store.id} setError={setError} hasError={hasError} store={store} />
+                  <ToRender key={store.id} setError={setError} store={store} />
                 ) : (
                   <Alert color="yellow" radius="md">
                     No {store.ui} found for {store.id}. Contact the site administrator if this issue perists.
