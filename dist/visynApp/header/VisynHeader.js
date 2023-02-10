@@ -1,4 +1,4 @@
-import { Header, Group, Title, ActionIcon, TextInput, Transition, useMantineTheme } from '@mantine/core';
+import { Header, Group, Title, ActionIcon, TextInput, Transition, useMantineTheme, createStyles } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
@@ -13,17 +13,26 @@ const cardTransition = {
     out: { opacity: 0, width: '0px' },
     transitionProperty: 'opacity, width',
 };
-export function VisynHeader({ color = 'white', backgroundColor = 'dark', components, undoCallback = null, redoCallback = null, searchCallback = null, }) {
-    const { appName } = useVisynAppContext();
+const useStyles = createStyles(() => ({
+    a: {
+        '& > a': {
+            '&:hover': {
+                color: 'currentColor',
+            },
+        },
+    },
+}));
+export function VisynHeader({ color = 'white', backgroundColor = 'gray', components, undoCallback = null, redoCallback = null, searchCallback = null, }) {
+    const { appName, user } = useVisynAppContext();
     const theme = useMantineTheme();
-    const { user } = useVisynAppContext();
+    const { classes } = useStyles();
     const [isSearching, setIsSearching] = useState(false);
     const [searchString, setSearchString] = useState('');
     const onSearch = useCallback((event) => {
         setSearchString(event.currentTarget.value);
         searchCallback(event.currentTarget.value);
     }, [searchCallback]);
-    return (React.createElement(Header, { height: HEADER_HEIGHT, style: { backgroundColor: theme.colors[backgroundColor]?.[theme.fn.primaryShade()] || backgroundColor } },
+    return (React.createElement(Header, { height: HEADER_HEIGHT, style: { backgroundColor: theme.colors[backgroundColor][7] || backgroundColor } },
         React.createElement(Group, { grow: true, pl: "sm", pr: "sm", sx: {
                 height: HEADER_HEIGHT,
                 display: 'flex',
@@ -43,12 +52,12 @@ export function VisynHeader({ color = 'white', backgroundColor = 'dark', compone
                 components?.afterLeft),
             React.createElement(Group, { align: "center", position: "center", noWrap: true },
                 components?.beforeTitle,
-                components?.title === undefined ? (React.createElement(Title, { order: 3, weight: 100, color: color, truncate: true }, appName)) : (components?.title),
+                components?.title === undefined ? (React.createElement(Title, { className: classes.a, order: 3, weight: 100, color: color, truncate: true }, appName)) : (components?.title),
                 components?.afterTitle),
             React.createElement(Group, { align: "center", position: "right", noWrap: true },
                 components?.beforeRight,
                 components?.logo === undefined ? React.createElement(DatavisynLogo, { color: backgroundColor === 'white' ? 'black' : 'white' }) : components?.logo,
-                components?.userAvatar === undefined ? (user ? (React.createElement(UserAvatar, { menu: components?.userMenu, user: user.name, color: backgroundColor })) : null) : (components?.userAvatar),
+                components?.userAvatar === undefined ? (user ? (React.createElement(UserAvatar, { menu: components?.userMenu, user: user.name, color: backgroundColor, dvLogo: components?.logo === undefined ? React.createElement(DatavisynLogo, { color: "color" }) : components?.logo, aboutAppModal: components?.aboutAppModal })) : null) : (components?.userAvatar),
                 components?.afterRight))));
 }
 //# sourceMappingURL=VisynHeader.js.map

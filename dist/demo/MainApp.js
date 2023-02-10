@@ -1,6 +1,6 @@
-import { Menu } from '@mantine/core';
+import { Text } from '@mantine/core';
 import * as React from 'react';
-import { Vis, LoginUtils, VisynHeader, VisynApp, useVisynAppContext, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, } from '..';
+import { Vis, VisynHeader, VisynApp, useVisynAppContext, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, } from '..';
 import { fetchIrisData } from '../vis/stories/Iris.stories';
 const irisData = fetchIrisData();
 export function MainApp() {
@@ -30,13 +30,9 @@ export function MainApp() {
         alphaSliderVal: 1,
     });
     return (React.createElement(VisynApp, { header: React.createElement(VisynHeader, { components: {
-                userMenu: user ? (React.createElement(React.Fragment, null,
-                    React.createElement(Menu.Label, null,
-                        "Logged in as ",
-                        user.name),
-                    React.createElement(Menu.Item, { onClick: () => {
-                            LoginUtils.logout();
-                        } }, "Logout"))) : null,
-            }, backgroundColor: "dark" }), appShellProps: {} }, user ? React.createElement(Vis, { columns: irisData, showSidebarDefault: true, externalConfig: visConfig, setExternalConfig: setVisConfig }) : null));
+                aboutAppModal: {
+                    content: React.createElement(Text, null, "This is the demo app for tdp core."),
+                },
+            } }), appShellProps: {} }, user ? React.createElement(Vis, { columns: irisData, showSidebarDefault: true, externalConfig: visConfig, setExternalConfig: setVisConfig }) : null));
 }
 //# sourceMappingURL=MainApp.js.map
