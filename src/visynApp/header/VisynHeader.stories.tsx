@@ -28,7 +28,11 @@ const user: IUser = {
   roles: [],
 };
 
-const customerLogo = <img src={caleydoAsCustomerLogo} alt="customer-logo" style={{ height: '24px' }} />;
+const customerLogo = (
+  <a href="#">
+    <img src={caleydoAsCustomerLogo} alt="customer-logo" style={{ height: '24px' }} />
+  </a>
+);
 
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 // eslint-disable-next-line react/function-component-definition
@@ -36,11 +40,7 @@ const Template: ComponentStory<typeof VisynHeader> = (args) => {
   const visynAppContextValue = React.useMemo(
     () => ({
       user,
-      appName: (
-        <Text component="a" href="#">
-          Demo Application
-        </Text>
-      ),
+      appName: 'Demo Application',
       clientConfig: {},
     }),
     [],
@@ -56,6 +56,7 @@ const Template: ComponentStory<typeof VisynHeader> = (args) => {
 
 export const Basic = Template.bind({}) as typeof Template;
 Basic.args = {
+  appLinkSrc: '#',
   components: {
     aboutAppModal: {
       content: <Text>You can add some custom content to this about app modal. It should provide some meaningful description about the application.</Text>,

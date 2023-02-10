@@ -1,9 +1,10 @@
 /// <reference types="react" />
 import { MantineColor } from '@mantine/core';
 import { IAboutAppModalConfig } from './AboutAppModal';
-export declare function VisynHeader({ color, backgroundColor, components, undoCallback, redoCallback, searchCallback, }: {
+export declare function VisynHeader({ color, backgroundColor, appLinkSrc, components, undoCallback, redoCallback, searchCallback, }: {
     backgroundColor?: MantineColor;
     color?: MantineColor;
+    appLinkSrc?: string;
     components?: {
         beforeLeft?: JSX.Element;
         burgerMenu?: JSX.Element;

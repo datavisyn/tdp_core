@@ -22,13 +22,14 @@ const user = {
     name: 'Jaimy Peters',
     roles: [],
 };
-const customerLogo = React.createElement("img", { src: caleydoAsCustomerLogo, alt: "customer-logo", style: { height: '24px' } });
+const customerLogo = (React.createElement("a", { href: "#" },
+    React.createElement("img", { src: caleydoAsCustomerLogo, alt: "customer-logo", style: { height: '24px' } })));
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 // eslint-disable-next-line react/function-component-definition
 const Template = (args) => {
     const visynAppContextValue = React.useMemo(() => ({
         user,
-        appName: (React.createElement(Text, { component: "a", href: "#" }, "Demo Application")),
+        appName: 'Demo Application',
         clientConfig: {},
     }), []);
     return (React.createElement(VisynAppContext.Provider, { value: visynAppContextValue },
@@ -37,6 +38,7 @@ const Template = (args) => {
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 export const Basic = Template.bind({});
 Basic.args = {
+    appLinkSrc: '#',
     components: {
         aboutAppModal: {
             content: React.createElement(Text, null, "You can add some custom content to this about app modal. It should provide some meaningful description about the application."),

@@ -1,21 +1,11 @@
-import { Avatar, createStyles, Menu } from '@mantine/core';
+import { Avatar, Menu } from '@mantine/core';
 import React from 'react';
 import { LoginUtils } from '../../base/LoginUtils';
 import { useVisynAppContext } from '../VisynAppContext';
 import { AboutAppModal } from './AboutAppModal';
-const useStyles = createStyles(() => ({
-    a: {
-        '& > div > a': {
-            '&:hover': {
-                color: 'currentColor',
-            },
-        },
-    },
-}));
 export function UserAvatar({ menu, user, color, dvLogo, aboutAppModal, }) {
     const { appName } = useVisynAppContext();
     const [showAboutModal, setShowAboutModal] = React.useState(false);
-    const { classes } = useStyles();
     return (React.createElement(React.Fragment, null,
         React.createElement(Menu, { shadow: "md", "data-testid": "visyn-user-avatar" },
             React.createElement(Menu.Target, null,
@@ -34,7 +24,7 @@ export function UserAvatar({ menu, user, color, dvLogo, aboutAppModal, }) {
                     menu ? (React.createElement(React.Fragment, null,
                         menu,
                         React.createElement(Menu.Divider, null))) : null,
-                    React.createElement(Menu.Item, { onClick: () => setShowAboutModal(true), className: classes.a },
+                    React.createElement(Menu.Item, { onClick: () => setShowAboutModal(true) },
                         "About ",
                         appName),
                     React.createElement(Menu.Divider, null),

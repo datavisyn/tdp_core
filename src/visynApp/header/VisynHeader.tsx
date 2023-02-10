@@ -1,4 +1,4 @@
-import { Header, Group, Title, ActionIcon, TextInput, Transition, useMantineTheme, MantineColor, createStyles } from '@mantine/core';
+import { Header, Group, Title, Text, ActionIcon, TextInput, Transition, useMantineTheme, MantineColor, createStyles } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
@@ -30,6 +30,7 @@ const useStyles = createStyles(() => ({
 export function VisynHeader({
   color = 'white',
   backgroundColor = 'gray',
+  appLinkSrc = null,
   components,
   undoCallback = null,
   redoCallback = null,
@@ -38,6 +39,8 @@ export function VisynHeader({
   backgroundColor?: MantineColor;
 
   color?: MantineColor;
+
+  appLinkSrc?: string;
 
   components?: {
     beforeLeft?: JSX.Element;
@@ -118,7 +121,13 @@ export function VisynHeader({
           {components?.beforeTitle}
           {components?.title === undefined ? (
             <Title className={classes.a} order={3} weight={100} color={color} truncate>
-              {appName}
+              {appLinkSrc ? (
+                <Text component="a" href={appLinkSrc}>
+                  {appName}
+                </Text>
+              ) : (
+                appName
+              )}
             </Title>
           ) : (
             components?.title

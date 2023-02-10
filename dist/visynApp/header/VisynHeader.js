@@ -1,4 +1,4 @@
-import { Header, Group, Title, ActionIcon, TextInput, Transition, useMantineTheme, createStyles } from '@mantine/core';
+import { Header, Group, Title, Text, ActionIcon, TextInput, Transition, useMantineTheme, createStyles } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
@@ -22,7 +22,7 @@ const useStyles = createStyles(() => ({
         },
     },
 }));
-export function VisynHeader({ color = 'white', backgroundColor = 'gray', components, undoCallback = null, redoCallback = null, searchCallback = null, }) {
+export function VisynHeader({ color = 'white', backgroundColor = 'gray', appLinkSrc = null, components, undoCallback = null, redoCallback = null, searchCallback = null, }) {
     const { appName, user } = useVisynAppContext();
     const theme = useMantineTheme();
     const { classes } = useStyles();
@@ -52,7 +52,7 @@ export function VisynHeader({ color = 'white', backgroundColor = 'gray', compone
                 components?.afterLeft),
             React.createElement(Group, { align: "center", position: "center", noWrap: true },
                 components?.beforeTitle,
-                components?.title === undefined ? (React.createElement(Title, { className: classes.a, order: 3, weight: 100, color: color, truncate: true }, appName)) : (components?.title),
+                components?.title === undefined ? (React.createElement(Title, { className: classes.a, order: 3, weight: 100, color: color, truncate: true }, appLinkSrc ? (React.createElement(Text, { component: "a", href: appLinkSrc }, appName)) : (appName))) : (components?.title),
                 components?.afterTitle),
             React.createElement(Group, { align: "center", position: "right", noWrap: true },
                 components?.beforeRight,

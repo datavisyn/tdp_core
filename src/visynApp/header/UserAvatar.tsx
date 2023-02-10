@@ -4,16 +4,6 @@ import { LoginUtils } from '../../base/LoginUtils';
 import { useVisynAppContext } from '../VisynAppContext';
 import { AboutAppModal, IAboutAppModalConfig } from './AboutAppModal';
 
-const useStyles = createStyles(() => ({
-  a: {
-    '& > div > a': {
-      '&:hover': {
-        color: 'currentColor',
-      },
-    },
-  },
-}));
-
 export function UserAvatar({
   menu,
   user,
@@ -29,7 +19,6 @@ export function UserAvatar({
 }) {
   const { appName } = useVisynAppContext();
   const [showAboutModal, setShowAboutModal] = React.useState(false);
-  const { classes } = useStyles();
 
   return (
     <>
@@ -55,9 +44,7 @@ export function UserAvatar({
                 <Menu.Divider />
               </>
             ) : null}
-            <Menu.Item onClick={() => setShowAboutModal(true)} className={classes.a}>
-              About {appName}
-            </Menu.Item>
+            <Menu.Item onClick={() => setShowAboutModal(true)}>About {appName}</Menu.Item>
             <Menu.Divider />
             <Menu.Item
               onClick={() => {
