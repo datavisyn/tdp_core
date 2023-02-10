@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Menu, Modal, Text } from '@mantine/core';
+import { Menu, Button, Text, createStyles, Flex } from '@mantine/core';
 import { VisynHeader } from './VisynHeader';
 import { VisynAppContext } from '../VisynAppContext';
 import { IUser } from '../../security';
@@ -13,6 +13,16 @@ export default {
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
 } as ComponentMeta<typeof VisynHeader>;
 
+const useStyles = createStyles((theme) => ({
+  button: {
+    color: theme.white,
+    backgroundColor: 'transparent',
+    '&:hover': {
+      backgroundColor: theme.colors.gray[6],
+    },
+  },
+}));
+
 const user: IUser = {
   name: 'Jaimy Peters',
   roles: [],
@@ -23,10 +33,15 @@ const customerLogo = <img src={caleydoAsCustomerLogo} alt="customer-logo" style=
 // More on component templates: https://storybook.js.org/docs/react/writing-stories/introduction#using-args
 // eslint-disable-next-line react/function-component-definition
 const Template: ComponentStory<typeof VisynHeader> = (args) => {
+  const { classes } = useStyles();
   const visynAppContextValue = React.useMemo(
     () => ({
       user,
-      appName: 'Demo Application',
+      appName: (
+        <Text component="a" href="#">
+          Demo Application
+        </Text>
+      ),
       clientConfig: {},
     }),
     [],
@@ -81,15 +96,53 @@ BurgerMenu.args = {
       content: <Text>You can add some custom content to this about app modal. It should provide some meaningful description about the application.</Text>,
     },
     burgerMenu: (
-      <Menu.Dropdown>
+      <>
         <Menu.Item>Page A</Menu.Item>
         <Menu.Item>Page B</Menu.Item>
         <Menu.Divider />
         <Menu.Item>Page C</Menu.Item>
-      </Menu.Dropdown>
+      </>
     ),
   },
 };
 
-// appname should have a link to the homepage to the app
-// project name should be in a specific style
+function AfterLeft() {
+  const { classes } = useStyles();
+  return (
+    <Flex h={50} gap={2} justify="flex-start" align="center" direction="row" wrap="wrap-reverse">
+      <Button type="button" className={classes.button}>
+        First
+      </Button>
+      <Button type="button" className={classes.button}>
+        Second
+      </Button>
+    </Flex>
+  );
+}
+
+export const CustomComponents = Template.bind({}) as typeof Template;
+CustomComponents.args = {
+  components: {
+    aboutAppModal: {
+      content: <Text>You can add some custom content to this about app modal. It should provide some meaningful description about the application.</Text>,
+    },
+    afterLeft: <AfterLeft />,
+  },
+};
+
+export const ExtendedUserMenu = Template.bind({}) as typeof Template;
+ExtendedUserMenu.args = {
+  components: {
+    aboutAppModal: {
+      content: <Text>You can add some custom content to this about app modal. It should provide some meaningful description about the application.</Text>,
+    },
+    userMenu: (
+      <>
+        <Menu.Item>Page A</Menu.Item>
+        <Menu.Item>Page B</Menu.Item>
+        <Menu.Divider />
+        <Menu.Item>Page C</Menu.Item>
+      </>
+    ),
+  },
+};

@@ -1,8 +1,18 @@
-import { Avatar, Menu, Modal } from '@mantine/core';
+import { Avatar, createStyles, Menu } from '@mantine/core';
 import React from 'react';
 import { LoginUtils } from '../../base/LoginUtils';
 import { useVisynAppContext } from '../VisynAppContext';
 import { AboutAppModal, IAboutAppModalConfig } from './AboutAppModal';
+
+const useStyles = createStyles(() => ({
+  a: {
+    '& > div > a': {
+      '&:hover': {
+        color: 'currentColor',
+      },
+    },
+  },
+}));
 
 export function UserAvatar({
   menu,
@@ -19,6 +29,7 @@ export function UserAvatar({
 }) {
   const { appName } = useVisynAppContext();
   const [showAboutModal, setShowAboutModal] = React.useState(false);
+  const { classes } = useStyles();
 
   return (
     <>
@@ -35,21 +46,27 @@ export function UserAvatar({
         </Menu.Target>
 
         <Menu.Dropdown>
-          {menu || (
-            <>
-              <Menu.Label>Logged in as {user}</Menu.Label>
-              <Menu.Divider />
-              <Menu.Item onClick={() => setShowAboutModal(true)}>About {appName}</Menu.Item>
-              <Menu.Divider />
-              <Menu.Item
-                onClick={() => {
-                  LoginUtils.logout();
-                }}
-              >
-                Logout
-              </Menu.Item>
-            </>
-          )}
+          <>
+            <Menu.Label>Logged in as {user}</Menu.Label>
+            <Menu.Divider />
+            {menu ? (
+              <>
+                {menu}
+                <Menu.Divider />
+              </>
+            ) : null}
+            <Menu.Item onClick={() => setShowAboutModal(true)} className={classes.a}>
+              About {appName}
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item
+              onClick={() => {
+                LoginUtils.logout();
+              }}
+            >
+              Logout
+            </Menu.Item>
+          </>
         </Menu.Dropdown>
       </Menu>
       {aboutAppModal && React.isValidElement(aboutAppModal) ? (

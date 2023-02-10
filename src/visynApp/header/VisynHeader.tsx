@@ -1,4 +1,4 @@
-import { Header, Group, Title, ActionIcon, TextInput, Transition, useMantineTheme, MantineColor, Modal } from '@mantine/core';
+import { Header, Group, Title, ActionIcon, TextInput, Transition, useMantineTheme, MantineColor, createStyles } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import * as React from 'react';
@@ -16,6 +16,16 @@ const cardTransition = {
   out: { opacity: 0, width: '0px' },
   transitionProperty: 'opacity, width',
 };
+
+const useStyles = createStyles(() => ({
+  a: {
+    '& > a': {
+      '&:hover': {
+        color: 'currentColor',
+      },
+    },
+  },
+}));
 
 export function VisynHeader({
   color = 'white',
@@ -53,6 +63,7 @@ export function VisynHeader({
 }) {
   const { appName, user } = useVisynAppContext();
   const theme = useMantineTheme();
+  const { classes } = useStyles();
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchString, setSearchString] = useState<string>('');
@@ -106,7 +117,7 @@ export function VisynHeader({
         <Group align="center" position="center" noWrap>
           {components?.beforeTitle}
           {components?.title === undefined ? (
-            <Title order={3} weight={100} color={color} truncate>
+            <Title className={classes.a} order={3} weight={100} color={color} truncate>
               {appName}
             </Title>
           ) : (
