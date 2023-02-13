@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { merge, uniqueId } from 'lodash';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActionIcon, Center, Container, Group, Stack, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
@@ -80,7 +80,7 @@ export function ScatterVis({
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
   const plotlyDivRef = React.useRef(null);
 
-  // const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
+  const eChartsInstance = useRef<any>(null);
 
   useEffect(() => {
     const ro = new ResizeObserver(() => {
@@ -189,10 +189,28 @@ export function ScatterVis({
   //   return [];
   // }, [plotsWithSelectedPoints, traces]);
 
-  console.log(traces);
   const plotly = useMemo(() => {
     if (traces?.plots) {
-      return <ReactECharts key={id} option={traces.plots[0]} style={{ height: '100%', width: '100%' }} />;
+      return (
+        <ReactECharts
+          key={id}
+          option={traces.plots[0]}
+          style={{ height: '100%', width: '100%' }}
+          opts={{ renderer: 'canvas' }}
+          onChartReady={(instance) => {
+            console.log(instance);
+            eChartsInstance.current = instance;
+            // instance.dispatchAction({
+            //   type: 'takeGlobalCursor',
+            //   key: 'brush',
+            //   brushOption: {
+            //     brushType: 'rect',
+            //     brushMode: 'single',
+            //   },
+            // });
+          }}
+        />
+      );
     }
     return null;
   }, [id, traces]);
@@ -211,7 +229,19 @@ export function ScatterVis({
       <Stack spacing={0} sx={{ height: '100%' }}>
         <Center>
           <Group mt="lg">
-            <BrushOptionButtons callback={(dragMode: EScatterSelectSettings) => setConfig({ ...config, dragMode })} dragMode={config.dragMode} />
+            <BrushOptionButtons
+              callback={(dragMode: EScatterSelectSettings) =>
+                eChartsInstance.current.dispatchAction({
+                  type: 'takeGlobalCursor',
+                  key: 'brush',
+                  brushOption: {
+                    brushType: dragMode,
+                    brushMode: 'single',
+                  },
+                })
+              }
+              dragMode={config.dragMode}
+            />
           </Group>
         </Center>
         {mergedExtensions.prePlot}

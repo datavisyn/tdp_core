@@ -27,7 +27,7 @@ function fetchData(numberOfPoints: number): VisColumn[] {
       .map(() => Math.random() * 100),
     category: Array(numberOfPoints)
       .fill(null)
-      .map(() => parseInt((Math.random() * 10).toString(), 10).toString()),
+      .map(() => parseInt((Math.random() * 2).toString(), 2).toString()),
   });
 
   const dataPromise = dataGetter();

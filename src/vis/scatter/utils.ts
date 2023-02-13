@@ -1,7 +1,6 @@
 import { merge } from 'lodash';
 import d3v3 from 'd3v3';
 import { EChartsOption } from 'echarts';
-import { config } from '@fortawesome/fontawesome-svg-core';
 import {
   PlotlyInfo,
   PlotlyData,
@@ -135,6 +134,10 @@ export async function createScatterTraces(
     return emptyVal;
   }
 
+  console.log(scales.color.domain(), scales.color.range());
+
+  const uniqueColorVals = new Set(colorCol?.resolvedValues.map((v) => v.val));
+
   // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
   if (validCols.length === 2) {
     plots.push({
@@ -142,34 +145,32 @@ export async function createScatterTraces(
         text: ``,
       },
       tooltip: {},
-      toolbox: {
-        left: 'center',
-        feature: {
-          dataZoom: {},
-        },
-      },
       legend: {
         orient: 'vertical',
         right: 10,
       },
       xAxis: [{ type: 'value' }],
       yAxis: [{ type: 'value' }],
-      visualMap: colorCol
-        ? {
-            min: 0,
-            max: 5,
-            dimension: 1,
-            type: 'continuous',
-            orient: 'vertical',
-            right: 10,
-            top: 'center',
-            text: ['HIGH', 'LOW'],
-            calculable: true,
-            inRange: {
-              color: ['#f2c31a', '#24b7f2'],
-            },
-          }
-        : null,
+      visualMap:
+        colorCol && colorCol.type === EColumnTypes.NUMERICAL
+          ? {
+              min: 0,
+              max: 100,
+              dimension: 1,
+              type: 'continuous',
+              orient: 'vertical',
+              right: 10,
+              top: 'center',
+              text: ['HIGH', 'LOW'],
+              calculable: false,
+              inRange: {
+                color:
+                  colorScaleType === ENumericalColorScaleType.SEQUENTIAL
+                    ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')]
+                    : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')],
+              },
+            }
+          : null,
       dataZoom: [
         {
           type: 'inside',
@@ -177,21 +178,56 @@ export async function createScatterTraces(
         {
           type: 'slider',
         },
-      ],
-      animation: false,
-      series: [
         {
-          name: 'A',
-          type: 'scatter',
-          data: validCols[0].resolvedValues.map((d, i) => [d.val, validCols[1].resolvedValues[i].val]),
-          dimensions: ['x', 'y'],
-          symbolSize: 10,
-          // itemStyle: {
-          //   opacity: alphaSliderVal,
-          // },
-          large: true,
+          type: 'inside',
+          orient: 'vertical',
+        },
+        {
+          type: 'slider',
+          orient: 'vertical',
+          left: 50,
         },
       ],
+      brush: {
+        toolbox: [null],
+        brushType: 'rect',
+        brushMode: 'single',
+        // brushLink: 'all',
+      },
+      animation: false,
+      series:
+        colorCol?.type === EColumnTypes.CATEGORICAL
+          ? [...uniqueColorVals].map((uniqueColor) => {
+              return {
+                name: uniqueColor,
+                type: 'scatter',
+                data: colorCol.resolvedValues
+                  .map((d, i) => {
+                    return [d.val === uniqueColor, validCols[0].resolvedValues[i].val, validCols[1].resolvedValues[i].val];
+                  })
+                  .filter((id) => id[0])
+                  .map((iid) => [iid[1], iid[2]] as [number, number]),
+                dimensions: ['x', 'y'],
+                symbolSize: 5,
+
+                itemStyle: {
+                  opacity: alphaSliderVal,
+                },
+                large: true,
+              };
+            })
+          : [
+              {
+                type: 'scatter',
+                data: validCols[0].resolvedValues.map((d, i) => [d.val, validCols[1].resolvedValues[i].val]),
+                dimensions: ['x', 'y'],
+                symbolSize: 5,
+                itemStyle: {
+                  opacity: alphaSliderVal,
+                },
+                large: true,
+              },
+            ],
     });
   }
   // } else {

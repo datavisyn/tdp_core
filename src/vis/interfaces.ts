@@ -74,9 +74,8 @@ export enum ENumericalColorScaleType {
 }
 
 export enum EScatterSelectSettings {
-  RECTANGLE = 'select',
-  LASSO = 'lasso',
-  ZOOM = 'zoom',
+  RECTANGLE = 'rect',
+  LASSO = 'polygon',
   PAN = 'pan',
 }
 
