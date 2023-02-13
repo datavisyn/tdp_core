@@ -189,6 +189,8 @@ export function ScatterVis({
   //   return [];
   // }, [plotsWithSelectedPoints, traces]);
 
+  useEffect(() => {});
+
   const plotly = useMemo(() => {
     if (traces?.plots) {
       return (
@@ -200,14 +202,14 @@ export function ScatterVis({
           onChartReady={(instance) => {
             console.log(instance);
             eChartsInstance.current = instance;
-            // instance.dispatchAction({
-            //   type: 'takeGlobalCursor',
-            //   key: 'brush',
-            //   brushOption: {
-            //     brushType: 'rect',
-            //     brushMode: 'single',
-            //   },
-            // });
+            instance.dispatchAction({
+              type: 'takeGlobalCursor',
+              key: 'brush',
+              brushOption: {
+                brushType: 'rect',
+                brushMode: 'single',
+              },
+            });
           }}
         />
       );
@@ -230,16 +232,18 @@ export function ScatterVis({
         <Center>
           <Group mt="lg">
             <BrushOptionButtons
-              callback={(dragMode: EScatterSelectSettings) =>
+              callback={(dragMode: EScatterSelectSettings) => {
                 eChartsInstance.current.dispatchAction({
                   type: 'takeGlobalCursor',
                   key: 'brush',
                   brushOption: {
-                    brushType: dragMode,
+                    brushType: dragMode === EScatterSelectSettings.PAN ? null : dragMode,
                     brushMode: 'single',
                   },
-                })
-              }
+                });
+
+                setConfig({ ...config, dragMode });
+              }}
               dragMode={config.dragMode}
             />
           </Group>

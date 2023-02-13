@@ -13,7 +13,7 @@ interface BrushOptionProps {
 export function BrushOptionButtons({
   callback,
   dragMode,
-  options = [EScatterSelectSettings.RECTANGLE, EScatterSelectSettings.LASSO, EScatterSelectSettings.PAN, EScatterSelectSettings.ZOOM],
+  options = [EScatterSelectSettings.RECTANGLE, EScatterSelectSettings.LASSO, EScatterSelectSettings.PAN],
 }: BrushOptionProps) {
   return (
     <SegmentedControl
@@ -43,14 +43,6 @@ export function BrushOptionButtons({
             </Tooltip>
           ),
           value: EScatterSelectSettings.PAN,
-        },
-        {
-          label: (
-            <Tooltip withinPortal withArrow arrowSize={6} label="Rectangular zoom">
-              <FontAwesomeIcon icon={faSearchPlus} />
-            </Tooltip>
-          ),
-          value: EScatterSelectSettings.ZOOM,
         },
       ].filter((d) => options.includes(d.value))}
     />
