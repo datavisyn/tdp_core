@@ -11,7 +11,7 @@ import { useSyncedRef } from '../hooks/useSyncedRef';
 import { hexinbMergeDefaultConfig, isHexbin } from './hexbin/utils';
 import { HexbinVis } from './hexbin/HexbinVis';
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
-export function Vis({ columns, selected = [], colors = null, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, enableSidebar = true, showSidebar: internalShowSidebar, setShowSidebar: internalSetShowSidebar, showSidebarDefault = false, }) {
+export function EagerVis({ columns, selected = [], colors = null, shapes = DEFAULT_SHAPES, selectionCallback = () => null, filterCallback = () => null, setExternalConfig = () => null, closeCallback = () => null, showCloseButton = false, externalConfig = null, enableSidebar = true, showSidebar: internalShowSidebar, setShowSidebar: internalSetShowSidebar, showSidebarDefault = false, scrollZoom = true, }) {
     const [showSidebar, setShowSidebar] = useUncontrolled({
         value: internalShowSidebar,
         defaultValue: showSidebarDefault,
@@ -129,7 +129,7 @@ export function Vis({ columns, selected = [], colors = null, shapes = DEFAULT_SH
                 color: {
                     enable: true,
                 },
-            }, shapes: shapes, setConfig: setVisConfig, filterCallback: filterCallback, selectionCallback: selectionCallback, selectedMap: selectedMap, selectedList: selected, columns: columns, scales: scales, showSidebar: showSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback, ...commonProps })) : null,
+            }, shapes: shapes, setConfig: setVisConfig, filterCallback: filterCallback, selectionCallback: selectionCallback, selectedMap: selectedMap, selectedList: selected, columns: columns, scales: scales, showSidebar: showSidebar, showCloseButton: showCloseButton, closeButtonCallback: closeCallback, scrollZoom: scrollZoom, ...commonProps })) : null,
         isViolin(visConfig) ? (React.createElement(ViolinVis, { config: visConfig, optionsConfig: {
                 overlay: {
                     enable: true,

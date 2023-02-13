@@ -1,5 +1,4 @@
-import {EChartsOption} from 'echarts';
-import { Plotly } from './Plot';
+import { EChartsOption } from 'echarts';
 
 export enum ESupportedPlotlyVis {
   SCATTER = 'Scatter plot',
@@ -144,6 +143,7 @@ export interface VisCommonColumn {
 
 export interface VisNumericalColumn extends VisCommonColumn {
   type: EColumnTypes.NUMERICAL;
+  domain?: [number | undefined, number | undefined];
 }
 
 export interface VisCategoricalColumn extends VisCommonColumn {
@@ -171,13 +171,15 @@ export type EChartsInfo = {
 };
 
 export type PlotlyData = {
-  data: Partial<Plotly.PlotData>;
+  data: Partial<EChartsOption>;
   xLabel: string;
   yLabel: string;
   xTicks?: string[];
   xTickLabels?: string[];
   yTicks?: string[];
   yTickLabels?: string[];
+  xDomain?: [number | undefined, number | undefined];
+  yDomain?: [number | undefined, number | undefined];
 };
 
 export type ColumnInfo = {

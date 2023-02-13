@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
 import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../../plotly';
+import { Plotly } from '../../plotly/full';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { createViolinTraces } from './utils';
@@ -65,14 +66,23 @@ export function ViolinVis({ config, optionsConfig, extensions, columns, setConfi
         // WARNING: Do not update when layout changes, that would be an infinite loop.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [traces]);
-    return (React.createElement(Container, { fluid: true, sx: { flexGrow: 1, height: '100%', width: '100%', position: 'relative' }, ref: plotlyDivRef },
+    return (React.createElement(Container, { fluid: true, sx: {
+            flexGrow: 1,
+            height: '100%',
+            width: '100%',
+            position: 'relative',
+            // Disable plotly crosshair cursor
+            '.nsewdrag': {
+                cursor: 'pointer !important',
+            },
+        }, ref: plotlyDivRef },
         React.createElement(Space, { h: "xl" }),
         showCloseButton ? React.createElement(CloseButton, { closeCallback: closeButtonCallback }) : null,
         enableSidebar ? (React.createElement(Tooltip, { withinPortal: true, label: I18nextManager.getInstance().i18n.t('tdp:core.vis.openSettings') },
             React.createElement(ActionIcon, { sx: { zIndex: 10, position: 'absolute', top: '10px', right: '10px' }, onClick: () => setShowSidebar(true) },
                 React.createElement(FontAwesomeIcon, { icon: faGear })))) : null,
         mergedExtensions.prePlot,
-        traceStatus === 'success' && layout && traces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, className: "tdpCoreVis", data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
+        traceStatus === 'success' && layout && traces?.plots.length > 0 ? (React.createElement(PlotlyComponent, { divId: `plotlyDiv${id}`, data: [...traces.plots.map((p) => p.data), ...traces.legendPlots.map((p) => p.data)], layout: layout, config: { responsive: true, displayModeBar: false }, useResizeHandler: true, style: { width: '100%', height: '100%' }, 
             // plotly redraws everything on updates, so you need to reappend title and
             onUpdate: () => {
                 for (const p of traces.plots) {

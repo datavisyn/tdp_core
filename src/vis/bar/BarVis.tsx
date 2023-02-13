@@ -5,9 +5,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { ActionIcon, Container, Space, Tooltip } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
-import { Layout } from 'plotly.js-dist-min';
 import { Scales, VisColumn, IVisConfig, IBarConfig, EBarGroupingType } from '../interfaces';
-import { PlotlyComponent, Plotly } from '../Plot';
+import { PlotlyComponent } from '../../plotly';
+import { Plotly } from '../../plotly/full';
 import { InvalidCols } from '../general';
 import { beautifyLayout } from '../general/layoutUtils';
 import { useAsync } from '../../hooks';
@@ -194,7 +194,21 @@ export function BarVis({
   }, [finalTraces]);
 
   return (
-    <Container fluid sx={{ flexGrow: 1, height: '100%', width: '100%', overflow: 'hidden', position: 'relative' }} ref={plotlyDivRef}>
+    <Container
+      fluid
+      sx={{
+        flexGrow: 1,
+        height: '100%',
+        width: '100%',
+        overflow: 'hidden',
+        position: 'relative',
+        // Disable plotly crosshair cursor
+        '.nsewdrag': {
+          cursor: 'pointer !important',
+        },
+      }}
+      ref={plotlyDivRef}
+    >
       {showCloseButton ? <CloseButton closeCallback={closeButtonCallback} /> : null}
 
       {mergedExtensions.prePlot}
@@ -214,7 +228,6 @@ export function BarVis({
           config={{ responsive: true, displayModeBar: false }}
           useResizeHandler
           style={{ width: '100%', height: '100%' }}
-          className="tdpCoreVis"
           onClick={(e) => {
             // plotly types here are just wrong. So have to convert to unknown first.
             const selectedPoints: string[] = e.points[0].customdata as unknown as string[];

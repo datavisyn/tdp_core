@@ -1,6 +1,5 @@
 /// <reference types="react" />
-export interface IVisynLoginFormProps {
+export declare function VisynLoginForm({ onLogin }: {
     onLogin: (username: string, password: string) => Promise<void>;
-}
-export declare function VisynLoginForm({ onLogin }: IVisynLoginFormProps): JSX.Element;
+}): JSX.Element;
 //# sourceMappingURL=VisynLoginForm.d.ts.map

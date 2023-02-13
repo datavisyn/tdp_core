@@ -141,7 +141,7 @@
         "closeButton": "Close",
         "title": "Please login",
         "alertOffline": "The server seems to be offline! Login not possible. Try again later.",
-        "alertWrongCredentials": "Username or password incorrect. Please check again."
+        "alertWrongCredentials": "Username or password incorrect. Please try again."
     },
     "core": {},
     "importer": {

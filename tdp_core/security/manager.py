@@ -227,7 +227,7 @@ def create_security_manager():
     :return: the security manager
     """
     user_stores = list(filter(None, [p.load().factory() for p in manager.registry.list("user_stores")]))
-    if len(user_stores) == 0 or manager.settings.tdp_core.alwaysAppendDummyStore:
+    if len(user_stores) == 0:
         from .store.dummy_store import DummyStore
 
         user_stores.append(DummyStore())

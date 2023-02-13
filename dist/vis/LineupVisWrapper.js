@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CategoricalColumn, LocalDataProvider, NumberColumn, Ranking, ValueColumn } from 'lineupjs';
-import { Vis } from './Vis';
+import { Vis } from './LazyVis';
 import { EColumnTypes, EFilterOptions } from './interfaces';
 import { I18nextManager } from '../i18n/I18nextManager';
 export class LineupVisWrapper {

@@ -2,9 +2,8 @@ import './webpack/_bootstrap';
 import { AppHeader } from './components';
 import { TourManager } from './tour/TourManager';
 import { CLUEGraphManager } from './clue';
-import { IAuthorizationConfiguration } from './auth';
 import { ACLUEWrapper } from './clue/wrapper';
-import { LoginMenu } from './base';
+import { LoginMenu, ITDPClientConfig } from './base';
 import { IMixedStorageProvenanceGraphManagerOptions, ProvenanceGraph } from './clue/provenance';
 export interface ITDPOptions {
     /**
@@ -89,21 +88,6 @@ export interface ITDPOptions {
      */
     clientConfig?: ITDPClientConfig | null | undefined;
 }
-export interface ITDPClientConfig {
-    /**
-     * Configuration for the TDPTokenManager.
-     */
-    tokenManager?: {
-        /**
-         * Initial authorization configurations.
-         * Note that this is an object, because then the deep-merge with the local and remote config is easier.
-         */
-        authorizationConfigurations?: {
-            [id: string]: Omit<IAuthorizationConfiguration, 'id'>;
-        };
-    };
-    [key: string]: any;
-}
 /**
  * base class for TDP based applications
  */
@@ -120,10 +104,6 @@ export declare abstract class ATDPApplication<T> extends ACLUEWrapper {
      * TODO make public and remove call in constructor in the future
      */
     protected initialize(): Promise<void>;
-    /**
-     * Loads the client config from '/clientConfig.json' and parses it.
-     */
-    static loadClientConfig<T = any>(): Promise<T | null>;
     /**
      * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
      * @param options Options where the client config should be merged into.

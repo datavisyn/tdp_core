@@ -28,6 +28,19 @@ export function isScatter(s: IVisConfig): s is IScatterConfig {
   return s.type === ESupportedPlotlyVis.SCATTER;
 }
 
+function calculateDomain(domain: [number | undefined, number | undefined], vals: number[]): [number, number] {
+  if (!domain) return null;
+  if (domain[0] !== undefined && domain[1] !== undefined) {
+    return [domain[0], domain[1]];
+  }
+  const min = Math.min(...(vals as number[]));
+  const max = Math.max(...(vals as number[]));
+
+  const calcDomain: [number, number] = [domain[0] ? domain[0] : min, domain[1] ? domain[1] : max + max / 20];
+
+  return calcDomain;
+}
+
 const defaultConfig: IScatterConfig = {
   type: ESupportedPlotlyVis.SCATTER,
   numColumnsSelected: [],
@@ -140,6 +153,13 @@ export async function createScatterTraces(
 
   // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
   if (validCols.length === 2) {
+    const xDataVals = validCols[0].resolvedValues.map((v) => v.val);
+
+    const yDataVals = validCols[1].resolvedValues.map((v) => v.val);
+
+    const calcXDomain = calculateDomain((validCols[0] as VisNumericalColumn).domain, xDataVals as number[]);
+    const calcYDomain = calculateDomain((validCols[1] as VisNumericalColumn).domain, yDataVals as number[]);
+
     plots.push({
       title: {
         text: ``,
