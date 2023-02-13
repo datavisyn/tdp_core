@@ -41,6 +41,7 @@ export function ScatterVis({
   showCloseButton = false,
   closeButtonCallback = () => null,
   scales,
+  scrollZoom,
 }: {
   config: IScatterConfig;
   optionsConfig?: {
@@ -76,6 +77,7 @@ export function ScatterVis({
   setShowSidebar?(show: boolean): void;
   enableSidebar?: boolean;
   showCloseButton?: boolean;
+  scrollZoom?: boolean;
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
   const plotlyDivRef = React.useRef(null);
@@ -201,7 +203,7 @@ export function ScatterVis({
           divId={`plotlyDiv${id}`}
           data={plotlyData}
           layout={layout}
-          config={{ responsive: true, displayModeBar: false, scrollZoom: true }}
+          config={{ responsive: true, displayModeBar: false, scrollZoom }}
           useResizeHandler
           style={{ width: '100%', height: '100%' }}
           onClick={(event) => {
@@ -219,7 +221,7 @@ export function ScatterVis({
       );
     }
     return null;
-  }, [id, plotsWithSelectedPoints, layout, selectedMap, selectionCallback, selectedList, traces?.plots, plotlyData]);
+  }, [id, plotsWithSelectedPoints, layout, selectedMap, selectionCallback, selectedList, traces?.plots, plotlyData, scrollZoom]);
 
   return (
     <Container
