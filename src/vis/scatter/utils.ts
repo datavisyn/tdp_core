@@ -1,6 +1,8 @@
 import { merge } from 'lodash';
 import d3v3 from 'd3v3';
 import { EChartsOption } from 'echarts';
+import { transform } from 'echarts-stat';
+import * as ecStat from 'echarts-stat';
 import {
   PlotlyInfo,
   PlotlyData,
@@ -248,6 +250,215 @@ export async function createScatterTraces(
                 large: true,
               },
             ],
+    });
+  } else {
+    const validColsGrid = validCols.map((xCol) => validCols.map((yCol) => ({ xCol, yCol }))).flat();
+
+    console.log(validColsGrid);
+    plots.push({
+      title: {
+        text: ``,
+      },
+      tooltip: {},
+      legend: {
+        orient: 'vertical',
+        right: 10,
+      },
+      visualMap:
+        colorCol && colorCol.type === EColumnTypes.NUMERICAL
+          ? {
+              min: 0,
+              max: 100,
+              dimension: 1,
+              type: 'continuous',
+              orient: 'vertical',
+              right: 10,
+              top: 'center',
+              text: ['HIGH', 'LOW'],
+              calculable: false,
+              inRange: {
+                color:
+                  colorScaleType === ENumericalColorScaleType.SEQUENTIAL
+                    ? [getCssValue('visyn-s9-blue'), getCssValue('visyn-s5-blue'), getCssValue('visyn-s1-blue')]
+                    : [getCssValue('visyn-c1'), '#d3d3d3', getCssValue('visyn-c2')],
+              },
+            }
+          : null,
+      dataZoom: [
+        {
+          type: 'inside',
+        },
+        {
+          type: 'slider',
+        },
+        {
+          type: 'inside',
+          orient: 'vertical',
+        },
+        {
+          type: 'slider',
+          orient: 'vertical',
+          left: 50,
+        },
+      ],
+      brush: {
+        toolbox: [null],
+        brushType: 'rect',
+        brushMode: 'single',
+        brushLink: 'all',
+        xAxisIndex: validColsGrid.map((c, i) => i),
+        yAxisIndex: validColsGrid.map((c, i) => i),
+      },
+      grid: validColsGrid.map((grid, i) => {
+        return {
+          id: `${grid.xCol.info.id},${grid.yCol.info.id}`,
+          left: `${((i % Math.sqrt(validColsGrid.length)) * 100) / Math.sqrt(validColsGrid.length)}%`,
+          top: `${(Math.floor(i / Math.sqrt(validColsGrid.length)) * 100) / Math.sqrt(validColsGrid.length)}%`,
+          width: `${100 / Math.sqrt(validColsGrid.length) - 5}%`,
+          height: `${100 / Math.sqrt(validColsGrid.length) - 5}%`,
+        };
+      }),
+      // grid: [
+      //   {
+      //     id: 'xAxisLeft-yAxisTop',
+      //     left: 80,
+      //     top: 50,
+      //     width: '35%',
+      //     height: '35%',
+      //   },
+      //   {
+      //     id: 'xAxisLeft-yAxisBottom',
+      //     left: 80,
+      //     bottom: 50,
+      //     width: '35%',
+      //     height: '35%',
+      //   },
+      //   {
+      //     id: 'xAxisRight-yAxisTop',
+      //     right: 80,
+      //     top: 50,
+      //     width: '35%',
+      //     height: '35%',
+      //   },
+      //   {
+      //     id: 'xAxisRight-yAxisBottom',
+      //     right: 80,
+      //     bottom: 50,
+      //     width: '35%',
+      //     height: '35%',
+      //   },
+      // ],
+      xAxis: validColsGrid.map((grid, i) => {
+        return { id: `${grid.xCol.info.id},${grid.yCol.info.id}`, gridId: `${grid.xCol.info.id},${grid.yCol.info.id}` };
+      }),
+      yAxis: validColsGrid.map((grid, i) => {
+        return { id: `${grid.xCol.info.id},${grid.yCol.info.id}`, gridId: `${grid.xCol.info.id},${grid.yCol.info.id}` };
+      }),
+
+      animation: false,
+      series:
+        colorCol?.type === EColumnTypes.CATEGORICAL
+          ? [...uniqueColorVals].map((uniqueColor) => {
+              return {
+                name: uniqueColor,
+                type: 'scatter',
+                data: colorCol.resolvedValues
+                  .map((d, i) => {
+                    return [d.val === uniqueColor, validCols[0].resolvedValues[i].val, validCols[1].resolvedValues[i].val];
+                  })
+                  .filter((id) => id[0])
+                  .map((iid) => [iid[1], iid[2]] as [number, number]),
+                dimensions: ['x', 'y'],
+                symbolSize: 5,
+
+                itemStyle: {
+                  opacity: alphaSliderVal,
+                },
+                large: true,
+              };
+            })
+          : validColsGrid.map((grid) => {
+              if (grid.xCol.info.id === grid.yCol.info.id) {
+                return {
+                  type: 'bar',
+                  data: ecStat.histogram(
+                    grid.xCol.resolvedValues.map((val) => val.val as number),
+                    'squareRoot',
+                  ).data,
+                  xAxisId: `${grid.xCol.info.id},${grid.yCol.info.id}`,
+                  yAxisId: `${grid.xCol.info.id},${grid.yCol.info.id}`,
+                  barWidth: '99.3%',
+                };
+              }
+
+              return {
+                // id: 'xAxisLeft-yAxisTop',
+                type: 'scatter',
+                data: grid.xCol.resolvedValues.map((d, i) => [d.val, grid.yCol.resolvedValues[i].val]),
+                xAxisId: `${grid.xCol.info.id},${grid.yCol.info.id}`,
+                yAxisId: `${grid.xCol.info.id},${grid.yCol.info.id}`,
+                symbolSize: 5,
+                itemStyle: {
+                  opacity: alphaSliderVal,
+                },
+                large: true,
+              };
+            }),
+      // : [
+      //     {
+      //       // id: 'xAxisLeft-yAxisTop',
+      //       type: 'scatter',
+      //       data: validCols[0].resolvedValues.map((d, i) => [d.val, validCols[1].resolvedValues[i].val]),
+      //       xAxisId: 'xAxisLeft-yAxisTop',
+      //       yAxisId: 'xAxisLeft-yAxisTop',
+      //       name: '1',
+      //       symbolSize: 5,
+      //       itemStyle: {
+      //         opacity: alphaSliderVal,
+      //       },
+      //       large: true,
+      //     },
+      //     {
+      //       // id: 'xAxisLeft-yAxisBottom',
+      //       type: 'scatter',
+      //       name: '1',
+      //       data: validCols[0].resolvedValues.map((d, i) => [d.val, validCols[1].resolvedValues[i].val]),
+      //       xAxisId: 'xAxisLeft-yAxisBottom',
+      //       yAxisId: 'xAxisLeft-yAxisBottom',
+      //       symbolSize: 5,
+      //       itemStyle: {
+      //         opacity: alphaSliderVal,
+      //       },
+      //       large: true,
+      //     },
+      //     {
+      //       // id: 'xAxisRight-yAxisTop',
+      //       type: 'scatter',
+      //       name: '1',
+
+      //       data: validCols[0].resolvedValues.map((d, i) => [d.val, validCols[1].resolvedValues[i].val]),
+      //       xAxisId: 'xAxisRight-yAxisTop',
+      //       yAxisId: 'xAxisRight-yAxisTop',
+      //       symbolSize: 5,
+      //       itemStyle: {
+      //         opacity: alphaSliderVal,
+      //       },
+      //       large: true,
+      //     },
+      //     {
+      //       // id: 'xAxisRight-yAxisBottom',
+      //       type: 'scatter',
+      //       name: '1',
+      //       data: validCols[0].resolvedValues.map((d, i) => [d.val, validCols[1].resolvedValues[i].val]),
+      //       xAxisId: 'xAxisRight-yAxisBottom',
+      //       yAxisId: 'xAxisRight-yAxisBottom',
+      //       symbolSize: 5,
+      //       itemStyle: {
+      //         opacity: alphaSliderVal,
+      //       },
+      //       large: true,
+      //     },
+      //   ],
     });
   }
   // } else {

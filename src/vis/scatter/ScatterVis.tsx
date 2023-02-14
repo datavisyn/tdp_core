@@ -5,6 +5,7 @@ import { ActionIcon, Center, Container, Group, Stack, Tooltip } from '@mantine/c
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGear } from '@fortawesome/free-solid-svg-icons';
 import ReactECharts from 'echarts-for-react';
+import * as ecStat from 'echarts-stat';
 import { EFilterOptions, IVisConfig, Scales, IScatterConfig, VisColumn, EScatterSelectSettings } from '../interfaces';
 import { InvalidCols } from '../general/InvalidCols';
 import { createScatterTraces } from './utils';
@@ -82,6 +83,7 @@ export function ScatterVis({
 }) {
   const id = React.useMemo(() => uniqueId('ScatterVis'), []);
   const plotlyDivRef = React.useRef(null);
+  const [layout, setLayout] = useState<Partial<Plotly.Layout>>(null);
 
   const eChartsInstance = useRef<any>(null);
 
@@ -207,7 +209,6 @@ export function ScatterVis({
           style={{ height: '100%', width: '100%' }}
           opts={{ renderer: 'canvas' }}
           onChartReady={(instance) => {
-            console.log(instance);
             eChartsInstance.current = instance;
             instance.dispatchAction({
               type: 'takeGlobalCursor',
@@ -217,6 +218,8 @@ export function ScatterVis({
                 brushMode: 'single',
               },
             });
+
+            // instance.registerTransform(ecStat.histogram);
           }}
         />
       );
