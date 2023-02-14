@@ -149,18 +149,15 @@ export async function createScatterTraces(
     return emptyVal;
   }
 
-  console.log(scales.color.domain(), scales.color.range());
-
   const uniqueColorVals = new Set(colorCol?.resolvedValues.map((v) => v.val));
 
   // if exactly 2 then return just one plot. otherwise, loop over and create n*n plots. TODO:: make the diagonal plots that have identical axis a histogram
   if (validCols.length === 2) {
     const xDataVals = validCols[0].resolvedValues.map((v) => v.val);
-
     const yDataVals = validCols[1].resolvedValues.map((v) => v.val);
 
-    const calcXDomain = calculateDomain((validCols[0] as VisNumericalColumn).domain, xDataVals as number[]);
-    const calcYDomain = calculateDomain((validCols[1] as VisNumericalColumn).domain, yDataVals as number[]);
+    // const calcXDomain = calculateDomain((validCols[0] as VisNumericalColumn).domain, xDataVals as number[]);
+    // const calcYDomain = calculateDomain((validCols[1] as VisNumericalColumn).domain, yDataVals as number[]);
 
     plots.push({
       title: {
