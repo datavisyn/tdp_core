@@ -1,6 +1,6 @@
 import itertools
 
-from .. import manager
+from visyn_core import manager
 
 _providers_r = None
 

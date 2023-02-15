@@ -1,13 +1,13 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
+from visyn_core.plugin.model import AVisynPlugin, RegHelper
 
-from .plugin.model import AVisynPlugin, RegHelper
+from .settings import TDPCoreSettings
 
 
 class VisynPlugin(AVisynPlugin):
     def init_app(self, app: FastAPI):
-        from .mol_img import img_api
-
-        app.include_router(img_api.app)
+        pass
 
     def register(self, registry: RegHelper):
         import logging
@@ -20,12 +20,6 @@ class VisynPlugin(AVisynPlugin):
             "caleydo-dataset",
             "tdp_core.dataset.dataset_api",
             {"namespace": "/api/dataset", "factory": "create_dataset"},
-        )
-        registry.append(
-            "namespace",
-            "caleydo-idtype",
-            "tdp_core.id_mapping.idtype_api",
-            {"namespace": "/api/idtype", "factory": "create_idtype"},
         )
 
         try:
@@ -68,49 +62,13 @@ class VisynPlugin(AVisynPlugin):
             {"namespace": "/api/tdp/storage"},
         )
         registry.append("namespace", "tdp_swagger", "tdp_core.swagger", {"namespace": "/api/tdp/ui"})
-        # TODO:
-        registry.append("namespace", "tdp_core_main", "tdp_core.server.mainapp", {"namespace": "/app"})
-        registry.append_router("tdp_config_router", "tdp_core.settings.router", {})
-        registry.append_router("tdp_plugin_router", "tdp_core.plugin.router", {})
-        registry.append("namespace", "tdp_xlsx2json", "tdp_core.xlsx", {"namespace": "/api/tdp/xlsx"})
-        registry.append("mapping_provider", "tdp_core", "tdp_core.mapping_table")
-
-        # DB migration plugins
-        registry.append(
-            "command",
-            "db-migration",
-            "tdp_core.dbmigration.manager",
-            {"factory": "create_migration_command"},
-        )
-        registry.append(
-            "namespace",
-            "db-migration-api",
-            "tdp_core.dbmigration.router",
-            {"factory": "create_migration_api", "namespace": "/api/tdp/db-migration"},
-        )
-
-        # phovea_security_flask
-        registry.append(
-            "user_stores",
-            "dummy_store",
-            "tdp_core.security.store.dummy_store",
-            {},
-        )
-        registry.append(
-            "user_stores",
-            "alb_security_store",
-            "tdp_core.security.store.alb_security_store",
-            {},
-        )
-        registry.append(
-            "user_stores",
-            "no_security_store",
-            "tdp_core.security.store.no_security_store",
-            {},
-        )
 
         # tdp_matomo
         registry.append("tdp-config-safe-keys", "matomo", "", {"configKey": "tdp_core.matomo"})
 
         # phovea_data_mongo
         registry.append("dataset-provider", "dataset-graph", "tdp_core.graph", {})
+
+    @property
+    def setting_class(self) -> type[BaseModel]:
+        return TDPCoreSettings
