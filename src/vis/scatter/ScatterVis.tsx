@@ -221,7 +221,7 @@ export function ScatterVis({
 
             // instance.registerTransform(ecStat.histogram);
           }}
-          onEvents={{ brushEnd: (b) => console.log(b), brushselected: (b) => console.log(b), selectchanged: (b) => console.log(b) }}
+          // onEvents={{ brushEnd: (b) => console.log(b), brushselected: (b) => console.log(b), selectchanged: (b) => console.log(b) }}
         />
       );
     }

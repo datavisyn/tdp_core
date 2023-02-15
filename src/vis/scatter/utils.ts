@@ -227,7 +227,7 @@ export async function createScatterTraces(
                   .filter((id) => id[0])
                   .map((iid) => [iid[1], iid[2]] as [number, number]),
                 dimensions: ['x', 'y'],
-                symbolSize: 5,
+                symbolSize: 7,
 
                 itemStyle: {
                   opacity: alphaSliderVal,
@@ -240,7 +240,8 @@ export async function createScatterTraces(
                 type: 'scatter',
                 data: validCols[0].resolvedValues.map((d, i) => [d.val, validCols[1].resolvedValues[i].val]),
                 dimensions: ['x', 'y'],
-                symbolSize: 5,
+                color: DEFAULT_COLOR,
+                symbolSize: 7,
                 itemStyle: {
                   opacity: alphaSliderVal,
                 },
@@ -261,6 +262,29 @@ export async function createScatterTraces(
         orient: 'vertical',
         right: 10,
       },
+      dataZoom: validCols
+        .map((col, i) => [
+          { xAxisIndex: [i, i + 3, i + 6], type: 'inside' },
+          { yAxisIndex: [i * 3, i * 3 + 1, i * 3 + 2], type: 'inside' },
+          {
+            xAxisIndex: [i, i + 3, i + 6],
+            type: 'slider',
+            bottom: 10,
+            height: 20,
+            width: `${100 / validCols.length - 5}%`,
+            left: `${((i % validColsGrid.length) * 100) / Math.sqrt(validColsGrid.length)}%`,
+          },
+          {
+            yAxisIndex: [i * 3, i * 3 + 1, i * 3 + 2],
+            type: 'slider',
+            left: 10,
+            width: 20,
+            height: `${100 / validCols.length - 5}%`,
+            top: `${((i % validColsGrid.length) * 100) / Math.sqrt(validColsGrid.length)}%`,
+            orientation: 'vertical',
+          },
+        ])
+        .flat(),
       visualMap:
         colorCol && colorCol.type === EColumnTypes.NUMERICAL
           ? {
@@ -281,23 +305,23 @@ export async function createScatterTraces(
               },
             }
           : null,
-      dataZoom: [
-        {
-          type: 'inside',
-        },
-        {
-          type: 'slider',
-        },
-        {
-          type: 'inside',
-          orient: 'vertical',
-        },
-        {
-          type: 'slider',
-          orient: 'vertical',
-          left: 50,
-        },
-      ],
+      // dataZoom: [
+      //   {
+      //     type: 'inside',
+      //   },
+      //   {
+      //     type: 'slider',
+      //   },
+      //   {
+      //     type: 'inside',
+      //     orient: 'vertical',
+      //   },
+      //   {
+      //     type: 'slider',
+      //     orient: 'vertical',
+      //     left: 50,
+      //   },
+      // ],
       brush: {
         toolbox: [null],
         brushType: 'rect',
@@ -366,7 +390,7 @@ export async function createScatterTraces(
                   .filter((id) => id[0])
                   .map((iid) => [iid[1], iid[2]] as [number, number]),
                 dimensions: ['x', 'y'],
-                symbolSize: 5,
+                symbolSize: 7,
 
                 itemStyle: {
                   opacity: alphaSliderVal,
@@ -384,6 +408,10 @@ export async function createScatterTraces(
                   ).data,
                   xAxisId: `${grid.xCol.info.id},${grid.yCol.info.id}`,
                   yAxisId: `${grid.xCol.info.id},${grid.yCol.info.id}`,
+                  itemStyle: {
+                    color: DEFAULT_COLOR,
+                    opacity: alphaSliderVal,
+                  },
                   barWidth: '99.3%',
                 };
               }
@@ -394,8 +422,9 @@ export async function createScatterTraces(
                 data: grid.xCol.resolvedValues.map((d, i) => [d.val, grid.yCol.resolvedValues[i].val]),
                 xAxisId: `${grid.xCol.info.id},${grid.yCol.info.id}`,
                 yAxisId: `${grid.xCol.info.id},${grid.yCol.info.id}`,
-                symbolSize: 5,
+                symbolSize: 7,
                 itemStyle: {
+                  color: DEFAULT_COLOR,
                   opacity: alphaSliderVal,
                 },
                 large: true,

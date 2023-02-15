@@ -112,7 +112,7 @@ ScatterPlot.args = {
     numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
     shape: null,
     dragMode: EScatterSelectSettings.RECTANGLE,
-    alphaSliderVal: 1,
+    alphaSliderVal: 0.4,
   },
 };
 
