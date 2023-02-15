@@ -1,3 +1,6 @@
 // Reexport everything from visyn_core for compatibility reasons.
-export { UserSession } from 'visyn_core/security';
+export { 
+/**
+ * @deprecated use import { <...> } from 'visyn_core/security' instead.
+ */ UserSession, } from 'visyn_core/security';
 //# sourceMappingURL=UserSession.js.map

@@ -1,9 +1,9 @@
 import { I18nextManager } from 'visyn_core/i18n';
+import { GlobalEventHandler } from 'visyn_core/base';
 import { NotificationHandler } from '../../base/NotificationHandler';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
 import { TemporarySessionList, PersistentSessionList } from './SessionList';
 import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
-import { GlobalEventHandler } from '../../base';
 import { Dialog, PHOVEA_UI_FormDialog } from '../../components';
 export class EditProvenanceGraphMenu {
     constructor(manager, parent) {

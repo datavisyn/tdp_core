@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { Dialog } from '../../components';
-import { PluginRegistry } from '../../app';
 // https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
 const categoryColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];
 // eslint-disable-next-line @typescript-eslint/naming-convention

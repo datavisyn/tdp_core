@@ -1,5 +1,5 @@
 import { EDirtyReason, IDataRow, IOrderedGroup, LocalDataProvider, Ranking } from 'lineupjs';
-import { EventHandler } from '../../base/event';
+import { EventHandler } from 'visyn_core/base';
 
 /**
  *  Store the ordered row indices for all, selected or filtered rows of the first ranking.

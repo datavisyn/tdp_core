@@ -3,12 +3,12 @@ import 'select2';
 import { event as d3event } from 'd3v3';
 import $ from 'jquery';
 import { I18nextManager } from 'visyn_core/i18n';
+import { UserSession } from 'visyn_core/security';
 import { AFormElement } from './AFormElement';
 import { FormElementType } from '../interfaces';
 import { FormSelect } from './FormSelect';
 import { FormSelect2 } from './FormSelect2';
 import { Select3 } from './Select3';
-import { UserSession } from '../../app';
 export class FormMap extends AFormElement {
     /**
      * Constructor

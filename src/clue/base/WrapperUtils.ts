@@ -1,4 +1,4 @@
-import { IEventHandler } from '../../base/event';
+import { IEventHandler } from 'visyn_core/base';
 import { AppContext } from '../../app';
 import { ProvenanceGraph } from '../provenance';
 import { CLUEMode, ModeWrapper } from './mode';

@@ -1,5 +1,5 @@
 import { IDataRow, Column, isNumberColumn, isDateColumn } from 'lineupjs';
-import { XlsxUtils } from '../../utils/XlsxUtils';
+import { XlsxUtils } from 'visyn_core/utils';
 
 export interface IExportFormat {
   name: string;

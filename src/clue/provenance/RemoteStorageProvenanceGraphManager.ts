@@ -1,11 +1,11 @@
 import { merge } from 'lodash';
+import { UserSession } from 'visyn_core/security';
 import { DataCache } from '../../data/DataCache';
 import { ProvenanceGraph } from './ProvenanceGraph';
 import type { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
 import type { IProvenanceGraphDataDescription } from './ICmd';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { GraphBase } from '../graph/GraphBase';
-import { UserSession } from '../../app/UserSession';
 import { GraphProxy } from '../graph/GraphProxy';
 import { RemoteStoreGraph } from '../graph/RemoteStorageGraph';
 import { IDataType } from '../../data/datatype';

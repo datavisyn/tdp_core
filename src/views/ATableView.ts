@@ -1,10 +1,10 @@
 import { I18nextManager } from 'visyn_core/i18n';
+import { XlsxUtils } from 'visyn_core/utils';
 import { BaseUtils } from '../base';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { IRow } from '../base/rest';
 import { ISelection, IViewContext } from '../base/interfaces';
 import { AView } from './AView';
-import { XlsxUtils } from '../utils/XlsxUtils';
 
 export interface ISortItem<T> {
   node: HTMLElement;

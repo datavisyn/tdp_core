@@ -1,12 +1,11 @@
 import { merge } from 'lodash';
+import { Permission, UserSession } from 'visyn_core/security';
 import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';
 import { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
 import { IProvenanceGraphDataDescription } from './ICmd';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { GraphBase } from '../graph/GraphBase';
 import { LocalStorageGraph } from '../graph/LocalStorageGraph';
-import { UserSession } from '../../app/UserSession';
-import { Permission } from '../../security';
 import { MemoryGraph } from '../graph/MemoryGraph';
 
 export interface ILocalStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {

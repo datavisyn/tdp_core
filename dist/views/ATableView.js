@@ -1,8 +1,8 @@
 import { I18nextManager } from 'visyn_core/i18n';
+import { XlsxUtils } from 'visyn_core/utils';
 import { BaseUtils } from '../base';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { AView } from './AView';
-import { XlsxUtils } from '../utils/XlsxUtils';
 /**
  * base class for views based on LineUp
  */

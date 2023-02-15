@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { EventHandler } from './event';
-import { PluginRegistry } from '../app';
 import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM } from './extensions';
 import { LoginUtils } from './LoginUtils';
 import { SessionWatcher } from './watcher';

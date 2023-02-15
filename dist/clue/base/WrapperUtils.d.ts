@@ -1,4 +1,4 @@
-import { IEventHandler } from '../../base/event';
+import { IEventHandler } from 'visyn_core/base';
 import { ProvenanceGraph } from '../provenance';
 export interface ICLUEWrapper extends IEventHandler {
     jumpToState(state: number): Promise<any>;

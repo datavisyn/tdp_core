@@ -1,9 +1,8 @@
 import 'select2';
 import * as d3v3 from 'd3v3';
 import { AFormElement } from './AFormElement';
-import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
+import { IFormElementDesc, IForm, FormElementType, IFormElement } from '../interfaces';
 import { ISelectOptions } from './FormSelect';
-import type { IFormElement } from '..';
 import { ISelect3Options, IdTextPair } from './Select3';
 import { IPluginDesc } from '../../base';
 export interface ISubDesc {

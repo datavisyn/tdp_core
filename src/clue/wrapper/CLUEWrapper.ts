@@ -6,6 +6,7 @@
 import { merge } from 'lodash';
 import { select } from 'd3v3';
 import * as d3v3 from 'd3v3';
+import { IEvent } from 'visyn_core/base';
 import { MixedStorageProvenanceGraphManager, IObjectRef, ProvenanceGraph } from '../provenance';
 import { SelectionRecorder } from '../../base/Selection';
 import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
@@ -15,7 +16,6 @@ import { ProvenanceGraphMenu } from '../provenance/ProvenanceGraphMenu';
 import { LoginMenu } from '../../base/LoginMenu';
 import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';
 import { AppHeader, AppHeaderLink, IAppHeaderOptions, IHeaderLink } from '../../components';
-import { IEvent } from '../../base';
 
 export interface ICLUEWrapperOptions extends IACLUEWrapperOptions {
   /**

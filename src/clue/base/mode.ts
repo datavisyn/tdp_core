@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
-import { EventHandler, GlobalEventHandler, IEvent } from '../../base/event';
+import { EventHandler, GlobalEventHandler, IEvent } from 'visyn_core/base';
 import { AppContext } from '../../app';
 
 /**

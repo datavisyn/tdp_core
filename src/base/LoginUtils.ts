@@ -1,6 +1,6 @@
+import { AppContext } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
-import { UserSession, AppContext } from '../app';
-import { IUser, IUserStore } from '../security';
+import { IUser, IUserStore, UserSession } from 'visyn_core/security';
 import { Ajax } from './ajax';
 
 export class LoginUtils {

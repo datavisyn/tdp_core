@@ -1,4 +1,4 @@
-import type { PluginRegistry } from '../app/PluginRegistry';
+import type { PluginRegistry } from 'visyn_core/plugin';
 
 /**
  * basic interface of a plugin

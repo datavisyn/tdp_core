@@ -1,4 +1,4 @@
-import { EventHandler } from '../../base/event';
+import { EventHandler } from 'visyn_core/base';
 /**
  * utility logic for zooming a vis instance
  */

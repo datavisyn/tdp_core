@@ -1,5 +1,5 @@
 import { IDType } from 'visyn_core/idtype';
-import { ISecureItem } from '../security';
+import { ISecureItem } from 'visyn_core/security';
 import { IStoredNamedSet } from './interfaces';
 export declare class RestStorageUtils {
     static readonly REST_NAMESPACE: string;

@@ -1,1 +1,1 @@
-{"version":3,"file":"PluginRegistry.js","sourceRoot":"","sources":["../../src/app/PluginRegistry.ts"],"names":[],"mappings":"AAAA,iEAAiE;AACjE,OAAO,EAAE,cAAc,EAAE,MAAM,mBAAmB,CAAC"}
+{"version":3,"file":"PluginRegistry.js","sourceRoot":"","sources":["../../src/app/PluginRegistry.ts"],"names":[],"mappings":"AAAA,iEAAiE;AACjE,OAAO;AACL;;GAEG;AACH,cAAc,GACf,MAAM,mBAAmB,CAAC"}

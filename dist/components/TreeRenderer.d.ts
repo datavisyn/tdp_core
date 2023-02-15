@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IBaseViewPluginDesc } from '../base/interfaces';
+import { IBaseViewPluginDesc } from 'visyn_core/base';
 export interface ITreeGroup {
     name: string;
     items: ITreeElement[];

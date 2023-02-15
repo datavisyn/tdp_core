@@ -1,9 +1,9 @@
 import { merge, identity } from 'lodash';
 import * as d3v3 from 'd3v3';
 import { I18nextManager } from 'visyn_core/i18n';
+import { UserSession } from 'visyn_core/security';
 import { ITypeDefinition, ValueTypeEditor, PHOVEA_IMPORTER_ValueTypeUtils } from './valuetype/valuetypes';
 import { BaseUtils } from '../base';
-import { UserSession } from '../app';
 import { IDataDescription } from '../data';
 
 export interface IColumnDefinition {

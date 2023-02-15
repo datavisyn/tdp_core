@@ -11,10 +11,10 @@
 
 import * as React from 'react';
 import { IDType, IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { EXTENSION_POINT_TDP_VIEW, ISelection, IView, IViewContext, IViewPlugin, IViewPluginDesc } from '../base';
 import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';
-import { PluginRegistry } from '../app';
 import { LocalStorageProvenanceGraphManager, ObjectRefUtils } from '../clue/provenance';
 import { AReactView, IReactHandler } from './AReactView';
 

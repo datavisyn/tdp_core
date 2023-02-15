@@ -1,7 +1,7 @@
 import * as d3v3 from 'd3v3';
+import { UserSession } from 'visyn_core/security';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
-import { UserSession } from '../../app';
 import { IPluginDesc } from '../../base';
 
 export interface IFormSelectOption {

@@ -1,5 +1,5 @@
+import { ISecureItem } from 'visyn_core/security';
 import { IProvenanceGraphDataDescription } from '../provenance';
-import { ISecureItem } from '../../security';
 export declare class ProvenanceGraphMenuUtils {
     static GLOBAL_EVENT_MANIPULATED: string;
     static isPersistent(d: IProvenanceGraphDataDescription): boolean;

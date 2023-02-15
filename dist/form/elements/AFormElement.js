@@ -1,7 +1,8 @@
-import { FormElementType } from '../interfaces';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { UserSession } from 'visyn_core/security';
+import { EventHandler } from 'visyn_core/base';
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
-import { UserSession, PluginRegistry } from '../../app';
-import { EventHandler } from '../../base';
+import { FormElementType } from '../interfaces';
 /**
  * Abstract form element class that is used as parent class for other form elements
  */

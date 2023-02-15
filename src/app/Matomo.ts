@@ -1,8 +1,8 @@
 import md5 from 'md5';
+import { IUser } from 'visyn_core/security';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { ActionNode, ProvenanceGraph } from '../clue/provenance';
-import { IUser } from '../security';
 import { AppContext } from './AppContext';
-import { PluginRegistry } from './PluginRegistry';
 
 /**
  * Trackable Matomo event

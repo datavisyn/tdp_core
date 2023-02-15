@@ -7,8 +7,6 @@ export * from './components';
 export * from './data';
 export * from './form';
 export * from './hooks';
-export * from './i18n';
-export * from './idtype';
 export * from './import';
 export * from './layout';
 export * from './lineup';

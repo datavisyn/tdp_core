@@ -1,2 +1,0 @@
-export { EP_PHOVEA_CORE_LOCALE, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT, ILoginExtensionPoint, ILoginExtensionPointDesc, ILogoutEP, ILogoutEPDesc, ILocaleEPDesc, } from 'visyn_core/plugin';
-//# sourceMappingURL=extensions.d.ts.map

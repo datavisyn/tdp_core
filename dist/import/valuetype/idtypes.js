@@ -1,7 +1,7 @@
 import { IDTypeManager } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { PHOVEA_IMPORTER_ValueTypeUtils } from './valuetypes';
-import { PluginRegistry } from '../../app';
 /**
  * edits the given type definition in place with idtype properties
  * @param definition call by reference argument

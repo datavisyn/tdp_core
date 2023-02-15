@@ -2,6 +2,9 @@
 import './webpack/_bootstrap';
 import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { UserSession } from 'visyn_core/security';
+import { loadClientConfig } from 'visyn_core/base';
 import { AppHeaderLink, AppHeader } from './components';
 import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
 import { DialogUtils } from './clue/base/dialogs';
@@ -10,8 +13,7 @@ import { TourManager } from './tour/TourManager';
 import { TemporarySessionList, ButtonModeSelector, CLUEGraphManager } from './clue';
 import { TDPTokenManager } from './auth';
 import { ACLUEWrapper } from './clue/wrapper';
-import { LoginMenu, loadClientConfig } from './base';
-import { UserSession, PluginRegistry } from './app';
+import { LoginMenu } from './base';
 import { MixedStorageProvenanceGraphManager } from './clue/provenance';
 import { VisLoader } from './clue/provvis';
 /**

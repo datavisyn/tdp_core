@@ -1,4 +1,4 @@
-import { EventHandler } from '../../base/event';
+import { EventHandler } from 'visyn_core/base';
 import { IProvenanceGraphDataDescription, IProvenanceGraphDump, ProvenanceGraph } from '../provenance';
 import type { MixedStorageProvenanceGraphManager } from '../provenance/MixedStorageProvenanceGraphManager';
 export interface IClueState {

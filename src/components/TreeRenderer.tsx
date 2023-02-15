@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { IBaseViewPluginDesc } from 'visyn_core/base';
 import { BaseUtils } from '../base/BaseUtils';
-import { IBaseViewPluginDesc } from '../base/interfaces';
 import { ViewUtils } from '../views/ViewUtils';
 
 export interface ITreeGroup {

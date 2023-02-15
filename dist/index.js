@@ -7,10 +7,6 @@ export * from './components';
 export * from './data';
 export * from './form';
 export * from './hooks';
-// eslint-disable-next-line import/export
-export * from './i18n';
-// eslint-disable-next-line import/export
-export * from './idtype';
 export * from './import';
 export * from './layout';
 export * from './lineup';

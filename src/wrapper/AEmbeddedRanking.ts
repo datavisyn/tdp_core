@@ -1,5 +1,6 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
 import { IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { ProvenanceGraph, ObjectRefUtils } from '../clue/provenance';
 import { ARankingView } from '../lineup/ARankingView';
 import { IARankingViewOptions } from '../lineup/IARankingViewOptions';
@@ -10,7 +11,6 @@ import { IScore } from '../base/interfaces';
 import { IServerColumnDesc, IRow } from '../base/rest';
 import { IFormElementDesc } from '../form/interfaces';
 import { ILazyLoadedColumn } from '../lineup/internal/column';
-import { PluginRegistry } from '../app';
 
 export interface IEmbeddedRanking extends ARankingView {
   rebuildLineUp(mode: 'data' | 'scores' | 'data+scores' | 'data+desc+scores' | 'data+desc'): Promise<any>;

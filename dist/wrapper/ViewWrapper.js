@@ -1,10 +1,10 @@
 import { IDTypeManager } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
+import { EventHandler } from 'visyn_core/base';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
-import { EventHandler } from '../base';
 import { NodeUtils, ObjectRefUtils } from '../clue/provenance';
 import { Dialog } from '../components';
 export class ViewWrapper extends EventHandler {

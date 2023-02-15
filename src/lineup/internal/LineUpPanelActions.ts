@@ -17,6 +17,8 @@ import {
 } from 'lineupjs';
 import { I18nextManager } from 'visyn_core/i18n';
 import { IDType, IDTypeManager } from 'visyn_core/idtype';
+import { IPlugin, IPluginDesc, PluginRegistry } from 'visyn_core/plugin';
+import { EventHandler } from 'visyn_core/base';
 import {
   EXTENSION_POINT_TDP_SCORE_LOADER,
   EXTENSION_POINT_TDP_SCORE,
@@ -48,8 +50,6 @@ import { FormElementType, IForm } from '../../form/interfaces';
 import { FormDialog } from '../../form';
 import { PanelSaveNamedSetButton } from '../panel/PanelSaveNamedSetButton';
 import { LineUpOrderedRowIndicies } from '../panel/LineUpOrderedRowIndicies';
-import { PluginRegistry } from '../../app';
-import { EventHandler, IPluginDesc, IPlugin } from '../../base';
 
 export function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
   if (!target) {

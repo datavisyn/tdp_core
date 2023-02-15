@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
-import { UserSession } from '../app/UserSession';
+import { UserSession } from 'visyn_core/security';
 import { BuildInfo } from './buildInfo';
 import { AppMetaDataUtils } from './metaData';
 /**

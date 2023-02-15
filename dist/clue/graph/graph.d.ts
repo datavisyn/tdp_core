@@ -1,5 +1,5 @@
+import { EventHandler } from 'visyn_core/base';
 import { IPersistable } from '../../base/IPersistable';
-import { EventHandler } from '../../base/event';
 import type { IDataType, IDataDescription } from '../../data';
 export declare class AttributeContainer extends EventHandler implements IPersistable {
     private attrMap;

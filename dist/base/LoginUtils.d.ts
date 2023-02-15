@@ -1,4 +1,4 @@
-import { IUser, IUserStore } from '../security';
+import { IUser, IUserStore } from 'visyn_core/security';
 export declare class LoginUtils {
     static defaultLoginForm: () => string;
     /**

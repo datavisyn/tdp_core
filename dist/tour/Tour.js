@@ -1,4 +1,4 @@
-import { PluginRegistry } from '../app';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { TourUtils } from './TourUtils';
 export class Tour {
     constructor(desc) {

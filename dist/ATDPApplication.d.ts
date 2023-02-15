@@ -1,9 +1,10 @@
 import './webpack/_bootstrap';
+import { ITDPClientConfig } from 'visyn_core/base';
 import { AppHeader } from './components';
 import { TourManager } from './tour/TourManager';
 import { CLUEGraphManager } from './clue';
 import { ACLUEWrapper } from './clue/wrapper';
-import { LoginMenu, ITDPClientConfig } from './base';
+import { LoginMenu } from './base';
 import { IMixedStorageProvenanceGraphManagerOptions, ProvenanceGraph } from './clue/provenance';
 export interface ITDPOptions {
     /**
