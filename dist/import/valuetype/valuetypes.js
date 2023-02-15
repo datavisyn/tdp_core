@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { I18nextManager } from '../../i18n';
+import { I18nextManager } from 'visyn_core/i18n';
 import { Dialog } from '../../components';
 import { PluginRegistry } from '../../app';
 // https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10

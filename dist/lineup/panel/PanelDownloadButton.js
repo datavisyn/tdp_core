@@ -1,8 +1,8 @@
 import { isSupportType } from 'lineupjs';
+import { I18nextManager } from 'visyn_core/i18n';
 import { ExportUtils } from '../internal/ExportUtils';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 import { BaseUtils } from '../../base/BaseUtils';
-import { I18nextManager } from '../../i18n';
 import { PHOVEA_UI_FormDialog } from '../../components/dialogs';
 /**
  * A button dropdown to download selected/all rows of the ranking

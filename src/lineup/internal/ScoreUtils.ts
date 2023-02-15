@@ -1,9 +1,9 @@
+import { I18nextManager } from 'visyn_core/i18n';
 import { IScore } from '../../base/interfaces';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
 import { AttachemntUtils } from '../../storage/internal/attachment';
 import { IViewProvider } from '../IViewProvider';
 import { PluginRegistry } from '../../app';
-import { I18nextManager } from '../../i18n';
 import { WebpackEnv } from '../../base/WebpackEnv';
 import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../../clue/provenance';
 

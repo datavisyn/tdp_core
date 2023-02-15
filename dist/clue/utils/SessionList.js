@@ -1,7 +1,7 @@
 import { select, event } from 'd3v3';
 import $ from 'jquery';
+import { I18nextManager } from 'visyn_core/i18n';
 import { PHOVEA_UI_FormDialog } from '../../components';
-import { I18nextManager } from '../../i18n';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
 import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
 import { NotificationHandler } from '../../base/NotificationHandler';

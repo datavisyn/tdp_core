@@ -86,7 +86,7 @@ export declare abstract class ARankingView extends AView {
      * return the idType of the shown items in LineUp
      * @returns {IDType}
      */
-    get itemIDType(): import("../idtype").IDType;
+    get itemIDType(): import("visyn_core/idtype").IDType;
     /**
      * The parameter of this (ranking) view has changed and this ranking needs to adapt to the change.
      * For example, depending on the set `selectionAdapter` additional dynamic columns can be added or

@@ -1,6 +1,6 @@
 import * as React from 'react';
+import { useAsync } from 'visyn_core/hooks';
 import { IInstanceViewExtensionDesc, IInstanceViewExtension, IInstantView, ISelection } from '../base';
-import { useAsync } from '../hooks';
 import { ViewUtils } from '../views';
 
 const loadInstantView = (view: IInstanceViewExtensionDesc, selection: ISelection) =>

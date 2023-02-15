@@ -1,4 +1,4 @@
-import { IDType } from '../idtype';
+import { IDType } from 'visyn_core/idtype';
 import { ISecureItem } from '../security';
 import { IStoredNamedSet } from './interfaces';
 export declare class RestStorageUtils {

@@ -57,7 +57,7 @@ export interface IPlugin {
      */
     factory(...args: any[]): any;
 }
-export declare type IRegistry = {
+export type IRegistry = {
     push: PluginRegistry['push'];
     pushVisynView: PluginRegistry['pushVisynView'];
 };

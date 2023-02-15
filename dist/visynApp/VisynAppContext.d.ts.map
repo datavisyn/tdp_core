@@ -1,1 +1,0 @@
-{"version":3,"file":"VisynAppContext.d.ts","sourceRoot":"","sources":["../../src/visynApp/VisynAppContext.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAK,KAAK,MAAM,OAAO,CAAC;AAC/B,OAAO,KAAK,EAAE,gBAAgB,EAAE,MAAM,sBAAsB,CAAC;AAC7D,OAAO,KAAK,EAAE,KAAK,EAAE,MAAM,aAAa,CAAC;AAEzC,eAAO,MAAM,eAAe;UACpB,KAAK,GAAG,IAAI;aACT,WAAW,GAAG,MAAM;kBACf,gBAAgB;EACxB,CAAC;AAET,wBAAgB,kBAAkB;;;;EAMjC"}

@@ -3,7 +3,7 @@ import { ProvenanceGraph } from './ProvenanceGraph';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { LocalStorageGraph } from '../graph/LocalStorageGraph';
 import { UserSession } from '../../app/UserSession';
-import { Permission } from '../../security/Permission';
+import { Permission } from '../../security';
 import { MemoryGraph } from '../graph/MemoryGraph';
 export class LocalStorageProvenanceGraphManager {
     constructor(options = {}) {

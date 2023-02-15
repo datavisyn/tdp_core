@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
+import { I18nextManager } from 'visyn_core/i18n';
 import { EventHandler, GlobalEventHandler } from '../../base/event';
 import { AppContext } from '../../app';
-import { I18nextManager } from '../../i18n';
 /**
  * normalizes the given coordinates to sum up to one
  * @param arr

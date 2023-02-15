@@ -1,6 +1,7 @@
 // TODO: Do we need a relative import?
 import './webpack/_bootstrap';
 import { merge } from 'lodash';
+import { I18nextManager } from 'visyn_core/i18n';
 import { AppHeaderLink, AppHeader } from './components';
 import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
 import { DialogUtils } from './clue/base/dialogs';
@@ -11,7 +12,6 @@ import { TDPTokenManager } from './auth';
 import { ACLUEWrapper } from './clue/wrapper';
 import { LoginMenu, loadClientConfig } from './base';
 import { UserSession, PluginRegistry } from './app';
-import { I18nextManager } from './i18n';
 import { MixedStorageProvenanceGraphManager } from './clue/provenance';
 import { VisLoader } from './clue/provvis';
 /**

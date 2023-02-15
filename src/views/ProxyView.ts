@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
-import { IDTypeManager } from '../idtype';
-import { I18nextManager } from '../i18n';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
 import { IViewContext, ISelection } from '../base/interfaces';
 import { FormElementType } from '../form/interfaces';
 import { IFormSelectElement, IFormSelectOption } from '../form/elements/FormSelect';

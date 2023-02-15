@@ -9,9 +9,9 @@
  *
  ******************************************************** */
 import { ReactElement } from 'react';
+import { IDTypeLike } from 'visyn_core/idtype';
 import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
-import { IDTypeLike } from '../idtype';
 /**
  * definition how to select elements within the react view
  */
@@ -41,7 +41,7 @@ export declare abstract class AReactView extends AView {
         generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
     }) => Promise<unknown>)>;
     private selectImpl;
-    get itemIDType(): import("../idtype").IDType;
+    get itemIDType(): import("visyn_core/idtype").IDType;
     /**
      * return the IDType of contained items needed for the selection
      * @returns {IDTypeLike}

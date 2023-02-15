@@ -1,8 +1,8 @@
 /// <reference types="jest" />
 import { buildCategoricalColumn, CategoricalColumn, Column } from 'lineupjs';
 import { difference } from 'lodash';
+import { IDTypeManager } from 'visyn_core/idtype';
 import { IAdditionalColumnDesc } from '../../../src/base';
-import { IDTypeManager } from '../../../src/idtype';
 import { AdapterUtils, IContext, ISelectionColumn } from '../../../src/lineup';
 
 describe('SingleSelectionAdapter', () => {

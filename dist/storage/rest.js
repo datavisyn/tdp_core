@@ -1,7 +1,7 @@
+import { IDTypeManager } from 'visyn_core/idtype';
 import { AppContext, UserSession } from '../app';
 import { Ajax } from '../base';
 import { RestBaseUtils } from '../base/rest';
-import { IDTypeManager } from '../idtype';
 import { Permission } from '../security';
 import { ENamedSetType } from './interfaces';
 export class RestStorageUtils {

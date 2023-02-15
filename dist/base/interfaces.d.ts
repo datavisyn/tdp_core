@@ -1,7 +1,7 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
+import { IDType } from 'visyn_core/idtype';
 import type { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
-import { IDType } from '../idtype/IDType';
 import type { IUser } from '../security';
 import type { IPlugin, IPluginDesc } from './plugin';
 import type { IEventHandler } from './event';

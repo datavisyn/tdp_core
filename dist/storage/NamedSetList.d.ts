@@ -1,5 +1,5 @@
+import { IDType } from 'visyn_core/idtype';
 import { INamedSet } from './interfaces';
-import { IDType } from '../idtype';
 export declare class NamedSetList {
     private readonly idType;
     private readonly sessionCreator;

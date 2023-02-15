@@ -3,6 +3,8 @@ import * as d3v3 from 'd3v3';
 import marked from 'marked';
 import * as $ from 'jquery';
 import { merge } from 'lodash';
+import { SelectionUtils, SelectOperation } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
 import { Renderer } from '../base/annotation';
 import { ModeWrapper } from '../base/mode';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
@@ -12,10 +14,8 @@ import textPNG from '../../assets/text.png';
 import { Dialog } from '../../components';
 import { SlideNode } from '../provenance';
 import { AVisInstance } from './visInstance';
-import { SelectionUtils, SelectOperation } from '../../idtype';
 import { ArrayUtils, BaseUtils } from '../../base';
 import { AppContext, DnDUtils } from '../../app';
-import { I18nextManager } from '../../i18n';
 export class VerticalStoryVis extends AVisInstance {
     constructor(data, parent, options = {}) {
         super();

@@ -1,5 +1,5 @@
+import { I18nextManager } from 'visyn_core/i18n';
 import { BaseUtils } from '../base';
-import { I18nextManager } from '../i18n';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { AView } from './AView';
 import { XlsxUtils } from '../utils/XlsxUtils';

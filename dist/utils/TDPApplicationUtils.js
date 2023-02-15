@@ -1,6 +1,6 @@
+import { I18nextManager } from 'visyn_core/i18n';
 import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../clue/provenance';
 import { BaseUtils } from '../base';
-import { I18nextManager } from '../i18n';
 import { Compression } from '../clue/base/Compression';
 import { EPermission, Permission, UserUtils } from '../security';
 import { UserSession } from '../app';

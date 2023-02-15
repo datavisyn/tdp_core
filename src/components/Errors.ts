@@ -1,5 +1,5 @@
+import { I18nextManager } from 'visyn_core/i18n';
 import { Ajax, isAjaxError } from '../base/ajax';
-import { I18nextManager } from '../i18n';
 import { Dialog } from './dialogs';
 
 let globalErrorTemplate = (details: string) => details;
@@ -31,7 +31,7 @@ export class Errors {
    */
   static showErrorModalDialog(error: any, additionalCSSClasses = '') {
     function commonDialog(title: string, body: string) {
-      return import('./dialogs').then(
+      return import('./dialogs.js').then(
         () =>
           ({ generateDialog }: { generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): Dialog }) =>
             new Promise((resolve, reject) => {

@@ -1,7 +1,7 @@
 import { merge, uniqueId } from 'lodash';
+import { I18nextManager } from 'visyn_core/i18n';
 import { UserSession } from '../../app';
 import { PHOVEA_UI_FormDialog } from '../../components';
-import { I18nextManager } from '../../i18n';
 import { EEntity } from '../../security';
 import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
 export class ProvenanceGraphMenuUtils {

@@ -1,4 +1,4 @@
-import { I18nextManager } from '../../i18n';
+import { I18nextManager } from 'visyn_core/i18n';
 import { ISimplePopupAuthorizationConfiguration } from '../interfaces';
 
 export async function simplePopupFlow({ id, url, tokenParameter }: ISimplePopupAuthorizationConfiguration): Promise<string> {

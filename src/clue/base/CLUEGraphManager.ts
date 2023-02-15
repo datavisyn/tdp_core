@@ -1,6 +1,6 @@
+import { I18nextManager } from 'visyn_core/i18n';
 import { EventHandler } from '../../base/event';
 import { UserSession } from '../../app';
-import { I18nextManager } from '../../i18n';
 import { IProvenanceGraphDataDescription, IProvenanceGraphDump, ProvenanceGraph } from '../provenance';
 import type { MixedStorageProvenanceGraphManager } from '../provenance/MixedStorageProvenanceGraphManager';
 import { CommonPropertyHandler, HashPropertyHandler, QueryPropertyHandler } from '../../base/url';

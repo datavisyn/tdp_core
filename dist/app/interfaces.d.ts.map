@@ -1,1 +1,1 @@
-{"version":3,"file":"interfaces.d.ts","sourceRoot":"","sources":["../../src/app/interfaces.ts"],"names":[],"mappings":"AAAA;;GAEG;AACH,MAAM,WAAW,cAAc;IAC7B;;OAEG;IACH,GAAG,EAAE,MAAM,CAAC;IACZ;;OAEG;IACH,kBAAkB,CAAC,EAAE;QACnB;;WAEG;QACH,QAAQ,CAAC,EAAE,MAAM,CAAC;KACnB,CAAC;CACH"}
+{"version":3,"file":"interfaces.d.ts","sourceRoot":"","sources":["../../src/app/interfaces.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,cAAc,EAAE,MAAM,qBAAqB,CAAC"}

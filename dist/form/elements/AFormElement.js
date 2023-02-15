@@ -38,7 +38,7 @@ export class AFormElement extends EventHandler {
         return UserSession.getInstance().retrieve(`${this.id}_value`, defaultValue);
     }
     hasStoredValue() {
-        return UserSession.getInstance().has(`${this.id}_value`);
+        return UserSession.getInstance().retrieve(`${this.id}_value`) != null;
     }
     isRequired() {
         return this.elementDesc.required;

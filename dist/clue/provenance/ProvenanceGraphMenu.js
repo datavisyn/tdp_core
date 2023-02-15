@@ -1,8 +1,8 @@
 import { event as d3event, select, time } from 'd3v3';
 import * as $ from 'jquery';
+import { I18nextManager } from 'visyn_core/i18n';
 import { Dialog, PHOVEA_UI_FormDialog } from '../../components';
 import { UserSession } from '../../app/UserSession';
-import { I18nextManager } from '../../i18n';
 export class ProvenanceGraphMenu {
     constructor(manager, parent, appendChild = true) {
         this.manager = manager;

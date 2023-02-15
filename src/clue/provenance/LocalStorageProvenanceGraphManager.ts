@@ -6,7 +6,7 @@ import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { GraphBase } from '../graph/GraphBase';
 import { LocalStorageGraph } from '../graph/LocalStorageGraph';
 import { UserSession } from '../../app/UserSession';
-import { Permission } from '../../security/Permission';
+import { Permission } from '../../security';
 import { MemoryGraph } from '../graph/MemoryGraph';
 
 export interface ILocalStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {

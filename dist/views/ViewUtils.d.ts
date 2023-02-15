@@ -1,7 +1,6 @@
+import { IDType } from 'visyn_core/idtype';
 import type { IViewContext, ISelection, IViewPluginDesc, IInstanceViewExtensionDesc, IBaseViewPluginDesc, IGroupData } from '../base/interfaces';
 import type { IObjectRef, ProvenanceGraph } from '../clue/provenance';
-import type { VisynViewPluginDesc } from './visyn/interfaces';
-import { IDType } from '../idtype';
 import { IPluginDesc } from '../base/plugin';
 export interface IGroupedViews<T extends IBaseViewPluginDesc> extends IGroupData {
     views: T[];
@@ -16,7 +15,7 @@ export declare class ViewUtils {
     static readonly VIEW_EVENT_UPDATE_ENTRY_POINT = "update_entry_point";
     static readonly VIEW_EVENT_LOADING_FINISHED = "loadingFinished";
     static readonly VIEW_EVENT_UPDATE_SHARED = "updateShared";
-    static toViewPluginDesc<ReturnType extends IViewPluginDesc | VisynViewPluginDesc = IViewPluginDesc>(p: IPluginDesc): ReturnType;
+    static toViewPluginDesc<ReturnType extends IViewPluginDesc = IViewPluginDesc>(p: IPluginDesc): ReturnType;
     static matchLength(s: any, length: number): boolean;
     /**
      * whether the view should be used as small multiple in case of multiple selections
@@ -48,7 +47,6 @@ export declare class ViewUtils {
     static findAllViews(idType?: IDType): Promise<(IViewPluginDesc & {
         enabled: boolean;
     })[]>;
-    static findVisynViews(idType?: IDType): Promise<VisynViewPluginDesc[]>;
     private static findViewBase;
     static canAccess(p: any): any;
     static findInstantViews(idType: IDType): Promise<IInstanceViewExtensionDesc[]>;

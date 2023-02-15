@@ -1,7 +1,7 @@
 import { SearchBox } from 'lineupjs';
 import { ISearchOption } from './ISearchOption';
 import { IPanelButton, IPanelButtonOptions } from './PanelButton';
-export declare type IPanelAddColumnButtonOptions = Pick<IPanelButtonOptions, 'btnClass'>;
+export type IPanelAddColumnButtonOptions = Pick<IPanelButtonOptions, 'btnClass'>;
 /**
  * Div HTMLElement that contains a button and a SearchBox.
  * The SearchBox is hidden by default and can be toggled by the button.

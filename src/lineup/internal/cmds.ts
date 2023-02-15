@@ -17,8 +17,8 @@ import {
   IGroup,
 } from 'lineupjs';
 import { isEqual } from 'lodash';
+import { I18nextManager } from 'visyn_core/i18n';
 import { LineUpFilterUtils } from './lineUpFilter';
-import { I18nextManager } from '../../i18n';
 import { IObjectRef, ICmdResult, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode, IAction } from '../../clue/provenance';
 
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings

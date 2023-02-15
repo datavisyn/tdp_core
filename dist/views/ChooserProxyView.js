@@ -1,7 +1,7 @@
+import { I18nextManager } from 'visyn_core/i18n';
 import { AView } from './AView';
 import { RestBaseUtils } from '../base/rest';
 import { SelectionChooser } from './SelectionChooser';
-import { I18nextManager } from '../i18n';
 export class ChooserProxyView extends AView {
     constructor(context, selection, parent, options = {}) {
         super(context, selection, parent);

@@ -3,6 +3,7 @@ import 'select2';
 import { event as d3event } from 'd3v3';
 import $ from 'jquery';
 import * as d3v3 from 'd3v3';
+import { I18nextManager } from 'visyn_core/i18n';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { ISelectOptions, IFormSelectOption, FormSelect } from './FormSelect';
@@ -11,7 +12,6 @@ import type { IFormElement } from '..';
 import { ISelect3Options, Select3, IdTextPair } from './Select3';
 import { UserSession } from '../../app';
 import { IPluginDesc } from '../../base';
-import { I18nextManager } from '../../i18n';
 
 export interface ISubDesc {
   name: string;

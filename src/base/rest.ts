@@ -1,7 +1,7 @@
 import { ICategory } from 'lineupjs';
+import { IDTypeLike } from 'visyn_core/idtype';
 import { Ajax } from './ajax';
 import { AppContext } from '../app';
-import { IDTypeLike } from '../idtype';
 import { IScoreRow } from './interfaces';
 
 /**

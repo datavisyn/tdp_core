@@ -1,6 +1,6 @@
+import { IDTypeLike } from 'visyn_core/idtype';
 import { IFormElement, IFormElementDesc } from '../form/interfaces';
 import { ISelection } from '../base/interfaces';
-import { IDTypeLike } from '../idtype';
 export interface ISelectionChooserOptions {
     /**
      * Readable IDType the selection is being mapped to. If there is a 1:n mapping or in case of different readable and target IDTypes this IDType is used as the options group

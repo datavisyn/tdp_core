@@ -127,6 +127,6 @@ export declare abstract class AGraph extends EventHandler {
     abstract get edges(): GraphEdge[];
     get nedges(): number;
     get dim(): number[];
-    get idtypes(): import("../../idtype").IDType[];
+    get idtypes(): import("visyn_core/idtype").IDType[];
 }
 //# sourceMappingURL=graph.d.ts.map

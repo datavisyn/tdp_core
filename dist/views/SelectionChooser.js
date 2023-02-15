@@ -1,7 +1,7 @@
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
 import { FormElementType } from '../form/interfaces';
-import { IDTypeManager } from '../idtype';
 import { BaseUtils } from '../base';
-import { I18nextManager } from '../i18n';
 /**
  * helper class for chooser logic
  */

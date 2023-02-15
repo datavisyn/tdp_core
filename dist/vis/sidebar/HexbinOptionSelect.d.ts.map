@@ -1,1 +1,0 @@
-{"version":3,"file":"HexbinOptionSelect.d.ts","sourceRoot":"","sources":["../../../src/vis/sidebar/HexbinOptionSelect.tsx"],"names":[],"mappings":";AAGA,OAAO,EAAE,cAAc,EAAE,MAAM,eAAe,CAAC;AAE/C,UAAU,uBAAuB;IAC/B,QAAQ,EAAE,CAAC,CAAC,EAAE,cAAc,KAAK,IAAI,CAAC;IACtC,eAAe,EAAE,cAAc,CAAC;CACjC;AAED,wBAAgB,kBAAkB,CAAC,EAAE,QAAQ,EAAE,eAAe,EAAE,EAAE,uBAAuB,eAcxF"}

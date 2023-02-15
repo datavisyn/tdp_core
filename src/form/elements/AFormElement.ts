@@ -52,7 +52,7 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
   }
 
   protected hasStoredValue(): boolean {
-    return UserSession.getInstance().has(`${this.id}_value`);
+    return UserSession.getInstance().retrieve(`${this.id}_value`) != null;
   }
 
   isRequired() {

@@ -1,7 +1,7 @@
 import { merge } from 'lodash';
+import { SelectOperation, SelectionUtils, IDTypeManager } from 'visyn_core/idtype';
 import { BaseUtils } from '../../base/BaseUtils';
 import { AppContext } from '../../app/AppContext';
-import { SelectOperation, SelectionUtils, IDTypeManager } from '../../idtype';
 import { ADataType } from '../../data/datatype';
 import { ObjectNode, ObjectRefUtils } from './ObjectNode';
 import { StateNode } from './StateNode';

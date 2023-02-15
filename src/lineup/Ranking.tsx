@@ -25,6 +25,10 @@ import {
 } from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
+import { LineupVisWrapper } from 'visyn_core/vis';
+import { IDTypeManager, IDType, SelectionUtils } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { useAsync } from 'visyn_core/hooks';
 import { ILazyLoadedColumn, LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
@@ -37,25 +41,19 @@ import { ISearchOption } from './panel/ISearchOption';
 import { IARankingViewOptions } from './IARankingViewOptions';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils } from '../base/BaseUtils';
-import { IDTypeManager } from '../idtype/IDTypeManager';
 import { AView } from '../views/AView';
 import { InvalidTokenError, TDPTokenManager } from '../auth/TokenManager';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
-import { I18nextManager } from '../i18n/I18nextManager';
-import { IDType } from '../idtype/IDType';
 import { RestStorageUtils } from '../storage/rest';
 import { NotificationHandler } from '../base/NotificationHandler';
-import { ISecureItem } from '../security/ISecureItem';
+import { ISecureItem } from '../security';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
 import { PluginRegistry } from '../app/PluginRegistry';
 import { ViewUtils } from '../views/ViewUtils';
-import { SelectionUtils } from '../idtype/SelectionUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
-import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { WebpackEnv } from '../base';
-import { LineupVisWrapper } from '../vis/LineupVisWrapper';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;

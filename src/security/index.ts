@@ -1,4 +1,2 @@
-export * from './ISecureItem';
-export * from './IUser';
-export * from './IUserStore';
-export * from './Permission';
+// Reexport everything from visyn_core for compatibility reasons.
+export { ISecureItem, ILogoutOptions, EEntity, EPermission, IUser, IUserStore, UserUtils, Permission } from 'visyn_core/security';

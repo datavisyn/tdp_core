@@ -1,6 +1,6 @@
+import { I18nextManager } from 'visyn_core/i18n';
 import { PHOVEA_UI_FormDialog } from '../components';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
-import { I18nextManager } from '../i18n';
 export class StoreUtils {
     static editDialog(namedSet, entitiesTitle, result) {
         const isCreate = namedSet === null;

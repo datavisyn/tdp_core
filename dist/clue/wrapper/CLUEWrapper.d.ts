@@ -56,8 +56,8 @@ export declare class CLUEWrapper extends ACLUEWrapper {
     protected buildImpl(body: HTMLElement): {
         graph: Promise<ProvenanceGraph>;
         manager: CLUEGraphManager;
-        storyVis: () => Promise<import("..").VerticalStoryVis>;
-        provVis: () => Promise<import("..").LayoutedProvVis>;
+        storyVis: () => Promise<import("../index").VerticalStoryVis>;
+        provVis: () => Promise<import("../index").LayoutedProvVis>;
     };
     reset(): void;
     /**

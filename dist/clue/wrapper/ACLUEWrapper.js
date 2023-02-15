@@ -1,9 +1,9 @@
+import { I18nextManager } from 'visyn_core/i18n';
 import { ModeWrapper } from '../base';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { WrapperUtils } from '../base/WrapperUtils';
 import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH } from '../../base/extensions';
 import { EventHandler } from '../../base';
-import { I18nextManager } from '../../i18n';
 import { PluginRegistry } from '../../app';
 const getTemplate = () => `<div class="box">
   <div class="content">

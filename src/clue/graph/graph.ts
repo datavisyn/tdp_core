@@ -1,4 +1,4 @@
-import { IDTypeManager } from '../../idtype';
+import { IDTypeManager } from 'visyn_core/idtype';
 import { UniqueIdManager } from '../../app/UniqueIdManager';
 import { IPersistable } from '../../base/IPersistable';
 import { EventHandler } from '../../base/event';

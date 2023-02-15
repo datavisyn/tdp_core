@@ -1,4 +1,5 @@
 import { isEqual } from 'lodash';
+import { IDType, IDTypeManager } from 'visyn_core/idtype';
 import {
   EXTENSION_POINT_TDP_VIEW,
   EXTENSION_POINT_VISYN_VIEW,
@@ -16,8 +17,6 @@ import type {
   IGroupData,
 } from '../base/interfaces';
 import type { IObjectRef, ProvenanceGraph } from '../clue/provenance';
-import type { VisynViewPluginDesc } from './visyn/interfaces';
-import { IDType, IDTypeManager } from '../idtype';
 import { PluginRegistry } from '../app/PluginRegistry';
 import { UserSession } from '../app/UserSession';
 import { IPluginDesc } from '../base/plugin';
@@ -40,7 +39,7 @@ export class ViewUtils {
 
   public static readonly VIEW_EVENT_UPDATE_SHARED = 'updateShared';
 
-  static toViewPluginDesc<ReturnType extends IViewPluginDesc | VisynViewPluginDesc = IViewPluginDesc>(p: IPluginDesc): ReturnType {
+  static toViewPluginDesc<ReturnType extends IViewPluginDesc = IViewPluginDesc>(p: IPluginDesc): ReturnType {
     const r: any = p;
     r.selection = r.selection || 'none';
     r.group = { name: 'Other', order: 99, ...r.group };
@@ -171,23 +170,6 @@ export class ViewUtils {
     return ViewUtils.findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_TDP_VIEW), true).then((r) => {
       return r
         .map(ViewUtils.toViewPluginDesc)
-        .map((v) => {
-          const access = ViewUtils.canAccess(v);
-          const hasAccessHint = !access && Boolean(v.securityNotAllowedText);
-          return {
-            ...v,
-            enabled: access,
-            disabledReason: !access ? (hasAccessHint ? <const>'security' : <const>'invalid') : undefined,
-          };
-        })
-        .filter((v) => v.disabledReason !== 'invalid');
-    });
-  }
-
-  static findVisynViews(idType?: IDType): Promise<VisynViewPluginDesc[]> {
-    return ViewUtils.findViewBase(idType || null, PluginRegistry.getInstance().listPlugins(EXTENSION_POINT_VISYN_VIEW), true).then((r) => {
-      return r
-        .map((v) => ViewUtils.toViewPluginDesc<VisynViewPluginDesc>(v))
         .map((v) => {
           const access = ViewUtils.canAccess(v);
           const hasAccessHint = !access && Boolean(v.securityNotAllowedText);

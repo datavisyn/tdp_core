@@ -1,4 +1,6 @@
 import { createStackDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc, } from 'lineupjs';
+import { I18nextManager } from 'visyn_core/i18n';
+import { IDTypeManager } from 'visyn_core/idtype';
 import { EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON, EP_TDP_CORE_LINEUP_PANEL_TAB, } from '../../base/extensions';
 import { PanelButton } from '../panel/PanelButton';
 import { PanelTabContainer, NullTabContainer } from '../panel/PanelTabContainer';
@@ -16,8 +18,6 @@ import { PanelSaveNamedSetButton } from '../panel/PanelSaveNamedSetButton';
 import { LineUpOrderedRowIndicies } from '../panel/LineUpOrderedRowIndicies';
 import { PluginRegistry } from '../../app';
 import { EventHandler } from '../../base';
-import { I18nextManager } from '../../i18n';
-import { IDTypeManager } from '../../idtype';
 export function findMappablePlugins(target, all) {
     if (!target) {
         return [];

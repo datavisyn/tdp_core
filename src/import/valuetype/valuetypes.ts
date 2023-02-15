@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { I18nextManager } from '../../i18n';
+import { I18nextManager } from 'visyn_core/i18n';
 import { Dialog } from '../../components';
 import { IPlugin } from '../../base';
 import { PluginRegistry } from '../../app';

@@ -1,10 +1,10 @@
 import * as d3v3 from 'd3v3';
 import marked from 'marked';
 import { merge } from 'lodash';
+import { I18nextManager } from 'visyn_core/i18n';
+import { SelectionUtils } from 'visyn_core/idtype';
 import { ModeWrapper } from './mode';
 import { AppContext } from '../../app';
-import { I18nextManager } from '../../i18n';
-import { SelectionUtils } from '../../idtype';
 import { SlideNode, ProvenanceGraph, IStateAnnotation, IFrameStateAnnotation, ITextStateAnnotation, IArrowStateAnnotation } from '../provenance';
 import { BaseUtils } from '../../base/BaseUtils';
 import { StoryTransition } from './Player';

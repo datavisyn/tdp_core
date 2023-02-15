@@ -1,18 +1,2 @@
-/**
- * Options of a logout action.
- */
-export interface ILogoutOptions {
-  /**
-   * Logout message.
-   */
-  msg: string;
-  /**
-   * Optional payload of the alb_security_store.
-   */
-  alb_security_store?: {
-    /**
-     * Redirect URL for the client to actually logout.
-     */
-    redirect?: string;
-  };
-}
+// Reexport everything from visyn_core for compatibility reasons.
+export { ILogoutOptions } from 'visyn_core/security';

@@ -1,5 +1,5 @@
 import { ICategory } from 'lineupjs';
-import { IDTypeLike } from '../idtype';
+import { IDTypeLike } from 'visyn_core/idtype';
 import { IScoreRow } from './interfaces';
 /**
  * common interface for a row as used in LineUp

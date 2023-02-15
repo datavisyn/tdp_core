@@ -1,3 +1,5 @@
+import { IDType, IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
 import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewContext, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
@@ -6,8 +8,6 @@ import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
 import { EventHandler, IEvent, IEventListener, IBaseViewPluginDesc } from '../base';
 import { NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph } from '../clue/provenance';
-import { I18nextManager } from '../i18n';
-import { IDType, IDTypeManager } from '../idtype';
 import { Dialog } from '../components';
 
 export class ViewWrapper extends EventHandler implements IViewProvider {

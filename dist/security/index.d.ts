@@ -1,5 +1,2 @@
-export * from './ISecureItem';
-export * from './IUser';
-export * from './IUserStore';
-export * from './Permission';
+export { ISecureItem, ILogoutOptions, EEntity, EPermission, IUser, IUserStore, UserUtils, Permission } from 'visyn_core/security';
 //# sourceMappingURL=index.d.ts.map

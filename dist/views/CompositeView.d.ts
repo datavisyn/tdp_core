@@ -1,4 +1,4 @@
-import { IDType } from '../idtype';
+import { IDType } from 'visyn_core/idtype';
 import { EventHandler } from '../base';
 import { ISelection, IView, IViewContext, IViewPluginDesc, EViewMode } from '../base/interfaces';
 interface IElementDesc {

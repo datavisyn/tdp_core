@@ -1,12 +1,12 @@
 import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
+import { SelectionUtils, SelectOperation } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { ActionMetaData, ActionNode, ProvenanceGraph, SlideNode, StateNode } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
-import { SelectionUtils, SelectOperation } from '../../idtype';
 import { AppContext, DnDUtils } from '../../app';
-import { I18nextManager } from '../../i18n';
 import { Dialog } from '../../components/dialogs';
 import { ModeWrapper } from '../base/mode';
 

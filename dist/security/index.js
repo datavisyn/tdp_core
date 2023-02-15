@@ -1,5 +1,3 @@
-export * from './ISecureItem';
-export * from './IUser';
-export * from './IUserStore';
-export * from './Permission';
+// Reexport everything from visyn_core for compatibility reasons.
+export { EEntity, EPermission, UserUtils, Permission } from 'visyn_core/security';
 //# sourceMappingURL=index.js.map

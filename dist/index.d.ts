@@ -10,17 +10,12 @@ export * from './hooks';
 export * from './i18n';
 export * from './idtype';
 export * from './import';
-export * from './initialize';
 export * from './layout';
 export * from './lineup';
-export * from './plotly';
 export * from './public';
-export * from './security';
 export * from './storage';
 export * from './tour';
 export * from './utils';
 export * from './views';
-export * from './vis';
-export * from './visynApp';
 export * from './wrapper';
 //# sourceMappingURL=index.d.ts.map

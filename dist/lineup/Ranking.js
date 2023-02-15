@@ -4,6 +4,10 @@
 import { LocalDataProvider, EngineRenderer, TaggleRenderer, Column, defaultOptions, isGroup, spaceFillingRule, updateLodRules, toolbar, dialogContext, } from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
+import { LineupVisWrapper } from 'visyn_core/vis';
+import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { useAsync } from 'visyn_core/hooks';
 import { LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
@@ -12,23 +16,18 @@ import { AttachemntUtils } from '../storage/internal/internal';
 import { EViewMode } from '../base/interfaces';
 import { ColumnDescUtils, LineupUtils } from '.';
 import { BaseUtils } from '../base/BaseUtils';
-import { IDTypeManager } from '../idtype/IDTypeManager';
 import { AView } from '../views/AView';
 import { InvalidTokenError, TDPTokenManager } from '../auth/TokenManager';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
-import { I18nextManager } from '../i18n/I18nextManager';
 import { RestStorageUtils } from '../storage/rest';
 import { NotificationHandler } from '../base/NotificationHandler';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
 import { PluginRegistry } from '../app/PluginRegistry';
 import { ViewUtils } from '../views/ViewUtils';
-import { SelectionUtils } from '../idtype/SelectionUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
-import { useAsync } from '../hooks/useAsync';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { WebpackEnv } from '../base';
-import { LineupVisWrapper } from '../vis/LineupVisWrapper';
 const defaults = {
     itemName: 'item',
     itemNamePlural: 'items',

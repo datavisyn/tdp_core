@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useAsync } from '../hooks';
+import { useAsync } from 'visyn_core/hooks';
 import { ViewUtils } from '../views';
 const loadInstantView = (view, selection) => view.load().then((r) => r.factory(selection, { document }));
 /**

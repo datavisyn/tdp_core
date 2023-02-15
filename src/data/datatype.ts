@@ -1,8 +1,8 @@
 /**
  * This file defines interfaces for various data types and their metadata.
  */
+import { IDType } from 'visyn_core/idtype';
 import { IPersistable } from '../base/IPersistable';
-import { IDType } from '../idtype/IDType';
 import { IDataDescription } from './DataDescription';
 import { EventHandler } from '../base/event';
 /**
