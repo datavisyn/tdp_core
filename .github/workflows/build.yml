@@ -19,6 +19,7 @@ jobs:
       cypress_run_because_flag: ${{ inputs.cypress == true }}
   chromatic: 
     needs: build
+    runs-on: ubuntu-20.04
     steps:
       - run: yarn run chromatic
 
