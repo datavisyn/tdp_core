@@ -1,11 +1,18 @@
 # .github/workflows/chromatic.yml
 
-# Other configuration required
+# Workflow name
+name: 'Chromatic'
 
+# Event for the workflow
+on: push
+
+# List of jobs
 jobs:
   chromatic-deployment:
+    # Operating System
+    runs-on: ubuntu-latest
+    # Job steps
     steps:
-        # 👇 Version 2 of the action
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
@@ -16,7 +23,7 @@ jobs:
         # 👇 Adds Chromatic as a step in the workflow
       - name: Publish to Chromatic
         uses: chromaui/action@v1
-        # Options required to the GitHub Chromatic Action
+        # Chromatic GitHub Action options
         with:
           # 👇 Chromatic projectToken, refer to the manage page to obtain it.
           projectToken: 66a533f812b7
