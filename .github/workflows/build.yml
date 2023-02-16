@@ -12,18 +12,11 @@ on:
   push:
 
 jobs:
-  # build:
-  #   uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@new_deployment
-  #   secrets: inherit
-  #   with:
-  #     cypress_enable: true
-  #     cypress_run_because_flag: ${{ inputs.cypress == true }}
-  chromatic: 
-    runs-on: ubuntu-20.04
-    steps:
-      - run: | 
-          ls
-          cd ..
-          yarn run chromatic
+  build:
+    uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@new_deployment
+    secrets: inherit
+    with:
+      cypress_enable: true
+      cypress_run_because_flag: ${{ inputs.cypress == true }}
 
 
