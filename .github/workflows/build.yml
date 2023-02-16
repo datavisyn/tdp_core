@@ -8,6 +8,7 @@ on:
         required: false
         type: boolean
         default: false
+      chromatic: 
   push:
 
 jobs:
@@ -21,6 +22,8 @@ jobs:
     needs: build
     runs-on: ubuntu-20.04
     steps:
-      - run: yarn run chromatic
+      - run: | 
+        cd ..
+        yarn run chromatic
 
 
