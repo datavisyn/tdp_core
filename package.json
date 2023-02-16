@@ -116,6 +116,7 @@
     "@storybook/manager-webpack5": "^6.5.16",
     "@storybook/preset-scss": "^1.0.3",
     "@storybook/react": "^6.5.16",
+    "@storybook/cli": "6.5.16",
     "@storybook/testing-library": "0.0.13",
     "cypress": "^11.2.0",
     "chromatic": "^6.15.0",
