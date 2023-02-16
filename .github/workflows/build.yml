@@ -22,11 +22,11 @@ jobs:
     needs: build
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v3
-    - name: Run chromatic
-    - run: | 
-        ls
-        cd tdp_core
-        npm run chromatic
+      - uses: actions/checkout@v3
+      - name: Run chromatic
+      - run: | 
+          ls
+          cd tdp_core
+          npm run chromatic
 
 
