@@ -11,7 +11,7 @@ import {
   EScatterSelectSettings,
   IVisConfig,
 } from '..';
-import { fetchIrisData } from '../vis/stories/Iris.stories';
+import { fetchIrisData } from '../vis/stories/fetchIrisData';
 
 const irisData = fetchIrisData();
 

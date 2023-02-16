@@ -51,7 +51,8 @@
     "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
     "test": "visyn_scripts test",
     "webpack:dev": "visyn_scripts build --mode development --env workspace_mode=single",
-    "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
+    "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single",
+    "chromatic": "npx chromatic --project-token=4d4e8c3ece4d --build-script-name=storybook:build"
   },
   "dependencies": {
     "@emotion/react": "^11.0.0",
@@ -76,6 +77,7 @@
     "@types/react-plotly.js": "^2.5.0",
     "@types/select2": "4.0.44",
     "bootstrap": "~5.1.0",
+    "chromatic": "^6.15.0",
     "core-js": "2.6.5",
     "crypto-js": "^4.0.0",
     "d3-hexbin": "^0.2.2",
