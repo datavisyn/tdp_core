@@ -18,15 +18,6 @@ jobs:
     with:
       cypress_enable: true
       cypress_run_because_flag: ${{ inputs.cypress == true }}
-  chromatic: 
-    needs: build
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run chromatic
-        run: | 
-          ls
-          cd tdp_core
-          npm run chromatic
+
 
 
