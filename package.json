@@ -52,7 +52,7 @@
     "test": "visyn_scripts test",
     "webpack:dev": "visyn_scripts build --mode development --env workspace_mode=single",
     "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single",
-    "chromatic": "npx chromatic --project-token=4d4e8c3ece4d --build-script-name=storybook:build"
+    "chromatic": "npx chromatic --project-token=66a533f812b7 --build-script-name=storybook:build"
   },
   "dependencies": {
     "@emotion/react": "^11.0.0",
