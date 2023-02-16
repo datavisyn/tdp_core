@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Vis } from '../LazyVis';
+import { Vis } from '../../../LazyVis';
 import {
   EAggregateTypes,
   EBarDirection,
@@ -12,10 +12,10 @@ import {
   ESupportedPlotlyVis,
   EViolinOverlay,
   VisColumn,
-} from '../interfaces';
+} from '../../../interfaces';
 
 function fetchIrisData(): VisColumn[] {
-  const dataPromise = import('./irisData').then((m) => m.iris);
+  const dataPromise = import('../../irisData').then((m) => m.iris);
 
   return [
     {
@@ -68,7 +68,7 @@ function fetchIrisData(): VisColumn[] {
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
-  title: 'Vis/IrisData',
+  title: 'Vis/Scatter',
   component: Vis,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
 } as ComponentMeta<typeof Vis>;
@@ -88,8 +88,32 @@ const Template: ComponentStory<typeof Vis> = (args) => {
 
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 
-export const ScatterPlot = Template.bind({}) as typeof Template;
-ScatterPlot.args = {
+export const Basic = Template.bind({}) as typeof Template;
+Basic.args = {
+  externalConfig: {
+    type: ESupportedPlotlyVis.SCATTER,
+    numColumnsSelected: [
+      {
+        description: '',
+        id: 'sepalLength',
+        name: 'Sepal Length',
+      },
+      {
+        description: '',
+        id: 'sepalWidth',
+        name: 'Sepal Width',
+      },
+    ],
+    color: null,
+    numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+    shape: null,
+    dragMode: EScatterSelectSettings.RECTANGLE,
+    alphaSliderVal: 1,
+  },
+};
+
+export const ColorByCategory = Template.bind({}) as typeof Template;
+ColorByCategory.args = {
   externalConfig: {
     type: ESupportedPlotlyVis.SCATTER,
     numColumnsSelected: [
@@ -112,34 +136,14 @@ ScatterPlot.args = {
     numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
     shape: null,
     dragMode: EScatterSelectSettings.RECTANGLE,
-    alphaSliderVal: 1,
+    alphaSliderVal: 0.5,
   },
 };
 
-export const BarChart = Template.bind({}) as typeof Template;
-BarChart.args = {
+export const ColorByNumerical = Template.bind({}) as typeof Template;
+ColorByNumerical.args = {
   externalConfig: {
-    type: ESupportedPlotlyVis.BAR,
-    multiples: null,
-    group: null,
-    direction: EBarDirection.VERTICAL,
-    display: EBarDisplayType.ABSOLUTE,
-    groupType: EBarGroupingType.GROUP,
-    numColumnsSelected: [],
-    catColumnSelected: {
-      description: '',
-      id: 'species',
-      name: 'Species',
-    },
-    aggregateColumn: null,
-    aggregateType: EAggregateTypes.COUNT,
-  },
-};
-
-export const ViolinPlot = Template.bind({}) as typeof Template;
-ViolinPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.VIOLIN,
+    type: ESupportedPlotlyVis.SCATTER,
     numColumnsSelected: [
       {
         description: '',
@@ -152,13 +156,43 @@ ViolinPlot.args = {
         name: 'Sepal Width',
       },
     ],
-    catColumnsSelected: [
+    color: {
+      description: '',
+      id: 'petalLength',
+      name: 'Petal Length',
+    },
+    numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+    shape: null,
+    dragMode: EScatterSelectSettings.RECTANGLE,
+    alphaSliderVal: 0.5,
+  },
+};
+
+export const SmallMultiples = Template.bind({}) as typeof Template;
+SmallMultiples.args = {
+  externalConfig: {
+    type: ESupportedPlotlyVis.SCATTER,
+    numColumnsSelected: [
       {
         description: '',
-        id: 'species',
-        name: 'Species',
+        id: 'sepalLength',
+        name: 'Sepal Length',
+      },
+      {
+        description: '',
+        id: 'sepalWidth',
+        name: 'Sepal Width',
+      },
+      {
+        description: '',
+        id: 'petalLength',
+        name: 'Petal Length',
       },
     ],
-    violinOverlay: EViolinOverlay.NONE,
+    color: null,
+    numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
+    shape: null,
+    dragMode: EScatterSelectSettings.RECTANGLE,
+    alphaSliderVal: 0.5,
   },
 };

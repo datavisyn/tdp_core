@@ -17,3 +17,9 @@ jobs:
     with:
       cypress_enable: true
       cypress_run_because_flag: ${{ inputs.cypress == true }}
+  chromatic: 
+    needs: build
+    steps:
+      - run: yarn run chromatic
+
+

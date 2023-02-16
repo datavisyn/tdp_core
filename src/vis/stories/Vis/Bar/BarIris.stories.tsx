@@ -1,6 +1,6 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Vis } from '../LazyVis';
+import { Vis } from '../../../LazyVis';
 import {
   EAggregateTypes,
   EBarDirection,
@@ -12,10 +12,10 @@ import {
   ESupportedPlotlyVis,
   EViolinOverlay,
   VisColumn,
-} from '../interfaces';
+} from '../../../interfaces';
 
 function fetchIrisData(): VisColumn[] {
-  const dataPromise = import('./irisData').then((m) => m.iris);
+  const dataPromise = import('../../irisData').then((m) => m.iris);
 
   return [
     {
@@ -68,7 +68,7 @@ function fetchIrisData(): VisColumn[] {
 
 // More on default export: https://storybook.js.org/docs/react/writing-stories/introduction#default-export
 export default {
-  title: 'Vis/IrisData',
+  title: 'Vis/Bar',
   component: Vis,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
 } as ComponentMeta<typeof Vis>;
@@ -88,34 +88,6 @@ const Template: ComponentStory<typeof Vis> = (args) => {
 
 // More on args: https://storybook.js.org/docs/react/writing-stories/args
 
-export const ScatterPlot = Template.bind({}) as typeof Template;
-ScatterPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.SCATTER,
-    numColumnsSelected: [
-      {
-        description: '',
-        id: 'sepalLength',
-        name: 'Sepal Length',
-      },
-      {
-        description: '',
-        id: 'sepalWidth',
-        name: 'Sepal Width',
-      },
-    ],
-    color: {
-      description: '',
-      id: 'species',
-      name: 'Species',
-    },
-    numColorScaleType: ENumericalColorScaleType.SEQUENTIAL,
-    shape: null,
-    dragMode: EScatterSelectSettings.RECTANGLE,
-    alphaSliderVal: 1,
-  },
-};
-
 export const BarChart = Template.bind({}) as typeof Template;
 BarChart.args = {
   externalConfig: {
@@ -133,32 +105,5 @@ BarChart.args = {
     },
     aggregateColumn: null,
     aggregateType: EAggregateTypes.COUNT,
-  },
-};
-
-export const ViolinPlot = Template.bind({}) as typeof Template;
-ViolinPlot.args = {
-  externalConfig: {
-    type: ESupportedPlotlyVis.VIOLIN,
-    numColumnsSelected: [
-      {
-        description: '',
-        id: 'sepalLength',
-        name: 'Sepal Length',
-      },
-      {
-        description: '',
-        id: 'sepalWidth',
-        name: 'Sepal Width',
-      },
-    ],
-    catColumnsSelected: [
-      {
-        description: '',
-        id: 'species',
-        name: 'Species',
-      },
-    ],
-    violinOverlay: EViolinOverlay.NONE,
   },
 };

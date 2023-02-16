@@ -82,7 +82,7 @@ function AllButtons() {
 
 // Create default export for this story
 export default {
-  title: 'Example/UI/Buttons',
+  title: 'UI/Buttons',
   component: AllButtons,
   // More on argTypes: https://storybook.js.org/docs/react/api/argtypes
 };
