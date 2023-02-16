@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Run chromatic
-      - run: | 
+        run: | 
           ls
           cd tdp_core
           npm run chromatic
