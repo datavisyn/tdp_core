@@ -77,7 +77,6 @@
     "@types/react-plotly.js": "^2.5.0",
     "@types/select2": "4.0.44",
     "bootstrap": "~5.1.0",
-    "chromatic": "^6.15.0",
     "core-js": "2.6.5",
     "crypto-js": "^4.0.0",
     "d3-hexbin": "^0.2.2",
@@ -119,6 +118,7 @@
     "@storybook/react": "^6.5.16",
     "@storybook/testing-library": "0.0.13",
     "cypress": "^11.2.0",
+    "chromatic": "^6.15.0",
     "storybook-addon-swc": "^1.1.9"
   },
   "overrides": {
