@@ -1,5 +1,5 @@
 import { Placement, PopperOptions } from 'popper.js';
-import type { IPlugin } from '../base';
+import type { IPlugin } from 'visyn_core/plugin';
 import { AppHeader } from '../components/header';
 import type { IViewPluginDesc, IView, ISelection } from '../base/interfaces';
 export interface ITDPTourExtensionDesc {

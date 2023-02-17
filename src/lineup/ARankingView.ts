@@ -22,6 +22,7 @@ import { LineupVisWrapper } from 'visyn_core/vis';
 import { IDTypeManager } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
 import { ISecureItem } from 'visyn_core/security';
+import { WebpackEnv } from 'visyn_core/base';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection, EViewMode, IScore, IScoreRow, IAdditionalColumnDesc } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -43,7 +44,6 @@ import { ISearchOption } from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 import { debounceAsync } from '../base';
-import { WebpackEnv } from '../base/WebpackEnv';
 
 /**
  * base class for views based on LineUp

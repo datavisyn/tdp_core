@@ -3,11 +3,12 @@ import marked from 'marked';
 import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
 import { SelectionUtils } from 'visyn_core/idtype';
+import { AppContext } from 'visyn_core/base';
 import { ModeWrapper } from './mode';
-import { AppContext } from '../../app';
 import { SlideNode, ProvenanceGraph, IStateAnnotation, IFrameStateAnnotation, ITextStateAnnotation, IArrowStateAnnotation } from '../provenance';
 import { BaseUtils } from '../../base/BaseUtils';
 import { StoryTransition } from './Player';
+import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 
 const modeFeatures = {
   isEditable: () => ModeWrapper.getInstance().getMode().authoring > 0.8,
@@ -229,7 +230,7 @@ export class Renderer {
     // and mode change
     ModeWrapper.getInstance().on('modeChanged', this.rerender);
 
-    AppContext.getInstance().onDOMNodeRemoved(<Element>$main.node(), this.destroy.bind(this));
+    onDOMNodeRemoved(<Element>$main.node(), this.destroy.bind(this));
   }
 
   /**

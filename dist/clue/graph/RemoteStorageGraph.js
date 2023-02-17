@@ -1,4 +1,4 @@
-import { AppContext } from '../../app/AppContext';
+import { AppContext } from 'visyn_core/base';
 import { GraphBase } from './GraphBase';
 import { GraphEdge, GraphNode } from './graph';
 export class RemoteStoreGraph extends GraphBase {

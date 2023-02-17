@@ -31,6 +31,7 @@ import { I18nextManager } from 'visyn_core/i18n';
 import { useAsync } from 'visyn_core/hooks';
 import { ISecureItem } from 'visyn_core/security';
 import { PluginRegistry } from 'visyn_core/plugin';
+import { WebpackEnv } from 'visyn_core/base';
 import { ILazyLoadedColumn, LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
@@ -53,7 +54,6 @@ import { ViewUtils } from '../views/ViewUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
-import { WebpackEnv } from '../base';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;

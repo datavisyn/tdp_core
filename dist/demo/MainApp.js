@@ -1,6 +1,8 @@
 import { Menu } from '@mantine/core';
 import * as React from 'react';
-import { Vis, LoginUtils, VisynHeader, VisynApp, useVisynAppContext, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, EColumnTypes, } from 'visyn_core';
+import { useVisynAppContext, VisynApp, VisynHeader } from 'visyn_core/app';
+import { LoginUtils } from 'visyn_core/security';
+import { Vis, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, EColumnTypes } from 'visyn_core/vis';
 export function fetchIrisData() {
     const dataPromise = import('./irisData.js').then((m) => m.iris);
     return [

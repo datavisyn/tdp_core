@@ -1,8 +1,8 @@
 import { merge } from 'lodash';
 import 'select2';
 import $ from 'jquery';
+import { AppContext } from 'visyn_core/base';
 import { AFormElement } from './AFormElement';
-import { AppContext } from '../../app';
 /**
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event

@@ -1,7 +1,8 @@
 import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
 import { EventHandler, GlobalEventHandler, IEvent } from 'visyn_core/base';
-import { AppContext } from '../../app';
+import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
+import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
 
 /**
  * normalizes the given coordinates to sum up to one
@@ -109,7 +110,7 @@ export class CLUEMode {
    * returns the default mode either stored in the hash or by default exploration
    */
   static defaultMode(): CLUEMode {
-    return CLUEMode.fromString(AppContext.getInstance().hash.getProp('clue', 'E'));
+    return CLUEMode.fromString(hashPropertyHandler.getProp('clue', 'E'));
   }
 }
 
@@ -135,7 +136,7 @@ export class ModeWrapper extends EventHandler {
     const bak = ModeWrapper.getInstance()._mode;
     ModeWrapper.getInstance()._mode = value;
     // store in hash
-    AppContext.getInstance().hash.setProp('clue', value.toString());
+    hashPropertyHandler.setProp('clue', value.toString());
     this.fire('modeChanged', value, bak);
     GlobalEventHandler.getInstance().fire('clue.modeChanged', value, bak);
   }
@@ -181,7 +182,7 @@ export class ButtonModeSelector {
       });
     };
     ModeWrapper.getInstance().on('modeChanged', listener);
-    AppContext.getInstance().onDOMNodeRemoved(this.node, () => {
+    onDOMNodeRemoved(this.node, () => {
       ModeWrapper.getInstance().off('modeChanged', listener);
     });
   }

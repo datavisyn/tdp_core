@@ -1,5 +1,5 @@
+import { IPlugin } from 'visyn_core/plugin';
 import { Dialog } from '../../components';
-import { IPlugin } from '../../base';
 export interface ITypeDefinition {
     type: string;
     [key: string]: any;

@@ -1,18 +1,16 @@
 import { isEqual } from 'lodash';
 import { IDType, IDTypeManager } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { PluginRegistry, IPluginDesc } from 'visyn_core/plugin';
 import { UserSession } from 'visyn_core/security';
 import { IBaseViewPluginDesc } from 'visyn_core/base';
 import {
   EXTENSION_POINT_TDP_VIEW,
-  EXTENSION_POINT_VISYN_VIEW,
   EXTENSION_POINT_TDP_LIST_FILTERS,
   EXTENSION_POINT_TDP_INSTANT_VIEW,
   EXTENSION_POINT_TDP_VIEW_GROUPS,
 } from '../base/extensions';
 import type { IViewContext, ISelection, IViewPluginDesc, IInstanceViewExtensionDesc, IViewGroupExtensionDesc, IGroupData } from '../base/interfaces';
 import type { IObjectRef, ProvenanceGraph } from '../clue/provenance';
-import { IPluginDesc } from '../base/plugin';
 
 export interface IGroupedViews<T extends IBaseViewPluginDesc> extends IGroupData {
   views: T[];

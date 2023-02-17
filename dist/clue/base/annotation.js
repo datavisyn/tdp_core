@@ -4,9 +4,9 @@ import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
 import { SelectionUtils } from 'visyn_core/idtype';
 import { ModeWrapper } from './mode';
-import { AppContext } from '../../app';
 import { BaseUtils } from '../../base/BaseUtils';
 import { StoryTransition } from './Player';
+import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 const modeFeatures = {
     isEditable: () => ModeWrapper.getInstance().getMode().authoring > 0.8,
 };
@@ -205,7 +205,7 @@ export class Renderer {
         this.graph.on(`select_slide_${SelectionUtils.defaultSelectionType}`, this.l);
         // and mode change
         ModeWrapper.getInstance().on('modeChanged', this.rerender);
-        AppContext.getInstance().onDOMNodeRemoved($main.node(), this.destroy.bind(this));
+        onDOMNodeRemoved($main.node(), this.destroy.bind(this));
     }
     /**
      * renders the given text by replacing variables and rendering markdown, then return the HTML code to display

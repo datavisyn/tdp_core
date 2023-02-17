@@ -1,7 +1,7 @@
 import { Ranking } from 'lineupjs';
+import { Ajax } from 'visyn_core/base';
 import { RestBaseUtils } from '../base/rest';
 import { FormMap } from '../form/elements/FormMap';
-import { Ajax } from '../base';
 export class AScoreAccessorProxy {
     constructor(missingValue = null) {
         this.missingValue = missingValue;

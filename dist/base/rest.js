@@ -1,5 +1,4 @@
-import { Ajax } from './ajax';
-import { AppContext } from '../app';
+import { Ajax, AppContext } from 'visyn_core/base';
 /**
  * Define empty filter object for use as function default parameter
  */

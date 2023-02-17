@@ -1,7 +1,6 @@
-import { EP_PHOVEA_CORE_LOCALE, PluginRegistry, ILocaleEPDesc, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT } from 'visyn_core/plugin';
+import { IRegistry, EP_PHOVEA_CORE_LOCALE, PluginRegistry, ILocaleEPDesc, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT } from 'visyn_core/plugin';
 import { FormElementType } from './form/interfaces';
 import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH, EP_TDP_CORE_FORM_ELEMENT } from './base/extensions';
-import { IRegistry } from './base';
 
 export default function (registry: IRegistry) {
   // eslint-disable-next-line @typescript-eslint/ban-types

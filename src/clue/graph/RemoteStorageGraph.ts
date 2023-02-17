@@ -1,5 +1,4 @@
-import { IEvent } from 'visyn_core/base';
-import { AppContext } from '../../app/AppContext';
+import { IEvent, AppContext } from 'visyn_core/base';
 import { GraphBase, IGraphFactory } from './GraphBase';
 import { GraphEdge, GraphNode, IGraphDataDescription } from './graph';
 

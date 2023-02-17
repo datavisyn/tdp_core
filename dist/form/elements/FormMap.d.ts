@@ -1,10 +1,10 @@
 import 'select2';
 import * as d3v3 from 'd3v3';
+import { IPluginDesc } from 'visyn_core/plugin';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, FormElementType, IFormElement } from '../interfaces';
 import { ISelectOptions } from './FormSelect';
 import { ISelect3Options, IdTextPair } from './Select3';
-import { IPluginDesc } from '../../base';
 export interface ISubDesc {
     name: string;
     value: string;

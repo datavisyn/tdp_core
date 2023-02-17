@@ -1,11 +1,10 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
 import { IDType } from 'visyn_core/idtype';
 import type { IEventHandler } from 'visyn_core/base';
-import type { IUser } from 'visyn_core/security';
 import { IBaseViewPluginDesc } from 'visyn_core/base';
+import type { IPlugin, IPluginDesc } from 'visyn_core/plugin';
 import type { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
-import type { IPlugin, IPluginDesc } from './plugin';
 import { ProvenanceGraph } from '../clue/provenance/ProvenanceGraph';
 import type { IObjectRef } from '../clue/provenance/ObjectNode';
 import { AppHeader } from '../components/header';

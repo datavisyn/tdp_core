@@ -9,6 +9,7 @@ import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
 import { useAsync } from 'visyn_core/hooks';
 import { PluginRegistry } from 'visyn_core/plugin';
+import { WebpackEnv } from 'visyn_core/base';
 import { LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
@@ -27,7 +28,6 @@ import { ViewUtils } from '../views/ViewUtils';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
-import { WebpackEnv } from '../base';
 const defaults = {
     itemName: 'item',
     itemNamePlural: 'items',

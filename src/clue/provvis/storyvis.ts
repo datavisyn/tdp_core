@@ -15,7 +15,8 @@ import { Dialog } from '../../components';
 import { IStateAnnotation, ProvenanceGraph, SlideNode, StateNode } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
 import { ArrayUtils, BaseUtils } from '../../base';
-import { AppContext, DnDUtils } from '../../app';
+import { DnDUtils } from '../../app';
+import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 
 interface ISlideNodeRepr {
   id: number | string;
@@ -92,7 +93,7 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
       this.options.topleft = 'left';
     }
     this.$node = this.build(d3v3.select(parent));
-    AppContext.getInstance().onDOMNodeRemoved(this.node, this.destroy, this);
+    onDOMNodeRemoved(this.node, this.destroy, this);
 
     this.player = new Player(data, this.node.querySelector('#player_controls'));
 

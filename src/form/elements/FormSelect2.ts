@@ -2,10 +2,10 @@ import { merge } from 'lodash';
 import 'select2';
 import * as d3v3 from 'd3v3';
 import $ from 'jquery';
+import { IPluginDesc } from 'visyn_core/plugin';
+import { AppContext } from 'visyn_core/base';
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
-import { AppContext } from '../../app';
-import { IPluginDesc } from '../../base';
 
 declare type IFormSelect2Options = Select2Options & {
   return?: 'text' | 'id';

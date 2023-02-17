@@ -1,8 +1,8 @@
 import { I18nextManager } from 'visyn_core/i18n';
 import { PluginRegistry } from 'visyn_core/plugin';
+import { WebpackEnv } from 'visyn_core/base';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
 import { AttachemntUtils } from '../../storage/internal/attachment';
-import { WebpackEnv } from '../../base/WebpackEnv';
 import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../clue/provenance';
 export class ScoreUtils {
     static async addScoreLogic(waitForScore, inputs, parameter) {

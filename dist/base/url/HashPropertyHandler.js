@@ -31,4 +31,5 @@ export class HashPropertyHandler extends CommonPropertyHandler {
         window.removeEventListener('hashchange', this.updated, false);
     }
 }
+export const hashPropertyHandler = new HashPropertyHandler();
 //# sourceMappingURL=HashPropertyHandler.js.map

@@ -1,16 +1,7 @@
-import { ICategory } from 'lineupjs';
 import { IDTypeLike } from 'visyn_core/idtype';
+import { IRow, IServerColumn } from 'visyn_core/base';
 import { IScoreRow } from './interfaces';
-/**
- * common interface for a row as used in LineUp
- */
-export interface IRow {
-    /**
-     * id, e.g. ESNGxxxx
-     */
-    readonly id: string;
-    [key: string]: any;
-}
+export type { IRow, IServerColumn } from 'visyn_core/base';
 /**
  * Describes the properties returned for each database connector
  */
@@ -81,33 +72,6 @@ export interface ILookupResult {
     items: ILookupItem[];
     more: boolean;
 }
-export interface IServerColumn {
-    /**
-     * column name to access with the data
-     */
-    column: string;
-    /**
-     * label of this column by default the column name
-     */
-    label: string;
-    /**
-     * column type
-     */
-    type: 'categorical' | 'number' | 'string';
-    /**
-     * the categories in case of type=categorical
-     * Compliant with https://github.com/lineupjs/lineupjs/blob/fad387fc892753ca819ea1a6b21b6568891c806e/src/model/ICategoricalColumn.ts#L7
-     */
-    categories?: (string | Partial<ICategory>)[];
-    /**
-     * the minimal value in case of type=number
-     */
-    min?: number;
-    /**
-     * the maxmial value in case of type=number
-     */
-    max?: number;
-}
 export declare class RestBaseUtils {
     static readonly REST_NAMESPACE = "/tdp";
     static readonly REST_DB_NAMESPACE: string;
@@ -167,7 +131,7 @@ export declare class RestBaseUtils {
      * @param filters URL filter parameters
      */
     static mergeParamAndFilters(params: IParams, filters: IParams): {
-        [x: string]: string | number | boolean | number[] | string[] | boolean[];
+        [x: string]: string | number | boolean | string[] | number[] | boolean[];
     };
     /**
      * query the TDP rest api to read data with additional given filters

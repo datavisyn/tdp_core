@@ -1,5 +1,5 @@
 import { IEventHandler } from 'visyn_core/base';
-import { AppContext } from '../../app';
+import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
 import { ProvenanceGraph } from '../provenance';
 import { CLUEMode, ModeWrapper } from './mode';
 
@@ -75,12 +75,12 @@ export class WrapperUtils {
 
   static handleMagicHashElements(body: HTMLElement, manager: ICLUEWrapper) {
     // special flag for rendering server side screenshots
-    if (AppContext.getInstance().hash.has('clue_headless')) {
+    if (hashPropertyHandler.has('clue_headless')) {
       WrapperUtils.injectHeadlessSupport(manager);
       body.classList.add('headless');
     }
 
-    if (AppContext.getInstance().hash.has('clue_contained')) {
+    if (hashPropertyHandler.has('clue_contained')) {
       WrapperUtils.injectParentWindowSupport(manager);
       body.classList.add('headless');
     }

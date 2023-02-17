@@ -1,10 +1,10 @@
 import { merge } from 'lodash';
 import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
-import { EventHandler, GlobalEventHandler } from './event';
-import { AppContext } from '../app';
+import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
 import { ObjectRefUtils } from '../clue/provenance';
 import { ActionMetaData } from '../clue/provenance/ActionMeta';
 import { Compression } from '../clue/base/Compression';
+import { hashPropertyHandler } from './url/HashPropertyHandler';
 const disabler = new EventHandler();
 export class Selection {
     static select(inputs, parameter, graph, within) {
@@ -12,7 +12,7 @@ export class Selection {
         const { selection } = parameter;
         const { type } = parameter;
         const bak = parameter.old || idtype.selections(type);
-        if (AppContext.getInstance().hash.has('debug')) {
+        if (hashPropertyHandler.has('debug')) {
             console.log('select', selection);
         }
         disabler.fire(`disable-${idtype.id}`);

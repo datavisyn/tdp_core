@@ -1,6 +1,6 @@
 import { IDTypeManager } from 'visyn_core/idtype';
 import { Permission, UserSession } from 'visyn_core/security';
-import { AppContext } from '../app';
+import { AppContext } from 'visyn_core/base';
 import { Ajax } from '../base';
 import { RestBaseUtils } from '../base/rest';
 import { ENamedSetType } from './interfaces';
