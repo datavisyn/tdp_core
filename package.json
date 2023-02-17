@@ -101,7 +101,6 @@
     "@storybook/react": "^6.5.16",
     "@storybook/testing-library": "0.0.13",
     "cypress": "^11.2.0",
-    "jest-environment-jsdom": "^29.4.3",
     "storybook-addon-swc": "^1.1.9"
   },
   "overrides": {
