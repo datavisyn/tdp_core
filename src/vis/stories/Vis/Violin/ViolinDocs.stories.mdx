@@ -1,0 +1,19 @@
+<!-- Random.stories.mdx -->
+
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { Vis } from '../../../LazyVis';
+
+
+<Meta
+  title="Vis/Violin/Documentation"
+  component={Vis}
+/>
+
+### Config props
+
+| Name | Type | Description |
+|--- |--- |--- |
+| type | 'Violin plot' |  |
+| numColumnsSelected | ColumnInfo [ ] | List of selected numerical columns. Each numerical column is displayed on its own row |
+| catColumnsSelected | ColumnInfo [ ] | List of selected categorical columns. Each categorical column is displayed as a column on each row. |
+| violinOverlay | 'None' \| 'Box' | Overlay type displayed in addition to violin. |

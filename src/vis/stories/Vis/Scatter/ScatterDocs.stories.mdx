@@ -9,6 +9,17 @@ import { Vis } from '../../../LazyVis';
   component={Vis}
 />
 
-### Checkbox
+### Config props
 
-Testing stuff idk
+| Name | Type | Description |
+|--- |--- |--- |
+| type | 'Scatter Plot' | column 3 |
+| numColorScaleType | 'Sequential' \| 'Divergent' | Color scale type when a numerical column is selected. |
+| alphaSliderVal | number | Opacity slider value |
+| dragMode | 'select' \| 'lasso' \| 'zoom' \| 'pan' | |
+| shape | ColumnInfo | Column used for the shape scale. Must be a categorical column. |
+| numColumnsSelected | ColumnInfo [ ] | List of selected columns. If more than two, columns will be shown in a small multiples grid. |
+| color | ColumnInfo | Column used for the color scale. Can be a numerical or categorical column. |
+
+
+Scatter Vis has 

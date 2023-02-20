@@ -1,0 +1,24 @@
+<!-- Random.stories.mdx -->
+
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { Vis } from '../../../LazyVis';
+
+
+<Meta
+  title="Vis/Hexbin/Documentation"
+  component={Vis}
+/>
+
+### Config props
+
+| Name | Type | Description |
+|--- |--- |--- |
+| type | 'Hexbin plot' |  |
+| numColumnsSelected | ColumnInfo [ ] | List of selected columns. If more than two, columns will be shown in a small multiples grid. |
+| color | ColumnInfo | Column used as the color scale. Must be a categorical column. |
+| hexRadius | number | Maximum size of each hex. |
+| isOpacityScale | boolean | Whether or not hexes opacity is used as a scale. |
+| isSizeScale | boolean | Whether or not hexes size is used as a scale. |
+| dragMode | 'select' \| 'lasso' \| 'zoom' \| 'pan' |  |
+| hexbinOptions | 'Color' \| 'Pie' \| 'Bins' | If a color is selected, decides how the color column is displayed. |
+

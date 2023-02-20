@@ -1,0 +1,26 @@
+<!-- Random.stories.mdx -->
+
+import { Meta, Story } from '@storybook/addon-docs/blocks';
+import { Vis } from '../../../LazyVis';
+
+
+<Meta
+  title="Vis/Bar/Documentation"
+  component={Vis}
+/>
+
+### Config props
+
+| Name | Type | Description |
+|--- |--- |--- |
+| type | 'Bar chart' |  |
+| multiples | ColumnInfo | Column used for small multiples. Cannot be the same as catColumnSelected |
+| group | ColumnInfo | Column used to group the bar chart. Cannot be the same as catColumnSelected |
+| catColumnSelected | ColumnInfo | Main column used for the bar chart.  |
+| groupType | 'Stacked' \| 'Grouped' | If a group column is given, determines whether the group column is displayed with a stacked bar chart or a grouped bar chart. |
+| display | 'Absolute' \| 'Normalized' | If group column is given, and groupType is 'Stacked', determines whether the resulting bar chart is normalized. |
+| direction | 'Vertical' \| 'Horizontal' | Direction of the bar chart. |
+| aggregateType | 'Count' \| 'Minimum' \| 'Average' \| 'Median' \| 'Maximum' | Aggregate type used on the catColumnSelected. If anything other than 'Count' is used, must also define an aggregateColumn|
+| aggregateColumn | ColumnInfo | Column used for aggregate types other than 'Count' |
+
+Scatter Vis has 
