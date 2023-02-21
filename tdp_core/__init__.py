@@ -23,7 +23,9 @@ class VisynPlugin(AVisynPlugin):
         )
 
         try:
-            import numpy  # noqa, type: ignore
+            import numpy  # type: ignore
+
+            assert numpy
 
             registry.append("json-encoder", "numpy", "tdp_core.encoder.json_encoder")
         except ImportError:
