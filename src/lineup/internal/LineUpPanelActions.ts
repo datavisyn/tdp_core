@@ -15,10 +15,10 @@ import {
   IRenderContext,
   IRankingHeaderContextContainer,
 } from 'lineupjs';
-import { I18nextManager } from 'visyn_core/i18n';
-import { IDType, IDTypeManager } from 'visyn_core/idtype';
-import { IPlugin, IPluginDesc, PluginRegistry } from 'visyn_core/plugin';
-import { EventHandler } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core';
+import { IDType, IDTypeManager } from 'visyn_core';
+import { IPlugin, IPluginDesc, PluginRegistry } from 'visyn_core';
+import { EventHandler } from 'visyn_core';
 import {
   EXTENSION_POINT_TDP_SCORE_LOADER,
   EXTENSION_POINT_TDP_SCORE,

@@ -1,1 +1,1 @@
-export { SessionWatcher } from 'visyn_core/security';
+export { SessionWatcher } from 'visyn_core';

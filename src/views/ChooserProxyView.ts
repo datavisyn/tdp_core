@@ -1,4 +1,4 @@
-import { I18nextManager } from 'visyn_core/i18n';
+import { I18nextManager } from 'visyn_core';
 import { AView } from './AView';
 import { IViewContext, ISelection } from '../base/interfaces';
 import { RestBaseUtils } from '../base/rest';

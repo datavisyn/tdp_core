@@ -1,5 +1,5 @@
 import { IDataRow, Ranking, LocalDataProvider } from 'lineupjs';
-import { IPluginDesc } from 'visyn_core/plugin';
+import { IPluginDesc } from 'visyn_core';
 import type { IScoreRow, IScoreLoader } from '../base/interfaces';
 import { IParams, IRow } from '../base/rest';
 import { IFormMultiMap, IFormRow } from '../form/elements/FormMap';

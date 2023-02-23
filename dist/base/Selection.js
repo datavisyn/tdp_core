@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
-import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
-import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
+import { IDTypeManager, SelectionUtils } from 'visyn_core';
+import { EventHandler, GlobalEventHandler } from 'visyn_core';
 import { ObjectRefUtils } from '../clue/provenance';
 import { ActionMetaData } from '../clue/provenance/ActionMeta';
 import { Compression } from '../clue/base/Compression';

@@ -1,4 +1,4 @@
-import type { IPluginDesc, IPlugin } from 'visyn_core/plugin';
+import type { IPluginDesc, IPlugin } from 'visyn_core';
 import type { ProvenanceGraph } from '../clue/provenance';
 export declare const EXTENSION_POINT_TDP_SCORE = "tdpScore";
 export declare const EXTENSION_POINT_TDP_SCORE_IMPL = "tdpScoreImpl";

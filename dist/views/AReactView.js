@@ -1,5 +1,5 @@
 import * as ReactDOM from 'react-dom';
-import { IDTypeManager } from 'visyn_core/idtype';
+import { IDTypeManager } from 'visyn_core';
 import { AView } from './AView';
 import { Errors } from '../components';
 /**

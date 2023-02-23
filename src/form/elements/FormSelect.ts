@@ -1,6 +1,6 @@
 import * as d3v3 from 'd3v3';
-import { UserSession } from 'visyn_core/security';
-import { IPluginDesc } from 'visyn_core/plugin';
+import { UserSession } from 'visyn_core';
+import { IPluginDesc } from 'visyn_core';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
 

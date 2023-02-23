@@ -9,8 +9,8 @@
  *
  ******************************************************** */
 import * as React from 'react';
-import { IDTypeManager } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { IDTypeManager } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
 import { EXTENSION_POINT_TDP_VIEW } from '../base';
 import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';

@@ -1,4 +1,4 @@
-import { IDTypeManager } from 'visyn_core/idtype';
+import { IDTypeManager } from 'visyn_core';
 import { ADataType } from '../../data/datatype';
 import { AGraph, IGraphDataDescription } from './graph';
 import { GraphFactoryUtils, IGraphFactory } from './GraphBase';

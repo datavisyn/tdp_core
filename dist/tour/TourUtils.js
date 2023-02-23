@@ -1,4 +1,4 @@
-import { GlobalEventHandler } from 'visyn_core/base';
+import { GlobalEventHandler } from 'visyn_core';
 import { BaseUtils } from '../base/BaseUtils';
 export class TourUtils {
     /**

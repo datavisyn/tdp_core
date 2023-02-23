@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { IPluginDesc } from 'visyn_core/plugin';
+import { IPluginDesc } from 'visyn_core';
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
 import { IdTextPair, ISelect3Item, ISelect3Options } from './Select3';

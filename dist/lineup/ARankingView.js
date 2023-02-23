@@ -1,9 +1,9 @@
 import { EngineRenderer, defaultOptions, isGroup, LocalDataProvider, deriveColors, TaggleRenderer, spaceFillingRule, updateLodRules, } from 'lineupjs';
 import { merge } from 'lodash';
-import { LineupVisWrapper } from 'visyn_core/vis';
-import { IDTypeManager } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
-import { WebpackEnv } from 'visyn_core/base';
+import { LineupVisWrapper } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
+import { WebpackEnv } from 'visyn_core';
 import { AView } from '../views/AView';
 import { EViewMode } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -180,7 +180,7 @@ export class ARankingView extends AView {
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
         if (this.options.enableVisPanel) {
-            this.generalVis = import('visyn_core/vis').then(() => {
+            this.generalVis = import('visyn_core').then(() => {
                 const newVis = new LineupVisWrapper({
                     provider: this.provider,
                     selectionCallback: (ids) => {

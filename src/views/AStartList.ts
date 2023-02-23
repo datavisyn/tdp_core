@@ -1,4 +1,4 @@
-import { UserSession } from 'visyn_core/security';
+import { UserSession } from 'visyn_core';
 import { ARankingView } from '../lineup/ARankingView';
 import { IARankingViewOptions } from '../lineup/IARankingViewOptions';
 import { ENamedSetType, INamedSet } from '../storage/interfaces';

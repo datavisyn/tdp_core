@@ -1,4 +1,4 @@
-import { IPluginDesc } from 'visyn_core/plugin';
+import { IPluginDesc } from 'visyn_core';
 import { IDataType } from '../../data/datatype';
 import { IVisMetaData } from './IVisMetaData';
 

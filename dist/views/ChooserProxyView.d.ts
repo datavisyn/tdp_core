@@ -42,7 +42,7 @@ export declare class ChooserProxyView extends AView {
     constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: Partial<IProxyViewChooserOptions>);
     init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any>;
     protected initImpl(): Promise<void>;
-    protected getParameterFormDescs(): import("../index").IFormElementDesc[];
+    protected getParameterFormDescs(): import("..").IFormElementDesc[];
     protected selectionChanged(): Promise<void>;
     protected parameterChanged(name: string): void;
     protected createUrl(args: any): string;

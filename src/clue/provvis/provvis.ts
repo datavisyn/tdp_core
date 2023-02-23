@@ -1,7 +1,7 @@
 import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
-import { SelectionUtils, SelectOperation } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
+import { SelectionUtils, SelectOperation } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { ActionMetaData, ActionNode, ProvenanceGraph, SlideNode, StateNode } from '../provenance';

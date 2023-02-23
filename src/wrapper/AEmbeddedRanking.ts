@@ -1,6 +1,6 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
-import { IDTypeManager } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { IDTypeManager } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
 import { ProvenanceGraph, ObjectRefUtils } from '../clue/provenance';
 import { ARankingView } from '../lineup/ARankingView';
 import { IARankingViewOptions } from '../lineup/IARankingViewOptions';

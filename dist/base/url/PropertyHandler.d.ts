@@ -45,4 +45,5 @@ export declare class PropertyHandler extends EventHandler {
     toString(): string;
     protected parse(code?: string): void;
 }
+export declare const propertyHandler: PropertyHandler;
 //# sourceMappingURL=PropertyHandler.d.ts.map

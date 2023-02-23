@@ -1,8 +1,8 @@
-import { IDTypeLike } from 'visyn_core/idtype';
-import { Ajax, IRow, IServerColumn, AppContext } from 'visyn_core/base';
+import { IDTypeLike } from 'visyn_core';
+import { Ajax, IRow, IServerColumn, AppContext } from 'visyn_core';
 import { IScoreRow } from './interfaces';
 
-export type { IRow, IServerColumn } from 'visyn_core/base';
+export type { IRow, IServerColumn } from 'visyn_core';
 /**
  * Describes the properties returned for each database connector
  */

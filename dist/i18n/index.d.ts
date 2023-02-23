@@ -1,2 +1,2 @@
-export * from 'visyn_core/i18n';
+export * from 'visyn_core';
 //# sourceMappingURL=index.d.ts.map

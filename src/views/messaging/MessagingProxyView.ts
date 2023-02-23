@@ -1,5 +1,5 @@
-import { IDTypeManager } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
+import { IDTypeManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
 import { AView } from '../AView';
 import { IViewContext, ISelection } from '../../base/interfaces';
 import { ITDPMessage, ITDPSetItemSelectionMessage, ITDPSetParameterMessage } from './interfaces';

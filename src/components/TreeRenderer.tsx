@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { IBaseViewPluginDesc } from 'visyn_core/base';
+import { IBaseViewPluginDesc } from 'visyn_core';
 import { BaseUtils } from '../base/BaseUtils';
 import { ViewUtils } from '../views/ViewUtils';
 

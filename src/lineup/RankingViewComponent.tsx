@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { isEqual } from 'lodash';
-import { I18nextManager } from 'visyn_core/i18n';
-import { useAsync } from 'visyn_core/hooks';
+import { I18nextManager } from 'visyn_core';
+import { useAsync } from 'visyn_core';
 import type { IRankingProps } from './Ranking';
 // eslint-disable-next-line import/no-cycle
 import { Ranking } from './Ranking';

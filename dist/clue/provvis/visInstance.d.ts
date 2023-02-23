@@ -1,4 +1,4 @@
-import { IEventHandler, EventHandler } from 'visyn_core/base';
+import { IEventHandler, EventHandler } from 'visyn_core';
 import { IPersistable } from '../../base/IPersistable';
 import { IDataType } from '../../data/datatype';
 import { ITransform } from './ITransform';

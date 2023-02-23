@@ -1,4 +1,4 @@
-import { IDTypeLike } from 'visyn_core/idtype';
+import { IDTypeLike } from 'visyn_core';
 import { AReactView } from './AReactView';
 import { ISelectionChooserOptions, SelectionChooser } from './SelectionChooser';
 /**
@@ -26,12 +26,12 @@ export declare abstract class AReactChooserView extends AReactView {
         target: IDTypeLike;
     };
     protected initReact(): Promise<void | (({ generateDialog }: {
-        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../index").Dialog;
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
     protected resolveSelection(): Promise<string[]>;
-    protected getParameterFormDescs(): import("../index").IFormElementDesc[];
+    protected getParameterFormDescs(): import("..").IFormElementDesc[];
     selectionChanged(): Promise<void | (({ generateDialog }: {
-        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../index").Dialog;
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
 }
 //# sourceMappingURL=AReactChooserView.d.ts.map

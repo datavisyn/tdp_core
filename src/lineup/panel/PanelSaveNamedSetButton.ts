@@ -1,4 +1,4 @@
-import { I18nextManager } from 'visyn_core/i18n';
+import { I18nextManager } from 'visyn_core';
 import { IPanelButton } from './PanelButton';
 import { StoreUtils } from '../../storage';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';

@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { UserSession } from 'visyn_core/security';
+import { UserSession } from 'visyn_core';
 import { DataCache } from '../../data/DataCache';
 import { ProvenanceGraph } from './ProvenanceGraph';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';

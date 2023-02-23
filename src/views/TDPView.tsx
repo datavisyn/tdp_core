@@ -10,8 +10,8 @@
  ******************************************************** */
 
 import * as React from 'react';
-import { IDType, IDTypeManager } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { IDType, IDTypeManager } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
 import { EXTENSION_POINT_TDP_VIEW, ISelection, IView, IViewContext, IViewPlugin, IViewPluginDesc } from '../base';
 import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';

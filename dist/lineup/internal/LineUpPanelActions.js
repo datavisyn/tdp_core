@@ -1,8 +1,8 @@
 import { createStackDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc, } from 'lineupjs';
-import { I18nextManager } from 'visyn_core/i18n';
-import { IDTypeManager } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
-import { EventHandler } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
+import { EventHandler } from 'visyn_core';
 import { EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON, EP_TDP_CORE_LINEUP_PANEL_TAB, } from '../../base/extensions';
 import { PanelButton } from '../panel/PanelButton';
 import { PanelTabContainer, NullTabContainer } from '../panel/PanelTabContainer';

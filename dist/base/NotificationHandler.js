@@ -1,4 +1,4 @@
-import { I18nextManager } from 'visyn_core/i18n';
+import { I18nextManager } from 'visyn_core';
 export class NotificationHandler {
     static pushNotification(level, msg, autoHideInMs = -1) {
         let parent = document.body.querySelector('div.toast-container-custom');

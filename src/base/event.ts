@@ -1,10 +1,10 @@
 export {
   /**
-   * @deprecated use import { <...> } from 'visyn_core/base' instead.
+   * @deprecated use import { <...> } from 'visyn_core' instead.
    */
   EventHandler,
   /**
-   * @deprecated use import { <...> } from 'visyn_core/base' instead.
+   * @deprecated use import { <...> } from 'visyn_core' instead.
    */
   GlobalEventHandler,
-} from 'visyn_core/base';
+} from 'visyn_core';

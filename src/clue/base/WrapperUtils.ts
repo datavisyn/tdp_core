@@ -1,4 +1,4 @@
-import { IEventHandler } from 'visyn_core/base';
+import { IEventHandler } from 'visyn_core';
 import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
 import { ProvenanceGraph } from '../provenance';
 import { CLUEMode, ModeWrapper } from './mode';

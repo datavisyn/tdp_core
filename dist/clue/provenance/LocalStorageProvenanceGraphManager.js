@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { Permission, UserSession } from 'visyn_core/security';
+import { Permission, UserSession } from 'visyn_core';
 import { ProvenanceGraph } from './ProvenanceGraph';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { LocalStorageGraph } from '../graph/LocalStorageGraph';

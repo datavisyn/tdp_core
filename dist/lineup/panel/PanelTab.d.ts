@@ -1,5 +1,5 @@
 import { SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer } from 'lineupjs';
-import { EventHandler } from 'visyn_core/base';
+import { EventHandler } from 'visyn_core';
 import { ISearchOption } from './ISearchOption';
 import { PanelButton, PanelNavButton } from './PanelButton';
 import { IPanelTabDesc } from './IPanelTabDesc';

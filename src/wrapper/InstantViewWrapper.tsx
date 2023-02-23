@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useAsync } from 'visyn_core/hooks';
+import { useAsync } from 'visyn_core';
 import { IInstanceViewExtensionDesc, IInstanceViewExtension, IInstantView, ISelection } from '../base';
 import { ViewUtils } from '../views';
 

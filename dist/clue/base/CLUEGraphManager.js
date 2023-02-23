@@ -1,6 +1,6 @@
-import { I18nextManager } from 'visyn_core/i18n';
-import { EventHandler } from 'visyn_core/base';
-import { UserSession } from 'visyn_core/security';
+import { I18nextManager } from 'visyn_core';
+import { EventHandler } from 'visyn_core';
+import { UserSession } from 'visyn_core';
 import { CommonPropertyHandler, HashPropertyHandler, QueryPropertyHandler } from '../../base/url';
 /**
  * Based on the selected property the other property handler is checked for CLUE parameter.

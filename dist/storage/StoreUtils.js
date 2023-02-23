@@ -1,4 +1,4 @@
-import { I18nextManager } from 'visyn_core/i18n';
+import { I18nextManager } from 'visyn_core';
 import { PHOVEA_UI_FormDialog } from '../components';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 export class StoreUtils {

@@ -1,6 +1,6 @@
 // Reexport everything from visyn_core for compatibility reasons.
 export {
   /**
-   * @deprecated use import { <...> } from 'visyn_core/security' instead.
+   * @deprecated use import { <...> } from 'visyn_core' instead.
    */ UserSession,
-} from 'visyn_core/security';
+} from 'visyn_core';

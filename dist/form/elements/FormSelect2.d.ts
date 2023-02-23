@@ -1,6 +1,6 @@
 import 'select2';
 import * as d3v3 from 'd3v3';
-import { IPluginDesc } from 'visyn_core/plugin';
+import { IPluginDesc } from 'visyn_core';
 import { AFormElement } from './AFormElement';
 import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
 declare type IFormSelect2Options = Select2Options & {

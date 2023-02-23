@@ -1,7 +1,7 @@
 /**
  * This file defines interfaces for various data types and their metadata.
  */
-import { ISecureItem } from 'visyn_core/security';
+import { ISecureItem } from 'visyn_core';
 /**
  * Interface defining metadata for a dataset.
  */

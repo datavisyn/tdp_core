@@ -1,6 +1,6 @@
 import { LocalDataProvider } from 'lineupjs';
-import { IDTypeManager } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { IDTypeManager } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
 import { ObjectRefUtils } from '../clue/provenance';
 import { ARankingView } from '../lineup/ARankingView';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';

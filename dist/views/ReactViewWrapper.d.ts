@@ -30,7 +30,7 @@ export declare class ReactViewWrapper extends AReactView {
     private impl;
     get desc(): IReactViewWrapperPluginDesc;
     protected initImpl(): Promise<void | (({ generateDialog }: {
-        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../index").Dialog;
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
     protected getItemType(): any;
     render(inputSelection: string[], itemSelection: string[], itemSelector: ISelector): JSX.Element;

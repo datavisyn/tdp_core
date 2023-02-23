@@ -1,7 +1,7 @@
 import { event as d3event, select, time, Selection } from 'd3v3';
 import * as $ from 'jquery';
-import { I18nextManager } from 'visyn_core/i18n';
-import { UserSession } from 'visyn_core/security';
+import { I18nextManager } from 'visyn_core';
+import { UserSession } from 'visyn_core';
 import { Dialog, PHOVEA_UI_FormDialog } from '../../components';
 import type { CLUEGraphManager } from '../base/CLUEGraphManager';
 import type { ProvenanceGraph } from './ProvenanceGraph';

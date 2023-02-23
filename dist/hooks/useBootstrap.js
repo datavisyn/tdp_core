@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Modal, Toast, Popover, Alert, Offcanvas, Tooltip, Tab, Collapse, Dropdown } from 'bootstrap';
-import { useSyncedRef } from 'visyn_core/hooks';
+import { useSyncedRef } from 'visyn_core';
 function useBSClass(clazz, ...options) {
     const [instance, setInstance] = React.useState(null);
     const setRef = React.useCallback((ref) => {

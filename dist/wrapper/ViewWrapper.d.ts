@@ -1,5 +1,5 @@
-import { IDType } from 'visyn_core/idtype';
-import { EventHandler, IEvent, IBaseViewPluginDesc } from 'visyn_core/base';
+import { IDType } from 'visyn_core';
+import { EventHandler, IEvent, IBaseViewPluginDesc } from 'visyn_core';
 import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
 import { AView } from '../views/AView';

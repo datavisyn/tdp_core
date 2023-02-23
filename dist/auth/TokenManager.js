@@ -1,6 +1,6 @@
 import { castArray } from 'lodash';
-import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
-import { UserSession } from 'visyn_core/security';
+import { EventHandler, GlobalEventHandler } from 'visyn_core';
+import { UserSession } from 'visyn_core';
 import { ERenderAuthorizationStatus } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
 export class TokenManager extends EventHandler {

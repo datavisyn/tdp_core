@@ -1,4 +1,4 @@
-import { ISecureItem } from 'visyn_core/security';
+import { ISecureItem } from 'visyn_core';
 import { IObjectRef, ProvenanceGraph, ActionNode } from '../clue/provenance';
 export interface IPermissionFormOptions {
     /**

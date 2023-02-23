@@ -4,12 +4,12 @@
 import { LocalDataProvider, EngineRenderer, TaggleRenderer, Column, defaultOptions, isGroup, spaceFillingRule, updateLodRules, toolbar, dialogContext, } from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { merge } from 'lodash';
-import { LineupVisWrapper } from 'visyn_core/vis';
-import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
-import { useAsync } from 'visyn_core/hooks';
-import { PluginRegistry } from 'visyn_core/plugin';
-import { WebpackEnv } from 'visyn_core/base';
+import { LineupVisWrapper } from 'visyn_core';
+import { IDTypeManager, SelectionUtils } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
+import { useAsync } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
+import { WebpackEnv } from 'visyn_core';
 import { LazyColumn } from './internal/column';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';

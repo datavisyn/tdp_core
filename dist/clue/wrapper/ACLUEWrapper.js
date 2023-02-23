@@ -1,5 +1,5 @@
-import { I18nextManager } from 'visyn_core/i18n';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { I18nextManager } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
 import { ModeWrapper } from '../base';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { WrapperUtils } from '../base/WrapperUtils';

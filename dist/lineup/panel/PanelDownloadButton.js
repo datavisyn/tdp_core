@@ -1,5 +1,5 @@
 import { isSupportType } from 'lineupjs';
-import { I18nextManager } from 'visyn_core/i18n';
+import { I18nextManager } from 'visyn_core';
 import { ExportUtils } from '../internal/ExportUtils';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 import { BaseUtils } from '../../base/BaseUtils';

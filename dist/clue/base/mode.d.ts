@@ -1,4 +1,4 @@
-import { EventHandler } from 'visyn_core/base';
+import { EventHandler } from 'visyn_core';
 /**
  * generic version of the CLUE mode, a combination of exploration, authoring, and normalization
  */

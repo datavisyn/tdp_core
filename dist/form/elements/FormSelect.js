@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { UserSession } from 'visyn_core/security';
+import { UserSession } from 'visyn_core';
 import { AFormElement } from './AFormElement';
 /**
  * ResolveNow executes the result without an intermediate tick, and because FormSelect#resolveData is sometimes used

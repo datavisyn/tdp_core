@@ -1,5 +1,5 @@
 import './webpack/_bootstrap';
-import { ITDPClientConfig } from 'visyn_core/base';
+import { ITDPClientConfig } from 'visyn_core';
 import { AppHeader } from './components';
 import { TourManager } from './tour/TourManager';
 import { CLUEGraphManager } from './clue';

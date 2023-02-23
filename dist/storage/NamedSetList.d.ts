@@ -1,4 +1,4 @@
-import { IDType } from 'visyn_core/idtype';
+import { IDType } from 'visyn_core';
 import { INamedSet } from './interfaces';
 export declare class NamedSetList {
     private readonly idType;

@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { EventHandler } from 'visyn_core/base';
+import { EventHandler } from 'visyn_core';
 export class FormButton extends EventHandler {
     /**
      * Constructor

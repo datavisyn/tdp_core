@@ -1,4 +1,4 @@
-import { EventHandler } from 'visyn_core/base';
+import { EventHandler } from 'visyn_core';
 import { UniqueIdManager } from '../../app/UniqueIdManager';
 /**
  * base class for an visualization

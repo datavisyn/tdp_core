@@ -128,3 +128,5 @@ export class PropertyHandler extends EventHandler {
     this.fire(PropertyHandler.EVENT_CHANGED);
   }
 }
+
+export const propertyHandler = new PropertyHandler();

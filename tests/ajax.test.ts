@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { AppContext } from 'visyn_core/base';
+import { AppContext } from 'visyn_core';
 import { Ajax } from '../src/base/ajax';
 
 describe('api2absURL', () => {

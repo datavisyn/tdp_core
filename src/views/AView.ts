@@ -1,7 +1,7 @@
 import { select } from 'd3v3';
-import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
-import { EventHandler, WebpackEnv } from 'visyn_core/base';
+import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
+import { EventHandler, WebpackEnv } from 'visyn_core';
 import { IFormElementDesc, IForm } from '../form/interfaces';
 import { FormBuilder } from '../form/FormBuilder';
 import { AFormElement } from '../form/elements/AFormElement';

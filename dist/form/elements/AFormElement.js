@@ -1,6 +1,6 @@
-import { PluginRegistry } from 'visyn_core/plugin';
-import { UserSession } from 'visyn_core/security';
-import { EventHandler } from 'visyn_core/base';
+import { PluginRegistry } from 'visyn_core';
+import { UserSession } from 'visyn_core';
+import { EventHandler } from 'visyn_core';
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
 import { FormElementType } from '../interfaces';
 /**

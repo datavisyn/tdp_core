@@ -1,4 +1,4 @@
-import { EventHandler } from 'visyn_core/base';
+import { EventHandler } from 'visyn_core';
 import { AppHeader } from '../components/header';
 export interface ILoginMenuOptions {
     /**

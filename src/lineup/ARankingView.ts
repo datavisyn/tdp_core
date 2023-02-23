@@ -18,11 +18,11 @@ import {
   IValueColumnDesc,
 } from 'lineupjs';
 import { merge } from 'lodash';
-import { LineupVisWrapper } from 'visyn_core/vis';
-import { IDTypeManager } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
-import { ISecureItem } from 'visyn_core/security';
-import { WebpackEnv } from 'visyn_core/base';
+import { LineupVisWrapper } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
+import { ISecureItem } from 'visyn_core';
+import { WebpackEnv } from 'visyn_core';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection, EViewMode, IScore, IScoreRow, IAdditionalColumnDesc } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -249,7 +249,7 @@ export abstract class ARankingView extends AView {
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
 
     if (this.options.enableVisPanel) {
-      this.generalVis = import('visyn_core/vis').then(() => {
+      this.generalVis = import('visyn_core').then(() => {
         const newVis = new LineupVisWrapper({
           provider: this.provider,
           selectionCallback: (ids: string[]) => {
