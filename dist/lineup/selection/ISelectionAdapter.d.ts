@@ -42,11 +42,11 @@ export interface ISelectionAdapter {
      * called when a parameter has changed
      * @param {IContext} context
      */
-    parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
+    parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<IContext | void>;
     /**
      * called when the input selection has changed
      * @param {IContext} context
      */
-    selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
+    selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<void | IContext>;
 }
 //# sourceMappingURL=ISelectionAdapter.d.ts.map
