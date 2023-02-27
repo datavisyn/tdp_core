@@ -1,0 +1,1 @@
+{"version":3,"file":"IUserStore.d.ts","sourceRoot":"","sources":["../../src/security/IUserStore.ts"],"names":[],"mappings":"AAAA,MAAM,WAAW,UAAU,CAAC,CAAC,SAAS,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC,GAAG,MAAM,CAAC,MAAM,EAAE,GAAG,CAAC;IAC7E,EAAE,EAAE,MAAM,CAAC;IACX,EAAE,EAAE,MAAM,GAAG,IAAI,CAAC;IAClB,aAAa,EAAE,CAAC,CAAC;CAClB"}

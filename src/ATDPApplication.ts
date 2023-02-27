@@ -10,7 +10,7 @@ import { TourManager } from './tour/TourManager';
 import { TemporarySessionList, ButtonModeSelector, CLUEGraphManager } from './clue';
 import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
 import { ACLUEWrapper } from './clue/wrapper';
-import { LoginMenu, Ajax } from './base';
+import { LoginMenu, Ajax, loadClientConfig, ITDPClientConfig } from './base';
 import { UserSession, PluginRegistry } from './app';
 import { I18nextManager } from './i18n';
 import { IMixedStorageProvenanceGraphManagerOptions, MixedStorageProvenanceGraphManager, ProvenanceGraph } from './clue/provenance';
@@ -113,22 +113,6 @@ export interface ITDPOptions {
   clientConfig?: ITDPClientConfig | null | undefined;
 }
 
-export interface ITDPClientConfig {
-  /**
-   * Configuration for the TDPTokenManager.
-   */
-  tokenManager?: {
-    /**
-     * Initial authorization configurations.
-     * Note that this is an object, because then the deep-merge with the local and remote config is easier.
-     */
-    authorizationConfigurations?: {
-      [id: string]: Omit<IAuthorizationConfiguration, 'id'>;
-    };
-  };
-  [key: string]: any;
-}
-
 /**
  * base class for TDP based applications
  */
@@ -212,16 +196,6 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
   }
 
   /**
-   * Loads the client config from '/clientConfig.json' and parses it.
-   */
-  public static async loadClientConfig<T = any>(): Promise<T | null> {
-    return Ajax.getJSON('/clientConfig.json').catch((e) => {
-      console.error('Error parsing clientConfig.json', e);
-      return null;
-    });
-  }
-
-  /**
    * Loads the client configuration via `loadClientConfig` and automatically merges it into the options.
    * @param options Options where the client config should be merged into.
    */
@@ -231,7 +205,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
       return null;
     }
     // Otherwise, load and merge the configuration into the existing one.
-    const parsedConfig = await ATDPApplication.loadClientConfig();
+    const parsedConfig = await loadClientConfig();
     options.clientConfig = merge(options?.clientConfig || {}, parsedConfig || {});
     return options;
   }

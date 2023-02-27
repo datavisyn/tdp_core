@@ -1,6 +1,6 @@
 import { UserSession, AppContext } from '../app';
 import { I18nextManager } from '../i18n';
-import { IUser } from '../security';
+import { IUser, IUserStore } from '../security';
 import { Ajax } from './ajax';
 
 export class LoginUtils {
@@ -65,13 +65,17 @@ export class LoginUtils {
     return Promise.resolve(true);
   }
 
-  static loggedInAs() {
-    return Ajax.send('/loggedinas', {}, 'POST').then((user) => {
-      if (user !== 'not_yet_logged_in' && user.name) {
+  static loggedInAs(): Promise<IUser> {
+    return Ajax.send('/loggedinas', {}, 'POST').then((user: string | IUser) => {
+      if (typeof user !== 'string' && user.name) {
         return user;
       }
       return Promise.reject('invalid');
     });
+  }
+
+  static getStores(): Promise<IUserStore[]> {
+    return Ajax.send('/api/security/stores', {}, 'GET');
   }
 
   /**

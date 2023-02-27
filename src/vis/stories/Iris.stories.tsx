@@ -1,7 +1,6 @@
 import React from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { Center } from '@mantine/core';
-import { Vis } from '../Vis';
+import { Vis } from '../LazyVis';
 import {
   EAggregateTypes,
   EBarDirection,

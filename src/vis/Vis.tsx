@@ -26,7 +26,7 @@ import { HexbinVis } from './hexbin/HexbinVis';
 
 const DEFAULT_SHAPES = ['circle', 'square', 'triangle-up', 'star'];
 
-export function Vis({
+export function EagerVis({
   columns,
   selected = [],
   colors = null,
@@ -41,6 +41,7 @@ export function Vis({
   showSidebar: internalShowSidebar,
   setShowSidebar: internalSetShowSidebar,
   showSidebarDefault = false,
+  scrollZoom = true,
 }: {
   /**
    * Required data columns which are displayed.
@@ -74,6 +75,7 @@ export function Vis({
   showSidebar?: boolean;
   setShowSidebar?(show: boolean): void;
   showSidebarDefault?: boolean;
+  scrollZoom?: boolean;
 }) {
   const [showSidebar, setShowSidebar] = useUncontrolled<boolean>({
     value: internalShowSidebar,
@@ -228,6 +230,7 @@ export function Vis({
           showSidebar={showSidebar}
           showCloseButton={showCloseButton}
           closeButtonCallback={closeCallback}
+          scrollZoom={scrollZoom}
           {...commonProps}
         />
       ) : null}

@@ -42,7 +42,7 @@ import { debounceAsync } from '../base';
 import { I18nextManager } from '../i18n';
 import { IDTypeManager } from '../idtype';
 import { ISecureItem } from '../security';
-import { LineupVisWrapper } from '../vis';
+import { LineupVisWrapper } from '../vis/LineupVisWrapper';
 import { WebpackEnv } from '../base/WebpackEnv';
 
 /**
