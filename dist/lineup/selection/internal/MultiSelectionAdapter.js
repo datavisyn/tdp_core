@@ -17,7 +17,7 @@ export class MultiSelectionAdapter extends ABaseSelectionAdapter {
         const selectedIds = context.selection.ids;
         await this.removePartialDynamicColumns(context, selectedIds);
         await this.addDynamicColumns(context, selectedIds);
-        onContextChanged?.(context);
+        return onContextChanged?.(context);
     }
     /**
      * Create one or multiple LineUp column descs + additional information for each selected sub-type and given id.

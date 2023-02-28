@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { isEqual } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import { Ranking } from './Ranking';
@@ -8,7 +8,7 @@ import { I18nextManager } from '../i18n/I18nextManager';
 import { AView } from '../views/AView';
 import { useAsync } from '../hooks/useAsync';
 import { ViewUtils } from '../views/ViewUtils';
-export function RankingViewComponent({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = null, selectionAdapter = null, options = {}, authorization = null, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, onUpdateEntryPoint, 
+export function RankingViewComponent({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = null, provider, selectionAdapter = null, options = {}, authorization = null, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, onUpdateEntryPoint, 
 /**
  * Maybe refactor this when using the native lineup implementation of scores
  */
@@ -19,6 +19,11 @@ onAddScoreColumn, }) {
     const [prevParameters, setPrevParameters] = useState(null);
     const [selectionAdapterContext, setSelectionAdapterContext] = React.useState(null);
     const viewRef = React.useRef(null);
+    // Some convoluted stuff here to solve a race case issue. Keep a reference to a promise.
+    // Below, when we update the columns, create a new promise which is attached to the currPromise .then, and then set the currPromise to that new promise.
+    // The currpromise essentially becomes a pointer to the back of a queue of promises, adding onto the end any time a new call comes in.
+    // This solves the race case, and ensures that return values from one promise to the next stay consistent.
+    const currPromise = useRef(null);
     const runAuthorizations = useCallback(async () => {
         await TDPTokenManager.runAuthorizations(authorization, {
             render: ({ authConfiguration, status, error, trigger }) => {
@@ -73,6 +78,12 @@ onAddScoreColumn, }) {
     const onContextChangedCallback = useCallback((newContext) => {
         setSelectionAdapterContext(newContext);
     }, []);
+    const selectionAdapterCallback = useCallback((context) => {
+        if (provider?.getLastRanking()) {
+            context = { ...context, columns: provider?.getLastRanking()?.flatColumns };
+        }
+        return context;
+    }, [provider]);
     /**
      * onInputSelectionChanged
      */
@@ -86,11 +97,21 @@ onAddScoreColumn, }) {
             selections.set(name, inputSelection);
             if (name === AView.DEFAULT_SELECTION_NAME) {
                 if (selectionAdapter) {
-                    selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
+                    if (currPromise.current) {
+                        // See comment where currPromise is created for details
+                        currPromise.current = currPromise.current.then((context) => {
+                            return selectionAdapter.selectionChanged({ ...context, selection: inputSelection }, selectionAdapterCallback);
+                        });
+                    }
+                    else {
+                        currPromise.current = selectionAdapter.selectionChanged({ ...selectionAdapterContext, selection: inputSelection }, selectionAdapterCallback);
+                    }
                 }
             }
         }
-    }, [status, inputSelection, selectionAdapterContext, selections, selectionAdapter, onContextChangedCallback]);
+        // Hacky fix, but don't want to call this when selectionAdapterContext changes. You could, it wouldn't break, but would be slow.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [status, selections, inputSelection]);
     /**
      * onParametersChanged
      */
@@ -100,11 +121,21 @@ onAddScoreColumn, }) {
         }
         if (status === 'success') {
             if (selectionAdapter) {
-                selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection }, onContextChangedCallback);
+                if (currPromise.current) {
+                    // See comment where currPromise is created for details
+                    currPromise.current = currPromise.current.then((context) => {
+                        return selectionAdapter.parameterChanged({ ...context, selection: inputSelection }, selectionAdapterCallback);
+                    });
+                }
+                else {
+                    currPromise.current = selectionAdapter.parameterChanged({ ...selectionAdapterContext, selection: inputSelection }, selectionAdapterCallback);
+                }
                 setPrevParameters(parameters);
             }
         }
-    }, [status, selectionAdapter, selectionAdapterContext, inputSelection, selections, parameters, prevParameters, onContextChangedCallback]);
+        // Hacky fix, but don't want to call this when selectionAdapterContext changes. You could, it wouldn't break, but would be slow.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [status, parameters]);
     return (React.createElement("div", { ref: viewRef, className: `h-100 ${status !== 'success' && 'tdp-busy'}` },
         React.createElement(Ranking, { data: data, columnDesc: columnDesc, itemSelection: itemSelection, options: options, onItemSelect: onItemSelect, onContextChanged: onContextChangedCallback, onAddScoreColumn: onAddScoreColumn, onBuiltLineUp: onBuiltLineUp, onItemSelectionChanged: onItemSelectionChanged, onCustomizeRanking: onCustomizeRanking, onUpdateEntryPoint: onUpdateEntryPoint })));
 }
