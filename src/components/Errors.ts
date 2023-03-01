@@ -31,7 +31,7 @@ export class Errors {
    */
   static showErrorModalDialog(error: any, additionalCSSClasses = '') {
     function commonDialog(title: string, body: string) {
-      return import('./dialogs.js').then(
+      return import('./dialogs').then(
         () =>
           ({ generateDialog }: { generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): Dialog }) =>
             new Promise((resolve, reject) => {

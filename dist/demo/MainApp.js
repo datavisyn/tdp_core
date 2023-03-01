@@ -4,7 +4,7 @@ import { useVisynAppContext, VisynApp, VisynHeader } from 'visyn_core';
 import { LoginUtils } from 'visyn_core';
 import { Vis, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, EColumnTypes } from 'visyn_core';
 export function fetchIrisData() {
-    const dataPromise = import('./irisData.js').then((m) => m.iris);
+    const dataPromise = import('./irisData').then((m) => m.iris);
     return [
         {
             info: {

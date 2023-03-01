@@ -8,7 +8,7 @@ export class VisLoader {
     let c: Promise<LayoutedProvVis>;
     return () => {
       if (!c) {
-        c = Promise.all([<any>data, import('./provvis.js')]).then((args) => args[1].LayoutedProvVis.createLayoutedProvVis(args[0], parent, options));
+        c = Promise.all([<any>data, import('./provvis')]).then((args) => args[1].LayoutedProvVis.createLayoutedProvVis(args[0], parent, options));
       }
       return c;
     };
@@ -24,7 +24,7 @@ export class VisLoader {
     let c: Promise<VerticalStoryVis>;
     return () => {
       if (!c) {
-        c = Promise.all([<any>graph, import('./storyvis.js')]).then((args) => args[1].VerticalStoryVis.createStoryVis(args[0], parent, main, options));
+        c = Promise.all([<any>graph, import('./storyvis')]).then((args) => args[1].VerticalStoryVis.createStoryVis(args[0], parent, main, options));
       }
       return c;
     };

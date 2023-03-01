@@ -9,7 +9,7 @@ import reg from './phovea';
  * build a registry by registering all phovea modules
  */
 // other modules
-import 'visyn_core';
+import 'visyn_core/phovea_registry';
 // self
 PluginRegistry.getInstance().register('tdp_core', reg);
 //# sourceMappingURL=phovea_registry.js.map
