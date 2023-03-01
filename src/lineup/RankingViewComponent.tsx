@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { isEqual } from 'lodash';
+import { I18nextManager, useAsync } from 'visyn_core';
 import { LocalDataProvider } from 'lineupjs';
 import type { IRankingProps } from './Ranking';
 // eslint-disable-next-line import/no-cycle
@@ -8,9 +9,7 @@ import { ISelection } from '../base/interfaces';
 import { IContext, ISelectionAdapter } from './selection/ISelectionAdapter';
 import { ERenderAuthorizationStatus, IAuthorizationConfiguration } from '../auth/interfaces';
 import { TDPTokenManager, TokenManager } from '../auth/TokenManager';
-import { I18nextManager } from '../i18n/I18nextManager';
 import { AView } from '../views/AView';
-import { useAsync } from '../hooks/useAsync';
 import { ViewUtils } from '../views/ViewUtils';
 
 /**

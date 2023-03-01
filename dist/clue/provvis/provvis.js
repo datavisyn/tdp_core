@@ -1,14 +1,15 @@
 import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
+import { SelectionUtils, SelectOperation } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { ActionMetaData, SlideNode } from '../provenance';
 import { AVisInstance } from './visInstance';
-import { SelectionUtils, SelectOperation } from '../../idtype';
-import { AppContext, DnDUtils } from '../../app';
-import { I18nextManager } from '../../i18n';
+import { DnDUtils } from '../../app';
 import { Dialog } from '../../components/dialogs';
 import { ModeWrapper } from '../base/mode';
+import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 const DOI_LARGE = 0.9;
 const DOI_MEDIUM = 0.7;
 const DOI_SMALL = 0.4;
@@ -341,7 +342,7 @@ export class LayoutedProvVis extends AVisInstance {
         this.options.scale = [1, 1];
         this.options.rotate = 0;
         this.$node = this.build(d3v3.select(parent));
-        AppContext.getInstance().onDOMNodeRemoved(this.node, this.destroy, this);
+        onDOMNodeRemoved(this.node, this.destroy, this);
         if (!this.options.provVisCollapsed) {
             this.bind();
             this.update();

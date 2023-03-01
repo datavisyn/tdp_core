@@ -1,15 +1,14 @@
 import logging
 
+import visyn_core.security as security
 from flask import Flask, abort, jsonify, request
 from pymongo import MongoClient
 from pymongo.collection import ReturnDocument
 
-import tdp_core.security as security
-
-from . import manager
+from .settings import get_settings
 from .utils import fix_id, random_id
 
-c = manager.settings.tdp_core.mongo
+c = get_settings().mongo
 _log = logging.getLogger(__name__)
 
 app = Flask(__name__)

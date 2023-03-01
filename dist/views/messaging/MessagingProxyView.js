@@ -1,6 +1,6 @@
+import { IDTypeManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
 import { AView } from '../AView';
-import { IDTypeManager } from '../../idtype';
-import { I18nextManager } from '../../i18n';
 export class MessagingProxyView extends AView {
     constructor(context, selection, parent, options = {}) {
         super(context, selection, parent);

@@ -1,5 +1,5 @@
 import { Column, BooleanColumn } from 'lineupjs';
-import { I18nextManager } from '../../i18n';
+import { I18nextManager } from 'visyn_core';
 /**
  * extra column for highlighting and filtering
  */

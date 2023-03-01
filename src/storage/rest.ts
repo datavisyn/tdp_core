@@ -1,8 +1,8 @@
-import { AppContext, UserSession } from '../app';
+import { IDType, IDTypeManager } from 'visyn_core';
+import { ISecureItem, Permission, UserSession } from 'visyn_core';
+import { AppContext } from 'visyn_core';
 import { Ajax } from '../base';
 import { RestBaseUtils } from '../base/rest';
-import { IDType, IDTypeManager } from '../idtype';
-import { ISecureItem, Permission } from '../security';
 import { ENamedSetType, IStoredNamedSet } from './interfaces';
 
 export class RestStorageUtils {

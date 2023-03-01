@@ -1,11 +1,10 @@
-import type { IPluginDesc, IPlugin } from './plugin';
+import type { IPluginDesc, IPlugin } from 'visyn_core';
 import type { ProvenanceGraph } from '../clue/provenance';
 export declare const EXTENSION_POINT_TDP_SCORE = "tdpScore";
 export declare const EXTENSION_POINT_TDP_SCORE_IMPL = "tdpScoreImpl";
 export declare const EXTENSION_POINT_TDP_SCORE_LOADER = "tdpScoreLoader";
 export declare const EXTENSION_POINT_TDP_RANKING_BUTTON = "tdpRankingButton";
 export declare const EXTENSION_POINT_TDP_VIEW = "tdpView";
-export declare const EXTENSION_POINT_VISYN_VIEW = "visynView";
 export declare const EXTENSION_POINT_TDP_INSTANT_VIEW = "tdpInstantView";
 export declare const EXTENSION_POINT_TDP_APP_EXTENSION = "tdpAppExtension";
 export declare const EXTENSION_POINT_TDP_LIST_FILTERS = "tdpListFilters";

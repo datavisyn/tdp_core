@@ -1,15 +1,16 @@
 import { select, Selection, event } from 'd3v3';
 import $ from 'jquery';
+import { I18nextManager } from 'visyn_core';
+import { GlobalEventHandler } from 'visyn_core';
+import { UserSession } from 'visyn_core';
 import { PHOVEA_UI_FormDialog } from '../../components';
-import { I18nextManager } from '../../i18n';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
 import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
 import { NotificationHandler } from '../../base/NotificationHandler';
 import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
 import { CLUEGraphManager } from '../base';
-import { GlobalEventHandler } from '../../base';
 import { IProvenanceGraphDataDescription } from '../provenance';
-import { UniqueIdManager, UserSession } from '../../app';
+import { UniqueIdManager } from '../../app';
 
 abstract class ASessionList {
   private handler: () => void;

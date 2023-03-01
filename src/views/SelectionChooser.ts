@@ -1,9 +1,9 @@
+import { IDType, IDTypeLike, IDTypeManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
 import { IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption } from '../form/elements/FormSelect';
 import { FormElementType, IFormElement, IFormElementDesc } from '../form/interfaces';
 import { ISelection } from '../base/interfaces';
-import { IDType, IDTypeLike, IDTypeManager } from '../idtype';
 import { BaseUtils } from '../base';
-import { I18nextManager } from '../i18n';
 
 export interface ISelectionChooserOptions {
   /**

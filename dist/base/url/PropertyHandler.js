@@ -116,4 +116,5 @@ export class PropertyHandler extends EventHandler {
 }
 PropertyHandler.EVENT_CHANGED = 'changed';
 PropertyHandler.EVENT_ENTRY_CHANGED = 'entryChanged';
+export const propertyHandler = new PropertyHandler();
 //# sourceMappingURL=PropertyHandler.js.map

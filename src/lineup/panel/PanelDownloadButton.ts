@@ -1,9 +1,9 @@
 import { Column, LocalDataProvider, isSupportType } from 'lineupjs';
+import { I18nextManager } from 'visyn_core';
 import { ExportUtils, IExportFormat } from '../internal/ExportUtils';
 import type { IPanelButton } from './PanelButton';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 import { BaseUtils } from '../../base/BaseUtils';
-import { I18nextManager } from '../../i18n';
 import { PHOVEA_UI_FormDialog } from '../../components/dialogs';
 
 interface IExportData {

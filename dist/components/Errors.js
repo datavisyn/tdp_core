@@ -1,5 +1,5 @@
-import { Ajax, isAjaxError } from '../base/ajax';
-import { I18nextManager } from '../i18n';
+import { I18nextManager } from 'visyn_core';
+import { Ajax, isAjaxError } from 'visyn_core';
 let globalErrorTemplate = (details) => details;
 export class Errors {
     /**
@@ -27,7 +27,7 @@ export class Errors {
      */
     static showErrorModalDialog(error, additionalCSSClasses = '') {
         function commonDialog(title, body) {
-            return import('./dialogs').then(() => ({ generateDialog }) => new Promise((resolve, reject) => {
+            return import('./dialogs.js').then(() => ({ generateDialog }) => new Promise((resolve, reject) => {
                 const dialog = generateDialog(title, I18nextManager.getInstance().i18n.t('phovea:ui.dismiss'), additionalCSSClasses);
                 dialog.body.innerHTML = globalErrorTemplate(body);
                 dialog.onSubmit(() => {

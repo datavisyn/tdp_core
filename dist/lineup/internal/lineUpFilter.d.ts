@@ -2,7 +2,7 @@ import { IStringGroupCriteria } from 'lineupjs';
 /**
  * Basic LineUp string filter values
  */
-declare type LineUpStringFilterValue = string[] | string | null;
+type LineUpStringFilterValue = string[] | string | null;
 /**
  * Serialize RegExp objects from LineUp string columns as plain object
  * that can be stored in the provenance graph

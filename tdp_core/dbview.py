@@ -6,8 +6,7 @@ from typing import Any
 import sqlalchemy
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
-
-from tdp_core.security import current_user, is_logged_in
+from visyn_core.security import current_user, is_logged_in
 
 from .utils import clean_query
 

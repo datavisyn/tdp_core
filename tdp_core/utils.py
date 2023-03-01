@@ -3,8 +3,7 @@ import logging
 
 from flask import abort, make_response
 from flask.wrappers import Response
-
-from . import manager
+from visyn_core import manager
 
 _log = logging.getLogger(__name__)
 

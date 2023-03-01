@@ -10,4 +10,5 @@ export declare class HashPropertyHandler extends CommonPropertyHandler {
     protected updateImpl(): void;
     destroy(): void;
 }
+export declare const hashPropertyHandler: HashPropertyHandler;
 //# sourceMappingURL=HashPropertyHandler.d.ts.map

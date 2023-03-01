@@ -1,9 +1,8 @@
 import { merge } from 'lodash';
+import { Permission, UserSession } from 'visyn_core';
 import { ProvenanceGraph } from './ProvenanceGraph';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { LocalStorageGraph } from '../graph/LocalStorageGraph';
-import { UserSession } from '../../app/UserSession';
-import { Permission } from '../../security/Permission';
 import { MemoryGraph } from '../graph/MemoryGraph';
 export class LocalStorageProvenanceGraphManager {
     constructor(options = {}) {

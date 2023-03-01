@@ -1,11 +1,8 @@
+@import "~visyn_core/dist/scss/main.scss";
+
 @import "./abstracts/functions";
 @import './abstracts/variables';
 @import './abstracts/mixins';
-@import "./abstracts/vis_colors";
-@import "./abstracts/ui_colors";
-
-@import "./fonts/roboto";
-
 
 @import './base/base';
 
@@ -14,7 +11,6 @@
 @import "./vendors/font-awesome";
 @import './vendors/select2';
 @import './vendors/select3';
-@import './vendors/lineup';
 
 
 @import './components/form_builder';

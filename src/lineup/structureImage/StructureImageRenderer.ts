@@ -10,8 +10,8 @@ import {
   ISummaryRenderer,
 } from 'lineupjs';
 import { abortAble } from 'lineupengine';
+import { I18nextManager } from 'visyn_core';
 import { StructureImageColumn } from './StructureImageColumn';
-import { I18nextManager } from '../../i18n';
 
 const template = '<div style="background-size: contain; background-position: center; background-repeat: no-repeat;"></div>';
 

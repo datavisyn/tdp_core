@@ -1,5 +1,5 @@
+import { I18nextManager } from 'visyn_core';
 import { PanelButton } from './PanelButton';
-import { I18nextManager } from '../../i18n';
 /**
  * Div HTMLElement that contains a button and a SearchBox.
  * The SearchBox is hidden by default and can be toggled by the button.

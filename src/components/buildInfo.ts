@@ -1,5 +1,5 @@
-import { AppContext } from '../app';
-import { I18nextManager } from '../i18n';
+import { AppContext } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
 
 interface IBuildInfo {
   name: string;

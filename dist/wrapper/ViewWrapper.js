@@ -1,13 +1,22 @@
+import { IDTypeManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
+import { EventHandler } from 'visyn_core';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
-import { EventHandler } from '../base';
 import { NodeUtils, ObjectRefUtils } from '../clue/provenance';
-import { I18nextManager } from '../i18n';
-import { IDTypeManager } from '../idtype';
 import { Dialog } from '../components';
 export class ViewWrapper extends EventHandler {
+    off(events, handler) {
+        return super.on(events, handler);
+    }
+    on(events, handler) {
+        return super.on(events, handler);
+    }
+    fire(events, ...args) {
+        return super.fire(events, ...args);
+    }
     constructor(plugin, graph, document, viewOptionGenerator = () => ({})) {
         super();
         this.plugin = plugin;
@@ -79,15 +88,6 @@ export class ViewWrapper extends EventHandler {
             });
         }
         this.ref = graph.findOrAddObject(ObjectRefUtils.objectRef(this, plugin.name, ObjectRefUtils.category.visual));
-    }
-    off(events, handler) {
-        return super.on(events, handler);
-    }
-    on(events, handler) {
-        return super.on(events, handler);
-    }
-    fire(events, ...args) {
-        return super.fire(events, ...args);
     }
     set visible(visible) {
         const selection = this.inputSelections.get(AView.DEFAULT_SELECTION_NAME);

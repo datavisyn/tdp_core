@@ -1,21 +1,8 @@
-import { ICategory } from 'lineupjs';
-import { Ajax } from './ajax';
-import { AppContext } from '../app';
-import { IDTypeLike } from '../idtype';
+import { IDTypeLike } from 'visyn_core';
+import { Ajax, IRow, IServerColumn, AppContext } from 'visyn_core';
 import { IScoreRow } from './interfaces';
 
-/**
- * common interface for a row as used in LineUp
- */
-export interface IRow {
-  /**
-   * id, e.g. ESNGxxxx
-   */
-  readonly id: string;
-
-  [key: string]: any;
-}
-
+export type { IRow, IServerColumn } from 'visyn_core';
 /**
  * Describes the properties returned for each database connector
  */
@@ -105,37 +92,6 @@ export interface ILookupItem {
 export interface ILookupResult {
   items: ILookupItem[];
   more: boolean;
-}
-
-export interface IServerColumn {
-  /**
-   * column name to access with the data
-   */
-  column: string;
-  /**
-   * label of this column by default the column name
-   */
-  label: string;
-  /**
-   * column type
-   */
-  type: 'categorical' | 'number' | 'string';
-
-  /**
-   * the categories in case of type=categorical
-   * Compliant with https://github.com/lineupjs/lineupjs/blob/fad387fc892753ca819ea1a6b21b6568891c806e/src/model/ICategoricalColumn.ts#L7
-   */
-  categories?: (string | Partial<ICategory>)[];
-
-  /**
-   * the minimal value in case of type=number
-   */
-  min?: number;
-
-  /**
-   * the maxmial value in case of type=number
-   */
-  max?: number;
 }
 
 export class RestBaseUtils {

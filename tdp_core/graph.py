@@ -1,6 +1,6 @@
-from . import manager
 from .dataset.dataset_def import ADataSetProvider
 from .dataset.graph import graph
+from .settings import get_settings
 from .utils import fix_id, random_id
 
 
@@ -279,7 +279,7 @@ class GraphProvider(ADataSetProvider):
     def __init__(self):
         from pymongo import MongoClient
 
-        c = manager.settings.tdp_core.mongo
+        c = get_settings().mongo
 
         self.client = MongoClient(c.host, c.port)
         self.db = self.client[c.db_graph]
@@ -295,7 +295,7 @@ class GraphProvider(ADataSetProvider):
     def upload(self, data, files, id=None):
         if data.get("type", "unknown") != "graph":
             return None  # can't handle
-        from tdp_core.security import current_user
+        from visyn_core.security import current_user
 
         user = current_user()
 

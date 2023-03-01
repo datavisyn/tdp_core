@@ -18,6 +18,11 @@ import {
   IValueColumnDesc,
 } from 'lineupjs';
 import { merge } from 'lodash';
+import { LineupVisWrapper } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
+import { ISecureItem } from 'visyn_core';
+import { WebpackEnv } from 'visyn_core';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection, EViewMode, IScore, IScoreRow, IAdditionalColumnDesc } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -39,11 +44,6 @@ import { ISearchOption } from './panel';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 import { debounceAsync } from '../base';
-import { I18nextManager } from '../i18n';
-import { IDTypeManager } from '../idtype';
-import { ISecureItem } from '../security';
-import { LineupVisWrapper } from '../vis/LineupVisWrapper';
-import { WebpackEnv } from '../base/WebpackEnv';
 
 /**
  * base class for views based on LineUp
@@ -249,7 +249,7 @@ export abstract class ARankingView extends AView {
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
 
     if (this.options.enableVisPanel) {
-      this.generalVis = import('../vis').then(() => {
+      this.generalVis = import('visyn_core').then(() => {
         const newVis = new LineupVisWrapper({
           provider: this.provider,
           selectionCallback: (ids: string[]) => {
