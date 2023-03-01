@@ -154,7 +154,9 @@ export class Matomo {
       Matomo.getInstance().trackEvent('provenance', 'runChain', 'Run actions in chain', nodes.length);
     });
 
-    const config: IPhoveaMatomoConfig = await AppContext.getInstance().getAPIJSON('/tdp/config/matomo');
+    const config: IPhoveaMatomoConfig = await AppContext.getInstance()
+      .getAPIJSON('/tdp/config/matomo')
+      .catch(() => ({}));
     Matomo.getInstance().init(config);
   }
 

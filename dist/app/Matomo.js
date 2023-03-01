@@ -84,7 +84,9 @@ export class Matomo {
         graph.on('run_chain', (_, nodes) => {
             Matomo.getInstance().trackEvent('provenance', 'runChain', 'Run actions in chain', nodes.length);
         });
-        const config = await AppContext.getInstance().getAPIJSON('/tdp/config/matomo');
+        const config = await AppContext.getInstance()
+            .getAPIJSON('/tdp/config/matomo')
+            .catch(() => ({}));
         Matomo.getInstance().init(config);
     }
     static getInstance() {
