@@ -1,9 +1,8 @@
 import { merge, uniqueId } from 'lodash';
-import { UserSession } from '../../app';
+import { I18nextManager } from 'visyn_core';
+import { UserSession, ISecureItem, EEntity } from 'visyn_core';
 import { PHOVEA_UI_FormDialog } from '../../components';
-import { I18nextManager } from '../../i18n';
 import { IProvenanceGraphDataDescription } from '../provenance';
-import { ISecureItem, EEntity } from '../../security';
 import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
 
 export class ProvenanceGraphMenuUtils {

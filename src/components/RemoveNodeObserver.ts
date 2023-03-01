@@ -130,3 +130,18 @@ export class RemoveNodeObserver {
     observer.observe(node, callback, thisArg);
   }
 }
+
+const removeNodeObserver = new RemoveNodeObserver();
+
+/**
+ * utility function to get notified, when the given dom element is removed from its parent
+ * @param node
+ * @param callback
+ */
+export function onDOMNodeRemoved(node: Element | Element[], callback: () => void, thisArg?: any) {
+  if (Array.isArray(node)) {
+    node.forEach((nodeid) => removeNodeObserver.observe(nodeid, callback, thisArg));
+  } else {
+    removeNodeObserver.observe(node, callback, thisArg);
+  }
+}

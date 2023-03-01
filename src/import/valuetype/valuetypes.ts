@@ -1,8 +1,7 @@
 import { merge } from 'lodash';
-import { I18nextManager } from '../../i18n';
+import { I18nextManager } from 'visyn_core';
+import { PluginRegistry, IPlugin } from 'visyn_core';
 import { Dialog } from '../../components';
-import { IPlugin } from '../../base';
-import { PluginRegistry } from '../../app';
 
 // https://github.com/d3/d3-3.x-api-reference/blob/master/Ordinal-Scales.md#category10
 const categoryColors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'];

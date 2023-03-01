@@ -1,5 +1,5 @@
-import { IDType } from '../idtype';
-import { EventHandler } from '../base';
+import { IDType } from 'visyn_core';
+import { EventHandler } from 'visyn_core';
 import { IFormElementDesc } from '../form/interfaces';
 import { ISelection, IView, IViewContext, EViewMode } from '../base/interfaces';
 import { IAuthorizationConfiguration } from '../auth';

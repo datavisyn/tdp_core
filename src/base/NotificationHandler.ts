@@ -1,4 +1,4 @@
-import { I18nextManager } from '../i18n';
+import { I18nextManager } from 'visyn_core';
 
 export class NotificationHandler {
   public static DEFAULT_SUCCESS_AUTO_HIDE = 5000;

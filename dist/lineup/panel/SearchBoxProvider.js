@@ -1,5 +1,5 @@
 import { SearchBox } from 'lineupjs';
-import { I18nextManager } from '../../i18n';
+import { I18nextManager } from 'visyn_core';
 /**
  * The SearchBoxProvider allows creating multiple LineUp SearchBoxes and stores them internally in a list.
  * All created search boxes can be updated simultaneously with a list of searchable items.

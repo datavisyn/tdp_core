@@ -10,10 +10,10 @@
  ******************************************************** */
 import { ReactElement } from 'react';
 import * as ReactDOM from 'react-dom';
+import { IDTypeLike, IDTypeManager } from 'visyn_core';
 import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
 import { Errors } from '../components';
-import { IDTypeLike, IDTypeManager } from '../idtype';
 
 /**
  * definition how to select elements within the react view

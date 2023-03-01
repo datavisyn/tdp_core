@@ -1,8 +1,8 @@
 import { merge } from 'lodash';
+import { UserSession } from 'visyn_core';
 import { DataCache } from '../../data/DataCache';
 import { ProvenanceGraph } from './ProvenanceGraph';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
-import { UserSession } from '../../app/UserSession';
 export class RemoteStorageProvenanceGraphManager {
     constructor(options = {}) {
         this.options = {

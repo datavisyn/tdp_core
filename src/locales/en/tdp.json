@@ -175,18 +175,6 @@
       "otherSessions": "Other Sessions"
     },
 
-    "vis": {
-      "violinError": "To create a violin plot, please select at least 1 numerical column.",
-      "scatterError": "To create a scatter plot, please select at least 2 numerical columns.",
-      "hexbinError": "To create a hexbin plot, please select at least 2 numerical columns.",
-      "stripError": "To create a strip plot, please select at least 1 numerical column.",
-      "barError": "To create a bar chart, please select 1 categorical column.",
-      "errorHeader": "Invalid settings",
-      "openSettings": "Open settings",
-      "hexbinOptions": "Hexbin options",
-      "missingValue": "n/a"
-    },
-
     "lineup": {
       "cmds": {
         "addRanking": "Add Ranking",

@@ -1,7 +1,7 @@
 import * as d3v3 from 'd3v3';
+import { IPluginDesc } from 'visyn_core';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { AFormElement } from './AFormElement';
-import { IPluginDesc } from '../../base';
 
 export interface ICheckBoxElementDesc extends IFormElementDesc {
   type: FormElementType.CHECKBOX;

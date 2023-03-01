@@ -1,1 +1,0 @@
-{"version":3,"file":"BarGroupTypeButtons.d.ts","sourceRoot":"","sources":["../../../src/vis/sidebar/BarGroupTypeButtons.tsx"],"names":[],"mappings":";AAEA,OAAO,EAAE,gBAAgB,EAAE,MAAM,eAAe,CAAC;AAEjD,UAAU,iBAAiB;IACzB,QAAQ,EAAE,CAAC,CAAC,EAAE,gBAAgB,KAAK,IAAI,CAAC;IACxC,eAAe,EAAE,gBAAgB,CAAC;CACnC;AAED,wBAAgB,mBAAmB,CAAC,EAAE,QAAQ,EAAE,eAAe,EAAE,EAAE,iBAAiB,eAenF"}

@@ -1,4 +1,4 @@
-export declare type IDragEffect = 'none' | 'copy' | 'copyLink' | 'copyMove' | 'link' | 'linkMove' | 'move' | 'all';
+export type IDragEffect = 'none' | 'copy' | 'copyLink' | 'copyMove' | 'link' | 'linkMove' | 'move' | 'all';
 export interface IDragStartResult {
     effectAllowed: IDragEffect;
     data: {

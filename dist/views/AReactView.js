@@ -1,7 +1,7 @@
 import * as ReactDOM from 'react-dom';
+import { IDTypeManager } from 'visyn_core';
 import { AView } from './AView';
 import { Errors } from '../components';
-import { IDTypeManager } from '../idtype';
 /**
  * a TDP view that is internally implemented using react.js
  */

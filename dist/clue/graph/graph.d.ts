@@ -1,5 +1,5 @@
+import { EventHandler } from 'visyn_core';
 import { IPersistable } from '../../base/IPersistable';
-import { EventHandler } from '../../base/event';
 import type { IDataType, IDataDescription } from '../../data';
 export declare class AttributeContainer extends EventHandler implements IPersistable {
     private attrMap;
@@ -127,6 +127,6 @@ export declare abstract class AGraph extends EventHandler {
     abstract get edges(): GraphEdge[];
     get nedges(): number;
     get dim(): number[];
-    get idtypes(): import("../../idtype").IDType[];
+    get idtypes(): import("visyn_core").IDType[];
 }
 //# sourceMappingURL=graph.d.ts.map

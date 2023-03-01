@@ -1,6 +1,6 @@
 import * as d3v3 from 'd3v3';
+import { UserSession } from 'visyn_core';
 import { AFormElement } from './AFormElement';
-import { UserSession } from '../../app';
 /**
  * ResolveNow executes the result without an intermediate tick, and because FormSelect#resolveData is sometimes used
  * as dependency for FormMap for example, the result needs to be there immediately as otherwise the dependents

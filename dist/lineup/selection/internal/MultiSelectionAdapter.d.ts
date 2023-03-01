@@ -47,7 +47,7 @@ export declare class MultiSelectionAdapter<T = string> extends ABaseSelectionAda
      * @param context selection adapter context
      * @returns A promise to wait until all new columns have been added
      */
-    protected parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
+    protected parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<IContext | void>;
     /**
      * Create one or multiple LineUp column descs + additional information for each selected sub-type and given id.
      *

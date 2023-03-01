@@ -3,6 +3,8 @@ import * as d3v3 from 'd3v3';
 import marked from 'marked';
 import * as $ from 'jquery';
 import { merge } from 'lodash';
+import { SelectionUtils, SelectOperation } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
 import { Renderer } from '../base/annotation';
 import { ModeWrapper } from '../base/mode';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
@@ -12,10 +14,9 @@ import textPNG from '../../assets/text.png';
 import { Dialog } from '../../components';
 import { SlideNode } from '../provenance';
 import { AVisInstance } from './visInstance';
-import { SelectionUtils, SelectOperation } from '../../idtype';
 import { ArrayUtils, BaseUtils } from '../../base';
-import { AppContext, DnDUtils } from '../../app';
-import { I18nextManager } from '../../i18n';
+import { DnDUtils } from '../../app';
+import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 export class VerticalStoryVis extends AVisInstance {
     constructor(data, parent, options = {}) {
         super();
@@ -70,7 +71,7 @@ export class VerticalStoryVis extends AVisInstance {
             this.options.topleft = 'left';
         }
         this.$node = this.build(d3v3.select(parent));
-        AppContext.getInstance().onDOMNodeRemoved(this.node, this.destroy, this);
+        onDOMNodeRemoved(this.node, this.destroy, this);
         this.player = new Player(data, this.node.querySelector('#player_controls'));
         this.bind();
         this.story = this.data.selectedSlides()[0] || this.data.getSlideChains()[0];

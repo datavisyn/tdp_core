@@ -1,6 +1,6 @@
-import { IDTypeManager } from '../../idtype';
+import { IDTypeManager } from 'visyn_core';
+import { EventHandler } from 'visyn_core';
 import { UniqueIdManager } from '../../app/UniqueIdManager';
-import { EventHandler } from '../../base/event';
 export class AttributeContainer extends EventHandler {
     constructor() {
         super(...arguments);

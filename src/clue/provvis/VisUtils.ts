@@ -1,5 +1,4 @@
-import { IPluginDesc } from '../../base/plugin';
-import { PluginRegistry } from '../../app/PluginRegistry';
+import { PluginRegistry, IPluginDesc } from 'visyn_core';
 import { IDataType } from '../../data/datatype';
 import { IVisPluginDesc } from './IVisPluginDesc';
 import { IVisInstance } from './visInstance';

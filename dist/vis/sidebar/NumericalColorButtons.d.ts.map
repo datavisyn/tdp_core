@@ -1,1 +1,0 @@
-{"version":3,"file":"NumericalColorButtons.d.ts","sourceRoot":"","sources":["../../../src/vis/sidebar/NumericalColorButtons.tsx"],"names":[],"mappings":";AAEA,OAAO,EAAE,wBAAwB,EAAE,MAAM,eAAe,CAAC;AAEzD,UAAU,0BAA0B;IAClC,QAAQ,EAAE,CAAC,CAAC,EAAE,wBAAwB,KAAK,IAAI,CAAC;IAChD,eAAe,EAAE,wBAAwB,CAAC;CAC3C;AAED,wBAAgB,qBAAqB,CAAC,EAAE,QAAQ,EAAE,eAAe,EAAE,EAAE,0BAA0B,eAgC9F"}

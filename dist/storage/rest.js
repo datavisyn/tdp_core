@@ -1,8 +1,8 @@
-import { AppContext, UserSession } from '../app';
+import { IDTypeManager } from 'visyn_core';
+import { Permission, UserSession } from 'visyn_core';
+import { AppContext } from 'visyn_core';
 import { Ajax } from '../base';
 import { RestBaseUtils } from '../base/rest';
-import { IDTypeManager } from '../idtype';
-import { Permission } from '../security';
 import { ENamedSetType } from './interfaces';
 export class RestStorageUtils {
     static listNamedSets(idType = null) {

@@ -1,6 +1,6 @@
 import md5 from 'md5';
-import { AppContext } from './AppContext';
-import { PluginRegistry } from './PluginRegistry';
+import { PluginRegistry } from 'visyn_core';
+import { AppContext } from 'visyn_core';
 // assume `_pag` is already declared
 window._paq = window._paq || [];
 export class Matomo {
@@ -84,7 +84,9 @@ export class Matomo {
         graph.on('run_chain', (_, nodes) => {
             Matomo.getInstance().trackEvent('provenance', 'runChain', 'Run actions in chain', nodes.length);
         });
-        const config = await AppContext.getInstance().getAPIJSON('/tdp/config/matomo');
+        const config = await AppContext.getInstance()
+            .getAPIJSON('/tdp/config/matomo')
+            .catch(() => ({}));
         Matomo.getInstance().init(config);
     }
     static getInstance() {

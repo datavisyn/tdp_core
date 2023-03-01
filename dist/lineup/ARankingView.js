@@ -1,5 +1,9 @@
 import { EngineRenderer, defaultOptions, isGroup, LocalDataProvider, deriveColors, TaggleRenderer, spaceFillingRule, updateLodRules, } from 'lineupjs';
 import { merge } from 'lodash';
+import { LineupVisWrapper } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
+import { WebpackEnv } from 'visyn_core';
 import { AView } from '../views/AView';
 import { EViewMode } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -16,10 +20,6 @@ import { LineupUtils } from './utils';
 import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 import { debounceAsync } from '../base';
-import { I18nextManager } from '../i18n';
-import { IDTypeManager } from '../idtype';
-import { LineupVisWrapper } from '../vis/LineupVisWrapper';
-import { WebpackEnv } from '../base/WebpackEnv';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.
@@ -180,7 +180,7 @@ export class ARankingView extends AView {
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
         if (this.options.enableVisPanel) {
-            this.generalVis = import('../vis').then(() => {
+            this.generalVis = import('visyn_core').then(() => {
                 const newVis = new LineupVisWrapper({
                     provider: this.provider,
                     selectionCallback: (ids) => {

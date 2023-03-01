@@ -45,7 +45,6 @@ export class ABaseSelectionAdapter {
         const diffRemoved = difference(lineupColIds, selectedIds);
         // remove deselected columns
         if (diffRemoved.length > 0) {
-            // console.log('remove columns', diffRemoved);
             await this.removeDynamicColumns(context, diffRemoved);
         }
         // add new columns to the end

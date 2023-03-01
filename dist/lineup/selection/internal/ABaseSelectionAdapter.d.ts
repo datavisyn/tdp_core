@@ -8,15 +8,15 @@ export declare abstract class ABaseSelectionAdapter implements ISelectionAdapter
      * @param context selection adapter context
      * @returns A promise that can waited for until the columns have been changed.
      */
-    selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
+    selectionChanged(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<void | IContext>;
     /**
      * Add or remove columns in LineUp ranking when the parametrs in the selection adapter context change
      * @param context selection adapter context
      * @returns A promise that can waited for until the columns have been changed.
      */
-    parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
-    protected abstract parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
-    protected selectionChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void>;
+    parameterChanged(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<IContext | void>;
+    protected abstract parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<void | IContext>;
+    protected selectionChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<void | IContext>;
     /**
      * Create a column desc with additional metadata for a given selected id.
      *

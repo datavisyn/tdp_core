@@ -1,9 +1,8 @@
+import { I18nextManager } from 'visyn_core';
+import { EPermission, Permission, UserUtils, UserSession } from 'visyn_core';
 import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../clue/provenance';
 import { BaseUtils } from '../base';
-import { I18nextManager } from '../i18n';
 import { Compression } from '../clue/base/Compression';
-import { EPermission, Permission, UserUtils } from '../security';
-import { UserSession } from '../app';
 export class TDPApplicationUtils {
     /**
      * see http://momentjs.com/docs/#/displaying/fromnow/

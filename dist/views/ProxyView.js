@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
-import { IDTypeManager } from '../idtype';
-import { I18nextManager } from '../i18n';
+import { IDTypeManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
 import { FormElementType } from '../form/interfaces';
 import { AD3View } from './AD3View';
 import { RestBaseUtils } from '../base/rest';

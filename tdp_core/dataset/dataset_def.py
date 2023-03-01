@@ -1,6 +1,7 @@
 import abc
 
-from ..security import can_read, can_write
+from visyn_core.security import can_read, can_write
+
 from ..utils import fix_id
 
 

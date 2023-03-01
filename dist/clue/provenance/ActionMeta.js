@@ -1,5 +1,5 @@
+import { UserSession } from 'visyn_core';
 import { ObjectRefUtils } from './ObjectNode';
-import { UserSession } from '../../app/UserSession';
 /**
  * additional data about a performed action
  */
