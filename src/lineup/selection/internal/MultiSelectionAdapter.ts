@@ -55,11 +55,12 @@ export class MultiSelectionAdapter<T = string> extends ABaseSelectionAdapter {
    * @param context selection adapter context
    * @returns A promise to wait until all new columns have been added
    */
-  protected async parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void): Promise<void> {
+  protected async parameterChangedImpl(context: IContext, onContextChanged?: (context: IContext) => void | IContext): Promise<IContext | void> {
     const selectedIds = context.selection.ids;
     await this.removePartialDynamicColumns(context, selectedIds);
     await this.addDynamicColumns(context, selectedIds);
-    onContextChanged?.(context);
+
+    return onContextChanged?.(context);
   }
 
   /**
