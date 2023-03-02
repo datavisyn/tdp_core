@@ -21,7 +21,7 @@ const defaultExtensions = {
     preSidebar: null,
     postSidebar: null,
 };
-export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, enableSidebar, setShowSidebar, showSidebar, showCloseButton = false, closeButtonCallback = () => null, scales, }) {
+export function ScatterVis({ config, optionsConfig, extensions, columns, shapes = ['circle', 'square', 'triangle-up', 'star'], filterCallback = () => null, selectionCallback = () => null, selectedMap = {}, selectedList = [], setConfig, enableSidebar, setShowSidebar, showSidebar, showCloseButton = false, closeButtonCallback = () => null, scales, scrollZoom, }) {
     const id = React.useMemo(() => uniqueId('ScatterVis'), []);
     const plotlyDivRef = React.useRef(null);
     const [layout, setLayout] = useState(null);
@@ -119,7 +119,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
     }, [plotsWithSelectedPoints, traces]);
     const plotly = useMemo(() => {
         if (traces?.plots && plotsWithSelectedPoints && layout) {
-            return (React.createElement(PlotlyComponent, { key: id, divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false, scrollZoom: true }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
+            return (React.createElement(PlotlyComponent, { key: id, divId: `plotlyDiv${id}`, data: plotlyData, layout: layout, config: { responsive: true, displayModeBar: false, scrollZoom }, useResizeHandler: true, style: { width: '100%', height: '100%' }, onClick: (event) => {
                     const clickedId = event.points[0].id;
                     if (selectedMap[clickedId]) {
                         selectionCallback(selectedList.filter((s) => s !== clickedId));
@@ -132,7 +132,7 @@ export function ScatterVis({ config, optionsConfig, extensions, columns, shapes 
                 } }));
         }
         return null;
-    }, [id, plotsWithSelectedPoints, layout, selectedMap, selectionCallback, selectedList, traces?.plots, plotlyData]);
+    }, [id, plotsWithSelectedPoints, layout, selectedMap, selectionCallback, selectedList, traces?.plots, plotlyData, scrollZoom]);
     return (React.createElement(Container, { fluid: true, sx: {
             flexGrow: 1,
             height: '100%',

@@ -41,6 +41,7 @@ export function EagerVis({
   showSidebar: internalShowSidebar,
   setShowSidebar: internalSetShowSidebar,
   showSidebarDefault = false,
+  scrollZoom = true,
 }: {
   /**
    * Required data columns which are displayed.
@@ -74,6 +75,7 @@ export function EagerVis({
   showSidebar?: boolean;
   setShowSidebar?(show: boolean): void;
   showSidebarDefault?: boolean;
+  scrollZoom?: boolean;
 }) {
   const [showSidebar, setShowSidebar] = useUncontrolled<boolean>({
     value: internalShowSidebar,
@@ -228,6 +230,7 @@ export function EagerVis({
           showSidebar={showSidebar}
           showCloseButton={showCloseButton}
           closeButtonCallback={closeCallback}
+          scrollZoom={scrollZoom}
           {...commonProps}
         />
       ) : null}
