@@ -1,4 +1,4 @@
-import { GlobalEventHandler } from 'visyn_core';
+import { GlobalEventHandler } from '../base/event';
 import { BaseUtils } from '../base/BaseUtils';
 export class TourUtils {
     /**
@@ -77,6 +77,34 @@ export class TourUtils {
             return false;
         }
         e.click();
+        return undefined;
+    }
+    /**
+     * Dispatches a click event on the given HTML element.
+     * In case of a string, the string is used as DOM selector to retrieve the HTML element.
+     *
+     * @param elem HTML element or DOM selector string
+     */
+    static focus(elem) {
+        const e = typeof elem === 'string' ? document.querySelector(elem) : elem;
+        if (!e) {
+            return false;
+        }
+        e.focus();
+        return undefined;
+    }
+    /**
+     * ??? - TEMPORARY: Dispatches a click event on the given HTML element.
+     * In case of a string, the string is used as DOM selector to retrieve the HTML element.
+     *
+     * @param elem HTML element or DOM selector string
+     */
+    static removeBlocker(elem) {
+        const e = typeof elem === 'string' ? document.querySelector(elem) : elem;
+        if (!e) {
+            return false;
+        }
+        e.style.display = 'none';
         return undefined;
     }
     /**
@@ -177,6 +205,67 @@ export class TourUtils {
             bubbles: true,
             cancelable: true,
         }));
+    }
+    /**
+     * ??? - TEMPORARY: Sets the value on the given HTML element and dispatches a `change` or `input` event.
+     *
+     * @param elem HTML input element or DOM selector string
+     * @param value Value that should be entered or selected
+     * @param eventType Event type `change` or `input` that should be dispatched
+     * @default eventType change
+     */
+    static setValueWithoutTrigger(elem, value) {
+        const e = typeof elem === 'string' ? document.querySelector(elem) : elem;
+        if (!e) {
+            return undefined;
+        }
+        e.value = value;
+        return undefined;
+        // return e.dispatchEvent(
+        //   new Event(eventType, {
+        //     bubbles: true,
+        //     cancelable: true,
+        //   }),
+        // );
+    }
+    /**
+     * ??? - TEMPORARY: Sets the value on the given HTML element and dispatches a `change` or `input` event.
+     *
+     * @param elem HTML input element or DOM selector string
+     * @param value Value that should be entered or selected
+     * @param eventType Event type `change` or `input` that should be dispatched
+     * @default eventType change
+     */
+    // eslint-disable-next-line @typescript-eslint/no-dupe-class-members
+    static fireMouseDown(elem) {
+        const e = typeof elem === 'string' ? document.querySelector(elem) : elem;
+        if (!e) {
+            return undefined;
+        }
+        // e.value = value;
+        // return undefined;
+        return e.dispatchEvent(new Event('mousedown', {
+        // bubbles: true,
+        // cancelable: true,
+        }));
+    }
+    /**
+     * ??? - TEMPORARY: Sets the value on the given HTML element and dispatches a `change` or `input` event.
+     *
+     * @param elem HTML input element or DOM selector string
+     * @param value Value that should be entered or selected
+     * @param eventType Event type `change` or `input` that should be dispatched
+     * @default eventType change
+     */
+    // eslint-disable-next-line @typescript-eslint/no-dupe-class-members
+    static fireKeyPress(elem, value) {
+        const e = typeof elem === 'string' ? document.querySelector(elem) : elem;
+        if (!e) {
+            return undefined;
+        }
+        // e.value = value;
+        // return undefined;
+        return e.dispatchEvent(new KeyboardEvent('keydown', { key: value }));
     }
     /**
      * Sets the value on the given HTML element and dispatches a `change` or `input` event.

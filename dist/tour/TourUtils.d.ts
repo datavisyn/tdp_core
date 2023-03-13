@@ -46,6 +46,20 @@ export declare class TourUtils {
      */
     static click(elem: HTMLElement | string): boolean;
     /**
+     * Dispatches a click event on the given HTML element.
+     * In case of a string, the string is used as DOM selector to retrieve the HTML element.
+     *
+     * @param elem HTML element or DOM selector string
+     */
+    static focus(elem: HTMLElement | string): boolean;
+    /**
+     * ??? - TEMPORARY: Dispatches a click event on the given HTML element.
+     * In case of a string, the string is used as DOM selector to retrieve the HTML element.
+     *
+     * @param elem HTML element or DOM selector string
+     */
+    static removeBlocker(elem: HTMLElement | string): boolean;
+    /**
      * Dispatches a click event on the HTML element with the given DOM selector.
      * This function can be passed directly to `preAction` or `postAction` of the step.
      *
@@ -101,6 +115,33 @@ export declare class TourUtils {
      * @default eventType change
      */
     static setValueAndTrigger(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string, value: string, eventType?: 'change' | 'input'): boolean;
+    /**
+     * ??? - TEMPORARY: Sets the value on the given HTML element and dispatches a `change` or `input` event.
+     *
+     * @param elem HTML input element or DOM selector string
+     * @param value Value that should be entered or selected
+     * @param eventType Event type `change` or `input` that should be dispatched
+     * @default eventType change
+     */
+    static setValueWithoutTrigger(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string, value: string): any;
+    /**
+     * ??? - TEMPORARY: Sets the value on the given HTML element and dispatches a `change` or `input` event.
+     *
+     * @param elem HTML input element or DOM selector string
+     * @param value Value that should be entered or selected
+     * @param eventType Event type `change` or `input` that should be dispatched
+     * @default eventType change
+     */
+    static fireMouseDown(elem: HTMLElement | HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string): boolean;
+    /**
+     * ??? - TEMPORARY: Sets the value on the given HTML element and dispatches a `change` or `input` event.
+     *
+     * @param elem HTML input element or DOM selector string
+     * @param value Value that should be entered or selected
+     * @param eventType Event type `change` or `input` that should be dispatched
+     * @default eventType change
+     */
+    static fireKeyPress(elem: HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | string, value: string): boolean;
     /**
      * Sets the value on the given HTML element and dispatches a `change` or `input` event.
      * This function can be passed directly to `preAction` or `postAction` of the step.
