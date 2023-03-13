@@ -2,8 +2,8 @@ import logging
 
 from flask import Flask, abort, make_response, request
 from flask.wrappers import Response
+from visyn_core import manager
 
-from .. import manager
 from ..utils import jsonify, to_json
 from .dataset import add, get, iter, list_datasets, remove
 

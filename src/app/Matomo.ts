@@ -1,8 +1,8 @@
 import md5 from 'md5';
+import { IUser } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
+import { AppContext } from 'visyn_core';
 import { ActionNode, ProvenanceGraph } from '../clue/provenance';
-import { IUser } from '../security';
-import { AppContext } from './AppContext';
-import { PluginRegistry } from './PluginRegistry';
 
 /**
  * Trackable Matomo event
@@ -154,7 +154,9 @@ export class Matomo {
       Matomo.getInstance().trackEvent('provenance', 'runChain', 'Run actions in chain', nodes.length);
     });
 
-    const config: IPhoveaMatomoConfig = await AppContext.getInstance().getAPIJSON('/tdp/config/matomo');
+    const config: IPhoveaMatomoConfig = await AppContext.getInstance()
+      .getAPIJSON('/tdp/config/matomo')
+      .catch(() => ({}));
     Matomo.getInstance().init(config);
   }
 

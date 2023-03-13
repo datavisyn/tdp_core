@@ -1,10 +1,10 @@
+import { I18nextManager } from 'visyn_core';
+import { IEvent, GlobalEventHandler } from 'visyn_core';
 import { NotificationHandler } from '../../base/NotificationHandler';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
 import { TemporarySessionList, PersistentSessionList } from './SessionList';
 import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
-import { IEvent, GlobalEventHandler, PropertyHandler } from '../../base';
-import { I18nextManager } from '../../i18n';
 import { ProvenanceGraph } from '../provenance';
 import { Dialog, PHOVEA_UI_FormDialog } from '../../components';
 

@@ -1,7 +1,7 @@
 import { EngineRenderer, NumberColumn, LocalDataProvider, StackColumn, ScriptColumn, OrdinalColumn, CompositeColumn, Ranking, Column, isMapAbleColumn, mappingFunctions, StringColumn, DateColumn, } from 'lineupjs';
 import { isEqual } from 'lodash';
+import { I18nextManager } from 'visyn_core';
 import { LineUpFilterUtils } from './lineUpFilter';
-import { I18nextManager } from '../../i18n';
 import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../clue/provenance';
 // used for function calls in the context of tracking or untracking actions in the provenance graph in order to get a consistent defintion of the used strings
 var LineUpTrackAndUntrackActions;

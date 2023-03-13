@@ -1,7 +1,6 @@
 import { merge } from 'lodash';
+import { IDType, SelectOperation, SelectionUtils, IDTypeManager } from 'visyn_core';
 import { BaseUtils } from '../../base/BaseUtils';
-import { AppContext } from '../../app/AppContext';
-import { IDType, SelectOperation, SelectionUtils, IDTypeManager } from '../../idtype';
 import { ADataType } from '../../data/datatype';
 import { ObjectNode, IObjectRef, ObjectRefUtils } from './ObjectNode';
 import { StateNode } from './StateNode';
@@ -14,6 +13,7 @@ import { ProvenanceGraphDim } from './provenance';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { MemoryGraph } from '../graph/MemoryGraph';
 import { ActionMetaData } from './ActionMeta';
+import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
 
 export interface IProvenanceGraphDump extends IGraphDump {
   /**
@@ -453,7 +453,7 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
       this.addEdge(action, 'resultsIn', next);
     }
     this.fire('execute', action);
-    if (AppContext.getInstance().hash.has('debug')) {
+    if (hashPropertyHandler.has('debug')) {
       console.log(`execute ${action.meta} ${action.f_id}`);
     }
     this.currentlyRunning = true;

@@ -1,7 +1,7 @@
 /// <reference types="react" />
 import { FormatOptionLabelMeta } from 'react-select';
-import { IPluginDesc } from '../../base';
-import { IDType } from '../../idtype';
+import { IDType } from 'visyn_core';
+import { IPluginDesc } from 'visyn_core';
 /**
  * a search result
  */

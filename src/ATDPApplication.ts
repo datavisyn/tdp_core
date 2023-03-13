@@ -1,6 +1,10 @@
 // TODO: Do we need a relative import?
 import './webpack/_bootstrap';
 import { merge } from 'lodash';
+import { I18nextManager } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
+import { UserSession } from 'visyn_core';
+import { ITDPClientConfig, loadClientConfig } from 'visyn_core';
 import { AppHeaderLink, AppHeader } from './components';
 import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
 import { DialogUtils } from './clue/base/dialogs';
@@ -10,9 +14,7 @@ import { TourManager } from './tour/TourManager';
 import { TemporarySessionList, ButtonModeSelector, CLUEGraphManager } from './clue';
 import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
 import { ACLUEWrapper } from './clue/wrapper';
-import { LoginMenu, Ajax, loadClientConfig, ITDPClientConfig } from './base';
-import { UserSession, PluginRegistry } from './app';
-import { I18nextManager } from './i18n';
+import { LoginMenu } from './base';
 import { IMixedStorageProvenanceGraphManagerOptions, MixedStorageProvenanceGraphManager, ProvenanceGraph } from './clue/provenance';
 import { VisLoader } from './clue/provvis';
 
@@ -167,7 +169,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     // Prefill the token manager with authorization configurations
     if (this.options.clientConfig?.tokenManager?.authorizationConfigurations) {
       await TDPTokenManager.addAuthorizationConfiguration(
-        Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({ id, ...config })),
+        Object.entries(this.options.clientConfig.tokenManager.authorizationConfigurations).map(([id, config]) => ({ id, ...(config as any) })),
       );
     }
 

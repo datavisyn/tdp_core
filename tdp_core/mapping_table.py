@@ -1,7 +1,9 @@
 import itertools
 import logging
 
-from . import db, manager
+from visyn_core import manager
+
+from . import db
 from .dbview import DBMapping
 
 _log = logging.getLogger(__name__)

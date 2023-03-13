@@ -1,4 +1,4 @@
-import { PluginRegistry } from '../../app/PluginRegistry';
+import { PluginRegistry } from 'visyn_core';
 export class VisUtils {
     static extrapolateFilter(r) {
         const v = r.filter;

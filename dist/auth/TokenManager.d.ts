@@ -1,6 +1,6 @@
-import { IEvent, EventHandler } from '../base/event';
+import { IEvent, EventHandler } from 'visyn_core';
 import { IAuthorizationConfiguration, IAuthorizationFlow, IRenderAuthorizationOptions } from './interfaces';
-declare type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;
+type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;
 export declare function authorizationStored(event: IEvent, id: string, token: string): void;
 export declare function authorizationRemoved(event: IEvent, ids: string[]): void;
 export declare class TokenManager extends EventHandler {

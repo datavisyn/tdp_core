@@ -1,9 +1,9 @@
 import { LocalDataProvider } from 'lineupjs';
+import { IDTypeManager } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
 import { ObjectRefUtils } from '../clue/provenance';
 import { ARankingView } from '../lineup/ARankingView';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
-import { PluginRegistry } from '../app';
-import { IDTypeManager } from '../idtype';
 export class AEmbeddedRanking {
     constructor(node) {
         this.node = node;

@@ -2,13 +2,13 @@ import { merge } from 'lodash';
 import 'select2';
 import { event as d3event } from 'd3v3';
 import $ from 'jquery';
+import { I18nextManager } from 'visyn_core';
+import { UserSession } from 'visyn_core';
 import { AFormElement } from './AFormElement';
 import { FormElementType } from '../interfaces';
 import { FormSelect } from './FormSelect';
 import { FormSelect2 } from './FormSelect2';
 import { Select3 } from './Select3';
-import { UserSession } from '../../app';
-import { I18nextManager } from '../../i18n';
 export class FormMap extends AFormElement {
     /**
      * Constructor

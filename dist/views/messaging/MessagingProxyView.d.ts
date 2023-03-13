@@ -20,7 +20,7 @@ export declare class MessagingProxyView extends AView {
     private iframeWindow;
     private messageQueue;
     constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: Partial<IPartialProxyViewOptions>);
-    get itemIDType(): import("../../idtype").IDType;
+    get itemIDType(): import("visyn_core").IDType;
     protected initImpl(): void;
     private build;
     private onWindowMessage;

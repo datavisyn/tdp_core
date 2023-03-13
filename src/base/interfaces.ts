@@ -1,10 +1,10 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
+import { IDType } from 'visyn_core';
+import type { IEventHandler } from 'visyn_core';
+import { IBaseViewPluginDesc } from 'visyn_core';
+import type { IPlugin, IPluginDesc } from 'visyn_core';
 import type { IAuthorizationConfiguration } from '../auth';
 import { PanelTab } from '../lineup/panel';
-import { IDType } from '../idtype/IDType';
-import type { IUser } from '../security';
-import type { IPlugin, IPluginDesc } from './plugin';
-import type { IEventHandler } from './event';
 import { ProvenanceGraph } from '../clue/provenance/ProvenanceGraph';
 import type { IObjectRef } from '../clue/provenance/ObjectNode';
 import { AppHeader } from '../components/header';
@@ -355,57 +355,6 @@ export interface IViewClass {
 
 export interface IViewPluginDesc extends IBaseViewPluginDesc, IPluginDesc {
   load(): Promise<IViewPlugin>;
-}
-
-// TODO:: refactor the Omit here to Partial<Pick<.. in ts 4
-export interface IBaseViewPluginDesc extends Partial<Omit<IPluginDesc, 'type' | 'id' | 'load'>> {
-  /**
-   * how many selection this view can handle and requires
-   */
-  selection: 'none' | '0' | 'any' | 'single' | '1' | 'small_multiple' | 'multiple' | 'chooser' | 'some' | '2';
-  /**
-   * idType regex that is required by this view
-   */
-  idtype?: string;
-  /**
-   * view group hint
-   */
-  group: { name: string; order: number };
-  /**
-   * optional preview callback function returning a url promise, the preview image should have 320x180 px
-   * @returns {Promise<string>}
-   */
-  preview?(): Promise<string>;
-  /**
-   * optional security check to show only certain views
-   */
-  security?: string | ((user: IUser) => boolean);
-  /**
-   * optional authorization configuration ensuring authorization exists before loading the view.
-   * This setting is automatically loaded in the `AView#getAuthorizationConfiguration` during initialization of the view.
-   */
-  authorization?: string | string[] | IAuthorizationConfiguration | IAuthorizationConfiguration[] | null;
-  /**
-   * a lot of topics/tags describing this view
-   */
-  topics?: string[];
-  /**
-   * a link to an external help page
-   */
-  helpUrl?: string | { url: string; linkText: string; title: string };
-  /**
-   * as an alternative an help text shown as pop up
-   */
-  helpText?: string;
-  /**
-   * a tour id to start a tour
-   */
-  helpTourId?: string;
-  /**
-   * optional help text when the user is not allowed to see this view, if false (default) the view won't be shown, if a text or true it will be just greyed out
-   * @default false
-   */
-  securityNotAllowedText?: string | boolean;
 }
 
 export interface IViewPlugin {

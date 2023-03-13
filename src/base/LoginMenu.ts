@@ -1,10 +1,10 @@
 import { merge } from 'lodash';
-import { EventHandler } from './event';
-import { PluginRegistry } from '../app';
-import { I18nextManager } from '../i18n';
+import { I18nextManager } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
+import { EventHandler, AppContext } from 'visyn_core';
+import { LoginUtils, IUser, UserSession } from 'visyn_core';
 import type { ICustomizedLoginFormPluginDesc, ICustomizedLoginFormPlugin } from './extensions';
 import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM } from './extensions';
-import { LoginUtils } from './LoginUtils';
 import { SessionWatcher } from './watcher';
 import { AppHeader } from '../components/header';
 
@@ -127,7 +127,24 @@ export class LoginMenu extends EventHandler {
       if (t) {
         loginForm = t.template;
       } else {
-        loginForm = LoginUtils.defaultLoginForm();
+        loginForm = `<form class="form-signin" action="/login" method="post" data-testid="security_flask-form-signin">
+        <div class="mb-3">
+          <label class="form-label" for="login_username">${I18nextManager.getInstance().i18n.t('phovea:security_flask.username')}</label>
+          <input type="text" class="form-control" id="login_username" data-testid="input-login-username" placeholder="${I18nextManager.getInstance().i18n.t(
+            'phovea:security_flask.username',
+          )}" required="required" autofocus="autofocus" autocomplete="username">
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="login_password"> ${I18nextManager.getInstance().i18n.t('phovea:security_flask.password')}</label>
+          <input type="password" class="form-control" id="login_password" data-testid="input-login-password" placeholder="${I18nextManager.getInstance().i18n.t(
+            'phovea:security_flask.password',
+          )}" required="required" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn btn-primary" data-testid="login-button"> ${I18nextManager.getInstance().i18n.t(
+          'phovea:security_flask.submit',
+        )}</button>
+        </form>
+        `;
       }
     }
     body.insertAdjacentHTML(
@@ -155,7 +172,42 @@ export class LoginMenu extends EventHandler {
 
     const dialog = <HTMLDivElement>body.querySelector('#loginDialog');
     const form = <HTMLFormElement>dialog.querySelector('form');
-    LoginUtils.bindLoginForm(
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const bindLoginForm = (form: HTMLFormElement, callback: (error: any, user: IUser) => any, onSubmit?: () => void) => {
+      UserSession.getInstance().reset();
+      if (!AppContext.getInstance().offline) {
+        LoginUtils.loggedInAs()
+          .then((user) => {
+            UserSession.getInstance().login(user);
+            callback(null, user);
+          })
+          .catch(() => {
+            // ignore not yet logged in
+          });
+      }
+      form.onsubmit = (event) => {
+        if (onSubmit) {
+          onSubmit();
+        }
+        const username = (<any>form).login_username.value;
+        const password = (<any>form).login_password.value;
+        LoginUtils.login(username, password)
+          .then((user) => callback(null, user))
+          .catch((error) => {
+            if (error.response && error.response.status !== 401) {
+              // 401 = Unauthorized
+              // server error
+              callback('not_reachable', null);
+            } else {
+              callback(error, null);
+            }
+          });
+        event.stopPropagation();
+        event.preventDefault();
+      };
+    };
+
+    bindLoginForm(
       form,
       (error, user) => {
         const success = !error && user;

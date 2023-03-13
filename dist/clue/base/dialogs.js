@@ -1,5 +1,5 @@
+import { I18nextManager } from 'visyn_core';
 import { Dialog } from '../../components';
-import { I18nextManager } from '../../i18n';
 export class DialogUtils {
     /**
      * utility dialog when a session was not found

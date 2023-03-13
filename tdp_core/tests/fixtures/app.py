@@ -3,10 +3,9 @@ from typing import Any, Generator
 import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
-
-from ...security import permissions
-from ...security.manager import SecurityManager
-from ...server.visyn_server import create_visyn_server
+from visyn_core.security import permissions
+from visyn_core.security.manager import SecurityManager
+from visyn_core.server.visyn_server import create_visyn_server
 
 
 @pytest.fixture()
@@ -21,7 +20,7 @@ def _mock_plugins(monkeypatch):
 def app() -> FastAPI:
     return create_visyn_server(
         workspace_config={
-            "tdp_core": {"enabled_plugins": ["tdp_core"]},
+            "visyn_core": {"enabled_plugins": ["tdp_core", "visyn_core"]},
         }
     )
 

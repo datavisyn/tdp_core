@@ -1,10 +1,10 @@
 import { merge } from 'lodash';
-import { EventHandler, GlobalEventHandler } from './event';
-import { AppContext } from '../app';
-import { IDTypeManager, IDType, SelectionUtils } from '../idtype';
+import { IDTypeManager, IDType, SelectionUtils } from 'visyn_core';
+import { EventHandler, GlobalEventHandler } from 'visyn_core';
 import { IObjectRef, ICmdResult, ActionNode, ProvenanceGraph, ObjectRefUtils } from '../clue/provenance';
 import { ActionMetaData } from '../clue/provenance/ActionMeta';
 import { Compression } from '../clue/base/Compression';
+import { hashPropertyHandler } from './url/HashPropertyHandler';
 
 const disabler = new EventHandler();
 
@@ -15,7 +15,7 @@ export class Selection {
     const { type } = parameter;
     const bak = parameter.old || idtype.selections(type);
 
-    if (AppContext.getInstance().hash.has('debug')) {
+    if (hashPropertyHandler.has('debug')) {
       console.log('select', selection);
     }
     disabler.fire(`disable-${idtype.id}`);

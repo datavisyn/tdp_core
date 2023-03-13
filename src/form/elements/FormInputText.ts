@@ -1,7 +1,7 @@
 import * as d3v3 from 'd3v3';
+import { IPluginDesc } from 'visyn_core';
 import { AFormElement } from './AFormElement';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
-import { IPluginDesc } from '../../base';
 
 /**
  * Add specific options for input form elements

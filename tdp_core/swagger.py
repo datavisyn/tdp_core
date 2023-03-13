@@ -6,8 +6,9 @@ from typing import Any
 from flask import Flask, render_template
 from flask.wrappers import Response
 from jinja2 import Template
+from visyn_core import manager
 
-from . import db, manager
+from . import db
 from .utils import secure_replacements
 
 _log = logging.getLogger(__name__)

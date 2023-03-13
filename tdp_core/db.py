@@ -4,9 +4,9 @@ from typing import Any
 from flask import abort
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
+from visyn_core import manager
 from werkzeug.datastructures import MultiDict
 
-from . import manager
 from .sql_filter import filter_logic
 from .utils import clean_query, secure_replacements
 

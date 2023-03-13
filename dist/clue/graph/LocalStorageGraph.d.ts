@@ -25,7 +25,7 @@ export declare class LocalStorageGraph extends GraphBase implements IGraph {
     addEdge(edgeOrSource: GraphEdge | GraphNode, type?: string, t?: GraphNode): this | PromiseLike<this>;
     removeEdge(e: GraphEdge): this;
     updateEdge(e: GraphEdge): any;
-    clear(): Promise<this>;
+    clear(): Promise<Awaited<this>>;
     persist(): any;
 }
 //# sourceMappingURL=LocalStorageGraph.d.ts.map

@@ -1,7 +1,8 @@
-import { FormElementType } from '../interfaces';
+import { PluginRegistry } from 'visyn_core';
+import { UserSession } from 'visyn_core';
+import { EventHandler } from 'visyn_core';
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
-import { UserSession, PluginRegistry } from '../../app';
-import { EventHandler } from '../../base';
+import { FormElementType } from '../interfaces';
 /**
  * Abstract form element class that is used as parent class for other form elements
  */
@@ -38,7 +39,7 @@ export class AFormElement extends EventHandler {
         return UserSession.getInstance().retrieve(`${this.id}_value`, defaultValue);
     }
     hasStoredValue() {
-        return UserSession.getInstance().has(`${this.id}_value`);
+        return UserSession.getInstance().retrieve(`${this.id}_value`) != null;
     }
     isRequired() {
         return this.elementDesc.required;

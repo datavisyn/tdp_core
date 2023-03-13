@@ -1,4 +1,8 @@
 import { Selection, select, event as d3event } from 'd3v3';
+import { IDType } from 'visyn_core';
+import { I18nextManager } from 'visyn_core';
+import { EEntity, UserSession } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
 import { PHOVEA_UI_FormDialog } from '../components';
 import { StoreUtils } from './StoreUtils';
 import { RestStorageUtils } from './rest';
@@ -6,10 +10,6 @@ import { INamedSet, IStoredNamedSet, ENamedSetType } from './interfaces';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { EXTENSION_POINT_TDP_LIST_FILTERS } from '../base/extensions';
 import { NotificationHandler } from '../base/NotificationHandler';
-import { UserSession, PluginRegistry } from '../app';
-import { I18nextManager } from '../i18n';
-import { IDType } from '../idtype';
-import { EEntity } from '../security';
 
 export class NamedSetList {
   readonly node: HTMLElement;

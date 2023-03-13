@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { IEventHandler } from '../base';
+import { IEventHandler } from 'visyn_core';
 
 /**
  * List of all available for elements that the form builder can handle

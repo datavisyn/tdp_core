@@ -112,12 +112,9 @@ $lu_include_font_awesome: false !default;
 .lu-dialog {
   .lu-checkbox {
     display: flex;
+    align-items: baseline;
     gap: 5px;
     margin: unset;
-  }
-
-  .lu-color-gradient {
-    margin: 5px;
   }
 }
 

@@ -1,5 +1,5 @@
-import { Ajax, isAjaxError } from '../base/ajax';
-import { I18nextManager } from '../i18n';
+import { I18nextManager } from 'visyn_core';
+import { Ajax, isAjaxError } from 'visyn_core';
 let globalErrorTemplate = (details) => details;
 export class Errors {
     /**

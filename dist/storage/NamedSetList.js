@@ -1,4 +1,7 @@
 import { select, event as d3event } from 'd3v3';
+import { I18nextManager } from 'visyn_core';
+import { EEntity, UserSession } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core';
 import { PHOVEA_UI_FormDialog } from '../components';
 import { StoreUtils } from './StoreUtils';
 import { RestStorageUtils } from './rest';
@@ -6,9 +9,6 @@ import { ENamedSetType } from './interfaces';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { EXTENSION_POINT_TDP_LIST_FILTERS } from '../base/extensions';
 import { NotificationHandler } from '../base/NotificationHandler';
-import { UserSession, PluginRegistry } from '../app';
-import { I18nextManager } from '../i18n';
-import { EEntity } from '../security';
 export class NamedSetList {
     constructor(idType, sessionCreator, doc = document) {
         this.idType = idType;
