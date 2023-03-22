@@ -129,4 +129,4 @@ export class PropertyHandler extends EventHandler {
   }
 }
 
-export const propertyHandler = new PropertyHandler();
+export const propertyHandler = new PropertyHandler(window.location.search);
