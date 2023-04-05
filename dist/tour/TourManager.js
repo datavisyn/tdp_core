@@ -46,7 +46,7 @@ export class TourManager {
         <button type="button" data-switch="--" class="btn-sm btn btn-light"><i class="fas fa-fast-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.restartButton')}</button>
         <button type="button" data-switch="-" class="btn-sm btn btn-light"><i class="fas fa-step-backward"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.backButton')}</button>
         <button type="button" data-switch="0" class="btn-sm btn btn-light"><i class="fas fa-stop"></i> ${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.cancelButton')}</button>
-        <button type="button" data-switch="+" class="btn-sm btn btn-primary"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
+        <button type="button" disabled data-switch="+" class="btn-sm btn btn-primary"><i class="fas fa-step-forward"></i>${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.nextButton')}</button>
       </div>
     </div>
     `;
@@ -173,6 +173,7 @@ export class TourManager {
     }
     setSteps(count) {
         const dots = this.step.querySelector('.tdp-tour-step-dots');
+        this.step.style.width = `${Math.max(count * 15 + 10, 500)}px`;
         dots.innerHTML = '';
         for (let i = 0; i < count; ++i) {
             dots.insertAdjacentHTML('beforeend', `<div title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.jumpToStep', { step: i + 1 })}" data-step="${i}" class="fas fa-circle"></div>`);

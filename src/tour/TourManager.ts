@@ -63,7 +63,6 @@ export class TourManager {
       hide: (finished?: boolean) => this.hideTour(finished),
       show: (stepNumber, step) => this.showStep(stepNumber, step),
     };
-
     this.backdrop = context.doc.createElement('div');
     this.backdrop.classList.add('tdp-tour-backdrop');
 
@@ -246,6 +245,11 @@ export class TourManager {
 
   private setSteps(count: number) {
     const dots = this.step.querySelector<HTMLElement>('.tdp-tour-step-dots');
+    // width of step modal is dependent on the step count
+    const STEP_MIN_WIDTH = 500;
+    const STEP_SIZE = 15;
+    const PADDING = 10;
+    this.step.style.width = `${Math.max(count * STEP_SIZE + PADDING, STEP_MIN_WIDTH)}px`;
     dots.innerHTML = '';
     for (let i = 0; i < count; ++i) {
       dots.insertAdjacentHTML(
