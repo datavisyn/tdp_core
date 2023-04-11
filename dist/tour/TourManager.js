@@ -68,6 +68,7 @@ export class TourManager {
                         this.hideTour();
                         break;
                     default:
+                        this.step.querySelector('button[data-switch="+"]').disabled = true;
                         this.activeTour.next(this.activeTourContext);
                         break;
                 }
