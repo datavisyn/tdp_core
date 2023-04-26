@@ -50,10 +50,10 @@ def _list_format_csv(data):
         return str(size)
 
     def gen():
-        yield delimiter.join(["ID", "Name", "FQName", "Type", "Size", "Entry"]) # type: ignore
+        yield delimiter.join(["ID", "Name", "FQName", "Type", "Size", "Entry"])  # type: ignore
         for d in data:
             yield "\n"
-            yield delimiter.join( # type: ignore
+            yield delimiter.join(  # type: ignore
                 [
                     str(d["id"]),
                     d["name"],
@@ -91,7 +91,7 @@ def _list_datasets():
         data = [d.to_description() for d in iter() if query(d)]
 
         limit = request.values.get("limit", -1)
-        if 0 < int(limit) < len(data): # type: ignore
+        if 0 < int(limit) < len(data):  # type: ignore
             data = data[:limit]
 
         format = request.args.get("format", "json")
@@ -103,7 +103,7 @@ def _list_datasets():
                     400,
                 )
             )
-        return formats[format](data) # type: ignore
+        return formats[format](data)  # type: ignore
     else:
         return _upload_dataset(request)
 

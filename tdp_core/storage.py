@@ -26,13 +26,13 @@ def list_namedset():
         id = _generate_id()
         name = request.values.get("name", "NoName")
         creator = request.values.get("creator", security.current_username())
-        permissions = int(request.values.get("permissions", security.DEFAULT_PERMISSION)) # type: ignore
+        permissions = int(request.values.get("permissions", security.DEFAULT_PERMISSION))  # type: ignore
         id_type = request.values.get("idType", "")
         ids = request.values.getlist("ids[]") or []
         description = request.values.get("description", "")
         sub_type_key = request.values.get("subTypeKey", "")
         sub_type_value = request.values.get("subTypeValue", "")
-        type = int(request.values.get("type", "0")) # type: ignore
+        type = int(request.values.get("type", "0"))  # type: ignore
         entry = {
             "id": id,
             "name": name,
