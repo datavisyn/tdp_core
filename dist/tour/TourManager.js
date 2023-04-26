@@ -68,6 +68,7 @@ export class TourManager {
                         this.hideTour();
                         break;
                     default:
+                        this.step.querySelector('button[data-switch="+"]').disabled = true;
                         this.activeTour.next(this.activeTourContext);
                         break;
                 }
@@ -173,6 +174,11 @@ export class TourManager {
     }
     setSteps(count) {
         const dots = this.step.querySelector('.tdp-tour-step-dots');
+        // width of step modal is dependent on the step count
+        const STEP_MIN_WIDTH = 500;
+        const STEP_SIZE = 15;
+        const PADDING = 10;
+        this.step.style.width = `${Math.max(count * STEP_SIZE + PADDING, STEP_MIN_WIDTH)}px`;
         dots.innerHTML = '';
         for (let i = 0; i < count; ++i) {
             dots.insertAdjacentHTML('beforeend', `<div title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.jumpToStep', { step: i + 1 })}" data-step="${i}" class="fas fa-circle"></div>`);

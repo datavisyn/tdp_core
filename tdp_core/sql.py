@@ -156,9 +156,9 @@ def lookup(database, view_name):
     This function is used in conjunction with Select2 form elements
     """
     view_name, _ = formatter(view_name)
-    query = request.values.get("query", "").lower()
-    page = int(request.values.get("page", 0))  # zero based
-    limit = int(request.values.get("limit", 30))  # or 'all'
+    query = request.values.get("query", "").lower()  # type: ignore
+    page = int(request.values.get("page", 0))  # type: ignore # zero based
+    limit = int(request.values.get("limit", 30))  # type: ignore # or 'all'
 
     if _return_query():
         return db.lookup_query(database, view_name, query, page, limit, request.values)
