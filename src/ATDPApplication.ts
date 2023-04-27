@@ -4,7 +4,7 @@ import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core';
 import { PluginRegistry } from 'visyn_core';
 import { UserSession } from 'visyn_core';
-import { ITDPClientConfig, loadClientConfig } from 'visyn_core';
+import { IClientConfig, loadClientConfig } from 'visyn_core';
 import { AppHeaderLink, AppHeader } from './components';
 import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
 import { DialogUtils } from './clue/base/dialogs';
@@ -112,7 +112,16 @@ export interface ITDPOptions {
    * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
    * Passing falsy values disables the client configuration load.
    */
-  clientConfig?: ITDPClientConfig | null | undefined;
+  clientConfig?: IClientConfig | null | undefined;
+}
+
+// Globally extend the clientConfig with settings relevant for tdp_core.
+declare module 'visyn_core' {
+  export interface IClientConfig {
+    tokenManager?: {
+      authorizationConfigurations?: IAuthorizationConfiguration[];
+    };
+  }
 }
 
 /**
@@ -208,7 +217,7 @@ export abstract class ATDPApplication<T> extends ACLUEWrapper {
     }
     // Otherwise, load and merge the configuration into the existing one.
     const parsedConfig = await loadClientConfig();
-    options.clientConfig = merge(options?.clientConfig || {}, parsedConfig || {});
+    options.clientConfig = merge(options?.clientConfig || {}, parsedConfig || {}) as IClientConfig;
     return options;
   }
 

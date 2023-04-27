@@ -1,8 +1,9 @@
 import './webpack/_bootstrap';
-import { ITDPClientConfig } from 'visyn_core';
+import { IClientConfig } from 'visyn_core';
 import { AppHeader } from './components';
 import { TourManager } from './tour/TourManager';
 import { CLUEGraphManager } from './clue';
+import { IAuthorizationConfiguration } from './auth';
 import { ACLUEWrapper } from './clue/wrapper';
 import { LoginMenu } from './base';
 import { IMixedStorageProvenanceGraphManagerOptions, ProvenanceGraph } from './clue/provenance';
@@ -87,7 +88,14 @@ export interface ITDPOptions {
      * To enable the asynchronous loading of the client configuration, pass an object (optionally with default values).
      * Passing falsy values disables the client configuration load.
      */
-    clientConfig?: ITDPClientConfig | null | undefined;
+    clientConfig?: IClientConfig | null | undefined;
+}
+declare module 'visyn_core' {
+    interface IClientConfig {
+        tokenManager?: {
+            authorizationConfigurations?: IAuthorizationConfiguration[];
+        };
+    }
 }
 /**
  * base class for TDP based applications
