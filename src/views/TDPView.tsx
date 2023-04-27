@@ -201,7 +201,12 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
     return (
       <div ref={(ref) => (this.node = ref as HTMLElement)} className="tdp-view">
         <header />
-        <main>{buildItem()}</main>
+
+        <main>
+          {/* TS 5 migration */}
+          {/* eslint-disable react/jsx-no-useless-fragment */}
+          <>{buildItem()}</>
+        </main>
       </div>
     );
   }

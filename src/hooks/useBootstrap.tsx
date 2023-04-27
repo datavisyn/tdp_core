@@ -80,7 +80,7 @@ export const useBSDropdown = __useBSClass(Dropdown);
  * component to get a ref handle on our wrapped components html.
  * @see https://gist.github.com/jimfb/32b587ee6177665fb4cf
  */
-class ReferenceWrapper extends React.Component {
+class ReferenceWrapper extends React.Component<{ children }> {
   static displayName = 'BSReferenceWrapper';
 
   render() {

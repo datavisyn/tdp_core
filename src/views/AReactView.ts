@@ -9,7 +9,7 @@
  *
  ******************************************************** */
 import { ReactElement } from 'react';
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { IDTypeLike, IDTypeManager } from 'visyn_core';
 import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
@@ -118,7 +118,7 @@ export abstract class AReactView extends AView {
       })
       .then((elem: ReactElement<any>) => {
         this.setBusy(false);
-        ReactDOM.render(elem, <HTMLElement>this.node.querySelector('div.react-view-body'));
+        createRoot(<HTMLElement>this.node.querySelector('div.react-view-body')).render(elem);
       })
       .catch(Errors.showErrorModalDialog)
       .catch((r) => {
