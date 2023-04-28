@@ -1,5 +1,5 @@
-import { AppContext } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
+import { AppContext } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core/i18n';
 export class BuildInfo {
     constructor(client, server) {
         this.client = client;

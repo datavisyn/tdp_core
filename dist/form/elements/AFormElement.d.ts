@@ -1,6 +1,6 @@
 import { Selection } from 'd3v3';
-import { IPluginDesc } from 'visyn_core';
-import { EventHandler } from 'visyn_core';
+import { IPluginDesc } from 'visyn_core/plugin';
+import { EventHandler } from 'visyn_core/base';
 import { IFormElementDesc, IForm, IFormElement } from '../interfaces';
 /**
  * Abstract form element class that is used as parent class for other form elements

@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { isEqual } from 'lodash';
-import { I18nextManager, useAsync } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { useAsync } from 'visyn_core/hooks';
 // eslint-disable-next-line import/no-cycle
 import { Ranking } from './Ranking';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';

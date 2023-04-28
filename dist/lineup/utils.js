@@ -1,5 +1,5 @@
 import { Ranking } from 'lineupjs';
-import { Ajax } from 'visyn_core';
+import { Ajax } from 'visyn_core/base';
 import { RestBaseUtils } from '../base/rest';
 import { FormMap } from '../form/elements/FormMap';
 export class AScoreAccessorProxy {

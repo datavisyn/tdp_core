@@ -4,8 +4,8 @@
  *
  * See IDataDescriptionMetaData in datatype.ts for various legal parameters
  */
-import { PluginRegistry } from 'visyn_core';
-import { AppContext } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { AppContext } from 'visyn_core/base';
 import { BaseUtils } from '../base/BaseUtils';
 import { DummyDataType } from './datatype';
 export class DataCache {

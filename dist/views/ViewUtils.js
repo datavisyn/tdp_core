@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash';
-import { IDTypeManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
-import { UserSession } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { UserSession } from 'visyn_core/security';
 import { EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS, } from '../base/extensions';
 class ViewUtils {
     static toViewPluginDesc(p) {

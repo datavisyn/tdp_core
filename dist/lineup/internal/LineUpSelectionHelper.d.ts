@@ -1,5 +1,5 @@
 import { LocalDataProvider } from 'lineupjs';
-import { IDType } from 'visyn_core';
+import { IDType } from 'visyn_core/idtype';
 import { EventHandler, ISelection } from '../../base';
 import { IRow } from '../../base/rest';
 export declare class LineUpSelectionHelper extends EventHandler {

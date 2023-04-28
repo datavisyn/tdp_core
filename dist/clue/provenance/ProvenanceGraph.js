@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { SelectOperation, SelectionUtils, IDTypeManager } from 'visyn_core';
+import { SelectOperation, SelectionUtils, IDTypeManager } from 'visyn_core/idtype';
 import { BaseUtils } from '../../base/BaseUtils';
 import { ADataType } from '../../data/datatype';
 import { ObjectNode, ObjectRefUtils } from './ObjectNode';

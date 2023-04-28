@@ -1,5 +1,5 @@
-import { I18nextManager } from 'visyn_core';
-import { EPermission, Permission, UserUtils, UserSession } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { EPermission, Permission, UserUtils, UserSession } from 'visyn_core/security';
 import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../clue/provenance';
 import { BaseUtils } from '../base';
 import { Compression } from '../clue/base/Compression';

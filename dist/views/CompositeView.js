@@ -1,7 +1,7 @@
-import { IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
-import { EventHandler, WebpackEnv } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { EventHandler, WebpackEnv } from 'visyn_core/base';
 import { BaseUtils } from '../base';
 import { AView } from './AView';
 import { EViewMode } from '../base/interfaces';

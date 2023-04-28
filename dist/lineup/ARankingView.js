@@ -1,9 +1,9 @@
 import { EngineRenderer, defaultOptions, isGroup, LocalDataProvider, deriveColors, TaggleRenderer, spaceFillingRule, updateLodRules, } from 'lineupjs';
 import { merge } from 'lodash';
-import { LineupVisWrapper } from 'visyn_core';
-import { IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
-import { WebpackEnv } from 'visyn_core';
+import { LineupVisWrapper } from 'visyn_core/vis';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { WebpackEnv } from 'visyn_core/base';
 import { AView } from '../views/AView';
 import { EViewMode } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';

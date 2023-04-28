@@ -2,7 +2,7 @@ import '../webpack/_bootstrap';
 import $ from 'jquery';
 import { merge } from 'lodash';
 import { Modal } from 'bootstrap';
-import { I18nextManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
 import { TourUtils } from '../tour/TourUtils';
 import { BaseUtils } from '../base/BaseUtils';
 class Dialog {

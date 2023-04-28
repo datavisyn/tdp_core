@@ -1,4 +1,4 @@
-import { IDTypeLike } from 'visyn_core';
+import { IDTypeLike } from 'visyn_core/idtype';
 import { IFormElement, IFormElementDesc } from '../form/interfaces';
 import { ISelection } from '../base/interfaces';
 export interface ISelectionChooserOptions {

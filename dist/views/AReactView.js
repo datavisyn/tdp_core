@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import { IDTypeManager } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
 import { AView } from './AView';
 import { Errors } from '../components';
 /**

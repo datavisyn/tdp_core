@@ -1,6 +1,6 @@
 import { ADialog } from 'lineupjs';
 import { debounce } from 'lodash';
-import { I18nextManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
 // copied from lineupjs
 function findFilterMissing(node) {
     return node.getElementsByClassName('lu-filter-missing')[0].previousElementSibling;
