@@ -37,7 +37,7 @@ export declare class TourUtils {
      */
     static waitForSelector(this: {
         selector?: string;
-    }): Promise<HTMLElement> | Promise<void>;
+    }): Promise<void> | Promise<HTMLElement>;
     /**
      * Dispatches a click event on the given HTML element.
      * In case of a string, the string is used as DOM selector to retrieve the HTML element.
