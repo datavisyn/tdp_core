@@ -112,7 +112,7 @@ function byDateDesc(a, b) {
 /**
  * a table ot the temporary sessions within this application
  */
-export class TemporarySessionList extends ASessionList {
+class TemporarySessionList extends ASessionList {
     async getData(manager) {
         let workspaces = (await manager.list()).filter((d) => !ProvenanceGraphMenuUtils.isPersistent(d)).sort(byDateDesc);
         // cleanup up temporary ones
@@ -191,6 +191,7 @@ export class TemporarySessionList extends ASessionList {
     }
 }
 TemporarySessionList.KEEP_ONLY_LAST_X_TEMPORARY_WORKSPACES = 10;
+export { TemporarySessionList };
 /**
  * a table ot the persistent sessions within this application
  */

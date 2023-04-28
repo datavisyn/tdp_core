@@ -3,7 +3,7 @@ import { LayoutContainerEvents } from '../interfaces';
 import { ALayoutContainer } from './ALayoutContainer';
 import { LAYOUT_CONTAINER_WRAPPER } from '../constants';
 import { DnDUtils } from '../../app';
-export class TabbingLayoutContainer extends AParentLayoutContainer {
+class TabbingLayoutContainer extends AParentLayoutContainer {
     constructor(document, options, ...children) {
         super(document, options);
         this.minChildCount = 0;
@@ -231,4 +231,5 @@ export class TabbingLayoutContainer extends AParentLayoutContainer {
     }
 }
 TabbingLayoutContainer.TAB_REORDER = `<div data-layout="tab-reorder">&nbsp;</div>`;
+export { TabbingLayoutContainer };
 //# sourceMappingURL=TabbingLayoutContainer.js.map

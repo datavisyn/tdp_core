@@ -3,7 +3,7 @@ import { EventHandler, GlobalEventHandler } from 'visyn_core';
 import { UserSession } from 'visyn_core';
 import { ERenderAuthorizationStatus } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
-export class TokenManager extends EventHandler {
+class TokenManager extends EventHandler {
     constructor() {
         super();
         /**
@@ -188,6 +188,7 @@ export class TokenManager extends EventHandler {
 }
 TokenManager.EVENT_AUTHORIZATION_STORED = 'event_authorization_stored';
 TokenManager.EVENT_AUTHORIZATION_REMOVED = 'event_authorization_removed';
+export { TokenManager };
 /**
  * Error thrown when a token is invalid (i.e. expired).
  */

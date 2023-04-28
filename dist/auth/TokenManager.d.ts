@@ -17,7 +17,7 @@ export declare class TokenManager extends EventHandler {
     /**
      * Map of possible authorization flows.
      */
-    protected authorizationFlows: Map<string, IAuthorizationFlow<import("./interfaces").ISimplePopupAuthorizationConfiguration>>;
+    protected authorizationFlows: Map<string, IAuthorizationFlow>;
     constructor();
     on(events: typeof TokenManager.EVENT_AUTHORIZATION_STORED, handler?: typeof authorizationStored): this;
     on(events: typeof TokenManager.EVENT_AUTHORIZATION_REMOVED, handler?: typeof authorizationRemoved): this;

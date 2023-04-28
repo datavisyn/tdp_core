@@ -17,7 +17,7 @@ import { AVisInstance } from './visInstance';
 import { ArrayUtils, BaseUtils } from '../../base';
 import { DnDUtils } from '../../app';
 import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
-export class VerticalStoryVis extends AVisInstance {
+class VerticalStoryVis extends AVisInstance {
     constructor(data, parent, options = {}) {
         super();
         this.data = data;
@@ -735,4 +735,5 @@ export class VerticalStoryVis extends AVisInstance {
     }
 }
 VerticalStoryVis.MIN_HEIGHT = 20;
+export { VerticalStoryVis };
 //# sourceMappingURL=storyvis.js.map

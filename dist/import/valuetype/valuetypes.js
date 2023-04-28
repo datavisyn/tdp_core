@@ -456,7 +456,7 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
         };
     }
 }
-export class ValueTypeEditor {
+class ValueTypeEditor {
     constructor(impl) {
         this.desc = impl.desc;
         this.impl = impl.factory();
@@ -521,4 +521,5 @@ export class ValueTypeEditor {
     }
 }
 ValueTypeEditor.EXTENSION_POINT = 'importer_value_type';
+export { ValueTypeEditor };
 //# sourceMappingURL=valuetypes.js.map

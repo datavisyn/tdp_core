@@ -4,7 +4,7 @@ import { AppContext } from 'visyn_core';
 import { Ajax } from '../base';
 import { RestBaseUtils } from '../base/rest';
 import { ENamedSetType } from './interfaces';
-export class RestStorageUtils {
+class RestStorageUtils {
     static listNamedSets(idType = null) {
         const args = idType ? { idType: IDTypeManager.getInstance().resolveIdType(idType).id } : {};
         return AppContext.getInstance()
@@ -62,4 +62,5 @@ export class RestStorageUtils {
     }
 }
 RestStorageUtils.REST_NAMESPACE = `${RestBaseUtils.REST_NAMESPACE}/storage`;
+export { RestStorageUtils };
 //# sourceMappingURL=rest.js.map

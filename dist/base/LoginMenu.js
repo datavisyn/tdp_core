@@ -8,7 +8,7 @@ import { SessionWatcher } from './watcher';
 /**
  * utility login menu that can be added to the Appheader for instance
  */
-export class LoginMenu extends EventHandler {
+class LoginMenu extends EventHandler {
     constructor(header, options = {}) {
         super();
         this.header = header;
@@ -196,4 +196,5 @@ export class LoginMenu extends EventHandler {
 }
 LoginMenu.EVENT_LOGGED_IN = 'loggedIn';
 LoginMenu.EVENT_LOGGED_OUT = 'loggedOut';
+export { LoginMenu };
 //# sourceMappingURL=LoginMenu.js.map

@@ -167,7 +167,8 @@ export class TDPView extends React.Component {
         };
         return (React.createElement("div", { ref: (ref) => (this.node = ref), className: "tdp-view" },
             React.createElement("header", null),
-            React.createElement("main", null, buildItem())));
+            React.createElement("main", null,
+                React.createElement(React.Fragment, null, buildItem()))));
     }
 }
 //# sourceMappingURL=TDPView.js.map

@@ -3,7 +3,7 @@ import { EPermission, Permission, UserUtils, UserSession } from 'visyn_core';
 import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../clue/provenance';
 import { BaseUtils } from '../base';
 import { Compression } from '../clue/base/Compression';
-export class TDPApplicationUtils {
+class TDPApplicationUtils {
     /**
      * see http://momentjs.com/docs/#/displaying/fromnow/
      * @param {Date} date
@@ -262,4 +262,5 @@ TDPApplicationUtils.getAreas = () => {
         [547 * TDPApplicationUtils.DAY, (d) => I18nextManager.getInstance().i18n.t('tdp:core.utilsInternal.year')],
     ];
 };
+export { TDPApplicationUtils };
 //# sourceMappingURL=TDPApplicationUtils.js.map

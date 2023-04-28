@@ -5,7 +5,7 @@ import { BaseUtils } from '../base';
 /**
  * helper class for chooser logic
  */
-export class SelectionChooser {
+class SelectionChooser {
     constructor(accessor, targetIDType, options = {}) {
         this.accessor = accessor;
         this.options = {
@@ -170,4 +170,5 @@ SelectionChooser.INVALID_MAPPING = {
     id: -1,
     label: '',
 };
+export { SelectionChooser };
 //# sourceMappingURL=SelectionChooser.js.map

@@ -1,4 +1,4 @@
-import * as ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { IDTypeManager } from 'visyn_core';
 import { AView } from './AView';
 import { Errors } from '../components';
@@ -72,7 +72,7 @@ export class AReactView extends AView {
         })
             .then((elem) => {
             this.setBusy(false);
-            ReactDOM.render(elem, this.node.querySelector('div.react-view-body'));
+            createRoot(this.node.querySelector('div.react-view-body')).render(elem);
         })
             .catch(Errors.showErrorModalDialog)
             .catch((r) => {

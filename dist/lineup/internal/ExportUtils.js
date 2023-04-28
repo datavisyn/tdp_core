@@ -1,6 +1,6 @@
 import { isNumberColumn, isDateColumn } from 'lineupjs';
 import { XlsxUtils } from 'visyn_core';
-export class ExportUtils {
+class ExportUtils {
     /**
      * Returns an IExportFormat object for the given format.
      * If no format is registered the return value is `null`.
@@ -144,4 +144,5 @@ ExportUtils.EXPORT_FORMAT = {
         },
     },
 };
+export { ExportUtils };
 //# sourceMappingURL=ExportUtils.js.map

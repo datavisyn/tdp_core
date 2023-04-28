@@ -52,7 +52,7 @@ export class Select3Utils {
         return a.every((ai, i) => ai.id === b[i].id && ai.text === b[i].text);
     }
 }
-export class Select3 extends EventHandler {
+class Select3 extends EventHandler {
     constructor(options = {}) {
         super();
         this.options = {
@@ -388,4 +388,5 @@ export class Select3 extends EventHandler {
  * @type {string}
  */
 Select3.EVENT_SELECT = 'select';
+export { Select3 };
 //# sourceMappingURL=Select3.js.map

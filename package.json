@@ -116,9 +116,7 @@
     "react": "~18.2.0",
     "react-dom": "~18.2.0",
     "visyn_core": "git+ssh://git@github.com/datavisyn/visyn_core#react18",
-    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#react18",
-    "typescript": "~5.0.4",
-    "webpack": "5.74.0"
+    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#react18"
   },
   "visyn": {
     "entries": {

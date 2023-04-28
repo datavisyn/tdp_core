@@ -19,7 +19,7 @@ import { VisLoader } from './clue/provvis';
 /**
  * base class for TDP based applications
  */
-export class ATDPApplication extends ACLUEWrapper {
+class ATDPApplication extends ACLUEWrapper {
     constructor(options = {}) {
         super();
         this.options = {
@@ -228,4 +228,5 @@ export class ATDPApplication extends ACLUEWrapper {
     }
 }
 ATDPApplication.EVENT_OPEN_START_MENU = 'openStartMenu';
+export { ATDPApplication };
 //# sourceMappingURL=ATDPApplication.js.map

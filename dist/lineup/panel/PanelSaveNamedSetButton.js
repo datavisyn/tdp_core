@@ -5,7 +5,7 @@ import { EventHandler } from '../../base';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */
-export class PanelSaveNamedSetButton extends EventHandler {
+class PanelSaveNamedSetButton extends EventHandler {
     constructor(parent, lineupOrderRowIndices, isTopMode) {
         super();
         this.node = parent.ownerDocument.createElement('div');
@@ -42,4 +42,5 @@ export class PanelSaveNamedSetButton extends EventHandler {
     }
 }
 PanelSaveNamedSetButton.EVENT_SAVE_NAMED_SET = 'saveNamedSet';
+export { PanelSaveNamedSetButton };
 //# sourceMappingURL=PanelSaveNamedSetButton.js.map

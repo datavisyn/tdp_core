@@ -4,7 +4,7 @@ import { WebpackEnv } from 'visyn_core';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
 import { AttachemntUtils } from '../../storage/internal/attachment';
 import { ActionUtils, ActionMetaData, ObjectRefUtils } from '../../clue/provenance';
-export class ScoreUtils {
+class ScoreUtils {
     static async addScoreLogic(waitForScore, inputs, parameter) {
         const scoreId = parameter.id;
         const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
@@ -124,4 +124,5 @@ export class ScoreUtils {
 }
 ScoreUtils.CMD_ADD_SCORE = 'tdpAddScore';
 ScoreUtils.CMD_REMOVE_SCORE = 'tdpRemoveScore';
+export { ScoreUtils };
 //# sourceMappingURL=ScoreUtils.js.map
