@@ -1,4 +1,4 @@
-import { IEventHandler } from 'visyn_core';
+import { IEventHandler } from 'visyn_core/base';
 
 /**
  * [width, height]

@@ -17,7 +17,7 @@ import {
   IGroup,
 } from 'lineupjs';
 import { isEqual } from 'lodash';
-import { I18nextManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
 import { LineUpFilterUtils } from './lineUpFilter';
 import { IObjectRef, ICmdResult, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode, IAction } from '../../clue/provenance';
 

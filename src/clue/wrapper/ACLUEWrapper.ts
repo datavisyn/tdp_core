@@ -1,5 +1,5 @@
-import { I18nextManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { ModeWrapper, CLUEMode } from '../base';
 import { LayoutedProvVis, VerticalStoryVis } from '../provvis';
 import { ProvenanceGraph, StateNode, SlideNode } from '../provenance';

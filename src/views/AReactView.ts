@@ -10,7 +10,7 @@
  ******************************************************** */
 import { ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
-import { IDTypeLike, IDTypeManager } from 'visyn_core';
+import { IDTypeLike, IDTypeManager } from 'visyn_core/idtype';
 import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
 import { Errors } from '../components';

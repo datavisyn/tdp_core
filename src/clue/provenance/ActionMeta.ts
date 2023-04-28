@@ -1,4 +1,4 @@
-import { UserSession } from 'visyn_core';
+import { UserSession } from 'visyn_core/security';
 import { ObjectRefUtils } from './ObjectNode';
 
 /**

@@ -1,8 +1,8 @@
 import { select, Selection, event } from 'd3v3';
 import $ from 'jquery';
-import { I18nextManager } from 'visyn_core';
-import { GlobalEventHandler } from 'visyn_core';
-import { UserSession } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { GlobalEventHandler } from 'visyn_core/base';
+import { UserSession } from 'visyn_core/security';
 import { PHOVEA_UI_FormDialog } from '../../components';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
 import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';

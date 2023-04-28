@@ -1,10 +1,11 @@
 // TODO: Do we need a relative import?
 import './webpack/_bootstrap';
 import { merge } from 'lodash';
-import { I18nextManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
-import { UserSession } from 'visyn_core';
-import { IClientConfig, loadClientConfig } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { UserSession } from 'visyn_core/security';
+import { loadClientConfig } from 'visyn_core/base';
+import { IClientConfig } from 'visyn_core';
 import { AppHeaderLink, AppHeader } from './components';
 import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
 import { DialogUtils } from './clue/base/dialogs';

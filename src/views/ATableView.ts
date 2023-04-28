@@ -1,5 +1,5 @@
-import { I18nextManager } from 'visyn_core';
-import { XlsxUtils } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { XlsxUtils } from 'visyn_core/utils';
 import { BaseUtils } from '../base';
 import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { IRow } from '../base/rest';
