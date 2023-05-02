@@ -1,6 +1,7 @@
 import $ from 'jquery';
+import { EventHandler } from 'visyn_core/base';
 import 'select2';
-import { EventHandler, BaseUtils } from '../../base';
+import { BaseUtils } from '../../base';
 function isSelect3Item(item) {
     return typeof item.verified === 'string';
 }

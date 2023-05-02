@@ -1,7 +1,6 @@
 import { IDTypeLike } from 'visyn_core/idtype';
 import { IRow, IServerColumn } from 'visyn_core/base';
 import { IScoreRow } from './interfaces';
-export type { IRow, IServerColumn } from 'visyn_core';
 /**
  * Describes the properties returned for each database connector
  */

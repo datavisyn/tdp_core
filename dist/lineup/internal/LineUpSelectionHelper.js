@@ -1,6 +1,6 @@
 import { LocalDataProvider } from 'lineupjs';
 import { difference } from 'lodash';
-import { EventHandler } from '../../base';
+import { EventHandler } from 'visyn_core/base';
 class LineUpSelectionHelper extends EventHandler {
     constructor(provider, idType, { idField = 'id', } = {}) {
         super();

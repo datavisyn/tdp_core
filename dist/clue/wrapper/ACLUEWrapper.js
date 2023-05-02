@@ -4,7 +4,7 @@ import { ModeWrapper } from '../base';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { WrapperUtils } from '../base/WrapperUtils';
 import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH } from '../../base/extensions';
-import { EventHandler } from '../../base';
+import { EventHandler } from 'visyn_core/base';
 const getTemplate = () => `<div class="box">
   <div class="content">
     <main data-anchor="main"></main>

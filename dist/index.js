@@ -16,16 +16,4 @@ export * from './tour';
 export * from './utils';
 export * from './views';
 export * from './wrapper';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
-export * from 'visyn_core';
 //# sourceMappingURL=index.js.map

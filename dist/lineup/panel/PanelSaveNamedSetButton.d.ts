@@ -1,6 +1,6 @@
 import { IPanelButton } from './PanelButton';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
-import { EventHandler } from '../../base';
+import { EventHandler } from 'visyn_core/base';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */

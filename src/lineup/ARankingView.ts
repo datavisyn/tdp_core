@@ -22,7 +22,7 @@ import { LineupVisWrapper } from 'visyn_core/vis';
 import { IDTypeManager } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
 import { ISecureItem } from 'visyn_core/security';
-import { WebpackEnv } from 'visyn_core/base';
+import { IRow, IServerColumn, WebpackEnv } from 'visyn_core/base';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection, EViewMode, IScore, IScoreRow, IAdditionalColumnDesc } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -33,7 +33,7 @@ import { ColumnDescUtils, IInitialRankingOptions, IColumnOptions } from './desc'
 import { IRankingWrapper } from './IRankingWrapper';
 import { ScoreUtils } from './internal/ScoreUtils';
 import { LineUpColors } from './internal/LineUpColors';
-import { IRow, IServerColumn, IServerColumnDesc } from '../base/rest';
+import { IServerColumnDesc } from '../base/rest';
 import { IContext, ISelectionAdapter, ISelectionColumn } from './selection/ISelectionAdapter';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LazyColumn, ILazyLoadedColumn } from './internal/column';
@@ -71,7 +71,7 @@ export abstract class ARankingView extends AView {
 
   private readonly panel: LineUpPanelActions;
 
-  private readonly generalVis: Promise<LineupVisWrapper>;
+  private readonly generalVis: LineupVisWrapper;
 
   /**
    * clears and rebuilds this lineup instance from scratch
@@ -249,28 +249,26 @@ export abstract class ARankingView extends AView {
     this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
 
     if (this.options.enableVisPanel) {
-      this.generalVis = import('visyn_core').then(() => {
-        const newVis = new LineupVisWrapper({
-          provider: this.provider,
-          selectionCallback: (ids: string[]) => {
-            // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
-            this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
-          },
-          doc: this.node.ownerDocument,
-        });
-
-        this.node.appendChild(newVis.node);
-
-        this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel: ISelection) => {
-          newVis.updateCustomVis();
-        });
-
-        this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-          newVis.toggleCustomVis();
-        });
-
-        return newVis;
+      const newVis = new LineupVisWrapper({
+        provider: this.provider,
+        selectionCallback: (ids: string[]) => {
+          // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+          this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+        },
+        doc: this.node.ownerDocument,
       });
+
+      this.node.appendChild(newVis.node);
+
+      this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel: ISelection) => {
+        newVis.updateCustomVis();
+      });
+
+      this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+        newVis.toggleCustomVis();
+      });
+
+      this.generalVis = newVis;
     }
     // When a new column desc is added to the provider, update the panel chooser
     this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
@@ -467,9 +465,7 @@ export abstract class ARankingView extends AView {
     }
 
     this.panel.hide();
-    this.generalVis?.then((vis) => {
-      vis.hide();
-    });
+    this.generalVis?.hide();
 
     if (this.dump !== null) {
       return;

@@ -4,8 +4,7 @@ import { merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
 import { PluginRegistry } from 'visyn_core/plugin';
 import { UserSession } from 'visyn_core/security';
-import { loadClientConfig } from 'visyn_core/base';
-import { IClientConfig } from 'visyn_core';
+import { IClientConfig, loadClientConfig } from 'visyn_core/base';
 import { AppHeaderLink, AppHeader } from './components';
 import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
 import { DialogUtils } from './clue/base/dialogs';
@@ -117,7 +116,7 @@ export interface ITDPOptions {
 }
 
 // Globally extend the clientConfig with settings relevant for tdp_core.
-declare module 'visyn_core' {
+declare module 'visyn_core/base' {
   export interface IClientConfig {
     tokenManager?: {
       authorizationConfigurations?: IAuthorizationConfiguration[];

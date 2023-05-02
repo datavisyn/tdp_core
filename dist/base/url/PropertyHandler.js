@@ -1,4 +1,4 @@
-import { EventHandler } from '../event';
+import { EventHandler } from 'visyn_core/base';
 class PropertyHandler extends EventHandler {
     constructor(code) {
         super();
