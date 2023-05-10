@@ -9,7 +9,7 @@
  *
  ******************************************************** */
 import { ReactElement } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, Root } from 'react-dom/client';
 import { IDTypeLike, IDTypeManager } from 'visyn_core/idtype';
 import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
@@ -41,6 +41,8 @@ export abstract class AReactView extends AView {
 
   private readonly handler?: IReactHandler;
 
+  private reactViewBodyRoot: Root;
+
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<Readonly<IReactViewOptions>> = {}) {
     super(context, selection, parent);
 
@@ -48,6 +50,7 @@ export abstract class AReactView extends AView {
 
     this.node.classList.add('react-view');
     this.node.innerHTML = `<div class="react-view-body"></div>`;
+    this.reactViewBodyRoot = createRoot(<HTMLElement>this.node.querySelector('div.react-view-body'));
   }
 
   protected initImpl() {
@@ -118,7 +121,7 @@ export abstract class AReactView extends AView {
       })
       .then((elem: ReactElement<any>) => {
         this.setBusy(false);
-        createRoot(<HTMLElement>this.node.querySelector('div.react-view-body')).render(elem);
+        this.reactViewBodyRoot.render(elem);
       })
       .catch(Errors.showErrorModalDialog)
       .catch((r) => {
