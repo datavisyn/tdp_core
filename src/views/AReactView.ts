@@ -41,7 +41,7 @@ export abstract class AReactView extends AView {
 
   private readonly handler?: IReactHandler;
 
-  private static reactViewBodyRoot: Root;
+  private reactViewBodyRoot: Root;
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<Readonly<IReactViewOptions>> = {}) {
     super(context, selection, parent);
@@ -49,13 +49,16 @@ export abstract class AReactView extends AView {
     this.handler = options && options.reactHandler ? options.reactHandler : null;
 
     this.node.classList.add('react-view');
-    this.node.innerHTML = `<div class="react-view-body"></div>`;
+    // this.node.innerHTML = `<div class="react-view-body"></div>`;
+    const child = document.createElement('div');
+    child.classList.add('react-view-body');
+    this.node.replaceChildren();
 
-    const node = <HTMLElement>this.node.querySelector('div.react-view-body');
-    if (!node.hasAttribute('data-reactroot')) {
-      AReactView.reactViewBodyRoot = createRoot(node);
-      node.setAttribute('data-reactroot', 'true');
-    }
+    // const child = <HTMLElement>this.node.querySelector('div.react-view-body');
+    // if (!child.hasAttribute('data-reactroot')) {
+    this.reactViewBodyRoot = createRoot(child);
+    // child.setAttribute('data-reactroot', 'true');
+    // }
   }
 
   protected initImpl() {
@@ -126,7 +129,7 @@ export abstract class AReactView extends AView {
       })
       .then((elem: ReactElement<any>) => {
         this.setBusy(false);
-        AReactView.reactViewBodyRoot.render(elem);
+        this.reactViewBodyRoot.render(elem);
       })
       .catch(Errors.showErrorModalDialog)
       .catch((r) => {

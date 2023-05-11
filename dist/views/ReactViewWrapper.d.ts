@@ -33,6 +33,6 @@ export declare class ReactViewWrapper extends AReactView {
         generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
     protected getItemType(): any;
-    render(inputSelection: string[], itemSelection: string[], itemSelector: ISelector): JSX.Element;
+    render(inputSelection: string[], itemSelection: string[], itemSelector: ISelector): React.JSX.Element;
 }
 //# sourceMappingURL=ReactViewWrapper.d.ts.map

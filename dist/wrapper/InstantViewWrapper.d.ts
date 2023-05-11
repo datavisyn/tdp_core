@@ -12,5 +12,5 @@ export declare function InstantViewWrapper({ selection, style, }: {
      * Optional style for the root element.
      */
     style?: React.CSSProperties;
-}): JSX.Element;
+}): React.JSX.Element;
 //# sourceMappingURL=InstantViewWrapper.d.ts.map
