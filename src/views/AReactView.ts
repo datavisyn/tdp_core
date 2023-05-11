@@ -52,7 +52,7 @@ export abstract class AReactView extends AView {
     // this.node.innerHTML = `<div class="react-view-body"></div>`;
     const child = document.createElement('div');
     child.classList.add('react-view-body');
-    this.node.replaceChildren();
+    this.node.replaceChildren(child);
 
     // const child = <HTMLElement>this.node.querySelector('div.react-view-body');
     // if (!child.hasAttribute('data-reactroot')) {
