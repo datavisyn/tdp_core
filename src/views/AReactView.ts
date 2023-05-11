@@ -45,7 +45,7 @@ export abstract class AReactView extends AView {
 
   constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options: Partial<Readonly<IReactViewOptions>> = {}) {
     super(context, selection, parent);
-
+    console.log('BEFORE');
     this.handler = options && options.reactHandler ? options.reactHandler : null;
 
     this.node.classList.add('react-view');

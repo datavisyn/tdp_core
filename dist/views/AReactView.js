@@ -9,12 +9,14 @@ export class AReactView extends AView {
     constructor(context, selection, parent, options = {}) {
         super(context, selection, parent);
         this.select = this.selectImpl.bind(this);
+        console.log('BEFORE');
         this.handler = options && options.reactHandler ? options.reactHandler : null;
         this.node.classList.add('react-view');
         // this.node.innerHTML = `<div class="react-view-body"></div>`;
-        const child = document.createElement('div');
-        child.classList.add('react-view-body');
-        this.node.replaceChildren();
+        const child = parent.ownerDocument.createElement('div');
+        // child.classList.add('react-view-body');
+        this.node.appendChild(child);
+        console.log('ausgführt');
         // const child = <HTMLElement>this.node.querySelector('div.react-view-body');
         // if (!child.hasAttribute('data-reactroot')) {
         this.reactViewBodyRoot = createRoot(child);
