@@ -104,6 +104,10 @@
     "storybook-addon-swc": "^1.1.9"
   },
   "overrides": {
+    "@types/react": "~18.2.0",
+    "@types/react-dom": "~18.2.0",
+    "react": "~18.2.0",
+    "react-dom": "~18.2.0",
     "webpack": "5.74.0"
   },
   "resolutions": {
