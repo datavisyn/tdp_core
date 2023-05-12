@@ -33,6 +33,7 @@ export interface IReactViewOptions {
 export declare abstract class AReactView extends AView {
     private readonly select;
     private readonly handler?;
+    private reactViewBodyRoot;
     constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: Partial<Readonly<IReactViewOptions>>);
     protected initImpl(): Promise<void | (({ generateDialog }: {
         generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;

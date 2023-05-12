@@ -11,7 +11,10 @@ export class AReactView extends AView {
         this.select = this.selectImpl.bind(this);
         this.handler = options && options.reactHandler ? options.reactHandler : null;
         this.node.classList.add('react-view');
-        this.node.innerHTML = `<div class="react-view-body"></div>`;
+        const child = parent.ownerDocument.createElement('div');
+        child.classList.add('react-view-body');
+        this.node.replaceChildren(child);
+        this.reactViewBodyRoot = createRoot(child);
     }
     initImpl() {
         super.initImpl();
@@ -72,7 +75,7 @@ export class AReactView extends AView {
         })
             .then((elem) => {
             this.setBusy(false);
-            createRoot(this.node.querySelector('div.react-view-body')).render(elem);
+            this.reactViewBodyRoot.render(elem);
         })
             .catch(Errors.showErrorModalDialog)
             .catch((r) => {

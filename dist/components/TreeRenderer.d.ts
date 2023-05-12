@@ -61,7 +61,7 @@ export declare class TreeRenderer extends React.Component<Partial<ITreeRendererP
     handleItemClick: (e: React.MouseEvent, item: ITreeElement) => void;
     handleSelectionChanged: (item: any, group: any, selected: any) => void;
     setSelectedIds: (itemIds?: string[]) => void;
-    render(): JSX.Element;
+    render(): React.JSX.Element;
 }
 export {};
 //# sourceMappingURL=TreeRenderer.d.ts.map

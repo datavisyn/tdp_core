@@ -21,7 +21,7 @@ export declare const BSModal: ({ children, instanceRef, ...options }: {
 } & Partial<Modal.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
-}) => JSX.Element;
+}) => React.JSX.Element;
 export declare const BSToast: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -34,7 +34,7 @@ export declare const BSToast: ({ children, instanceRef, ...options }: {
 } & Partial<Toast.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
-}) => JSX.Element;
+}) => React.JSX.Element;
 export declare const BSPopover: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -47,7 +47,7 @@ export declare const BSPopover: ({ children, instanceRef, ...options }: {
 } & Partial<Popover.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
-}) => JSX.Element;
+}) => React.JSX.Element;
 export declare const BSAlert: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -57,7 +57,7 @@ export declare const BSAlert: ({ children, instanceRef, ...options }: {
      * Optional ref to get access to the instance of the BS class.
      */
     instanceRef?: (instance: Alert) => void;
-} & Record<string, unknown>) => JSX.Element;
+} & Record<string, unknown>) => React.JSX.Element;
 export declare const BSOffcanvas: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -71,7 +71,7 @@ export declare const BSOffcanvas: ({ children, instanceRef, ...options }: {
     show?: boolean;
     relatedTarget?: HTMLElement;
     setShow?: (show: boolean) => void;
-}) => JSX.Element;
+}) => React.JSX.Element;
 export declare const BSTooltip: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -84,7 +84,7 @@ export declare const BSTooltip: ({ children, instanceRef, ...options }: {
 } & Partial<Tooltip.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
-}) => JSX.Element;
+}) => React.JSX.Element;
 export declare const BSTab: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -94,7 +94,7 @@ export declare const BSTab: ({ children, instanceRef, ...options }: {
      * Optional ref to get access to the instance of the BS class.
      */
     instanceRef?: (instance: Tab) => void;
-} & Record<string, unknown>) => JSX.Element;
+} & Record<string, unknown>) => React.JSX.Element;
 export declare const BSCollapse: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -107,7 +107,7 @@ export declare const BSCollapse: ({ children, instanceRef, ...options }: {
 } & Partial<Collapse.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
-}) => JSX.Element;
+}) => React.JSX.Element;
 export declare const BSDropdown: ({ children, instanceRef, ...options }: {
     /**
      * Child element of the BS class, i.e. the `<div class="modal">...</div>` in the case of BSModal.
@@ -120,5 +120,5 @@ export declare const BSDropdown: ({ children, instanceRef, ...options }: {
 } & Partial<Dropdown.Options> & {
     show?: boolean;
     setShow?: (show: boolean) => void;
-}) => JSX.Element;
+}) => React.JSX.Element;
 //# sourceMappingURL=useBootstrap.d.ts.map
