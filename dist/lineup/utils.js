@@ -8,6 +8,7 @@ export class AScoreAccessorProxy {
         /**
          * the accessor for the score column
          * @param row
+         * @readonly
          */
         this.accessor = (row) => this.access(row.v);
         this.scores = new Map();

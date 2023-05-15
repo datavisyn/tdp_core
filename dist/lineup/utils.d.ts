@@ -16,8 +16,9 @@ export declare class AScoreAccessorProxy<T> {
     /**
      * the accessor for the score column
      * @param row
+     * @readonly
      */
-    readonly accessor: IAccessorFunc<T>;
+    accessor: IAccessorFunc<T>;
     readonly scores: Map<string, T>;
     constructor(missingValue?: T);
     clear(): void;
