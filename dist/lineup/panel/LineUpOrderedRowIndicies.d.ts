@@ -1,5 +1,5 @@
 import { LocalDataProvider } from 'lineupjs';
-import { EventHandler } from 'visyn_core';
+import { EventHandler } from 'visyn_core/base';
 /**
  *  Store the ordered row indices for all, selected or filtered rows of the first ranking.
  */

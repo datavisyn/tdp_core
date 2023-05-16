@@ -1,12 +1,12 @@
-import { PluginRegistry } from 'visyn_core';
-import { UserSession } from 'visyn_core';
-import { EventHandler } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { UserSession } from 'visyn_core/security';
+import { EventHandler } from 'visyn_core/base';
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
 import { FormElementType } from '../interfaces';
 /**
  * Abstract form element class that is used as parent class for other form elements
  */
-export class AFormElement extends EventHandler {
+class AFormElement extends EventHandler {
     /**
      * Constructor
      * @param form The form this element is a part of
@@ -182,4 +182,5 @@ export class AFormElement extends EventHandler {
 }
 AFormElement.EVENT_CHANGE = 'change';
 AFormElement.EVENT_INITIAL_VALUE = 'initial';
+export { AFormElement };
 //# sourceMappingURL=AFormElement.js.map

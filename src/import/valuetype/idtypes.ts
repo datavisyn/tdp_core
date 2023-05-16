@@ -1,6 +1,6 @@
-import { IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { ITypeDefinition, IValueTypeEditor, PHOVEA_IMPORTER_ValueTypeUtils, ValueTypeEditor } from './valuetypes';
 
 /**
@@ -71,7 +71,7 @@ export class IDTypeUtils {
 
   static async isIDType(name: string, index: number, data: any[], accessor: (row: any) => string, sampleSize: number) {
     // first check if it is number then it cant be an IDType
-    const isNumber = PHOVEA_IMPORTER_ValueTypeUtils.numerical().isType(name, index, data, accessor, sampleSize);
+    const isNumber = await PHOVEA_IMPORTER_ValueTypeUtils.numerical().isType(name, index, data, accessor, sampleSize);
     if (isNumber > 0.8) {
       // pretty sure it is a number
       return 0;

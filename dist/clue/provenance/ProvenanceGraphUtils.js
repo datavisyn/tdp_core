@@ -1,4 +1,4 @@
-import { PluginRegistry } from 'visyn_core';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { ObjectNode, ObjectRefUtils } from './ObjectNode';
 import { StateNode } from './StateNode';
 import { ActionNode } from './ActionNode';

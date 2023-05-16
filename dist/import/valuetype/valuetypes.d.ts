@@ -1,4 +1,4 @@
-import { IPlugin } from 'visyn_core';
+import { IPlugin } from 'visyn_core/plugin';
 import { Dialog } from '../../components';
 export interface ITypeDefinition {
     type: string;

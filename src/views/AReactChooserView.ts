@@ -1,4 +1,4 @@
-import { IDTypeLike } from 'visyn_core';
+import { IDTypeLike } from 'visyn_core/idtype';
 import { AReactView } from './AReactView';
 import { ISelectionChooserOptions, SelectionChooser } from './SelectionChooser';
 

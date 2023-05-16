@@ -1,5 +1,5 @@
 import './webpack/_bootstrap';
-import { IClientConfig } from 'visyn_core';
+import { IClientConfig } from 'visyn_core/base';
 import { AppHeader } from './components';
 import { TourManager } from './tour/TourManager';
 import { CLUEGraphManager } from './clue';
@@ -90,7 +90,7 @@ export interface ITDPOptions {
      */
     clientConfig?: IClientConfig | null | undefined;
 }
-declare module 'visyn_core' {
+declare module 'visyn_core/base' {
     interface IClientConfig {
         tokenManager?: {
             authorizationConfigurations?: IAuthorizationConfiguration[];

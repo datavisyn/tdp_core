@@ -8,7 +8,7 @@ export declare class GraphProxy extends ADataType<IGraphDataDescription> {
     get nedges(): number;
     get dim(): number[];
     impl(factory?: IGraphFactory): PromiseLike<AGraph>;
-    get idtypes(): import("visyn_core").IDType[];
+    get idtypes(): import("visyn_core/idtype").IDType[];
     /**
      * module entry point for creating a datatype
      * @param desc

@@ -80,7 +80,7 @@ export class ViewBuilder extends ABuilder {
         return new ViewLayoutContainer(this.view, options);
     }
 }
-export class LayoutUtils {
+class LayoutUtils {
     /**
      * restores the given layout dump
      * @param {ILayoutDump} dump the dump
@@ -347,6 +347,7 @@ export class LayoutUtils {
     }
 }
 LayoutUtils.noPadding = LayoutUtils.padding(0);
+export { LayoutUtils };
 export class AParentBuilder extends ABuilder {
     constructor(children) {
         super();

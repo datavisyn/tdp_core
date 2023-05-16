@@ -1,13 +1,13 @@
-import { IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
-import { EventHandler } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { EventHandler } from 'visyn_core/base';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
 import { ViewUtils } from '../views/ViewUtils';
 import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
 import { NodeUtils, ObjectRefUtils } from '../clue/provenance';
 import { Dialog } from '../components';
-export class ViewWrapper extends EventHandler {
+class ViewWrapper extends EventHandler {
     off(events, handler) {
         return super.on(events, handler);
     }
@@ -339,4 +339,5 @@ export class ViewWrapper extends EventHandler {
 ViewWrapper.EVENT_VIEW_INITIALIZED = 'viewInitialized';
 ViewWrapper.EVENT_VIEW_CREATED = 'viewCreated';
 ViewWrapper.EVENT_VIEW_DESTROYED = 'viewDestroyed';
+export { ViewWrapper };
 //# sourceMappingURL=ViewWrapper.js.map

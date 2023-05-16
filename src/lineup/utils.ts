@@ -1,8 +1,9 @@
 import { IDataRow, Ranking, LocalDataProvider } from 'lineupjs';
-import { IPluginDesc } from 'visyn_core';
-import { Ajax } from 'visyn_core';
+import { Ajax, IRow } from 'visyn_core/base';
+import { IPluginDesc } from 'visyn_core/plugin';
+
 import type { IScoreRow, IScoreLoader } from '../base/interfaces';
-import { RestBaseUtils, IParams, IRow } from '../base/rest';
+import { RestBaseUtils, IParams } from '../base/rest';
 import { IFormMultiMap, IFormRow, FormMap } from '../form/elements/FormMap';
 import { IRankingWrapper } from './IRankingWrapper';
 
@@ -17,8 +18,9 @@ export class AScoreAccessorProxy<T> {
   /**
    * the accessor for the score column
    * @param row
+   * @readonly
    */
-  readonly accessor: IAccessorFunc<T> = (row: IDataRow) => this.access(row.v);
+  accessor: IAccessorFunc<T> = (row: IDataRow) => this.access(row.v);
 
   public readonly scores = new Map<string, T>();
 

@@ -5,7 +5,7 @@ import { BaseUtils } from '../base';
 function isNumeric(obj) {
     return obj - parseFloat(obj) + 1 >= 0;
 }
-export class ValueTypeUtils {
+class ValueTypeUtils {
     /**
      * guesses the type of the given value array returning its description
      * @param arr
@@ -50,4 +50,5 @@ ValueTypeUtils.VALUE_TYPE_CATEGORICAL = 'categorical';
 ValueTypeUtils.VALUE_TYPE_STRING = 'string';
 ValueTypeUtils.VALUE_TYPE_REAL = 'real';
 ValueTypeUtils.VALUE_TYPE_INT = 'int';
+export { ValueTypeUtils };
 //# sourceMappingURL=valuetype.js.map

@@ -1,8 +1,8 @@
 import { isEqual } from 'lodash';
-import { IDType, IDTypeManager } from 'visyn_core';
-import { PluginRegistry, IPluginDesc } from 'visyn_core';
-import { UserSession } from 'visyn_core';
-import { IBaseViewPluginDesc } from 'visyn_core';
+import { IDType, IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry, IPluginDesc } from 'visyn_core/plugin';
+import { UserSession } from 'visyn_core/security';
+import { IBaseViewPluginDesc } from 'visyn_core/base';
 import {
   EXTENSION_POINT_TDP_VIEW,
   EXTENSION_POINT_TDP_LIST_FILTERS,

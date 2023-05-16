@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { IPluginDesc } from 'visyn_core';
+import { IPluginDesc } from 'visyn_core/plugin';
 import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
 import { AFormElement } from './AFormElement';
 export interface ICheckBoxElementDesc extends IFormElementDesc {

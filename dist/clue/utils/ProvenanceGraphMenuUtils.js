@@ -1,9 +1,9 @@
 import { merge, uniqueId } from 'lodash';
-import { I18nextManager } from 'visyn_core';
-import { UserSession, EEntity } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { UserSession, EEntity } from 'visyn_core/security';
 import { PHOVEA_UI_FormDialog } from '../../components';
 import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
-export class ProvenanceGraphMenuUtils {
+class ProvenanceGraphMenuUtils {
     static isPersistent(d) {
         return d.local === false || d.local === undefined;
     }
@@ -68,4 +68,5 @@ export class ProvenanceGraphMenuUtils {
     }
 }
 ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED = 'provenanceGraphMenuManipulated';
+export { ProvenanceGraphMenuUtils };
 //# sourceMappingURL=ProvenanceGraphMenuUtils.js.map

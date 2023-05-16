@@ -1,4 +1,4 @@
-import { IEvent, EventHandler } from 'visyn_core';
+import { IEvent, EventHandler } from 'visyn_core/base';
 import { IAuthorizationConfiguration, IAuthorizationFlow, IRenderAuthorizationOptions } from './interfaces';
 type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;
 export declare function authorizationStored(event: IEvent, id: string, token: string): void;
@@ -17,7 +17,7 @@ export declare class TokenManager extends EventHandler {
     /**
      * Map of possible authorization flows.
      */
-    protected authorizationFlows: Map<string, IAuthorizationFlow<import("./interfaces").ISimplePopupAuthorizationConfiguration>>;
+    protected authorizationFlows: Map<string, IAuthorizationFlow>;
     constructor();
     on(events: typeof TokenManager.EVENT_AUTHORIZATION_STORED, handler?: typeof authorizationStored): this;
     on(events: typeof TokenManager.EVENT_AUTHORIZATION_REMOVED, handler?: typeof authorizationRemoved): this;

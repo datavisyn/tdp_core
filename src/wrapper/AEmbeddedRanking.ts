@@ -1,6 +1,7 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
-import { IDTypeManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
+import { IRow } from 'visyn_core/base';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { ProvenanceGraph, ObjectRefUtils } from '../clue/provenance';
 import { ARankingView } from '../lineup/ARankingView';
 import { IARankingViewOptions } from '../lineup/IARankingViewOptions';
@@ -8,7 +9,7 @@ import { IInitialRankingOptions } from '../lineup/desc';
 import { IViewProviderLocal } from '../lineup/internal/cmds';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
 import { IScore } from '../base/interfaces';
-import { IServerColumnDesc, IRow } from '../base/rest';
+import { IServerColumnDesc } from '../base/rest';
 import { IFormElementDesc } from '../form/interfaces';
 import { ILazyLoadedColumn } from '../lineup/internal/column';
 

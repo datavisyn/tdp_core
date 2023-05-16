@@ -1,10 +1,10 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
+import { IRow } from 'visyn_core/base';
 import { ProvenanceGraph } from '../clue/provenance';
 import { ARankingView } from '../lineup/ARankingView';
 import { IARankingViewOptions } from '../lineup/IARankingViewOptions';
 import { IViewProviderLocal } from '../lineup/internal/cmds';
 import { IScore } from '../base/interfaces';
-import { IRow } from '../base/rest';
 import { IFormElementDesc } from '../form/interfaces';
 import { ILazyLoadedColumn } from '../lineup/internal/column';
 export interface IEmbeddedRanking extends ARankingView {

@@ -1,6 +1,6 @@
-import { IDType, IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
-import { EventHandler, IEvent, IEventListener, IBaseViewPluginDesc } from 'visyn_core';
+import { IDType, IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { EventHandler, IEvent, IEventListener, IBaseViewPluginDesc } from 'visyn_core/base';
 import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewContext, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
 import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';

@@ -1,4 +1,4 @@
-import { I18nextManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
 export async function simplePopupFlow({ id, url, tokenParameter }) {
     console.log(`Openining popup window for ${id}`);
     // Allow a redirect_uri placeholder to automatically inject the location origin

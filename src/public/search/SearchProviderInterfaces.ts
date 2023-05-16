@@ -1,6 +1,6 @@
 import { FormatOptionLabelMeta } from 'react-select';
-import { IDType } from 'visyn_core';
-import { IPluginDesc } from 'visyn_core';
+import { IDType } from 'visyn_core/idtype';
+import { IPluginDesc } from 'visyn_core/plugin';
 
 /**
  * a search result

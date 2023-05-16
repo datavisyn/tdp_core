@@ -1,4 +1,4 @@
-import { Ajax, AppContext } from 'visyn_core';
+import { Ajax, AppContext } from 'visyn_core/base';
 /**
  * Define empty filter object for use as function default parameter
  */
@@ -9,7 +9,7 @@ const emptyFilters = {
     gt: {},
     gte: {},
 };
-export class RestBaseUtils {
+class RestBaseUtils {
     static getTDPDataImpl(database, view, method, params = {}) {
         const mmethod = method === 'none' ? '' : `/${method}`;
         const url = `${RestBaseUtils.REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
@@ -184,4 +184,5 @@ export class RestBaseUtils {
 }
 RestBaseUtils.REST_NAMESPACE = '/tdp';
 RestBaseUtils.REST_DB_NAMESPACE = `${RestBaseUtils.REST_NAMESPACE}/db`;
+export { RestBaseUtils };
 //# sourceMappingURL=rest.js.map

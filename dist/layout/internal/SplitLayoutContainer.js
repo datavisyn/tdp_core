@@ -1,7 +1,7 @@
 import { EOrientation, LayoutContainerEvents } from '../interfaces';
 import { ALayoutContainer } from './ALayoutContainer';
 import { ASequentialLayoutContainer } from './ASequentialLayoutContainer';
-export class SplitLayoutContainer extends ASequentialLayoutContainer {
+class SplitLayoutContainer extends ASequentialLayoutContainer {
     constructor(document, options, ratio, child1, child2) {
         super(document, options);
         this.minChildCount = 2;
@@ -290,4 +290,5 @@ export class SplitLayoutContainer extends ASequentialLayoutContainer {
 }
 SplitLayoutContainer.SEPARATOR = `<div data-layout="separator"><span title="Squeeze Left"></span><span title="Squeeze Right"></span></div>`;
 SplitLayoutContainer.SEPARATOR_WIDTH = 5;
+export { SplitLayoutContainer };
 //# sourceMappingURL=SplitLayoutContainer.js.map

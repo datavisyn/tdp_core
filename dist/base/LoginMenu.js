@@ -1,14 +1,13 @@
 import { merge } from 'lodash';
-import { I18nextManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
-import { EventHandler, AppContext } from 'visyn_core';
-import { LoginUtils, UserSession } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { EventHandler, AppContext } from 'visyn_core/base';
+import { LoginUtils, UserSession, SessionWatcher } from 'visyn_core/security';
 import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM } from './extensions';
-import { SessionWatcher } from './watcher';
 /**
  * utility login menu that can be added to the Appheader for instance
  */
-export class LoginMenu extends EventHandler {
+class LoginMenu extends EventHandler {
     constructor(header, options = {}) {
         super();
         this.header = header;
@@ -196,4 +195,5 @@ export class LoginMenu extends EventHandler {
 }
 LoginMenu.EVENT_LOGGED_IN = 'loggedIn';
 LoginMenu.EVENT_LOGGED_OUT = 'loggedOut';
+export { LoginMenu };
 //# sourceMappingURL=LoginMenu.js.map

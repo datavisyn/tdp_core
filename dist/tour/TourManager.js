@@ -1,6 +1,6 @@
 import Popper from 'popper.js';
-import { I18nextManager } from 'visyn_core';
-import { GlobalEventHandler } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { GlobalEventHandler } from 'visyn_core/base';
 import { Tour } from './Tour';
 import { TourUtils } from './TourUtils';
 import { BaseUtils } from '../base/BaseUtils';

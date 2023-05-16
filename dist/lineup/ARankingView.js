@@ -1,9 +1,9 @@
 import { EngineRenderer, defaultOptions, isGroup, LocalDataProvider, deriveColors, TaggleRenderer, spaceFillingRule, updateLodRules, } from 'lineupjs';
 import { merge } from 'lodash';
-import { LineupVisWrapper } from 'visyn_core';
-import { IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
-import { WebpackEnv } from 'visyn_core';
+import { LineupVisWrapper } from 'visyn_core/vis';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { WebpackEnv } from 'visyn_core/base';
 import { AView } from '../views/AView';
 import { EViewMode } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -180,24 +180,22 @@ export class ARankingView extends AView {
         this.selectionHelper = new LineUpSelectionHelper(this.provider, () => this.itemIDType);
         this.panel = new LineUpPanelActions(this.provider, this.taggle.ctx, this.options, this.node.ownerDocument);
         if (this.options.enableVisPanel) {
-            this.generalVis = import('visyn_core').then(() => {
-                const newVis = new LineupVisWrapper({
-                    provider: this.provider,
-                    selectionCallback: (ids) => {
-                        // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
-                        this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
-                    },
-                    doc: this.node.ownerDocument,
-                });
-                this.node.appendChild(newVis.node);
-                this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
-                    newVis.updateCustomVis();
-                });
-                this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
-                    newVis.toggleCustomVis();
-                });
-                return newVis;
+            const newVis = new LineupVisWrapper({
+                provider: this.provider,
+                selectionCallback: (ids) => {
+                    // The incoming selection is already working with row.v.id instead of row.v._id, so we have to convert first.
+                    this.selectionHelper.setGeneralVisSelection({ idtype: IDTypeManager.getInstance().resolveIdType(this.itemIDType.id), ids });
+                },
+                doc: this.node.ownerDocument,
             });
+            this.node.appendChild(newVis.node);
+            this.selectionHelper.on(LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION, (_event, sel) => {
+                newVis.updateCustomVis();
+            });
+            this.panel.on(LineUpPanelActions.EVENT_OPEN_VIS, () => {
+                newVis.toggleCustomVis();
+            });
+            this.generalVis = newVis;
         }
         // When a new column desc is added to the provider, update the panel chooser
         this.provider.on(LocalDataProvider.EVENT_ADD_DESC, () => this.updatePanelChooser());
@@ -373,9 +371,7 @@ export class ARankingView extends AView {
             return;
         }
         this.panel.hide();
-        this.generalVis?.then((vis) => {
-            vis.hide();
-        });
+        this.generalVis?.hide();
         if (this.dump !== null) {
             return;
         }

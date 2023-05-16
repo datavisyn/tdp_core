@@ -1,7 +1,7 @@
 import { merge, identity } from 'lodash';
 import * as d3v3 from 'd3v3';
-import { I18nextManager } from 'visyn_core';
-import { UserSession } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { UserSession } from 'visyn_core/security';
 import { PHOVEA_IMPORTER_ValueTypeUtils } from './valuetype/valuetypes';
 import { BaseUtils } from '../base';
 export class ImportUtils {

@@ -1,4 +1,4 @@
-import { EventHandler } from '../../base';
+import { EventHandler } from 'visyn_core/base';
 import { ILayoutDump, ILayoutContainer, ILayoutParentContainer } from '../interfaces';
 import { IParentLayoutContainer } from './IParentLayoutContainer';
 export interface ILayoutContainerOption {

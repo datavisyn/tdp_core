@@ -1,7 +1,7 @@
-import { IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
-import { EventHandler, WebpackEnv } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { EventHandler, WebpackEnv } from 'visyn_core/base';
 import { BaseUtils } from '../base';
 import { AView } from './AView';
 import { EViewMode } from '../base/interfaces';
@@ -67,7 +67,7 @@ class WrapperView {
         return -1;
     }
 }
-export class CompositeView extends EventHandler {
+class CompositeView extends EventHandler {
     constructor(context, selection, parent, options = {}) {
         super();
         this.context = context;
@@ -402,4 +402,5 @@ export class CompositeView extends EventHandler {
 }
 CompositeView.VIEW_COMPOSITE_EVENT_CHANGE_RATIOS = 'changeRatios';
 CompositeView.VIEW_COMPOSITE_EVENT_SET_ACTIVE_TAB = 'setActiveTab';
+export { CompositeView };
 //# sourceMappingURL=CompositeView.js.map

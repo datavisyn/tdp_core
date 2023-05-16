@@ -1,8 +1,8 @@
 import { LocalDataProvider } from 'lineupjs';
 import { difference } from 'lodash';
-import { IDType } from 'visyn_core';
-import { EventHandler, ISelection } from '../../base';
-import { IRow } from '../../base/rest';
+import { EventHandler, IRow } from 'visyn_core/base';
+import { IDType } from 'visyn_core/idtype';
+import { ISelection } from '../../base';
 
 export class LineUpSelectionHelper extends EventHandler {
   static readonly EVENT_SET_ITEM_SELECTION = 'setItemSelection';

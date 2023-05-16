@@ -1,5 +1,5 @@
+import { EventHandler } from 'visyn_core/base';
 import 'select2';
-import { EventHandler } from '../../base';
 export interface IdTextPair {
     id: string;
     text: string;

@@ -1,7 +1,7 @@
 import { LocalDataProvider } from 'lineupjs';
 import { difference } from 'lodash';
-import { EventHandler } from '../../base';
-export class LineUpSelectionHelper extends EventHandler {
+import { EventHandler } from 'visyn_core/base';
+class LineUpSelectionHelper extends EventHandler {
     constructor(provider, idType, { idField = 'id', } = {}) {
         super();
         this.provider = provider;
@@ -106,4 +106,5 @@ export class LineUpSelectionHelper extends EventHandler {
     }
 }
 LineUpSelectionHelper.EVENT_SET_ITEM_SELECTION = 'setItemSelection';
+export { LineUpSelectionHelper };
 //# sourceMappingURL=LineUpSelectionHelper.js.map

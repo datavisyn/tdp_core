@@ -37,7 +37,7 @@ function Leaf(props) {
         leaf,
         React.createElement(Toolbar, null)));
 }
-export class TreeRenderer extends React.Component {
+class TreeRenderer extends React.Component {
     constructor(props) {
         super(props);
         this.handleItemClick = (e, item) => {
@@ -115,4 +115,5 @@ TreeRenderer.defaultProps = {
      */
     selectionChanged: (items) => null,
 };
+export { TreeRenderer };
 //# sourceMappingURL=TreeRenderer.js.map

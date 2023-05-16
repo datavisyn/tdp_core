@@ -1,4 +1,4 @@
-import { GlobalEventHandler } from 'visyn_core';
+import { GlobalEventHandler } from 'visyn_core/base';
 import { BaseUtils } from '../base/BaseUtils';
 import type { IViewTourContext } from './extensions';
 

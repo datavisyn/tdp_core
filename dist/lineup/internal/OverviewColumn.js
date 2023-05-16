@@ -1,9 +1,9 @@
 import { Column, BooleanColumn } from 'lineupjs';
-import { I18nextManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
 /**
  * extra column for highlighting and filtering
  */
-export class OverviewColumn extends BooleanColumn {
+class OverviewColumn extends BooleanColumn {
     constructor(id, desc) {
         super(id, Object.assign(desc, {
             label: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.overviewSelection'),
@@ -40,4 +40,5 @@ export class OverviewColumn extends BooleanColumn {
 }
 OverviewColumn.GROUP_TRUE = { name: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.selectedInOverview'), color: 'white' };
 OverviewColumn.GROUP_FALSE = { name: I18nextManager.getInstance().i18n.t('tdp:core.lineup.OverviewColumn.rest'), color: '#AAAAAA' };
+export { OverviewColumn };
 //# sourceMappingURL=OverviewColumn.js.map

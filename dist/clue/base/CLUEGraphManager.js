@@ -1,6 +1,6 @@
-import { I18nextManager } from 'visyn_core';
-import { EventHandler } from 'visyn_core';
-import { UserSession } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { EventHandler } from 'visyn_core/base';
+import { UserSession } from 'visyn_core/security';
 import { CommonPropertyHandler, HashPropertyHandler, QueryPropertyHandler } from '../../base/url';
 /**
  * Based on the selected property the other property handler is checked for CLUE parameter.
@@ -41,7 +41,7 @@ export function rewriteURLOtherProperty(selectedProperty) {
     toHandler.destroy();
     window.history.pushState(null, `State ${Date.now()}`, url);
 }
-export class CLUEGraphManager extends EventHandler {
+class CLUEGraphManager extends EventHandler {
     constructor(manager, { isReadOnly = false, propertyHandler = 'hash', rewriteOtherProperty = false } = {
         isReadOnly: false,
         propertyHandler: 'hash',
@@ -292,4 +292,5 @@ CLUEGraphManager.EVENT_EXTERNAL_STATE_CHANGE = 'externalStateChanged';
  * @type {number}
  */
 CLUEGraphManager.DEBOUNCE_UPDATE_DELAY = 100;
+export { CLUEGraphManager };
 //# sourceMappingURL=CLUEGraphManager.js.map

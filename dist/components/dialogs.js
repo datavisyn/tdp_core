@@ -2,10 +2,10 @@ import '../webpack/_bootstrap';
 import $ from 'jquery';
 import { merge } from 'lodash';
 import { Modal } from 'bootstrap';
-import { I18nextManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
 import { TourUtils } from '../tour/TourUtils';
 import { BaseUtils } from '../base/BaseUtils';
-export class Dialog {
+class Dialog {
     /**
      * @param title Dialog title
      * @param primaryBtnText Label for primary button
@@ -155,6 +155,7 @@ export class Dialog {
     }
 }
 Dialog.openDialogs = 0;
+export { Dialog };
 // eslint-disable-next-line @typescript-eslint/naming-convention
 export class PHOVEA_UI_FormDialog extends Dialog {
     constructor(title, primaryBtnText = 'OK', formId = `form${BaseUtils.randomId(5)}`, additionalCSSClasses = '') {

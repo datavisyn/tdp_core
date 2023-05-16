@@ -1,8 +1,8 @@
 import { createStackDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc, } from 'lineupjs';
-import { I18nextManager } from 'visyn_core';
-import { IDTypeManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
-import { EventHandler } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { EventHandler } from 'visyn_core/base';
 import { EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON, EP_TDP_CORE_LINEUP_PANEL_TAB, } from '../../base/extensions';
 import { PanelButton } from '../panel/PanelButton';
 import { PanelTabContainer, NullTabContainer } from '../panel/PanelTabContainer';
@@ -38,7 +38,7 @@ export function findMappablePlugins(target, all) {
         return all.filter((d) => valid.indexOf(d.idtype) >= 0);
     });
 }
-export class LineUpPanelActions extends EventHandler {
+class LineUpPanelActions extends EventHandler {
     constructor(provider, ctx, options, doc = document) {
         super();
         this.provider = provider;
@@ -479,4 +479,5 @@ LineUpPanelActions.EVENT_ADD_SCORE_COLUMN = 'addScoreColumn';
  * @type {string}
  */
 LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
+export { LineUpPanelActions };
 //# sourceMappingURL=LineUpPanelActions.js.map
