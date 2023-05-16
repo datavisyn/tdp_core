@@ -1,7 +1,7 @@
 import { select, event as d3event } from 'd3v3';
-import { I18nextManager } from 'visyn_core';
-import { EEntity, UserSession } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { EEntity, UserSession } from 'visyn_core/security';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { PHOVEA_UI_FormDialog } from '../components';
 import { StoreUtils } from './StoreUtils';
 import { RestStorageUtils } from './rest';

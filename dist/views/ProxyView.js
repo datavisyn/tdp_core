@@ -1,13 +1,13 @@
 import { merge } from 'lodash';
-import { IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
 import { FormElementType } from '../form/interfaces';
 import { AD3View } from './AD3View';
 import { RestBaseUtils } from '../base/rest';
 /**
  * helper view for proxying an existing external website using an iframe
  */
-export class ProxyView extends AD3View {
+class ProxyView extends AD3View {
     constructor(context, selection, parent, options = {}) {
         super(context, selection, parent);
         this.options = {
@@ -182,4 +182,5 @@ export class ProxyView extends AD3View {
     }
 }
 ProxyView.FORM_ID_SELECTED_ITEM = 'externalItem';
+export { ProxyView };
 //# sourceMappingURL=ProxyView.js.map

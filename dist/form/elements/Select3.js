@@ -1,6 +1,7 @@
 import $ from 'jquery';
+import { EventHandler } from 'visyn_core/base';
 import 'select2';
-import { EventHandler, BaseUtils } from '../../base';
+import { BaseUtils } from '../../base';
 function isSelect3Item(item) {
     return typeof item.verified === 'string';
 }
@@ -52,7 +53,7 @@ export class Select3Utils {
         return a.every((ai, i) => ai.id === b[i].id && ai.text === b[i].text);
     }
 }
-export class Select3 extends EventHandler {
+class Select3 extends EventHandler {
     constructor(options = {}) {
         super();
         this.options = {
@@ -388,4 +389,5 @@ export class Select3 extends EventHandler {
  * @type {string}
  */
 Select3.EVENT_SELECT = 'select';
+export { Select3 };
 //# sourceMappingURL=Select3.js.map

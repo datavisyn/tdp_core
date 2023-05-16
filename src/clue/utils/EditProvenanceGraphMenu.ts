@@ -1,5 +1,5 @@
-import { I18nextManager } from 'visyn_core';
-import { IEvent, GlobalEventHandler } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { IEvent, GlobalEventHandler } from 'visyn_core/base';
 import { NotificationHandler } from '../../base/NotificationHandler';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
 import { TemporarySessionList, PersistentSessionList } from './SessionList';

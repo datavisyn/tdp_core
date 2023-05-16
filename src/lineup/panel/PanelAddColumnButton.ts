@@ -1,5 +1,5 @@
 import { SearchBox } from 'lineupjs';
-import { I18nextManager } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
 import { ISearchOption } from './ISearchOption';
 import { IPanelButton, PanelButton, IPanelButtonOptions } from './PanelButton';
 

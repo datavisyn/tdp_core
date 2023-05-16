@@ -1,4 +1,4 @@
-import { IRow } from '../base/rest';
+import { IRow } from 'visyn_core/base';
 import { ISelection, IViewContext } from '../base/interfaces';
 import { AView } from './AView';
 export interface ISortItem<T> {

@@ -9,8 +9,8 @@
  *
  ******************************************************** */
 import * as React from 'react';
-import { IDTypeManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { EXTENSION_POINT_TDP_VIEW } from '../base';
 import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';
@@ -167,7 +167,8 @@ export class TDPView extends React.Component {
         };
         return (React.createElement("div", { ref: (ref) => (this.node = ref), className: "tdp-view" },
             React.createElement("header", null),
-            React.createElement("main", null, buildItem())));
+            React.createElement("main", null,
+                React.createElement(React.Fragment, null, buildItem()))));
     }
 }
 //# sourceMappingURL=TDPView.js.map

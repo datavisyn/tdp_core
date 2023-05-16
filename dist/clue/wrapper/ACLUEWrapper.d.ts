@@ -1,7 +1,7 @@
+import { EventHandler } from 'visyn_core/base';
 import { LayoutedProvVis, VerticalStoryVis } from '../provvis';
 import { ProvenanceGraph, SlideNode } from '../provenance';
 import { CLUEGraphManager } from '../base/CLUEGraphManager';
-import { EventHandler } from '../../base';
 export interface IACLUEWrapperOptions {
     replaceBody?: boolean;
 }

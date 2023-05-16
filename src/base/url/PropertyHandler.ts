@@ -1,4 +1,4 @@
-import { EventHandler } from '../event';
+import { EventHandler } from 'visyn_core/base';
 
 export class PropertyHandler extends EventHandler {
   static readonly EVENT_CHANGED = 'changed';

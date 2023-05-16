@@ -1,5 +1,5 @@
-/// <reference types="react" />
 import { LocalDataProvider, EngineRenderer, TaggleRenderer, IColumnDesc } from 'lineupjs';
+import React from 'react';
 import { ILazyLoadedColumn } from './internal/column';
 import { EViewMode, IAdditionalColumnDesc, IScoreRow, ISelection } from '../base/interfaces';
 import { IContext } from './selection/ISelectionAdapter';
@@ -38,5 +38,5 @@ export declare function Ranking({ data, itemSelection, columnDesc, options: opts
 /**
  * Maybe refactor this when using the native lineup implementation of scores
  */
-onAddScoreColumn, }: IRankingProps): JSX.Element;
+onAddScoreColumn, }: IRankingProps): React.JSX.Element;
 //# sourceMappingURL=Ranking.d.ts.map

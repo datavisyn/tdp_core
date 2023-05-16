@@ -3,8 +3,8 @@ import * as d3v3 from 'd3v3';
 import marked from 'marked';
 import * as $ from 'jquery';
 import { merge } from 'lodash';
-import { SelectionUtils, SelectOperation } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
+import { SelectionUtils, SelectOperation } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
 import { Renderer } from '../base/annotation';
 import { ModeWrapper } from '../base/mode';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
@@ -17,7 +17,7 @@ import { AVisInstance } from './visInstance';
 import { ArrayUtils, BaseUtils } from '../../base';
 import { DnDUtils } from '../../app';
 import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
-export class VerticalStoryVis extends AVisInstance {
+class VerticalStoryVis extends AVisInstance {
     constructor(data, parent, options = {}) {
         super();
         this.data = data;
@@ -735,4 +735,5 @@ export class VerticalStoryVis extends AVisInstance {
     }
 }
 VerticalStoryVis.MIN_HEIGHT = 20;
+export { VerticalStoryVis };
 //# sourceMappingURL=storyvis.js.map

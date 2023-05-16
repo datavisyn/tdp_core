@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { SelectOperation, SelectionUtils, IDTypeManager } from 'visyn_core';
+import { SelectOperation, SelectionUtils, IDTypeManager } from 'visyn_core/idtype';
 import { BaseUtils } from '../../base/BaseUtils';
 import { ADataType } from '../../data/datatype';
 import { ObjectNode, ObjectRefUtils } from './ObjectNode';
@@ -12,7 +12,7 @@ import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { MemoryGraph } from '../graph/MemoryGraph';
 import { ActionMetaData } from './ActionMeta';
 import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
-export class ProvenanceGraph extends ADataType {
+class ProvenanceGraph extends ADataType {
     constructor(desc, backend) {
         super(desc);
         this.backend = backend;
@@ -796,4 +796,5 @@ export class ProvenanceGraph extends ADataType {
     }
 }
 ProvenanceGraph.PROPAGATED_EVENTS = ['sync', 'add_edge', 'add_node', 'sync_node', 'sync_edge', 'sync_start'];
+export { ProvenanceGraph };
 //# sourceMappingURL=ProvenanceGraph.js.map

@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
-import { I18nextManager } from 'visyn_core';
-import { EventHandler, GlobalEventHandler } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
 import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
 /**
@@ -15,7 +15,7 @@ function normalize(arr) {
 /**
  * generic version of the CLUE mode, a combination of exploration, authoring, and normalization
  */
-export class CLUEMode {
+class CLUEMode {
     constructor(exploration, authoring, presentation) {
         this.coord = normalize([exploration, authoring, presentation]);
     }
@@ -99,6 +99,7 @@ CLUEMode.modes = {
     Authoring: CLUEMode.mode(0, 1, 0),
     Presentation: CLUEMode.mode(0, 0, 1),
 };
+export { CLUEMode };
 /**
  * wrapper containing the current mode
  */

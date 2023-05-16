@@ -1,9 +1,9 @@
 import { EDirtyReason, LocalDataProvider, Ranking } from 'lineupjs';
-import { EventHandler } from 'visyn_core';
+import { EventHandler } from 'visyn_core/base';
 /**
  *  Store the ordered row indices for all, selected or filtered rows of the first ranking.
  */
-export class LineUpOrderedRowIndicies extends EventHandler {
+class LineUpOrderedRowIndicies extends EventHandler {
     constructor(provider) {
         super();
         /**
@@ -112,4 +112,5 @@ export class LineUpOrderedRowIndicies extends EventHandler {
 LineUpOrderedRowIndicies.EVENT_UPDATE_ALL = 'updateAll';
 LineUpOrderedRowIndicies.EVENT_UPDATE_SELECTED = 'updateSelected';
 LineUpOrderedRowIndicies.EVENT_UPDATE_FILTERED = 'updateFiltered';
+export { LineUpOrderedRowIndicies };
 //# sourceMappingURL=LineUpOrderedRowIndicies.js.map

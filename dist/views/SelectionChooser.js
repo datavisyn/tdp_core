@@ -1,11 +1,11 @@
-import { IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
 import { FormElementType } from '../form/interfaces';
 import { BaseUtils } from '../base';
 /**
  * helper class for chooser logic
  */
-export class SelectionChooser {
+class SelectionChooser {
     constructor(accessor, targetIDType, options = {}) {
         this.accessor = accessor;
         this.options = {
@@ -170,4 +170,5 @@ SelectionChooser.INVALID_MAPPING = {
     id: -1,
     label: '',
 };
+export { SelectionChooser };
 //# sourceMappingURL=SelectionChooser.js.map

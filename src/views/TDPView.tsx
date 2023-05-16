@@ -10,8 +10,8 @@
  ******************************************************** */
 
 import * as React from 'react';
-import { IDType, IDTypeManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
+import { IDType, IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { EXTENSION_POINT_TDP_VIEW, ISelection, IView, IViewContext, IViewPlugin, IViewPluginDesc } from '../base';
 import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';
@@ -201,7 +201,12 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
     return (
       <div ref={(ref) => (this.node = ref as HTMLElement)} className="tdp-view">
         <header />
-        <main>{buildItem()}</main>
+
+        <main>
+          {/* TS 5 migration */}
+          {/* eslint-disable react/jsx-no-useless-fragment */}
+          <>{buildItem()}</>
+        </main>
       </div>
     );
   }

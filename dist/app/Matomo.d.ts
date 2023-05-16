@@ -1,4 +1,4 @@
-import { IUser } from 'visyn_core';
+import { IUser } from 'visyn_core/security';
 import { ActionNode, ProvenanceGraph } from '../clue/provenance';
 /**
  * Trackable Matomo event

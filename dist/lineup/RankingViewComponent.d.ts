@@ -1,4 +1,4 @@
-/// <reference types="react" />
+import React from 'react';
 import { LocalDataProvider } from 'lineupjs';
 import type { IRankingProps } from './Ranking';
 import { ISelection } from '../base/interfaces';
@@ -21,5 +21,5 @@ export declare function RankingViewComponent({ data, selection: inputSelection, 
 /**
  * Maybe refactor this when using the native lineup implementation of scores
  */
-onAddScoreColumn, }: IRankingViewComponentProps): JSX.Element;
+onAddScoreColumn, }: IRankingViewComponentProps): React.JSX.Element;
 //# sourceMappingURL=RankingViewComponent.d.ts.map

@@ -1,6 +1,6 @@
-import { GlobalEventHandler } from 'visyn_core';
+import { GlobalEventHandler } from 'visyn_core/base';
 import { BaseUtils } from '../base/BaseUtils';
-export class TourUtils {
+class TourUtils {
     /**
      * start a view help tour
      * @param tourId the tour id to start
@@ -234,4 +234,5 @@ export class TourUtils {
 TourUtils.GLOBAL_EVENT_START_TOUR = 'tdpStartTour';
 TourUtils.GLOBAL_EVENT_END_TOUR = 'tdpEndTour';
 TourUtils.EXTENSION_POINT_TDP_TOUR = 'tdpTour';
+export { TourUtils };
 //# sourceMappingURL=TourUtils.js.map

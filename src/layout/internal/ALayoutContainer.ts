@@ -1,5 +1,5 @@
+import { EventHandler } from 'visyn_core/base';
 import { UniqueIdManager, DnDUtils } from '../../app';
-import { EventHandler } from '../../base';
 import { ILayoutDump, LayoutContainerEvents, ILayoutContainer, ILayoutParentContainer } from '../interfaces';
 import { IParentLayoutContainer } from './IParentLayoutContainer';
 

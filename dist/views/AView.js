@@ -1,7 +1,7 @@
 import { select } from 'd3v3';
-import { IDTypeManager, SelectionUtils } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
-import { EventHandler, WebpackEnv } from 'visyn_core';
+import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
+import { EventHandler, WebpackEnv } from 'visyn_core/base';
 import { FormBuilder } from '../form/FormBuilder';
 import { AFormElement } from '../form/elements/AFormElement';
 import { ViewUtils } from './ViewUtils';
@@ -9,7 +9,7 @@ import { ERenderAuthorizationStatus, TokenManager, TDPTokenManager } from '../au
 /**
  * base class for all views
  */
-export class AView extends EventHandler {
+class AView extends EventHandler {
     constructor(context, selection, parent) {
         super();
         this.context = context;
@@ -330,4 +330,5 @@ AView.EVENT_LOADING_FINISHED = ViewUtils.VIEW_EVENT_LOADING_FINISHED;
  * params(name: string, oldValue: any, newValue: any)
  */
 AView.EVENT_UPDATE_SHARED = ViewUtils.VIEW_EVENT_UPDATE_SHARED;
+export { AView };
 //# sourceMappingURL=AView.js.map

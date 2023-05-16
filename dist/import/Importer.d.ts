@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { EventHandler } from '../base';
+import { EventHandler } from 'visyn_core/base';
 import { IDataDescription } from '../data';
 export interface IImporterOptions {
     /**

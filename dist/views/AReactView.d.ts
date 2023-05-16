@@ -9,7 +9,7 @@
  *
  ******************************************************** */
 import { ReactElement } from 'react';
-import { IDTypeLike } from 'visyn_core';
+import { IDTypeLike } from 'visyn_core/idtype';
 import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';
 /**
@@ -33,6 +33,7 @@ export interface IReactViewOptions {
 export declare abstract class AReactView extends AView {
     private readonly select;
     private readonly handler?;
+    private reactViewBodyRoot;
     constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: Partial<Readonly<IReactViewOptions>>);
     protected initImpl(): Promise<void | (({ generateDialog }: {
         generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
@@ -41,7 +42,7 @@ export declare abstract class AReactView extends AView {
         generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
     }) => Promise<unknown>)>;
     private selectImpl;
-    get itemIDType(): import("visyn_core").IDType;
+    get itemIDType(): import("visyn_core/idtype").IDType;
     /**
      * return the IDType of contained items needed for the selection
      * @returns {IDTypeLike}

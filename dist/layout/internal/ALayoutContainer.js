@@ -1,7 +1,7 @@
+import { EventHandler } from 'visyn_core/base';
 import { UniqueIdManager, DnDUtils } from '../../app';
-import { EventHandler } from '../../base';
 import { LayoutContainerEvents } from '../interfaces';
-export class ALayoutContainer extends EventHandler {
+class ALayoutContainer extends EventHandler {
     constructor(document, options) {
         super();
         this.parent = null;
@@ -155,4 +155,5 @@ export class ALayoutContainer extends EventHandler {
     }
 }
 ALayoutContainer.MIME_TYPE = 'text/x-phovea-layout-container';
+export { ALayoutContainer };
 //# sourceMappingURL=ALayoutContainer.js.map

@@ -1,4 +1,4 @@
-import { EventHandler } from 'visyn_core';
+import { EventHandler } from 'visyn_core/base';
 /**
  * dummy data type just holding the description
  */

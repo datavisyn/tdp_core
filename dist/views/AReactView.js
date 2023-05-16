@@ -1,5 +1,5 @@
-import * as ReactDOM from 'react-dom';
-import { IDTypeManager } from 'visyn_core';
+import { createRoot } from 'react-dom/client';
+import { IDTypeManager } from 'visyn_core/idtype';
 import { AView } from './AView';
 import { Errors } from '../components';
 /**
@@ -11,7 +11,10 @@ export class AReactView extends AView {
         this.select = this.selectImpl.bind(this);
         this.handler = options && options.reactHandler ? options.reactHandler : null;
         this.node.classList.add('react-view');
-        this.node.innerHTML = `<div class="react-view-body"></div>`;
+        const child = parent.ownerDocument.createElement('div');
+        child.classList.add('react-view-body');
+        this.node.replaceChildren(child);
+        this.reactViewBodyRoot = createRoot(child);
     }
     initImpl() {
         super.initImpl();
@@ -72,7 +75,7 @@ export class AReactView extends AView {
         })
             .then((elem) => {
             this.setBusy(false);
-            ReactDOM.render(elem, this.node.querySelector('div.react-view-body'));
+            this.reactViewBodyRoot.render(elem);
         })
             .catch(Errors.showErrorModalDialog)
             .catch((r) => {

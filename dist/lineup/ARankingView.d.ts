@@ -1,10 +1,11 @@
 import { EngineRenderer, LocalDataProvider, TaggleRenderer } from 'lineupjs';
+import { IRow, IServerColumn } from 'visyn_core/base';
 import { AView } from '../views/AView';
 import { IViewContext, ISelection, EViewMode, IScore, IAdditionalColumnDesc } from '../base/interfaces';
 import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
 import { IInitialRankingOptions } from './desc';
 import { IRankingWrapper } from './IRankingWrapper';
-import { IRow, IServerColumn, IServerColumnDesc } from '../base/rest';
+import { IServerColumnDesc } from '../base/rest';
 import { ISelectionAdapter } from './selection/ISelectionAdapter';
 import { ILazyLoadedColumn } from './internal/column';
 import { IARankingViewOptions } from './IARankingViewOptions';
@@ -86,7 +87,7 @@ export declare abstract class ARankingView extends AView {
      * return the idType of the shown items in LineUp
      * @returns {IDType}
      */
-    get itemIDType(): import("visyn_core").IDType;
+    get itemIDType(): import("visyn_core/idtype").IDType;
     /**
      * The parameter of this (ranking) view has changed and this ranking needs to adapt to the change.
      * For example, depending on the set `selectionAdapter` additional dynamic columns can be added or

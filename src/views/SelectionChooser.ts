@@ -1,5 +1,5 @@
-import { IDType, IDTypeLike, IDTypeManager } from 'visyn_core';
-import { I18nextManager } from 'visyn_core';
+import { IDType, IDTypeLike, IDTypeManager } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_core/i18n';
 import { IFormSelectElement, IFormSelectOptionGroup, IFormSelectOption } from '../form/elements/FormSelect';
 import { FormElementType, IFormElement, IFormElementDesc } from '../form/interfaces';
 import { ISelection } from '../base/interfaces';

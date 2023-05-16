@@ -1,5 +1,5 @@
-import { IDTypeManager } from 'visyn_core';
-import { EventHandler } from 'visyn_core';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { EventHandler } from 'visyn_core/base';
 import { UniqueIdManager } from '../../app/UniqueIdManager';
 export class AttributeContainer extends EventHandler {
     constructor() {
@@ -142,7 +142,7 @@ export class GraphEdge extends AttributeContainer {
         return (edge) => (type instanceof RegExp ? type.test(edge.type) : edge.type === type);
     }
 }
-export class AGraph extends EventHandler {
+class AGraph extends EventHandler {
     get nnodes() {
         return this.nodes.length;
     }
@@ -160,4 +160,5 @@ AGraph.DIM_NODES = 0;
 AGraph.IDTYPE_NODES = '_nodes';
 AGraph.DIM_EDGES = 1;
 AGraph.IDTYPE_EDGES = '_edges';
+export { AGraph };
 //# sourceMappingURL=graph.js.map

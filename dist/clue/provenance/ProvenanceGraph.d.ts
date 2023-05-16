@@ -1,4 +1,4 @@
-import { IDType, SelectOperation } from 'visyn_core';
+import { IDType, SelectOperation } from 'visyn_core/idtype';
 import { ADataType } from '../../data/datatype';
 import { ObjectNode, IObjectRef } from './ObjectNode';
 import { StateNode } from './StateNode';

@@ -1,13 +1,13 @@
 import { merge } from 'lodash';
 import 'select2';
 import $ from 'jquery';
-import { AppContext } from 'visyn_core';
+import { AppContext } from 'visyn_core/base';
 import { AFormElement } from './AFormElement';
 /**
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event
  */
-export class FormSelect2 extends AFormElement {
+class FormSelect2 extends AFormElement {
     /**
      * Constructor
      * @param form The form this element is a part of
@@ -220,4 +220,5 @@ FormSelect2.DEFAULT_AJAX_OPTIONS = {
     },
     ...FormSelect2.DEFAULT_OPTIONS,
 };
+export { FormSelect2 };
 //# sourceMappingURL=FormSelect2.js.map

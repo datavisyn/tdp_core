@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { IEventHandler } from 'visyn_core';
+import { IEventHandler } from 'visyn_core/base';
 /**
  * List of all available for elements that the form builder can handle
  * @see FormBuilder.appendElement()

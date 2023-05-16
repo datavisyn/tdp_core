@@ -6,7 +6,7 @@
 import { merge } from 'lodash';
 import { select } from 'd3v3';
 import * as d3v3 from 'd3v3';
-import { IEvent } from 'visyn_core';
+import { IEvent } from 'visyn_core/base';
 import { MixedStorageProvenanceGraphManager, IObjectRef, ProvenanceGraph } from '../provenance';
 import { SelectionRecorder } from '../../base/Selection';
 import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';

@@ -1,12 +1,12 @@
-import { I18nextManager } from 'visyn_core';
-import { PluginRegistry } from 'visyn_core';
+import { I18nextManager } from 'visyn_core/i18n';
+import { PluginRegistry } from 'visyn_core/plugin';
+import { EventHandler } from 'visyn_core/base';
 import { ModeWrapper, CLUEMode } from '../base';
 import { LayoutedProvVis, VerticalStoryVis } from '../provvis';
 import { ProvenanceGraph, StateNode, SlideNode } from '../provenance';
 import { CLUEGraphManager, IClueState } from '../base/CLUEGraphManager';
 import { WrapperUtils } from '../base/WrapperUtils';
 import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH, IProvenanceGraphEPDesc, IProvenanceGraphEP } from '../../base/extensions';
-import { EventHandler } from '../../base';
 
 const getTemplate = () => `<div class="box">
   <div class="content">
