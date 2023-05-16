@@ -109,16 +109,14 @@
     "react": "~18.2.0",
     "react-dom": "~18.2.0",
     "webpack": "5.74.0",
-    "visyn_core": "git+ssh://git@github.com/datavisyn/visyn_core#react18",
-    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#react18"
+    "visyn_core": "git+ssh://git@github.com/datavisyn/visyn_core#develop",
+    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#develop"
   },
   "resolutions": {
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.0",
     "react": "~18.2.0",
-    "react-dom": "~18.2.0",
-    "visyn_core": "git+ssh://git@github.com/datavisyn/visyn_core#react18",
-    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#react18"
+    "react-dom": "~18.2.0"
   },
   "visyn": {
     "entries": {
