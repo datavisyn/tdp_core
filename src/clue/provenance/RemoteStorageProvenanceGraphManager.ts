@@ -49,7 +49,7 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
     return this.import(graph.persist(), desc);
   }
 
-  private importImpl(json: { nodes: any[]; edges: any[] }, desc: any = {}): PromiseLike<AGraph> {
+  private async importImpl(json: { nodes: any[]; edges: any[] }, desc: any = {}): Promise<AGraph> {
     const pdesc: any = merge(
       {
         type: 'graph',
@@ -67,30 +67,21 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
       },
       desc,
     );
-    return DataCache.getInstance()
-      .upload(pdesc)
-      .then((base: IDataType) => {
-        return (<GraphProxy>base).impl(ProvenanceGraphUtils.provenanceGraphFactory());
-      });
+    const base: GraphProxy = (await DataCache.getInstance().upload(pdesc)) as GraphProxy;
+    return base.impl(ProvenanceGraphUtils.provenanceGraphFactory());
   }
 
-  import(json: any, desc: any = {}): PromiseLike<ProvenanceGraph> {
-    return this.importImpl(json, desc).then((impl: GraphBase) => {
-      return new ProvenanceGraph(<IProvenanceGraphDataDescription>impl.desc, impl);
-    });
+  async import(json: any, desc: any = {}): Promise<ProvenanceGraph> {
+    const impl: GraphBase = (await this.importImpl(json, desc)) as GraphBase;
+    return new ProvenanceGraph(<IProvenanceGraphDataDescription>impl.desc, impl);
   }
 
-  migrate(graph: ProvenanceGraph, desc: any = {}): PromiseLike<ProvenanceGraph> {
-    return this.importImpl({ nodes: [], edges: [] }, desc).then((backend: RemoteStoreGraph) => {
-      return Promise.resolve(graph.backend.migrate())
-        .then(({ nodes, edges }) => {
-          return backend.addAll(nodes, edges);
-        })
-        .then(() => {
-          graph.migrateBackend(backend);
-          return graph;
-        });
-    });
+  async migrate(graph: ProvenanceGraph, desc: any = {}): Promise<ProvenanceGraph> {
+    const backend: RemoteStoreGraph = (await this.importImpl({ nodes: [], edges: [] }, desc)) as RemoteStoreGraph;
+    const { nodes, edges } = await graph.backend.migrate();
+    backend.addAll(nodes, edges);
+    graph.migrateBackend(backend);
+    return graph;
   }
 
   async edit(graph: ProvenanceGraph | IProvenanceGraphDataDescription, desc: any = {}) {

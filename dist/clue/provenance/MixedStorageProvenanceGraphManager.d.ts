@@ -21,7 +21,7 @@ export declare class MixedStorageProvenanceGraphManager implements IProvenanceGr
     cloneRemote(desc: IProvenanceGraphDataDescription, extras?: any): Promise<ProvenanceGraph>;
     migrateRemote(graph: ProvenanceGraph, extras?: any): PromiseLike<ProvenanceGraph>;
     importLocal(json: IProvenanceGraphDump, desc?: any): Promise<ProvenanceGraph>;
-    importRemote(json: IProvenanceGraphDump, desc?: any): PromiseLike<ProvenanceGraph>;
+    importRemote(json: IProvenanceGraphDump, desc?: any): Promise<ProvenanceGraph>;
     import(json: IProvenanceGraphDump, desc?: any): Promise<ProvenanceGraph>;
     createLocal(desc?: any): Promise<ProvenanceGraph>;
     createRemote(desc?: any): Promise<ProvenanceGraph>;

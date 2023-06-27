@@ -13,8 +13,8 @@ export declare class RemoteStorageProvenanceGraphManager implements IProvenanceG
     delete(desc: IProvenanceGraphDataDescription): Promise<boolean>;
     clone(graph: GraphBase, desc?: any): PromiseLike<ProvenanceGraph>;
     private importImpl;
-    import(json: any, desc?: any): PromiseLike<ProvenanceGraph>;
-    migrate(graph: ProvenanceGraph, desc?: any): PromiseLike<ProvenanceGraph>;
+    import(json: any, desc?: any): Promise<ProvenanceGraph>;
+    migrate(graph: ProvenanceGraph, desc?: any): Promise<ProvenanceGraph>;
     edit(graph: ProvenanceGraph | IProvenanceGraphDataDescription, desc?: any): Promise<IProvenanceGraphDataDescription>;
     create(desc?: any): Promise<ProvenanceGraph>;
 }

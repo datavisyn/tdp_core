@@ -25,7 +25,7 @@ export class RemoteStorageProvenanceGraphManager {
     clone(graph, desc = {}) {
         return this.import(graph.persist(), desc);
     }
-    importImpl(json, desc = {}) {
+    async importImpl(json, desc = {}) {
         const pdesc = merge({
             type: 'graph',
             attrs: {
@@ -39,28 +39,19 @@ export class RemoteStorageProvenanceGraphManager {
             nodes: json.nodes,
             edges: json.edges,
         }, desc);
-        return DataCache.getInstance()
-            .upload(pdesc)
-            .then((base) => {
-            return base.impl(ProvenanceGraphUtils.provenanceGraphFactory());
-        });
+        const base = (await DataCache.getInstance().upload(pdesc));
+        return base.impl(ProvenanceGraphUtils.provenanceGraphFactory());
     }
-    import(json, desc = {}) {
-        return this.importImpl(json, desc).then((impl) => {
-            return new ProvenanceGraph(impl.desc, impl);
-        });
+    async import(json, desc = {}) {
+        const impl = (await this.importImpl(json, desc));
+        return new ProvenanceGraph(impl.desc, impl);
     }
-    migrate(graph, desc = {}) {
-        return this.importImpl({ nodes: [], edges: [] }, desc).then((backend) => {
-            return Promise.resolve(graph.backend.migrate())
-                .then(({ nodes, edges }) => {
-                return backend.addAll(nodes, edges);
-            })
-                .then(() => {
-                graph.migrateBackend(backend);
-                return graph;
-            });
-        });
+    async migrate(graph, desc = {}) {
+        const backend = (await this.importImpl({ nodes: [], edges: [] }, desc));
+        const { nodes, edges } = await graph.backend.migrate();
+        backend.addAll(nodes, edges);
+        graph.migrateBackend(backend);
+        return graph;
     }
     async edit(graph, desc = {}) {
         const base = graph instanceof ProvenanceGraph ? graph.desc : graph;
