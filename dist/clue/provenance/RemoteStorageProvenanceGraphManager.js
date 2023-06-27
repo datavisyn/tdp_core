@@ -42,14 +42,26 @@ export class RemoteStorageProvenanceGraphManager {
         const base = (await DataCache.getInstance().upload(pdesc));
         return base.impl(ProvenanceGraphUtils.provenanceGraphFactory());
     }
+    /**
+     * Import a provenance graph from a JSON object and return the imported graph
+     * @param json Nodes and edges to be imported
+     * @param desc Provenance graph metadata description to be merged with the imported graph
+     * @returns Returns the imported provenance graph
+     */
     async import(json, desc = {}) {
         const impl = (await this.importImpl(json, desc));
         return new ProvenanceGraph(impl.desc, impl);
     }
+    /**
+     * Migrate a given provenance graph to a remote storage backend and return the migrated graph
+     * @param graph Provenance graph to be migrated
+     * @param desc Provenance graph metadata description to be merged with the migrated graph
+     * @returns Returns the migrated provenance graph
+     */
     async migrate(graph, desc = {}) {
-        const backend = (await this.importImpl({ nodes: [], edges: [] }, desc));
-        const { nodes, edges } = await graph.backend.migrate();
-        backend.addAll(nodes, edges);
+        const dump = graph.persist();
+        const backend = (await this.importImpl({ nodes: dump.nodes, edges: dump.edges }, desc));
+        // switch the localstorage backend to the remote backend for the same graph
         graph.migrateBackend(backend);
         return graph;
     }
