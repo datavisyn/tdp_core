@@ -91,7 +91,7 @@ export declare class CLUEGraphManager extends EventHandler {
      */
     importGraph(dump: IProvenanceGraphDump, remote?: boolean, descOverrides?: any): Promise<void>;
     importExistingGraph(graph: IProvenanceGraphDataDescription, extras?: any, cleanUpLocal?: boolean): Promise<void>;
-    migrateGraph(graph: ProvenanceGraph, extras?: any): PromiseLike<ProvenanceGraph>;
+    migrateGraph(graph: ProvenanceGraph, extras?: any): Promise<ProvenanceGraph>;
     editGraphMetaData(graph: IProvenanceGraphDataDescription, extras?: any): PromiseLike<IProvenanceGraphDataDescription>;
     setGraph(graph: ProvenanceGraph): ProvenanceGraph;
     private chooseNew;

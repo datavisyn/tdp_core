@@ -163,16 +163,16 @@ class CLUEGraphManager extends EventHandler {
             return p.then(() => this.loadGraph(newGraph.desc));
         });
     }
-    migrateGraph(graph, extras = {}) {
+    async migrateGraph(graph, extras = {}) {
         const old = graph.desc;
-        return this.manager.migrateRemote(graph, extras).then((newGraph) => {
-            return (old.local ? this.manager.delete(old) : Promise.resolve(true)).then(() => {
-                if (!this.isReadOnly) {
-                    this.propertyHandler.setProp('clue_graph', newGraph.desc.id); // just update the reference
-                }
-                return newGraph;
-            });
-        });
+        const newGraph = await this.manager.migrateRemote(graph, extras);
+        if (old.local) {
+            await this.manager.delete(old);
+        }
+        if (!this.isReadOnly) {
+            this.propertyHandler.setProp('clue_graph', newGraph.desc.id); // just update the reference
+        }
+        return newGraph;
     }
     editGraphMetaData(graph, extras = {}) {
         return this.manager.edit(graph, extras);
