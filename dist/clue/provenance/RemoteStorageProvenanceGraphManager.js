@@ -1,8 +1,9 @@
 import { merge } from 'lodash';
-import { UserSession } from 'visyn_core/security';
+import { userSession } from 'visyn_core/security';
 import { DataCache } from '../../data/DataCache';
 import { ProvenanceGraph } from './ProvenanceGraph';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
+import { RemoteStoreGraph } from '../graph/RemoteStorageGraph';
 export class RemoteStorageProvenanceGraphManager {
     constructor(options = {}) {
         this.options = {
@@ -25,23 +26,6 @@ export class RemoteStorageProvenanceGraphManager {
     clone(graph, desc = {}) {
         return this.import(graph.persist(), desc);
     }
-    async importImpl(json, desc = {}) {
-        const pdesc = merge({
-            type: 'graph',
-            attrs: {
-                graphtype: 'provenance_graph',
-                of: this.options.application,
-            },
-            name: 'Persistent WS',
-            creator: UserSession.getInstance().currentUserNameOrAnonymous(),
-            ts: Date.now(),
-            description: '',
-            nodes: json.nodes,
-            edges: json.edges,
-        }, desc);
-        const base = (await DataCache.getInstance().upload(pdesc));
-        return base.impl(ProvenanceGraphUtils.provenanceGraphFactory());
-    }
     /**
      * Import a provenance graph from a JSON object and return the imported graph
      * @param json Nodes and edges to be imported
@@ -49,7 +33,21 @@ export class RemoteStorageProvenanceGraphManager {
      * @returns Returns the imported provenance graph
      */
     async import(json, desc = {}) {
-        const impl = (await this.importImpl(json, desc));
+        const pdesc = merge({
+            type: 'graph',
+            attrs: {
+                graphtype: 'provenance_graph',
+                of: this.options.application,
+            },
+            name: 'Persistent WS',
+            creator: userSession.currentUserNameOrAnonymous(),
+            ts: Date.now(),
+            description: '',
+            nodes: json.nodes,
+            edges: json.edges,
+        }, desc);
+        const base = (await DataCache.getInstance().upload(pdesc));
+        const impl = (await base.impl(ProvenanceGraphUtils.provenanceGraphFactory()));
         return new ProvenanceGraph(impl.desc, impl);
     }
     /**
@@ -60,9 +58,24 @@ export class RemoteStorageProvenanceGraphManager {
      */
     async migrate(graph, desc = {}) {
         const dump = graph.persist();
-        const backend = (await this.importImpl({ nodes: dump.nodes, edges: dump.edges }, desc));
+        const pdesc = merge({
+            type: 'graph',
+            attrs: {
+                graphtype: 'provenance_graph',
+                of: this.options.application,
+            },
+            name: 'Persistent WS',
+            creator: userSession.currentUserNameOrAnonymous(),
+            ts: Date.now(),
+            description: '',
+            nodes: dump.nodes,
+            edges: dump.edges,
+        }, desc);
+        const uploadedDataset = await DataCache.getInstance().upload(pdesc);
+        // create remote graph from the given dataset/graph desc
+        const graphBackend = new RemoteStoreGraph(uploadedDataset.desc);
         // switch the localstorage backend to the remote backend for the same graph
-        graph.migrateBackend(backend);
+        graph.migrateBackend(graphBackend);
         return graph;
     }
     async edit(graph, desc = {}) {
@@ -82,7 +95,7 @@ export class RemoteStorageProvenanceGraphManager {
             },
             name: `Persistent WS`,
             fqname: `provenance_graphs/Persistent WS`,
-            creator: UserSession.getInstance().currentUserNameOrAnonymous(),
+            creator: userSession.currentUserNameOrAnonymous(),
             size: [0, 0],
             ts: Date.now(),
             description: '',

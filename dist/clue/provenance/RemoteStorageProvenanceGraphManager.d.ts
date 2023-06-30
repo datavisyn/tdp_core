@@ -12,7 +12,6 @@ export declare class RemoteStorageProvenanceGraphManager implements IProvenanceG
     get(desc: IProvenanceGraphDataDescription): Promise<ProvenanceGraph>;
     delete(desc: IProvenanceGraphDataDescription): Promise<boolean>;
     clone(graph: GraphBase, desc?: any): PromiseLike<ProvenanceGraph>;
-    private importImpl;
     /**
      * Import a provenance graph from a JSON object and return the imported graph
      * @param json Nodes and edges to be imported
