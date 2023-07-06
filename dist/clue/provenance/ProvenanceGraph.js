@@ -41,6 +41,10 @@ class ProvenanceGraph extends ADataType {
             this.act = (act >= 0 ? this.getStateById(act) : this._states[0]);
         }
     }
+    /**
+     * Switches the storage backend of the current provenance graph
+     * @param backend Remote or local backend for storing the graph data
+     */
     migrateBackend(backend) {
         // asserts that the old backend and the new one have the same nodes inside of them
         this.stopPropagation(this.backend, ...ProvenanceGraph.PROPAGATED_EVENTS);

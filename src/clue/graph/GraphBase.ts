@@ -1,8 +1,8 @@
 import { GraphNode, GraphEdge, AGraph, IGraph, IGraphDataDescription, IGraphNodeDump, IGraphEdgeDump } from './graph';
 
 export interface IGraphFactory {
-  makeNode(p: any): GraphNode;
-  makeEdge(p: any, lookup: (id: number) => GraphNode): GraphEdge;
+  makeNode(p: IGraphNodeDump): GraphNode;
+  makeEdge(p: IGraphEdgeDump, lookup: (id: number) => GraphNode): GraphEdge;
 }
 
 export interface IGraphDump {
@@ -24,8 +24,8 @@ export interface IGraphDump {
 
 export class GraphFactoryUtils {
   static defaultGraphFactory: IGraphFactory = {
-    makeNode: (p: any) => new GraphNode().restore(p),
-    makeEdge: (p: any, lookup) => new GraphEdge().restore(p, lookup),
+    makeNode: (p: IGraphNodeDump) => new GraphNode().restore(p),
+    makeEdge: (p: IGraphEdgeDump, lookup) => new GraphEdge().restore(p, lookup),
   };
 }
 

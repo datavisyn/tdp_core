@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import { UserSession } from 'visyn_core/security';
+import { userSession } from 'visyn_core/security';
 import { DataCache } from '../../data/DataCache';
 import { ProvenanceGraph } from './ProvenanceGraph';
 import type { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
@@ -8,8 +8,6 @@ import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { GraphBase } from '../graph/GraphBase';
 import { GraphProxy } from '../graph/GraphProxy';
 import { RemoteStoreGraph } from '../graph/RemoteStorageGraph';
-import { IDataType } from '../../data/datatype';
-import { AGraph } from '../graph';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface IRemoteStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {
@@ -49,7 +47,13 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
     return this.import(graph.persist(), desc);
   }
 
-  private importImpl(json: { nodes: any[]; edges: any[] }, desc: any = {}): PromiseLike<AGraph> {
+  /**
+   * Import a provenance graph from a JSON object and return the imported graph
+   * @param json Nodes and edges to be imported
+   * @param desc Provenance graph metadata description to be merged with the imported graph
+   * @returns Returns the imported provenance graph
+   */
+  async import(json: any, desc: any = {}): Promise<ProvenanceGraph> {
     const pdesc: any = merge(
       {
         type: 'graph',
@@ -58,7 +62,7 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
           of: this.options.application,
         },
         name: 'Persistent WS',
-        creator: UserSession.getInstance().currentUserNameOrAnonymous(),
+        creator: userSession.currentUserNameOrAnonymous(),
         ts: Date.now(),
         description: '',
 
@@ -67,30 +71,45 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
       },
       desc,
     );
-    return DataCache.getInstance()
-      .upload(pdesc)
-      .then((base: IDataType) => {
-        return (<GraphProxy>base).impl(ProvenanceGraphUtils.provenanceGraphFactory());
-      });
+    const base: GraphProxy = (await DataCache.getInstance().upload(pdesc)) as GraphProxy;
+    const impl: GraphBase = (await base.impl(ProvenanceGraphUtils.provenanceGraphFactory())) as GraphBase;
+    return new ProvenanceGraph(<IProvenanceGraphDataDescription>impl.desc, impl);
   }
 
-  import(json: any, desc: any = {}): PromiseLike<ProvenanceGraph> {
-    return this.importImpl(json, desc).then((impl: GraphBase) => {
-      return new ProvenanceGraph(<IProvenanceGraphDataDescription>impl.desc, impl);
-    });
-  }
+  /**
+   * Migrate a given provenance graph to a remote storage backend and return the migrated graph
+   * @param graph Provenance graph to be migrated
+   * @param desc Provenance graph metadata description to be merged with the migrated graph
+   * @returns Returns the migrated provenance graph
+   */
+  async migrate(graph: ProvenanceGraph, desc: any = {}): Promise<ProvenanceGraph> {
+    const dump = graph.persist();
 
-  migrate(graph: ProvenanceGraph, desc: any = {}): PromiseLike<ProvenanceGraph> {
-    return this.importImpl({ nodes: [], edges: [] }, desc).then((backend: RemoteStoreGraph) => {
-      return Promise.resolve(graph.backend.migrate())
-        .then(({ nodes, edges }) => {
-          return backend.addAll(nodes, edges);
-        })
-        .then(() => {
-          graph.migrateBackend(backend);
-          return graph;
-        });
-    });
+    const pdesc: any = merge(
+      {
+        type: 'graph',
+        attrs: {
+          graphtype: 'provenance_graph',
+          of: this.options.application,
+        },
+        name: 'Persistent WS',
+        creator: userSession.currentUserNameOrAnonymous(),
+        ts: Date.now(),
+        description: '',
+
+        nodes: dump.nodes,
+        edges: dump.edges,
+      },
+      desc,
+    );
+
+    const uploadedDataset = await DataCache.getInstance().upload(pdesc);
+    // create remote graph from the given dataset/graph desc
+    const graphBackend: RemoteStoreGraph = new RemoteStoreGraph(uploadedDataset.desc as IProvenanceGraphDataDescription);
+    graphBackend.import(dump.nodes, dump.edges, ProvenanceGraphUtils.provenanceGraphFactory());
+    // switch the localstorage backend to the remote backend for the same graph
+    graph.migrateBackend(graphBackend);
+    return graph;
   }
 
   async edit(graph: ProvenanceGraph | IProvenanceGraphDataDescription, desc: any = {}) {
@@ -112,7 +131,7 @@ export class RemoteStorageProvenanceGraphManager implements IProvenanceGraphMana
         },
         name: `Persistent WS`,
         fqname: `provenance_graphs/Persistent WS`,
-        creator: UserSession.getInstance().currentUserNameOrAnonymous(),
+        creator: userSession.currentUserNameOrAnonymous(),
         size: <[number, number]>[0, 0],
         ts: Date.now(),
         description: '',

@@ -31,6 +31,10 @@ export declare class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescr
     executeCurrentActionWithin: number;
     private nextQueue;
     constructor(desc: IProvenanceGraphDataDescription, backend: GraphBase);
+    /**
+     * Switches the storage backend of the current provenance graph
+     * @param backend Remote or local backend for storing the graph data
+     */
     migrateBackend(backend: GraphBase): void;
     get isEmpty(): boolean;
     get dim(): number[];
