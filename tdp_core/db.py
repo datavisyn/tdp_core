@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 from flask import abort
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from visyn_core import manager
 from werkzeug.datastructures import MultiDict
@@ -107,9 +107,17 @@ class WrappedSession:
         session wrapper of sql alchemy with auto cleanup
         :param engine:
         """
-        _log.info("creating session")
+        self._engine = engine
+        import uuid
+        self._name = uuid.uuid4()
+        _log.info("%s - engine status before: %s", self._name, engine.pool.status())
+        _log.info("%s - creating session", self._name)
+        # add connection count and session count with SQLALCHEMY_POOL_SIZE and SQLALCHEMY_MAX_OVERFLOW
+        # https://stackoverflow.com/questions/34775501/how-could-i-check-the-number-of-active-sqlalchemy-connections-in-a-pool-at-any-g
         self._session: Session = manager.db.create_session(engine)
+        _log.info("%s - session created", self._name)
         self._supports_array_parameter = _supports_sql_parameters(engine.name)
+        _log.info("%s - supports array parameter: %s", self._name, self._supports_array_parameter)
 
     def execute(self, sql, **kwargs):
         """
@@ -118,12 +126,18 @@ class WrappedSession:
         :param kwargs: additional args to replace
         :return: the session result
         """
+        _log.info("%s - replace array parameter in sql query: %s", self._name, sql)
         parsed = to_query(sql, self._supports_array_parameter, kwargs)
+        _log.info("%s - execute the given query with the given args: %s", self._name, sql)
         _log.info("%s (%s)", parsed, kwargs)
         try:
             return self._session.execute(parsed, kwargs)
         except OperationalError as error:
+            _log.error('OperationalError: %s', error)
             abort(408, error)
+        except SQLAlchemyError as error:
+            _log.error('SQLAlchemyError: %s', error)
+            
 
     def run(self, sql, **kwargs):
         """
@@ -132,7 +146,9 @@ class WrappedSession:
         :param kwargs: args for this query
         :return: list of dicts
         """
+        _log.info("%s - run sql statement: %s", self._name, sql)
         result = self.execute(sql, **kwargs)
+        _log.info("%s - ran sql statement: %s", self._name, sql)
         columns = result.keys()
         return [{c: r[c] for c in columns} for r in result]
 
@@ -153,9 +169,11 @@ class WrappedSession:
 
     def _destroy(self):
         if self._session:
-            _log.info("removing session again")
+            _log.info("%s - removing session", self._name)
             self._session.close()
             self._session = None  # type: ignore
+            _log.info("%s - removed session", self._name)
+            _log.info("%s - engine status after destroy: %s", self._name, self._engine.pool.status())
 
     def __del__(self):
         self._destroy()
@@ -342,14 +360,18 @@ def get_data(
     query = view.query
 
     if callable(query):
+        _log.info("get data with callback variant")
         # callback variant
         return query(engine, arguments, filters), view
 
     with session(engine) as sess:
+        _log.info("%s - get DATA with session", sess._name)
         if config.statement_timeout and config.statement_timeout_query:
             _log.info("set statement_timeout to {}".format(config.statement_timeout))
             sess.execute(config.statement_timeout_query.format(config.statement_timeout))
+        _log.info("%s - get DATA before run", sess._name)
         r = sess.run(query.format(**replace), **kwargs)
+        _log.info("%s - get DATA after run", sess._name)
     return r, view
 
 
@@ -434,10 +456,13 @@ def get_count(database, view_name, args):
         return count_query(engine, processed_args, where_clause)
 
     with session(engine) as sess:
+        _log.info("%s - get COUNT with session", sess._name)
         if config.statement_timeout and config.statement_timeout_query:
             _log.info("set statement_timeout to {}".format(config.statement_timeout))
             sess.execute(config.statement_timeout_query.format(config.statement_timeout))
+        _log.info("%s - get COUNT before run", sess._name)
         r = sess.run(count_query.format(**replace), **kwargs)
+        _log.info("%s - get COUNT after run", sess._name)
     if r:
         return r[0]["count"]
     return 0
@@ -483,11 +508,14 @@ def derive_columns(table_name, engine, columns=None):
         k for k, col in columns.items() if (col["type"] == "categorical" or col["type"] == "set") and "categories" not in col
     ]
     if number_columns or categorical_columns:
-        with session(engine) as s:
+        with session(engine) as sess:
+            _log.info("%s - DERIVE COLUMNS with session", sess._name)
             if number_columns:
                 template = "min({col}) as {col}_min, max({col}) as {col}_max"
                 minmax = ", ".join(template.format(col=col) for col in number_columns)
-                row = next(iter(s.execute("""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))
+                _log.info("%s - DERIVE COLUMNS number columns before run", sess._name)
+                row = next(iter(sess.execute("""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))
+                _log.info("%s - DERIVE COLUMNS number columns after run", sess._name)
                 for num_col in number_columns:
                     columns[num_col]["min"] = row[num_col + "_min"]
                     columns[num_col]["max"] = row[num_col + "_max"]
@@ -496,7 +524,9 @@ def derive_columns(table_name, engine, columns=None):
                 if _differentiates_empty_string_and_null(engine.name):
                     template += """ AND {col} <> ''"""
                 template += """ ORDER BY {col} ASC"""
-                cats = s.execute(template.format(col=col, table=table_name))
+                _log.info("%s - DERIVE COLUMNS categorical columns before run: %s, %s", sess._name, table_name, col)
+                cats = sess.execute(template.format(col=col, table=table_name))
+                _log.info("%s - DERIVE COLUMNS categorical columns after run: %s, %s", sess._name, table_name, col)
                 categories = [str(r["cat"]) for r in cats if r["cat"] is not None]
                 if columns[col]["type"] == "set":
                     separator = getattr(columns[col], "separator", ";")
@@ -505,12 +535,13 @@ def derive_columns(table_name, engine, columns=None):
                     categories = list({category for sublist in separated_categories for category in sublist})
                     categories.sort()  # sort list to avoid random order with each run
                 columns[col]["categories"] = categories
+            _log.info("%s - DERIVE COLUMNS done", sess._name)
 
     return columns
 
 
 def _fill_up_columns(view, engine):
-    _log.info("fill up view")
+    _log.info("fill up view %s", view)
     # update the real object
     view.columns = derive_columns(view.table, engine, view.columns)
     view.columns_filled_up = True
