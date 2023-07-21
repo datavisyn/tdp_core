@@ -360,18 +360,18 @@ def get_data(
     query = view.query
 
     if callable(query):
-        _log.info("get data with callback variant")
+        _log.info("GET DATA with callback variant")
         # callback variant
         return query(engine, arguments, filters), view
 
     with session(engine) as sess:
-        _log.info("%s - get DATA with session", sess._name)
+        _log.info("%s - GET DATA with session", sess._name)
         if config.statement_timeout and config.statement_timeout_query:
             _log.info("set statement_timeout to {}".format(config.statement_timeout))
             sess.execute(config.statement_timeout_query.format(config.statement_timeout))
-        _log.info("%s - get DATA before run", sess._name)
+        _log.info("%s - GET DATA before run", sess._name)
         r = sess.run(query.format(**replace), **kwargs)
-        _log.info("%s - get DATA after run", sess._name)
+        _log.info("%s - GET DATA after run", sess._name)
     return r, view
 
 
@@ -456,13 +456,13 @@ def get_count(database, view_name, args):
         return count_query(engine, processed_args, where_clause)
 
     with session(engine) as sess:
-        _log.info("%s - get COUNT with session", sess._name)
+        _log.info("%s - GET COUNT with session", sess._name)
         if config.statement_timeout and config.statement_timeout_query:
             _log.info("set statement_timeout to {}".format(config.statement_timeout))
             sess.execute(config.statement_timeout_query.format(config.statement_timeout))
-        _log.info("%s - get COUNT before run", sess._name)
+        _log.info("%s - GET COUNT before run", sess._name)
         r = sess.run(count_query.format(**replace), **kwargs)
-        _log.info("%s - get COUNT after run", sess._name)
+        _log.info("%s - GET COUNT after run", sess._name)
     if r:
         return r[0]["count"]
     return 0
