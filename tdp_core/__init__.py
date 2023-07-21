@@ -12,6 +12,12 @@ class VisynPlugin(AVisynPlugin):
     def register(self, registry: RegHelper):
         import logging
 
+        logging.basicConfig(
+            format="%(asctime)s.%(msecs)03d %(process)d %(levelname)s %(name)s:%(lineno)d %(message)s",
+            datefmt="%Y%m%d-%H%M%S",
+            level=logging.DEBUG
+        )
+
         _log = logging.getLogger(__name__)
 
         # phovea_server
