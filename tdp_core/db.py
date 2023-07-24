@@ -109,6 +109,7 @@ class WrappedSession:
         """
         self._engine = engine
         import uuid
+
         self._name = uuid.uuid4()
         _log.debug("%s - engine status before: %s", self._name, engine.pool.status())
         _log.debug("%s - creating session", self._name)
@@ -133,11 +134,10 @@ class WrappedSession:
         try:
             return self._session.execute(parsed, kwargs)
         except OperationalError as error:
-            _log.error('OperationalError: %s', error)
+            _log.error("OperationalError: %s", error)
             abort(408, error)
         except SQLAlchemyError as error:
-            _log.error('SQLAlchemyError: %s', error)
-            
+            _log.error("SQLAlchemyError: %s", error)
 
     def run(self, sql, **kwargs):
         """
@@ -149,8 +149,8 @@ class WrappedSession:
         _log.debug("%s - run sql statement: %s", self._name, sql)
         result = self.execute(sql, **kwargs)
         _log.debug("%s - ran sql statement: %s", self._name, sql)
-        columns = result.keys()
-        return [{c: r[c] for c in columns} for r in result]
+        columns = result.keys()  # type: ignore
+        return [{c: r[c] for c in columns} for r in result]  # type: ignore
 
     def __call__(self, sql, **kwargs):
         return self.run(sql, **kwargs)
@@ -514,7 +514,7 @@ def derive_columns(table_name, engine, columns=None):
                 template = "min({col}) as {col}_min, max({col}) as {col}_max"
                 minmax = ", ".join(template.format(col=col) for col in number_columns)
                 _log.debug("%s - DERIVE COLUMNS number columns before run", sess._name)
-                row = next(iter(sess.execute("""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))
+                row = next(iter(sess.execute("""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))  # type: ignore
                 _log.debug("%s - DERIVE COLUMNS number columns after run", sess._name)
                 for num_col in number_columns:
                     columns[num_col]["min"] = row[num_col + "_min"]
@@ -527,7 +527,7 @@ def derive_columns(table_name, engine, columns=None):
                 _log.debug("%s - DERIVE COLUMNS categorical columns before run: %s, %s", sess._name, table_name, col)
                 cats = sess.execute(template.format(col=col, table=table_name))
                 _log.debug("%s - DERIVE COLUMNS categorical columns after run: %s, %s", sess._name, table_name, col)
-                categories = [str(r["cat"]) for r in cats if r["cat"] is not None]
+                categories = [str(r["cat"]) for r in cats if r["cat"] is not None]  # type: ignore
                 if columns[col]["type"] == "set":
                     separator = getattr(columns[col], "separator", ";")
                     separated_categories = [category.split(separator) for category in categories]
