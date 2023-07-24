@@ -74,6 +74,7 @@ export class RemoteStorageProvenanceGraphManager {
         const uploadedDataset = await DataCache.getInstance().upload(pdesc);
         // create remote graph from the given dataset/graph desc
         const graphBackend = new RemoteStoreGraph(uploadedDataset.desc);
+        graphBackend.import(dump.nodes, dump.edges, ProvenanceGraphUtils.provenanceGraphFactory());
         // switch the localstorage backend to the remote backend for the same graph
         graph.migrateBackend(graphBackend);
         return graph;

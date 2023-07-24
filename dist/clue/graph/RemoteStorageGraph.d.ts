@@ -1,5 +1,5 @@
 import { GraphBase, IGraphFactory } from './GraphBase';
-import { GraphEdge, GraphNode, IGraphDataDescription } from './graph';
+import { GraphEdge, GraphNode, IGraphDataDescription, IGraphEdgeDump, IGraphNodeDump } from './graph';
 export declare class RemoteStoreGraph extends GraphBase {
     private static readonly DEFAULT_BATCH_SIZE;
     private static readonly DEFAULT_WAIT_TIME_BEFORE_EARLY_FLUSH;
@@ -17,6 +17,14 @@ export declare class RemoteStoreGraph extends GraphBase {
         nodes: GraphNode[];
         edges: GraphEdge[];
     };
+    /**
+     * Import the given nodes and edges into this graph.
+     * It will override the current graph and fire a loaded event once done.
+     * @param nodes Nodes to import
+     * @param edges Edges to import
+     * @param factory Factory to use to create the nodes and edges
+     */
+    import(nodes: IGraphNodeDump[], edges: IGraphEdgeDump[], factory: IGraphFactory): void;
     static load(desc: IGraphDataDescription, factory: IGraphFactory): Promise<RemoteStoreGraph>;
     private load;
     private loadImpl;
