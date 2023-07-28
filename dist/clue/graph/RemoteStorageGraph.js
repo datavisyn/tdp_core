@@ -1,4 +1,4 @@
-import { AppContext } from 'visyn_core/base';
+import { appContext } from 'visyn_core/base';
 import { GraphBase } from './GraphBase';
 import { GraphEdge, GraphNode } from './graph';
 class RemoteStoreGraph extends GraphBase {
@@ -24,13 +24,23 @@ class RemoteStoreGraph extends GraphBase {
         // TODO delete old
         return super.migrate();
     }
+    /**
+     * Import the given nodes and edges into this graph.
+     * It will override the current graph and fire a loaded event once done.
+     * @param nodes Nodes to import
+     * @param edges Edges to import
+     * @param factory Factory to use to create the nodes and edges
+     */
+    import(nodes, edges, factory) {
+        this.loadImpl(nodes, edges, factory);
+    }
     static load(desc, factory) {
         const r = new RemoteStoreGraph(desc);
         return r.load(factory);
     }
     async load(factory) {
         this.fire('sync_load_start,sync_start', ++this.waitForSynced);
-        const r = await AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/data`);
+        const r = await appContext.sendAPI(`/dataset/graph/${this.desc.id}/data`);
         this.loadImpl(r.nodes, r.edges, factory);
         this.fire('sync_load,sync', --this.waitForSynced);
         return this;
@@ -86,11 +96,11 @@ class RemoteStoreGraph extends GraphBase {
         const create = () => {
             switch (op) {
                 case 'add':
-                    return AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/${type}`, data, 'POST');
+                    return appContext.sendAPI(`/dataset/graph/${this.desc.id}/${type}`, data, 'POST');
                 case 'update':
-                    return AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/${type}/${elem.id}`, data, 'PUT');
+                    return appContext.sendAPI(`/dataset/graph/${this.desc.id}/${type}/${elem.id}`, data, 'PUT');
                 case 'remove':
-                    return AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/${type}/${elem.id}`, {}, 'DELETE');
+                    return appContext.sendAPI(`/dataset/graph/${this.desc.id}/${type}/${elem.id}`, {}, 'DELETE');
                 default:
                     return undefined;
             }
@@ -107,9 +117,7 @@ class RemoteStoreGraph extends GraphBase {
         // clear
         this.queue.splice(0, this.queue.length);
         this.fire(`sync_start`, ++this.waitForSynced, 'batch');
-        return AppContext.getInstance()
-            .sendAPI(`/dataset/${this.desc.id}`, { desc: param }, 'POST')
-            .then(() => {
+        return appContext.sendAPI(`/dataset/${this.desc.id}`, { desc: param }, 'POST').then(() => {
             this.fire(`sync`, --this.waitForSynced, 'batch');
             return this;
         });
@@ -187,7 +195,7 @@ class RemoteStoreGraph extends GraphBase {
             .then(() => {
             this.fire('sync_start', ++this.waitForSynced, 'clear');
             // clear all nodes
-            return AppContext.getInstance().sendAPI(`/dataset/graph/${this.desc.id}/node`, {}, 'DELETE');
+            return appContext.sendAPI(`/dataset/graph/${this.desc.id}/node`, {}, 'DELETE');
         })
             .then(() => {
             this.fire('sync');

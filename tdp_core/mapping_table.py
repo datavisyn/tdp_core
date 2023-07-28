@@ -29,7 +29,7 @@ class SQLMappingTable:
             mapped = session.execute(self._query, ids=ids)
 
             # handle multi mappings
-            data = sorted(mapped, key=lambda x: x["f"])
+            data = sorted(mapped, key=lambda x: x["f"])  # type: ignore
             grouped = {k: [r["t"] for r in g] for k, g in itertools.groupby(data, lambda x: x["f"])}
             # Return according to the given ids to ensure that we are preserving the order correctly
             return [grouped.get(id, []) for id in ids]

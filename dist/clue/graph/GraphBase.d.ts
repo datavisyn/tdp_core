@@ -1,7 +1,7 @@
 import { GraphNode, GraphEdge, AGraph, IGraph, IGraphDataDescription, IGraphNodeDump, IGraphEdgeDump } from './graph';
 export interface IGraphFactory {
-    makeNode(p: any): GraphNode;
-    makeEdge(p: any, lookup: (id: number) => GraphNode): GraphEdge;
+    makeNode(p: IGraphNodeDump): GraphNode;
+    makeEdge(p: IGraphEdgeDump, lookup: (id: number) => GraphNode): GraphEdge;
 }
 export interface IGraphDump {
     /**

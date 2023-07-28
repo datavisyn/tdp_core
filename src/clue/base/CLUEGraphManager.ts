@@ -244,16 +244,16 @@ export class CLUEGraphManager extends EventHandler {
     });
   }
 
-  migrateGraph(graph: ProvenanceGraph, extras: any = {}): PromiseLike<ProvenanceGraph> {
+  async migrateGraph(graph: ProvenanceGraph, extras: any = {}): Promise<ProvenanceGraph> {
     const old = graph.desc;
-    return this.manager.migrateRemote(graph, extras).then((newGraph) => {
-      return (old.local ? this.manager.delete(old) : Promise.resolve(true)).then(() => {
-        if (!this.isReadOnly) {
-          this.propertyHandler.setProp('clue_graph', newGraph.desc.id); // just update the reference
-        }
-        return newGraph;
-      });
-    });
+    const newGraph = await this.manager.migrateRemote(graph, extras);
+    if (old.local) {
+      await this.manager.delete(old);
+    }
+    if (!this.isReadOnly) {
+      this.propertyHandler.setProp('clue_graph', newGraph.desc.id); // just update the reference
+    }
+    return newGraph;
   }
 
   editGraphMetaData(graph: IProvenanceGraphDataDescription, extras: any = {}) {

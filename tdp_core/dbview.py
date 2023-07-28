@@ -607,6 +607,7 @@ class DBConnector:
         :param agg_score: optional specify how aggregation should be handled
         :param mappings: optional database mappings
         """
+        _log.debug("create db connector")
         self.agg_score = agg_score or default_agg_score
         self.views = views or {}
         self.dburl: str = None  # type: ignore
@@ -625,7 +626,9 @@ class DBConnector:
             "pool_pre_ping": True,
         }
         engine_options.update(config.get("engine", {}))
+        _log.debug("db connector: create engine with options %s", engine_options)
         return sqlalchemy.create_engine(self.dburl, **engine_options)
 
     def create_sessionmaker(self, engine) -> sessionmaker:
+        _log.debug("db connector: create_sessionmaker")
         return sessionmaker(bind=engine)

@@ -28,7 +28,7 @@ export class GraphProxy extends ADataType {
     get dim() {
         return [this.nnodes, this.nedges];
     }
-    impl(factory = GraphFactoryUtils.defaultGraphFactory) {
+    async impl(factory = GraphFactoryUtils.defaultGraphFactory) {
         if (this.cache) {
             return this.cache;
         }
@@ -36,23 +36,21 @@ export class GraphProxy extends ADataType {
         if (type === 'memory') {
             // memory only
             this.loaded = new MemoryGraph(this.desc, [], [], factory);
-            this.cache = Promise.resolve(this.loaded);
         }
         else if (type === 'local') {
             this.loaded = LocalStorageGraph.load(this.desc, factory, localStorage);
-            this.cache = Promise.resolve(this.loaded);
         }
         else if (type === 'session') {
             this.loaded = LocalStorageGraph.load(this.desc, factory, sessionStorage);
-            this.cache = Promise.resolve(this.loaded);
         }
         else if (type === 'given' && this.desc.graph instanceof AGraph) {
             this.loaded = this.desc.graph;
-            this.cache = Promise.resolve(this.loaded);
         }
         else {
-            this.cache = Promise.resolve(RemoteStoreGraph.load(this.desc, factory)).then((graph) => (this.loaded = graph));
+            const graph = await RemoteStoreGraph.load(this.desc, factory);
+            this.loaded = graph;
         }
+        this.cache = Promise.resolve(this.loaded);
         return this.cache;
     }
     get idtypes() {

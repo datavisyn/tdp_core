@@ -31,27 +31,29 @@ export class GraphProxy extends ADataType<IGraphDataDescription> {
     return [this.nnodes, this.nedges];
   }
 
-  impl(factory: IGraphFactory = GraphFactoryUtils.defaultGraphFactory): PromiseLike<AGraph> {
+  async impl(factory: IGraphFactory = GraphFactoryUtils.defaultGraphFactory): Promise<AGraph> {
     if (this.cache) {
       return this.cache;
     }
+
     const type = this.desc.storage || 'remote';
+
     if (type === 'memory') {
       // memory only
       this.loaded = new MemoryGraph(this.desc, [], [], factory);
-      this.cache = Promise.resolve(this.loaded);
     } else if (type === 'local') {
       this.loaded = LocalStorageGraph.load(this.desc, factory, localStorage);
-      this.cache = Promise.resolve(this.loaded);
     } else if (type === 'session') {
       this.loaded = LocalStorageGraph.load(this.desc, factory, sessionStorage);
-      this.cache = Promise.resolve(this.loaded);
     } else if (type === 'given' && this.desc.graph instanceof AGraph) {
       this.loaded = this.desc.graph;
-      this.cache = Promise.resolve(this.loaded);
     } else {
-      this.cache = Promise.resolve(RemoteStoreGraph.load(this.desc, factory)).then((graph: AGraph) => (this.loaded = graph));
+      const graph: AGraph = await RemoteStoreGraph.load(this.desc, factory);
+      this.loaded = graph;
     }
+
+    this.cache = Promise.resolve(this.loaded);
+
     return this.cache;
   }
 
