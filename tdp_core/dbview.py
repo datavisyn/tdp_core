@@ -10,6 +10,9 @@ from visyn_core.security import current_user, is_logged_in
 
 from .utils import clean_query
 
+from opentelemetry import trace
+
+tracer = trace.get_tracer(__name__)
 _log = logging.getLogger(__name__)
 REGEX_TYPE = type(re.compile(""))
 
@@ -607,14 +610,15 @@ class DBConnector:
         :param agg_score: optional specify how aggregation should be handled
         :param mappings: optional database mappings
         """
-        _log.debug("create db connector")
-        self.agg_score = agg_score or default_agg_score
-        self.views = views or {}
-        self.dburl: str = None  # type: ignore
-        self.mappings = mappings
-        self.statement_timeout = None
-        self.statement_timeout_query: str | None = None
-        self.description = ""
+        with tracer.start_as_current_span("DBConnector.init"):
+            _log.debug("create db connector")
+            self.agg_score = agg_score or default_agg_score
+            self.views = views or {}
+            self.dburl: str = None  # type: ignore
+            self.mappings = mappings
+            self.statement_timeout = None
+            self.statement_timeout_query: str | None = None
+            self.description = ""
 
     def dump(self, name):
         return OrderedDict(name=name, description=self.description)
@@ -627,8 +631,10 @@ class DBConnector:
         }
         engine_options.update(config.get("engine", {}))
         _log.debug("db connector: create engine with options %s", engine_options)
-        return sqlalchemy.create_engine(self.dburl, **engine_options)
+        with tracer.start_as_current_span("DBConnector.create_engine"):
+            return sqlalchemy.create_engine(self.dburl, **engine_options)
 
     def create_sessionmaker(self, engine) -> sessionmaker:
-        _log.debug("db connector: create_sessionmaker")
-        return sessionmaker(bind=engine)
+        with tracer.start_as_current_span("DBConnector.create_sessionmaker"):
+            _log.debug("db connector: create_sessionmaker")
+            return sessionmaker(bind=engine)
