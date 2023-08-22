@@ -4,13 +4,12 @@ from collections import OrderedDict
 from typing import Any
 
 import sqlalchemy
+from opentelemetry import trace
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 from visyn_core.security import current_user, is_logged_in
 
 from .utils import clean_query
-
-from opentelemetry import trace
 
 tracer = trace.get_tracer(__name__)
 _log = logging.getLogger(__name__)

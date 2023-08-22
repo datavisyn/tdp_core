@@ -2,6 +2,7 @@ import logging
 from typing import Any
 
 from flask import abort
+from opentelemetry import trace
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
 from visyn_core import manager
@@ -9,8 +10,6 @@ from werkzeug.datastructures import MultiDict
 
 from .sql_filter import filter_logic
 from .utils import clean_query, secure_replacements
-
-from opentelemetry import trace
 
 tracer = trace.get_tracer(__name__)
 _log = logging.getLogger(__name__)
