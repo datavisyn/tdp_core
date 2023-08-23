@@ -636,9 +636,7 @@ class DBConnector:
         _log.info("db connector: using poolclass %s", poolclass)
 
         # Set some default engine options for QueuePool to be backwards compatible with previous tdp_core code
-        engine_options = (
-            {"pool_size": 30, "pool_pre_ping": True} if poolclass_name == "QueuePool" or poolclass == QueuePool else {}
-        )
+        engine_options = {"pool_size": 30, "pool_pre_ping": True} if poolclass_name == "QueuePool" or poolclass == QueuePool else {}
 
         engine_options.update(config.get("engine", {}))
         _log.debug("db connector: create engine with options %s", engine_options)
