@@ -7,6 +7,7 @@ import sqlalchemy
 from opentelemetry import trace
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool
 from visyn_core.security import current_user, is_logged_in
 
 from .utils import clean_query
@@ -630,13 +631,13 @@ class DBConnector:
             poolclass = getattr(importlib.import_module("sqlalchemy.pool"), poolclass_name)
         except AttributeError:
             _log.warning("db connector: poolclass %s not found, using default QueuePool", poolclass_name)
-            poolclass = sqlalchemy.pool.QueuePool
+            poolclass = QueuePool
 
         _log.info("db connector: using poolclass %s", poolclass)
 
         # Set some default engine options for QueuePool to be backwards compatible with previous tdp_core code
         engine_options = (
-            {"pool_size": 30, "pool_pre_ping": True} if poolclass_name == "QueuePool" or poolclass == sqlalchemy.pool.QueuePool else {}
+            {"pool_size": 30, "pool_pre_ping": True} if poolclass_name == "QueuePool" or poolclass == QueuePool else {}
         )
 
         engine_options.update(config.get("engine", {}))
