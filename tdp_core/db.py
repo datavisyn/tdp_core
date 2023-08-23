@@ -112,6 +112,7 @@ class WrappedSession:
         with tracer.start_as_current_span("WrappedSession.__init__", attributes={"db.pool_status": engine.pool.status()}):
             self._engine = engine
             import uuid
+
             self._name = uuid.uuid4()
             _log.debug("%s - engine status before: %s", self._name, engine.pool.status())
             _log.debug("%s - creating session", self._name)
@@ -529,7 +530,14 @@ def derive_columns(table_name, engine, columns=None):
             k for k, col in columns.items() if (col["type"] == "categorical" or col["type"] == "set") and "categories" not in col
         ]
         if number_columns or categorical_columns:
-            with tracer.start_as_current_span("db.derive_column", attributes={"db.table_name": table_name, "db.number_columns": number_columns, "db.categorical_columns": categorical_columns}), session(engine) as sess:
+            with tracer.start_as_current_span(
+                "db.derive_column",
+                attributes={
+                    "db.table_name": table_name,
+                    "db.number_columns": number_columns,
+                    "db.categorical_columns": categorical_columns,
+                },
+            ), session(engine) as sess:
                 _log.debug("%s - DERIVE COLUMNS with session", sess._name)
                 if number_columns:
                     template = "min({col}) as {col}_min, max({col}) as {col}_max"
