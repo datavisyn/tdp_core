@@ -529,35 +529,34 @@ def derive_columns(table_name, engine, columns=None):
             k for k, col in columns.items() if (col["type"] == "categorical" or col["type"] == "set") and "categories" not in col
         ]
         if number_columns or categorical_columns:
-            with tracer.start_as_current_span("db.derive_column", attributes={"db.table_name": table_name, "db.number_columns": number_columns, "db.categorical_columns": categorical_columns}):
-                with session(engine) as sess:
-                    _log.debug("%s - DERIVE COLUMNS with session", sess._name)
-                    if number_columns:
-                        template = "min({col}) as {col}_min, max({col}) as {col}_max"
-                        minmax = ", ".join(template.format(col=col) for col in number_columns)
-                        _log.debug("%s - DERIVE COLUMNS number columns before run", sess._name)
-                        row = next(iter(sess.execute("""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))  # type: ignore
-                        _log.debug("%s - DERIVE COLUMNS number columns after run", sess._name)
-                        for num_col in number_columns:
-                            columns[num_col]["min"] = row[num_col + "_min"]
-                            columns[num_col]["max"] = row[num_col + "_max"]
-                    for col in categorical_columns:
-                        template = """SELECT distinct {col} as cat FROM {table} WHERE {col} is not NULL"""
-                        if _differentiates_empty_string_and_null(engine.name):
-                            template += """ AND {col} <> ''"""
-                        template += """ ORDER BY {col} ASC"""
-                        _log.debug("%s - DERIVE COLUMNS categorical columns before run: %s, %s", sess._name, table_name, col)
-                        cats = sess.execute(template.format(col=col, table=table_name))
-                        _log.debug("%s - DERIVE COLUMNS categorical columns after run: %s, %s", sess._name, table_name, col)
-                        categories = [str(r["cat"]) for r in cats if r["cat"] is not None]  # type: ignore
-                        if columns[col]["type"] == "set":
-                            separator = getattr(columns[col], "separator", ";")
-                            separated_categories = [category.split(separator) for category in categories]
-                            # flatten array
-                            categories = list({category for sublist in separated_categories for category in sublist})
-                            categories.sort()  # sort list to avoid random order with each run
-                        columns[col]["categories"] = categories
-                    _log.debug("%s - DERIVE COLUMNS done", sess._name)
+            with tracer.start_as_current_span("db.derive_column", attributes={"db.table_name": table_name, "db.number_columns": number_columns, "db.categorical_columns": categorical_columns}), session(engine) as sess:
+                _log.debug("%s - DERIVE COLUMNS with session", sess._name)
+                if number_columns:
+                    template = "min({col}) as {col}_min, max({col}) as {col}_max"
+                    minmax = ", ".join(template.format(col=col) for col in number_columns)
+                    _log.debug("%s - DERIVE COLUMNS number columns before run", sess._name)
+                    row = next(iter(sess.execute("""SELECT {minmax} FROM {table}""".format(table=table_name, minmax=minmax))))  # type: ignore
+                    _log.debug("%s - DERIVE COLUMNS number columns after run", sess._name)
+                    for num_col in number_columns:
+                        columns[num_col]["min"] = row[num_col + "_min"]
+                        columns[num_col]["max"] = row[num_col + "_max"]
+                for col in categorical_columns:
+                    template = """SELECT distinct {col} as cat FROM {table} WHERE {col} is not NULL"""
+                    if _differentiates_empty_string_and_null(engine.name):
+                        template += """ AND {col} <> ''"""
+                    template += """ ORDER BY {col} ASC"""
+                    _log.debug("%s - DERIVE COLUMNS categorical columns before run: %s, %s", sess._name, table_name, col)
+                    cats = sess.execute(template.format(col=col, table=table_name))
+                    _log.debug("%s - DERIVE COLUMNS categorical columns after run: %s, %s", sess._name, table_name, col)
+                    categories = [str(r["cat"]) for r in cats if r["cat"] is not None]  # type: ignore
+                    if columns[col]["type"] == "set":
+                        separator = getattr(columns[col], "separator", ";")
+                        separated_categories = [category.split(separator) for category in categories]
+                        # flatten array
+                        categories = list({category for sublist in separated_categories for category in sublist})
+                        categories.sort()  # sort list to avoid random order with each run
+                    columns[col]["categories"] = categories
+                _log.debug("%s - DERIVE COLUMNS done", sess._name)
 
         return columns
 
