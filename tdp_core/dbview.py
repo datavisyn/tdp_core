@@ -4,12 +4,15 @@ from collections import OrderedDict
 from typing import Any
 
 import sqlalchemy
+from opentelemetry import trace
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import QueuePool
 from visyn_core.security import current_user, is_logged_in
 
 from .utils import clean_query
 
+tracer = trace.get_tracer(__name__)
 _log = logging.getLogger(__name__)
 REGEX_TYPE = type(re.compile(""))
 
@@ -607,28 +610,41 @@ class DBConnector:
         :param agg_score: optional specify how aggregation should be handled
         :param mappings: optional database mappings
         """
-        _log.debug("create db connector")
-        self.agg_score = agg_score or default_agg_score
-        self.views = views or {}
-        self.dburl: str = None  # type: ignore
-        self.mappings = mappings
-        self.statement_timeout = None
-        self.statement_timeout_query: str | None = None
-        self.description = ""
+        with tracer.start_as_current_span("DBConnector.init"):
+            _log.debug("create db connector")
+            self.agg_score = agg_score or default_agg_score
+            self.views = views or {}
+            self.dburl: str = None  # type: ignore
+            self.mappings = mappings
+            self.statement_timeout = None
+            self.statement_timeout_query: str | None = None
+            self.description = ""
 
     def dump(self, name):
         return OrderedDict(name=name, description=self.description)
 
     def create_engine(self, config) -> Engine:
-        engine_options = {
-            # Increase the pool size to 30 to avoid "too many clients" errors
-            "pool_size": 30,
-            "pool_pre_ping": True,
-        }
+        import importlib
+
+        poolclass_name = config.get("poolclass", "QueuePool")  # set to SQLAlchemy default poolclass = QueuePool
+        try:
+            poolclass = getattr(importlib.import_module("sqlalchemy.pool"), poolclass_name)
+        except AttributeError:
+            _log.warning("db connector: poolclass %s not found, using default QueuePool", poolclass_name)
+            poolclass = QueuePool
+
+        _log.info("db connector: using poolclass %s", poolclass)
+
+        # Set some default engine options for QueuePool to be backwards compatible with previous tdp_core code
+        engine_options = {"pool_size": 30, "pool_pre_ping": True} if poolclass_name == "QueuePool" or poolclass == QueuePool else {}
+
         engine_options.update(config.get("engine", {}))
         _log.debug("db connector: create engine with options %s", engine_options)
-        return sqlalchemy.create_engine(self.dburl, **engine_options)
+
+        with tracer.start_as_current_span("DBConnector.create_engine"):
+            return sqlalchemy.create_engine(self.dburl, poolclass=poolclass, **engine_options)
 
     def create_sessionmaker(self, engine) -> sessionmaker:
-        _log.debug("db connector: create_sessionmaker")
-        return sessionmaker(bind=engine)
+        with tracer.start_as_current_span("DBConnector.create_sessionmaker"):
+            _log.debug("db connector: create_sessionmaker")
+            return sessionmaker(bind=engine)
