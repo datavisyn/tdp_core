@@ -20,11 +20,29 @@
   "types": "src/index.ts",
   "exports": {
     ".": {
-      "types": ["./dist/index.d.ts", "./src/index.ts"],
-      "import": ["./dist/index.js", "./src/index.ts"],
-      "default": ["./dist/index.js", "./src/index.ts"]
+      "types": [
+        "./dist/index.d.ts",
+        "./src/index.ts"
+      ],
+      "import": [
+        "./dist/index.js",
+        "./src/index.ts"
+      ],
+      "default": [
+        "./dist/index.js",
+        "./src/index.ts"
+      ]
     },
-    "./phovea_registry": ["./dist/phovea_registry.js", "./src/phovea_registry.ts"]
+    "./phovea_registry": [
+      "./dist/phovea_registry.js",
+      "./src/phovea_registry.ts"
+    ],
+    "./src/scss/*": ["./dist/scss/*", "./src/scss/*"],
+    "./dist/scss/*": ["./dist/scss/*", "./src/scss/*"],
+    "./src/assets/*": ["./dist/assets/*", "./src/assets/*"],
+    "./dist/assets/*": ["./dist/assets/*", "./src/assets/*"],
+    "./src/webpack/*": ["./dist/webpack/*", "./src/webpack/*"],
+    "./dist/webpack/*": ["./dist/webpack/*", "./src/webpack/*"]
   },
   "files": [
     "src",
@@ -93,7 +111,7 @@
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "use-deep-compare-effect": "^1.8.0",
     "visyn_core": "git+ssh://git@github.com/datavisyn/visyn_core#no_dist",
-    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#develop"
+    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#no_dist"
   },
   "devDependencies": {
     "@babel/core": "^7.17.7",

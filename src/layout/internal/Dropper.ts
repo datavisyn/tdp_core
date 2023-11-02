@@ -63,7 +63,7 @@ export class Dropper {
     );
   }
 
-  static dropLogic(item: ILayoutContainer, reference: ALayoutContainer<any> & ILayoutContainer, area: IDropArea) {
+  static dropLogic(item: ILayoutContainer, reference: (ALayoutContainer<any> & ILayoutContainer) | TabbingLayoutContainer, area: IDropArea) {
     if (item instanceof AParentLayoutContainer && reference.parents.indexOf(item) >= 0) {
       // can drop item within one of its children
       return false;
