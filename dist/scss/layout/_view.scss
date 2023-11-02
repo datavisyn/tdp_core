@@ -1,9 +1,0 @@
-@import './vars';
-
-article[data-layout=view] {
-  display: flex;
-
-  > * {
-    flex: 1 1 auto;
-  }
-}
