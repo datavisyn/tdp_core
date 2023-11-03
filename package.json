@@ -37,12 +37,8 @@
       "./dist/phovea_registry.js",
       "./src/phovea_registry.ts"
     ],
-    "./src/scss/*": ["./dist/scss/*", "./src/scss/*"],
-    "./dist/scss/*": ["./dist/scss/*", "./src/scss/*"],
-    "./src/assets/*": ["./dist/assets/*", "./src/assets/*"],
-    "./dist/assets/*": ["./dist/assets/*", "./src/assets/*"],
-    "./src/webpack/*": ["./dist/webpack/*", "./src/webpack/*"],
-    "./dist/webpack/*": ["./dist/webpack/*", "./src/webpack/*"]
+    "./src/*": ["./dist/*", "./src/*"],
+    "./dist/*": ["./dist/*", "./src/*"]
   },
   "files": [
     "src",
