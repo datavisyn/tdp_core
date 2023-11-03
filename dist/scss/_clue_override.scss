@@ -1,0 +1,102 @@
+/**
+ * All rules in this file override or directly extend the original clue styles
+ */
+
+// overrides caleydo_clue/styles/base
+header.clue-modeselector {
+  top: 1px;
+}
+
+[data-clue=E] header.clue-modeselector.collapsed {
+  transition: none;
+}
+
+// overrides caleydo_clue/styles/base
+aside {
+  &.provenance-layout-vis {
+    border: 0;
+    border-left: 2px solid $core_colour_selected;
+    border-radius: 0;
+    margin: 0;
+
+    &.collapsed {
+      border-left: 0; // hide border when panel is collapsed
+    }
+  }
+
+  &.provenance-story-vis {
+    border: 0;
+    border-left: 2px solid $core_colour_selected;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  &.annotations {
+    border-radius: 0;
+    margin: 0;
+    border: 2px solid $core_colour_selected;
+
+    > div:first-of-type {
+      background-color: $presentation-stage;
+    }
+  }
+}
+
+// overrides caleydo_clue/styles/base
+label {
+
+  &.clue-E, &.clue-A, &.clue-P {
+    padding: 7px 10px;
+    border-radius: 0 !important;
+    border: none;
+    border-left: 1px solid $header-menu-bg-color;
+    border-right: 1px solid $header-menu-bg-color;
+    margin: 0;
+    background-color: transparent;
+
+    &.active, &:hover, &:active {
+      font-weight: normal;
+    }
+  }
+}
+
+// overrides caleydo_clue/styles/storyvis
+.provenance-story-vis {
+  width: auto;
+
+  div.current {
+    margin: .2em .5em;
+  }
+
+  form.toolbar {
+    margin: .2em .5em;
+  }
+}
+
+div.stories {
+
+  &.vertical {
+
+    &.large {
+      width: auto;
+    }
+
+  }
+}
+
+// overrides caleydo_clue/styles/provvis
+.provenance-layout-vis {
+  div.state {
+
+    .toolbar {
+      margin: .2em .5em;
+    }
+
+    &.caleydo-select-selected {
+      font-weight: 500;
+    }
+    &.caleydo-select-hovered {
+      font-weight: 500;
+    }
+  }
+}

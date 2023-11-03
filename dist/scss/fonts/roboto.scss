@@ -1,0 +1,37 @@
+@import './font';
+
+/* roboto-regular - latin */
+@include font-face(
+  Roboto,
+  normal,
+  400,
+  '../../assets/fonts/roboto-v29-latin-regular',
+  regular
+);
+
+/* roboto-500 - latin */
+@include font-face(
+  Roboto,
+  normal,
+  500,
+  '../../assets/fonts/roboto-v29-latin-500',
+  regular
+);
+
+/* roboto-700 - latin */
+@include font-face(
+  Roboto,
+  normal,
+  700,
+  '../../assets/fonts/roboto-v29-latin-700',
+  regular
+);
+
+/* roboto-900 - latin */
+@include font-face(
+  Roboto,
+  normal,
+  900,
+  '../../assets/fonts/roboto-v29-latin-900',
+  regular
+);

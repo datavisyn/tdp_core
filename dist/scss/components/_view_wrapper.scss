@@ -1,0 +1,102 @@
+article.#{$tdp-css-prefix}-view-wrapper {
+  flex: 1 1 auto;
+  border: 1px solid lightgray;
+  border-radius: 2px;
+  align-items: stretch;
+  flex-direction: column;
+  position: relative;
+  padding: 2px 7px;
+  overflow: auto;
+  display: none;
+
+  &.active {
+    display: flex;
+  }
+
+  > header {
+    flex: 0 0 auto;
+
+    > div.parameters {
+      display: inline-block;
+      &:empty {
+        display: none;
+      }
+    }
+  }
+
+  > main {
+    flex: 1 1 auto;
+    position: relative;
+    overflow: auto;
+
+    > * {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    div.tdp-view.proxy_view {
+      bottom: 5px;
+      height: auto;
+      width: auto;
+    }
+
+    @import '../../scss/components/view';
+  }
+
+  > .preview-image {
+    display: none;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    > div {
+      background: $tdp-view-wrapper-preview-background;
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      border-radius: 3px;
+      border: 1px solid #e1e1e1;
+      display: block;
+      width: 16em;
+      height: 9em;
+      margin: 1em;
+    }
+
+    > span {
+      text-align: center;
+    }
+  }
+
+  > .view-help {
+    position: absolute;
+    right: 0.3em;
+    top: 0.3em;
+    z-index: 100;
+
+    &::before {
+      @extend .fas;
+      content: fa-content($fa-var-question-circle);
+      margin-right: 0.3em;
+    }
+  }
+
+  &.disabled-view {
+    & > main,
+    & > header {
+      display: none;
+    }
+
+    & > .preview-image {
+      display: flex;
+    }
+  }
+
+  &.not-allowed {
+    filter: grayscale(100%);
+    cursor: not-allowed;
+  }
+}

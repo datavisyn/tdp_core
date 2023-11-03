@@ -1,0 +1,10 @@
+@import '~@fortawesome/fontawesome-free/scss/solid';
+@import '~@fortawesome/fontawesome-free/scss/regular';
+@import '~@fortawesome/fontawesome-free/scss/brands';
+@import '~@fortawesome/fontawesome-free/scss/fontawesome';
+
+
+// vertically align all font-awesome icons inside of the .btn class
+.btn > .fas, .btn > .far, .btn > fal, .btn > .fad, .btn > .fab {
+  vertical-align: middle;
+}

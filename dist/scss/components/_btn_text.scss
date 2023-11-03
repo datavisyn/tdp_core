@@ -1,0 +1,47 @@
+@each $color, $value in $theme-colors {
+  // btn-text has no background or border, and only sets the font-color.
+  .btn-icon-#{$color} {
+    @include button-variant(
+      $background: transparent,
+      $border: transparent,
+      $color: rgba($value, 0.85),
+      $hover-background: transparent,
+      $hover-border: transparent,
+      $hover-color: if(color-contrast($value) == $color-contrast-light, shade-color($value, $btn-hover-bg-shade-amount), tint-color($value, $btn-hover-bg-tint-amount)),
+      $active-background: transparent,
+      $active-border: transparent,
+      $active-color:  if(color-contrast($value) == $color-contrast-light, shade-color($value, $btn-active-bg-shade-amount), tint-color($value, $btn-active-bg-tint-amount)),
+      $disabled-background: transparent,
+      $disabled-border: transparent,
+      $disabled-color: rgba($value, $btn-disabled-opacity)
+    );
+  }
+
+  // btn-text has no background or border, and only sets the font-color. The background is only set on hover
+  .btn-text-#{$color} {
+    @include button-variant(
+      $background: transparent,
+      $border: transparent,
+      $color: $value,
+      $hover-background: rgba($value, 0.15),
+      $hover-border: transparent,
+      $hover-color: $value,
+      $active-background: rgba($value, 0.20),
+      $active-border: transparent,
+      $active-color: $value,
+      $disabled-background: transparent,
+      $disabled-border: transparent,
+      $disabled-color: rgba($value, $btn-disabled-opacity)
+    );
+  }
+
+  // override the background color of button-outline-variant
+  .btn-outline-#{$color} {
+    @include button-outline-variant(
+      $color: $value,
+      $color-hover: $value,
+      $active-color:  if(color-contrast($value) == $color-contrast-light, shade-color($value, $btn-active-bg-shade-amount), tint-color($value, $btn-active-bg-tint-amount)),
+      $active-background: rgba($value, 0.10)
+    )
+  }
+}
