@@ -37,8 +37,8 @@
       "./dist/phovea_registry.js",
       "./src/phovea_registry.ts"
     ],
-    "./src/*": ["./dist/*", "./src/*"],
-    "./dist/*": ["./dist/*", "./src/*"]
+    "./src/*": ["./dist/*.js", "./src/*.ts", "./src/*.tsx", "./src/*"],
+    "./dist/*": ["./dist/*.js", "./src/*.ts", "./src/*.tsx", "./src/*"]
   },
   "files": [
     "src",
