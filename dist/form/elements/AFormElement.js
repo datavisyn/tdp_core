@@ -6,7 +6,7 @@ import { FormElementType } from '../interfaces';
 /**
  * Abstract form element class that is used as parent class for other form elements
  */
-class AFormElement extends EventHandler {
+export class AFormElement extends EventHandler {
     /**
      * Constructor
      * @param form The form this element is a part of
@@ -182,5 +182,4 @@ class AFormElement extends EventHandler {
 }
 AFormElement.EVENT_CHANGE = 'change';
 AFormElement.EVENT_INITIAL_VALUE = 'initial';
-export { AFormElement };
 //# sourceMappingURL=AFormElement.js.map

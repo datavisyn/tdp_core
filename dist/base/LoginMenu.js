@@ -7,7 +7,7 @@ import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM } from './extensions';
 /**
  * utility login menu that can be added to the Appheader for instance
  */
-class LoginMenu extends EventHandler {
+export class LoginMenu extends EventHandler {
     constructor(header, options = {}) {
         super();
         this.header = header;
@@ -195,5 +195,4 @@ class LoginMenu extends EventHandler {
 }
 LoginMenu.EVENT_LOGGED_IN = 'loggedIn';
 LoginMenu.EVENT_LOGGED_OUT = 'loggedOut';
-export { LoginMenu };
 //# sourceMappingURL=LoginMenu.js.map

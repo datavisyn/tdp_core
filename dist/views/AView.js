@@ -9,7 +9,7 @@ import { ERenderAuthorizationStatus, TokenManager, TDPTokenManager } from '../au
 /**
  * base class for all views
  */
-class AView extends EventHandler {
+export class AView extends EventHandler {
     constructor(context, selection, parent) {
         super();
         this.context = context;
@@ -330,5 +330,4 @@ AView.EVENT_LOADING_FINISHED = ViewUtils.VIEW_EVENT_LOADING_FINISHED;
  * params(name: string, oldValue: any, newValue: any)
  */
 AView.EVENT_UPDATE_SHARED = ViewUtils.VIEW_EVENT_UPDATE_SHARED;
-export { AView };
 //# sourceMappingURL=AView.js.map

@@ -158,7 +158,8 @@ export abstract class AParentLayoutContainer<T extends ILayoutContainerOption> e
     });
   }
 
-  find(id: number | ((container: ILayoutContainer) => boolean)) {
+  // @ts-ignore
+  find(id: number | ((container: ILayoutContainer) => boolean)): ILayoutContainer {
     if (super.find(id) != null) {
       return <ILayoutContainer>this;
     }

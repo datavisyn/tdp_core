@@ -12,7 +12,7 @@ import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
 import { MemoryGraph } from '../graph/MemoryGraph';
 import { ActionMetaData } from './ActionMeta';
 import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
-class ProvenanceGraph extends ADataType {
+export class ProvenanceGraph extends ADataType {
     constructor(desc, backend) {
         super(desc);
         this.backend = backend;
@@ -800,5 +800,4 @@ class ProvenanceGraph extends ADataType {
     }
 }
 ProvenanceGraph.PROPAGATED_EVENTS = ['sync', 'add_edge', 'add_node', 'sync_node', 'sync_edge', 'sync_start'];
-export { ProvenanceGraph };
 //# sourceMappingURL=ProvenanceGraph.js.map

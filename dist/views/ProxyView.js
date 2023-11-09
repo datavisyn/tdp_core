@@ -7,7 +7,7 @@ import { RestBaseUtils } from '../base/rest';
 /**
  * helper view for proxying an existing external website using an iframe
  */
-class ProxyView extends AD3View {
+export class ProxyView extends AD3View {
     constructor(context, selection, parent, options = {}) {
         super(context, selection, parent);
         this.options = {
@@ -182,5 +182,4 @@ class ProxyView extends AD3View {
     }
 }
 ProxyView.FORM_ID_SELECTED_ITEM = 'externalItem';
-export { ProxyView };
 //# sourceMappingURL=ProxyView.js.map

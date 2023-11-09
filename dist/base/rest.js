@@ -9,7 +9,7 @@ const emptyFilters = {
     gt: {},
     gte: {},
 };
-class RestBaseUtils {
+export class RestBaseUtils {
     static getTDPDataImpl(database, view, method, params = {}) {
         const mmethod = method === 'none' ? '' : `/${method}`;
         const url = `${RestBaseUtils.REST_DB_NAMESPACE}/${database}/${view}${mmethod}`;
@@ -184,5 +184,4 @@ class RestBaseUtils {
 }
 RestBaseUtils.REST_NAMESPACE = '/tdp';
 RestBaseUtils.REST_DB_NAMESPACE = `${RestBaseUtils.REST_NAMESPACE}/db`;
-export { RestBaseUtils };
 //# sourceMappingURL=rest.js.map

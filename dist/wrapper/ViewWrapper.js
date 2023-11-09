@@ -7,7 +7,7 @@ import { AView } from '../views/AView';
 import { TourUtils } from '../tour/TourUtils';
 import { NodeUtils, ObjectRefUtils } from '../clue/provenance';
 import { Dialog } from '../components';
-class ViewWrapper extends EventHandler {
+export class ViewWrapper extends EventHandler {
     off(events, handler) {
         return super.on(events, handler);
     }
@@ -339,5 +339,4 @@ class ViewWrapper extends EventHandler {
 ViewWrapper.EVENT_VIEW_INITIALIZED = 'viewInitialized';
 ViewWrapper.EVENT_VIEW_CREATED = 'viewCreated';
 ViewWrapper.EVENT_VIEW_DESTROYED = 'viewDestroyed';
-export { ViewWrapper };
 //# sourceMappingURL=ViewWrapper.js.map

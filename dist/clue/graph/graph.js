@@ -142,7 +142,7 @@ export class GraphEdge extends AttributeContainer {
         return (edge) => (type instanceof RegExp ? type.test(edge.type) : edge.type === type);
     }
 }
-class AGraph extends EventHandler {
+export class AGraph extends EventHandler {
     get nnodes() {
         return this.nodes.length;
     }
@@ -160,5 +160,4 @@ AGraph.DIM_NODES = 0;
 AGraph.IDTYPE_NODES = '_nodes';
 AGraph.DIM_EDGES = 1;
 AGraph.IDTYPE_EDGES = '_edges';
-export { AGraph };
 //# sourceMappingURL=graph.js.map

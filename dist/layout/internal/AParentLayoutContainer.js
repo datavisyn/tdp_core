@@ -126,6 +126,7 @@ export class AParentLayoutContainer extends ALayoutContainer {
             children: this._children.map((d) => d.persist()),
         });
     }
+    // @ts-ignore
     find(id) {
         if (super.find(id) != null) {
             return this;
