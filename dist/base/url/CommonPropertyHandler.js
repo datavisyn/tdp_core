@@ -1,5 +1,5 @@
 import { PropertyHandler } from './PropertyHandler';
-class CommonPropertyHandler extends PropertyHandler {
+export class CommonPropertyHandler extends PropertyHandler {
     constructor() {
         super(...arguments);
         this.debounceTimer = -1;
@@ -85,5 +85,4 @@ class CommonPropertyHandler extends PropertyHandler {
 }
 CommonPropertyHandler.EVENT_STATE_PUSHED = 'pushedState';
 CommonPropertyHandler.EVENT_HASH_CHANGED = 'hashChanged';
-export { CommonPropertyHandler };
 //# sourceMappingURL=CommonPropertyHandler.js.map

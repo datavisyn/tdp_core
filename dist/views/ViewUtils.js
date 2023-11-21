@@ -3,7 +3,7 @@ import { IDTypeManager } from 'visyn_core/idtype';
 import { PluginRegistry } from 'visyn_core/plugin';
 import { UserSession } from 'visyn_core/security';
 import { EXTENSION_POINT_TDP_VIEW, EXTENSION_POINT_TDP_LIST_FILTERS, EXTENSION_POINT_TDP_INSTANT_VIEW, EXTENSION_POINT_TDP_VIEW_GROUPS, } from '../base/extensions';
-class ViewUtils {
+export class ViewUtils {
     static toViewPluginDesc(p) {
         const r = p;
         r.selection = r.selection || 'none';
@@ -261,5 +261,4 @@ ViewUtils.VIEW_EVENT_ITEM_SELECT = 'select';
 ViewUtils.VIEW_EVENT_UPDATE_ENTRY_POINT = 'update_entry_point';
 ViewUtils.VIEW_EVENT_LOADING_FINISHED = 'loadingFinished';
 ViewUtils.VIEW_EVENT_UPDATE_SHARED = 'updateShared';
-export { ViewUtils };
 //# sourceMappingURL=ViewUtils.js.map

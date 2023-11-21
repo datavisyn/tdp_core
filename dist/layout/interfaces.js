@@ -1,4 +1,4 @@
-class LayoutContainerEvents {
+export class LayoutContainerEvents {
 }
 LayoutContainerEvents.EVENT_LAYOUT_CHANGED = 'changed';
 LayoutContainerEvents.EVENT_DESTROYED = 'destroy';
@@ -11,7 +11,6 @@ LayoutContainerEvents.EVENT_TAB_REORDED = 'tabReorded';
 LayoutContainerEvents.EVENT_CHANGE_ACTIVE_TAB = 'changeActiveTab';
 LayoutContainerEvents.EVENT_MAXIMIZE = 'maximize';
 LayoutContainerEvents.EVENT_RESTORE_SIZE = 'restoreSize';
-export { LayoutContainerEvents };
 export var EOrientation;
 (function (EOrientation) {
     EOrientation[EOrientation["HORIZONTAL"] = 0] = "HORIZONTAL";

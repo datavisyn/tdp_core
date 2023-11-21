@@ -30,7 +30,7 @@ var EUrlTracking;
     EUrlTracking[EUrlTracking["DISABLE_JUMPING"] = 1] = "DISABLE_JUMPING";
     EUrlTracking[EUrlTracking["DISABLE_RESTORING"] = 2] = "DISABLE_RESTORING";
 })(EUrlTracking || (EUrlTracking = {}));
-class ACLUEWrapper extends EventHandler {
+export class ACLUEWrapper extends EventHandler {
     constructor() {
         super(...arguments);
         this.urlTracking = EUrlTracking.ENABLE;
@@ -242,5 +242,4 @@ class ACLUEWrapper extends EventHandler {
 }
 ACLUEWrapper.EVENT_MODE_CHANGED = 'modeChanged';
 ACLUEWrapper.EVENT_JUMPED_TO = 'jumped_to';
-export { ACLUEWrapper };
 //# sourceMappingURL=ACLUEWrapper.js.map

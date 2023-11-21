@@ -29,7 +29,7 @@ export declare abstract class AParentLayoutContainer<T extends ILayoutContainerO
     resized(): void;
     destroy(): void;
     persist(): ILayoutDump;
-    find(id: number | ((container: ILayoutContainer) => boolean)): any;
+    find(id: number | ((container: ILayoutContainer) => boolean)): ILayoutContainer;
     findAll(predicate: (container: ILayoutContainer) => boolean): ILayoutContainer[];
 }
 //# sourceMappingURL=AParentLayoutContainer.d.ts.map

@@ -2,7 +2,16 @@ import { Menu } from '@mantine/core';
 import * as React from 'react';
 import { useVisynAppContext, VisynApp, VisynHeader } from 'visyn_core/app';
 import { LoginUtils } from 'visyn_core/security';
-import { Vis, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, IVisConfig, EColumnTypes, VisColumn } from 'visyn_core/vis';
+import {
+  Vis,
+  ESupportedPlotlyVis,
+  ENumericalColorScaleType,
+  EScatterSelectSettings,
+  IScatterConfig,
+  BaseVisConfig,
+  EColumnTypes,
+  VisColumn,
+} from 'visyn_core/vis';
 
 export function fetchIrisData(): VisColumn[] {
   const dataPromise = import('./irisData').then((m) => m.iris);
@@ -60,7 +69,7 @@ const irisData = fetchIrisData();
 
 export function MainApp() {
   const { user } = useVisynAppContext();
-  const [visConfig, setVisConfig] = React.useState<IVisConfig>({
+  const [visConfig, setVisConfig] = React.useState<IScatterConfig | BaseVisConfig>({
     type: ESupportedPlotlyVis.SCATTER,
     numColumnsSelected: [
       {

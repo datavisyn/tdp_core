@@ -15,7 +15,7 @@ function normalize(arr) {
 /**
  * generic version of the CLUE mode, a combination of exploration, authoring, and normalization
  */
-class CLUEMode {
+export class CLUEMode {
     constructor(exploration, authoring, presentation) {
         this.coord = normalize([exploration, authoring, presentation]);
     }
@@ -99,7 +99,6 @@ CLUEMode.modes = {
     Authoring: CLUEMode.mode(0, 1, 0),
     Presentation: CLUEMode.mode(0, 0, 1),
 };
-export { CLUEMode };
 /**
  * wrapper containing the current mode
  */

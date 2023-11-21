@@ -3,7 +3,7 @@ import { IDTypeManager } from 'visyn_core/idtype';
 import { Permission, UserSession } from 'visyn_core/security';
 import { RestBaseUtils } from '../base/rest';
 import { ENamedSetType } from './interfaces';
-class RestStorageUtils {
+export class RestStorageUtils {
     static listNamedSets(idType = null) {
         const args = idType ? { idType: IDTypeManager.getInstance().resolveIdType(idType).id } : {};
         return AppContext.getInstance()
@@ -61,5 +61,4 @@ class RestStorageUtils {
     }
 }
 RestStorageUtils.REST_NAMESPACE = `${RestBaseUtils.REST_NAMESPACE}/storage`;
-export { RestStorageUtils };
 //# sourceMappingURL=rest.js.map

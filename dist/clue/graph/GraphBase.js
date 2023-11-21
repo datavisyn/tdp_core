@@ -1,11 +1,10 @@
 import { GraphNode, GraphEdge, AGraph } from './graph';
-class GraphFactoryUtils {
+export class GraphFactoryUtils {
 }
 GraphFactoryUtils.defaultGraphFactory = {
     makeNode: (p) => new GraphNode().restore(p),
     makeEdge: (p, lookup) => new GraphEdge().restore(p, lookup),
 };
-export { GraphFactoryUtils };
 export class GraphBase extends AGraph {
     constructor(desc, nodes = [], edges = []) {
         super();

@@ -1,5 +1,5 @@
 import { RestStorageUtils } from '../rest';
-class AttachemntUtils {
+export class AttachemntUtils {
     /**
      * checks whether the given object should be externalized
      * @param {Object} data
@@ -36,5 +36,4 @@ class AttachemntUtils {
 }
 AttachemntUtils.ATTACHMENT_PREFIX = '@attachment:';
 AttachemntUtils.MAX_INPLACE_SIZE = 10e3; // 10k
-export { AttachemntUtils };
 //# sourceMappingURL=attachment.js.map

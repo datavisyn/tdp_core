@@ -5,7 +5,7 @@ import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */
-class PanelSaveNamedSetButton extends EventHandler {
+export class PanelSaveNamedSetButton extends EventHandler {
     constructor(parent, lineupOrderRowIndices, isTopMode) {
         super();
         this.node = parent.ownerDocument.createElement('div');
@@ -42,5 +42,4 @@ class PanelSaveNamedSetButton extends EventHandler {
     }
 }
 PanelSaveNamedSetButton.EVENT_SAVE_NAMED_SET = 'saveNamedSet';
-export { PanelSaveNamedSetButton };
 //# sourceMappingURL=PanelSaveNamedSetButton.js.map

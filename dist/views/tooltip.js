@@ -1,5 +1,5 @@
 import Popper from 'popper.js';
-class TooltipUtils {
+export class TooltipUtils {
     static findTooltip(ensureExists = true) {
         let tooltip = document.querySelector(`div.tdp-tooltip`);
         if (!tooltip && ensureExists) {
@@ -144,5 +144,4 @@ TooltipUtils.template = `<div class="tdp-tooltip" role="tooltip">
     <div></div>
     <div x-arrow></div>
   </div>`;
-export { TooltipUtils };
 //# sourceMappingURL=tooltip.js.map

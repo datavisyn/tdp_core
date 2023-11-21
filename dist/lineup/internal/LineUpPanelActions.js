@@ -38,7 +38,7 @@ export function findMappablePlugins(target, all) {
         return all.filter((d) => valid.indexOf(d.idtype) >= 0);
     });
 }
-class LineUpPanelActions extends EventHandler {
+export class LineUpPanelActions extends EventHandler {
     constructor(provider, ctx, options, doc = document) {
         super();
         this.provider = provider;
@@ -479,5 +479,4 @@ LineUpPanelActions.EVENT_ADD_SCORE_COLUMN = 'addScoreColumn';
  * @type {string}
  */
 LineUpPanelActions.EVENT_ADD_TRACKED_SCORE_COLUMN = 'addTrackedScoreColumn';
-export { LineUpPanelActions };
 //# sourceMappingURL=LineUpPanelActions.js.map

@@ -1,5 +1,5 @@
 import { GraphNode, GraphEdge } from '../graph/graph';
-class SlideNode extends GraphNode {
+export class SlideNode extends GraphNode {
     constructor() {
         super('story');
     }
@@ -114,5 +114,4 @@ class SlideNode extends GraphNode {
 }
 SlideNode.DEFAULT_DURATION = 1500; // ms
 SlideNode.DEFAULT_TRANSITION = 0; // ms
-export { SlideNode };
 //# sourceMappingURL=SlideNode.js.map

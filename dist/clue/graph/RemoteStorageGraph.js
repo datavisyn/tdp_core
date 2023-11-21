@@ -1,7 +1,7 @@
 import { appContext } from 'visyn_core/base';
 import { GraphBase } from './GraphBase';
 import { GraphEdge, GraphNode } from './graph';
-class RemoteStoreGraph extends GraphBase {
+export class RemoteStoreGraph extends GraphBase {
     constructor(desc) {
         super(desc);
         this.updateHandler = (event) => {
@@ -207,5 +207,4 @@ class RemoteStoreGraph extends GraphBase {
 RemoteStoreGraph.DEFAULT_BATCH_SIZE = 10;
 RemoteStoreGraph.DEFAULT_WAIT_TIME_BEFORE_EARLY_FLUSH = 1000; // ms
 RemoteStoreGraph.DEFAULT_WAIT_TIME_BEFORE_FULL_FLUSH = 100; // ms
-export { RemoteStoreGraph };
 //# sourceMappingURL=RemoteStorageGraph.js.map

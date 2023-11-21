@@ -1,7 +1,7 @@
 import { DataCache } from '../../data/DataCache';
 import { ADataType } from '../../data/datatype';
 import { GraphNode } from '../graph/graph';
-class ObjectRefUtils {
+export class ObjectRefUtils {
     /**
      * creates an object reference to the given object
      * @param v
@@ -40,7 +40,6 @@ ObjectRefUtils.operation = {
     update: 'update',
     remove: 'remove',
 };
-export { ObjectRefUtils };
 /**
  * tries to persist an object value supporting datatypes and DOM elements having an id
  * @param v

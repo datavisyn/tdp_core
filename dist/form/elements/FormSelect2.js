@@ -7,7 +7,7 @@ import { AFormElement } from './AFormElement';
  * Select2 drop down field with integrated search field and communication to external data provider
  * Propagates the changes from the DOM select element using the internal `change` event
  */
-class FormSelect2 extends AFormElement {
+export class FormSelect2 extends AFormElement {
     /**
      * Constructor
      * @param form The form this element is a part of
@@ -220,5 +220,4 @@ FormSelect2.DEFAULT_AJAX_OPTIONS = {
     },
     ...FormSelect2.DEFAULT_OPTIONS,
 };
-export { FormSelect2 };
 //# sourceMappingURL=FormSelect2.js.map

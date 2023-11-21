@@ -1,5 +1,5 @@
 import { I18nextManager } from 'visyn_core/i18n';
-class NotificationHandler {
+export class NotificationHandler {
     static pushNotification(level, msg, autoHideInMs = -1) {
         let parent = document.body.querySelector('div.toast-container-custom');
         if (!parent) {
@@ -32,5 +32,4 @@ class NotificationHandler {
 }
 NotificationHandler.DEFAULT_SUCCESS_AUTO_HIDE = 5000;
 NotificationHandler.DEFAULT_ERROR_AUTO_HIDE = -1; // not
-export { NotificationHandler };
 //# sourceMappingURL=NotificationHandler.js.map

@@ -41,7 +41,7 @@ export function rewriteURLOtherProperty(selectedProperty) {
     toHandler.destroy();
     window.history.pushState(null, `State ${Date.now()}`, url);
 }
-class CLUEGraphManager extends EventHandler {
+export class CLUEGraphManager extends EventHandler {
     constructor(manager, { isReadOnly = false, propertyHandler = 'hash', rewriteOtherProperty = false } = {
         isReadOnly: false,
         propertyHandler: 'hash',
@@ -292,5 +292,4 @@ CLUEGraphManager.EVENT_EXTERNAL_STATE_CHANGE = 'externalStateChanged';
  * @type {number}
  */
 CLUEGraphManager.DEBOUNCE_UPDATE_DELAY = 100;
-export { CLUEGraphManager };
 //# sourceMappingURL=CLUEGraphManager.js.map

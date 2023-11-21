@@ -1,5 +1,5 @@
 import { EventHandler } from 'visyn_core/base';
-class PropertyHandler extends EventHandler {
+export class PropertyHandler extends EventHandler {
     constructor(code) {
         super();
         this.map = new Map();
@@ -116,6 +116,5 @@ class PropertyHandler extends EventHandler {
 }
 PropertyHandler.EVENT_CHANGED = 'changed';
 PropertyHandler.EVENT_ENTRY_CHANGED = 'entryChanged';
-export { PropertyHandler };
 export const propertyHandler = new PropertyHandler(window.location.search);
 //# sourceMappingURL=PropertyHandler.js.map
