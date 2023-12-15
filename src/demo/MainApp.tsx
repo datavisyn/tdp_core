@@ -1,7 +1,5 @@
-import { Menu } from '@mantine/core';
 import * as React from 'react';
 import { useVisynAppContext, VisynApp, VisynHeader } from 'visyn_core/app';
-import { LoginUtils } from 'visyn_core/security';
 import {
   Vis,
   ESupportedPlotlyVis,
@@ -95,28 +93,7 @@ export function MainApp() {
   });
 
   return (
-    <VisynApp
-      header={
-        <VisynHeader
-          components={{
-            userMenu: user ? (
-              <>
-                <Menu.Label>Logged in as {user.name}</Menu.Label>
-                <Menu.Item
-                  onClick={() => {
-                    LoginUtils.logout();
-                  }}
-                >
-                  Logout
-                </Menu.Item>
-              </>
-            ) : null,
-          }}
-          backgroundColor="dark"
-        />
-      }
-      appShellProps={{}}
-    >
+    <VisynApp header={<VisynHeader backgroundColor="dark" />} appShellProps={{}}>
       {user ? <Vis columns={irisData} showSidebarDefault externalConfig={visConfig} setExternalConfig={setVisConfig} /> : null}
     </VisynApp>
   );

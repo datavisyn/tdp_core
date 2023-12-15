@@ -4,7 +4,7 @@ import { VisynAppProvider } from 'visyn_core/app';
 import { MainApp } from './MainApp';
 
 createRoot(document.getElementById('main')).render(
-  <VisynAppProvider appName="Demo App">
+  <VisynAppProvider disableMantine6 appName="Demo App">
     <MainApp />
   </VisynAppProvider>,
 );
