@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useVisynAppContext, VisynApp, VisynHeader } from 'visyn_core/app';
+import { Menu } from '@mantine/core';
 import {
   Vis,
   ESupportedPlotlyVis,
@@ -93,7 +94,16 @@ export function MainApp() {
   });
 
   return (
-    <VisynApp header={<VisynHeader backgroundColor="dark" />} appShellProps={{}}>
+    <VisynApp
+      header={
+        <VisynHeader
+          components={{
+            userMenu: <Menu.Item data-testid="user-menu-item">Test menu item</Menu.Item>,
+          }}
+        />
+      }
+      appShellProps={{}}
+    >
       {user ? <Vis columns={irisData} showSidebarDefault externalConfig={visConfig} setExternalConfig={setVisConfig} /> : null}
     </VisynApp>
   );
