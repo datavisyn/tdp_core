@@ -4,5 +4,5 @@ on: workflow_dispatch
 
 jobs:
   publish:
-    uses: datavisyn/github-workflows/.github/workflows/publish-node-python.yml@main
+    uses: datavisyn/github-workflows/.github/workflows/publish-node-python.yml@new_deployment
     secrets: inherit
