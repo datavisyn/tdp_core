@@ -97,8 +97,8 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
             <div class="radio">
               <label class="radio">
                 <input type="radio" name="string-convert" value="" ${!convert ? 'checked="checked"' : ''}> ${I18nextManager.getInstance().i18n.t(
-        'phovea:importer.none',
-      )}
+                  'phovea:importer.none',
+                )}
               </label>
             </div>
             <div class="radio">

@@ -99,7 +99,12 @@ class SelectionTypeRecorder {
 
   private typeRecorders = [];
 
-  constructor(private idtype: IDType, private graph: ProvenanceGraph, private type?: string, private options: any = {}) {
+  constructor(
+    private idtype: IDType,
+    private graph: ProvenanceGraph,
+    private type?: string,
+    private options: any = {},
+  ) {
     if (this.type) {
       this.typeRecorders = this.type.split(',').map((ttype) => {
         const t = (event, sel, added, removed, old) => {
@@ -152,7 +157,11 @@ export class SelectionRecorder {
     }
   };
 
-  constructor(private graph: ProvenanceGraph, private type?: string, private options: any = {}) {
+  constructor(
+    private graph: ProvenanceGraph,
+    private type?: string,
+    private options: any = {},
+  ) {
     this.options = merge(
       {
         filter: true,

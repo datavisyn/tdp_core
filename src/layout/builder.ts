@@ -429,7 +429,12 @@ export abstract class AParentBuilder extends ABuilder {
 export class SplitBuilder extends AParentBuilder {
   private _ratio = 0.5;
 
-  constructor(private readonly orientation: EOrientation, ratio: number, left: IBuildAbleOrViewLike, right: IBuildAbleOrViewLike) {
+  constructor(
+    private readonly orientation: EOrientation,
+    ratio: number,
+    left: IBuildAbleOrViewLike,
+    right: IBuildAbleOrViewLike,
+  ) {
     super([left, right]);
     this._ratio = ratio;
   }
@@ -458,7 +463,11 @@ export class SplitBuilder extends AParentBuilder {
 }
 
 class LineUpBuilder extends AParentBuilder {
-  constructor(private readonly orientation: EOrientation, children: IBuildAbleOrViewLike[], private readonly stackLayout: boolean = false) {
+  constructor(
+    private readonly orientation: EOrientation,
+    children: IBuildAbleOrViewLike[],
+    private readonly stackLayout: boolean = false,
+  ) {
     super(children);
   }
 

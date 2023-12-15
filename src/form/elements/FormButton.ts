@@ -26,7 +26,11 @@ export class FormButton extends EventHandler implements IFormElement {
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(readonly form: IForm, readonly elementDesc: IButtonElementDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(
+    readonly form: IForm,
+    readonly elementDesc: IButtonElementDesc,
+    readonly pluginDesc: IPluginDesc,
+  ) {
     super();
     this.id = elementDesc.id;
   }

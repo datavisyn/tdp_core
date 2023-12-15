@@ -15,7 +15,11 @@ import { UniqueIdManager } from '../../app';
 abstract class ASessionList {
   private handler: () => void;
 
-  constructor(private readonly parent: HTMLElement, graphManager: CLUEGraphManager, protected readonly mode: 'table' | 'list' = 'table') {
+  constructor(
+    private readonly parent: HTMLElement,
+    graphManager: CLUEGraphManager,
+    protected readonly mode: 'table' | 'list' = 'table',
+  ) {
     this.build(graphManager).then((update) => {
       this.handler = () => update();
       GlobalEventHandler.getInstance().on(ProvenanceGraphMenuUtils.GLOBAL_EVENT_MANIPULATED, this.handler);
@@ -194,8 +198,8 @@ export class TemporarySessionList extends ASessionList {
           <td></td>
           <td></td>
           <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton(
-        'delete',
-      )}</td>`);
+            'delete',
+          )}</td>`);
 
       this.registerActionListener(manager, $trEnter);
       $tr
@@ -222,8 +226,8 @@ export class TemporarySessionList extends ASessionList {
           <span></span>
           <span></span>
           <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('persist')}${ASessionList.createButton(
-        'delete',
-      )}</span>`);
+            'delete',
+          )}</span>`);
 
       this.registerActionListener(manager, $trEnter);
       $tr
@@ -298,11 +302,11 @@ export class PersistentSessionList extends ASessionList {
     </p>
         <ul class="nav nav-tabs" role="tablist">
           <li class="nav-item active"><a href="#${mySessionsTabId}" class="nav-link active" role="tab"><i class="fas fa-user"></i> ${I18nextManager.getInstance().i18n.t(
-      'tdp:core.SessionList.mySessions',
-    )}</a></li>
+            'tdp:core.SessionList.mySessions',
+          )}</a></li>
           <li class="nav-item"><a href="#${otherSessionsTabId}" class="nav-link" role="tab"><i class="fas fa-users"></i> ${I18nextManager.getInstance().i18n.t(
-      'tdp:core.SessionList.otherSessions',
-    )}</a></li>
+            'tdp:core.SessionList.otherSessions',
+          )}</a></li>
         </ul>
         <div class="tab-content pt-1">
             <div id="${mySessionsTabId}" class="tab-pane show active" role="tabpanel">
@@ -338,8 +342,8 @@ export class PersistentSessionList extends ASessionList {
             <td class="text-center"><i class="fa"></i></td>
             <td></td>
             <td>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('edit')}${ASessionList.createButton(
-            'delete',
-          )}</td>`);
+              'delete',
+            )}</td>`);
 
           this.registerActionListener(manager, $trEnter);
           $tr.select('td').text((d) => d.name);
@@ -390,8 +394,8 @@ export class PersistentSessionList extends ASessionList {
             <span><i class="fa"></i></span>
             <span></span>
             <span>${ASessionList.createButton('select')}${ASessionList.createButton('clone')}${ASessionList.createButton('edit')}${ASessionList.createButton(
-            'delete',
-          )}</span>`);
+              'delete',
+            )}</span>`);
 
           this.registerActionListener(manager, $trEnter);
           $tr.select('span').text((d) => d.name);

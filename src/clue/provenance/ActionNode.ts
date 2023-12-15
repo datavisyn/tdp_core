@@ -27,7 +27,12 @@ export class ActionUtils {
 export class ActionNode extends GraphNode {
   public inverter: IInverseActionCreator;
 
-  constructor(meta: ActionMetaData, functionId: string, public f: ICmdFunction, parameter: any = {}) {
+  constructor(
+    meta: ActionMetaData,
+    functionId: string,
+    public f: ICmdFunction,
+    parameter: any = {},
+  ) {
     super('action');
     super.setAttr('meta', meta);
     super.setAttr('f_id', functionId);

@@ -84,7 +84,11 @@ export class VerticalStoryVis extends AVisInstance implements IVisInstance {
 
   player: Player = null;
 
-  constructor(public data: ProvenanceGraph, public parent: Element, options: any = {}) {
+  constructor(
+    public data: ProvenanceGraph,
+    public parent: Element,
+    options: any = {},
+  ) {
     super();
     this.options = merge(this.options, options);
     if (this.options.class === 'horizontal') {

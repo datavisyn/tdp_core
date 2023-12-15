@@ -22,7 +22,11 @@ export class Player {
 
   private $play: d3v3.Selection<any>;
 
-  constructor(private graph: ProvenanceGraph, controls: Element, options: any = {}) {
+  constructor(
+    private graph: ProvenanceGraph,
+    controls: Element,
+    options: any = {},
+  ) {
     merge(this.options, options);
 
     const $controls = d3v3.select(controls);

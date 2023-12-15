@@ -33,7 +33,11 @@ export class FormInputText extends AFormElement<IFormInputTextDesc> {
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, elementDesc: IFormInputTextDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(
+    form: IForm,
+    elementDesc: IFormInputTextDesc,
+    readonly pluginDesc: IPluginDesc,
+  ) {
     super(form, elementDesc, pluginDesc);
   }
 

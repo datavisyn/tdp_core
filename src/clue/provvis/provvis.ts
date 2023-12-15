@@ -28,7 +28,10 @@ class StateRepr {
 
   a: ActionNode = null;
 
-  constructor(public s: StateNode, public graph: ProvenanceGraph) {
+  constructor(
+    public s: StateNode,
+    public graph: ProvenanceGraph,
+  ) {
     this.doi = 0.1;
     this.a = s.creator;
   }
@@ -396,7 +399,11 @@ export class LayoutedProvVis extends AVisInstance implements IVisInstance {
     tags: [],
   };
 
-  constructor(public data: ProvenanceGraph, public parent: Element, private options: any) {
+  constructor(
+    public data: ProvenanceGraph,
+    public parent: Element,
+    private options: any,
+  ) {
     super();
     this.options = merge(
       {

@@ -13,7 +13,10 @@ export class EditProvenanceGraphMenu {
 
   private graph: ProvenanceGraph = null;
 
-  constructor(private readonly manager: CLUEGraphManager, parent: HTMLElement) {
+  constructor(
+    private readonly manager: CLUEGraphManager,
+    parent: HTMLElement,
+  ) {
     this.node = this.init(parent);
     parent.insertBefore(this.node, parent.firstChild);
   }

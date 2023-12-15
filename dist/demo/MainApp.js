@@ -1,7 +1,6 @@
-import { Menu } from '@mantine/core';
 import * as React from 'react';
 import { useVisynAppContext, VisynApp, VisynHeader } from 'visyn_core/app';
-import { LoginUtils } from 'visyn_core/security';
+import { Menu } from '@mantine/core';
 import { Vis, ESupportedPlotlyVis, ENumericalColorScaleType, EScatterSelectSettings, EColumnTypes, } from 'visyn_core/vis';
 export function fetchIrisData() {
     const dataPromise = import('./irisData').then((m) => m.iris);
@@ -81,13 +80,7 @@ export function MainApp() {
         alphaSliderVal: 1,
     });
     return (React.createElement(VisynApp, { header: React.createElement(VisynHeader, { components: {
-                userMenu: user ? (React.createElement(React.Fragment, null,
-                    React.createElement(Menu.Label, null,
-                        "Logged in as ",
-                        user.name),
-                    React.createElement(Menu.Item, { onClick: () => {
-                            LoginUtils.logout();
-                        } }, "Logout"))) : null,
-            }, backgroundColor: "dark" }), appShellProps: {} }, user ? React.createElement(Vis, { columns: irisData, showSidebarDefault: true, externalConfig: visConfig, setExternalConfig: setVisConfig }) : null));
+                userMenu: React.createElement(Menu.Item, { "data-testid": "user-menu-item" }, "Test menu item"),
+            } }), appShellProps: {} }, user ? React.createElement(Vis, { columns: irisData, showSidebarDefault: true, externalConfig: visConfig, setExternalConfig: setVisConfig }) : null));
 }
 //# sourceMappingURL=MainApp.js.map

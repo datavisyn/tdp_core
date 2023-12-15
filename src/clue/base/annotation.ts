@@ -65,7 +65,11 @@ class Anchor {
    */
   private _pos: [number, number] = null;
 
-  constructor(private elem: Element, private anchor: EAnchorDirection, lazy = false) {
+  constructor(
+    private elem: Element,
+    private anchor: EAnchorDirection,
+    lazy = false,
+  ) {
     if (!lazy) {
       this._pos = this.compute();
     }
@@ -222,7 +226,11 @@ export class Renderer {
 
   private anchorWatcher = new AnchorWatcher();
 
-  constructor(private $main: d3v3.Selection<any>, private graph: ProvenanceGraph, options = {}) {
+  constructor(
+    private $main: d3v3.Selection<any>,
+    private graph: ProvenanceGraph,
+    options = {},
+  ) {
     merge(this.options, options);
     // update during slide change
     this.graph.on(`select_slide_${SelectionUtils.defaultSelectionType}`, this.l);

@@ -90,7 +90,11 @@ export class FormMap extends AFormElement<IFormMapDesc> {
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, elementDesc: IFormMapDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(
+    form: IForm,
+    elementDesc: IFormMapDesc,
+    readonly pluginDesc: IPluginDesc,
+  ) {
     super(form, elementDesc, pluginDesc);
     this.inline = this.elementDesc.options.inlineForm;
   }

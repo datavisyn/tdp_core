@@ -18,7 +18,11 @@ export class FormRadio extends AFormElement<IRadioElementDesc> {
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, elementDesc: IRadioElementDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(
+    form: IForm,
+    elementDesc: IRadioElementDesc,
+    readonly pluginDesc: IPluginDesc,
+  ) {
     super(form, { options: { buttons: [] }, ...elementDesc }, pluginDesc);
   }
 

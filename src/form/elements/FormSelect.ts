@@ -91,7 +91,11 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, elementDesc: IFormSelectDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(
+    form: IForm,
+    elementDesc: IFormSelectDesc,
+    readonly pluginDesc: IPluginDesc,
+  ) {
     super(form, elementDesc, pluginDesc);
   }
 

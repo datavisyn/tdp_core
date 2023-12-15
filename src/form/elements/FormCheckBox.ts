@@ -28,7 +28,11 @@ export class FormCheckBox extends AFormElement<ICheckBoxElementDesc> {
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, elementDesc: ICheckBoxElementDesc, readonly pluginDesc: IPluginDesc) {
+  constructor(
+    form: IForm,
+    elementDesc: ICheckBoxElementDesc,
+    readonly pluginDesc: IPluginDesc,
+  ) {
     super(form, { options: { checked: true, unchecked: false }, ...elementDesc }, pluginDesc);
   }
 

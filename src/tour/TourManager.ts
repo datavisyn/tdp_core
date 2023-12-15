@@ -150,8 +150,8 @@ export class TourManager {
                     (d) => `<li data-id="${d.id}">
                   <i class="fa-li ${finished.has(d.id) ? 'fas fa-check-square' : 'far fa-square'}"></i>
                   <a href="#" title="${I18nextManager.getInstance().i18n.t('tdp:core.TourManager.showTour')}" data-bs-dismiss="modal" data-name="${d.name}">${
-                      d.name
-                    }</a>
+                    d.name
+                  }</a>
                   ${d.description ? `<p>${d.description}</p>` : ''}
                 </li>`,
                   )

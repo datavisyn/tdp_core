@@ -49,7 +49,10 @@ export class ProvenanceGraph extends ADataType<IProvenanceGraphDataDescription> 
 
   private nextQueue: (() => any)[] = [];
 
-  constructor(desc: IProvenanceGraphDataDescription, public backend: GraphBase) {
+  constructor(
+    desc: IProvenanceGraphDataDescription,
+    public backend: GraphBase,
+  ) {
     super(desc);
     this.propagate(this.backend, ...ProvenanceGraph.PROPAGATED_EVENTS);
 
