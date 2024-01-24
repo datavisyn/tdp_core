@@ -29,7 +29,7 @@ node_modules/
 /tests/**/*.map 
 *.css
 /package-lock.json
-!yarn.lock
+/yarn.lock
 
 # yarn
 .pnp.*
