@@ -6,7 +6,10 @@ import { IVisMetaData } from './IVisMetaData';
  * utility logic for zooming a vis instance
  */
 export class ZoomLogic extends EventHandler {
-  constructor(public readonly v: IVisInstance, public readonly meta: IVisMetaData) {
+  constructor(
+    public readonly v: IVisInstance,
+    public readonly meta: IVisMetaData,
+  ) {
     super();
   }
 

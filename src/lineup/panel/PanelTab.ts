@@ -28,7 +28,10 @@ export class PanelTab extends EventHandler {
    * @param parent The parent HTML DOM element
    * @param options Extra styles to apply to the PanelTab
    */
-  constructor(private parent: HTMLElement, options?: IPanelTabDesc) {
+  constructor(
+    private parent: HTMLElement,
+    options?: IPanelTabDesc,
+  ) {
     super();
 
     this.node = parent.ownerDocument.createElement('div');

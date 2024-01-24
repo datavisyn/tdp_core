@@ -32,7 +32,11 @@ async function fetchSubstructure(structures: string[], substructure: string): Pr
 export class StructureImageFilterDialog extends ADialog {
   private readonly before: IStructureImageFilter | null;
 
-  constructor(private readonly column: StructureImageColumn, dialog: IDialogContext, private readonly ctx: IRankingHeaderContext) {
+  constructor(
+    private readonly column: StructureImageColumn,
+    dialog: IDialogContext,
+    private readonly ctx: IRankingHeaderContext,
+  ) {
     super(dialog, {
       livePreview: 'filter',
     });

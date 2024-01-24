@@ -24,7 +24,11 @@ export class FormBuilder {
    * @param formId unique form id
    * @param formInline whether the form is in inline mode or not
    */
-  constructor($parent: d3v3.Selection<any>, private readonly formId = BaseUtils.randomId(), private readonly formInline: boolean = false) {
+  constructor(
+    $parent: d3v3.Selection<any>,
+    private readonly formId = BaseUtils.randomId(),
+    private readonly formInline: boolean = false,
+  ) {
     this.form = new Form($parent, formId);
   }
 

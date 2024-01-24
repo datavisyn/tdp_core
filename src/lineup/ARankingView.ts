@@ -556,8 +556,8 @@ export abstract class ARankingView extends AView {
                   e
                     ? `<i class="fas fa-exclamation"></i>`
                     : status === ERenderAuthorizationStatus.PENDING
-                    ? `<i class="fas fa-spinner fa-pulse"></i>`
-                    : `<i class="fas fa-lock"></i>`
+                      ? `<i class="fas fa-spinner fa-pulse"></i>`
+                      : `<i class="fas fa-lock"></i>`
                 }<span class="text-truncate" style="max-width: 100%">${
                   e ? e.toString() : I18nextManager.getInstance().i18n.t('tdp:core.lineup.RankingView.scoreAuthorizationRequired')
                 }</span>`;

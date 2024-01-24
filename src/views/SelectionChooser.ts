@@ -49,7 +49,11 @@ export class SelectionChooser {
 
   private currentOptions: IFormSelectOption[];
 
-  constructor(private readonly accessor: (id: string) => IFormElement, targetIDType?: IDTypeLike, options: Partial<ISelectionChooserOptions> = {}) {
+  constructor(
+    private readonly accessor: (id: string) => IFormElement,
+    targetIDType?: IDTypeLike,
+    options: Partial<ISelectionChooserOptions> = {},
+  ) {
     Object.assign(this.options, options);
     this.target = targetIDType ? IDTypeManager.getInstance().resolveIdType(targetIDType) : null;
     this.readAble = options.readableIDType ? IDTypeManager.getInstance().resolveIdType(options.readableIDType) : null;
@@ -168,14 +172,17 @@ export class SelectionChooser {
   private updateItems(options: (IFormSelectOption | IFormSelectOptionGroup)[], reuseOld: boolean) {
     const element = <IFormSelectElement>this.accessor(this.formID);
 
-    const flatOptions = options.reduce((acc, d) => {
-      if ((<any>d).children) {
-        acc.push(...(<IFormSelectOptionGroup>d).children);
-      } else {
-        acc.push(<IFormSelectOption>d);
-      }
-      return acc;
-    }, <IFormSelectOption[]>[]);
+    const flatOptions = options.reduce(
+      (acc, d) => {
+        if ((<any>d).children) {
+          acc.push(...(<IFormSelectOptionGroup>d).children);
+        } else {
+          acc.push(<IFormSelectOption>d);
+        }
+        return acc;
+      },
+      <IFormSelectOption[]>[],
+    );
 
     // backup entry and restore the selectedIndex by value afterwards again,
     // because the position of the selected element might change

@@ -57,7 +57,10 @@ export class ViewLayoutContainer extends ALayoutContainer<IViewLayoutContainerOp
 
   readonly type = 'view';
 
-  constructor(public readonly view: PHOVEA_UI_IView, options: Partial<ILayoutContainerOption>) {
+  constructor(
+    public readonly view: PHOVEA_UI_IView,
+    options: Partial<ILayoutContainerOption>,
+  ) {
     super(view.node.ownerDocument, options);
     this.node = view.node.ownerDocument.createElement('article');
     this.node.dataset.layout = 'view';

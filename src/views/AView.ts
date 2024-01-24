@@ -51,7 +51,11 @@ export abstract class AView extends EventHandler implements IView {
 
   private readonly selections = new Map<string, ISelection>();
 
-  constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement) {
+  constructor(
+    protected readonly context: IViewContext,
+    protected selection: ISelection,
+    parent: HTMLElement,
+  ) {
     super();
     this.selections.set(AView.DEFAULT_SELECTION_NAME, selection);
     this.itemSelections.set(AView.DEFAULT_SELECTION_NAME, { idtype: null, ids: [] });
@@ -153,10 +157,10 @@ export abstract class AView extends EventHandler implements IView {
             <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
                 <p class="lead">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationRequired', { name: authConfiguration.name })}</p>
                 <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${
-            status === 'pending'
-              ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading')
-              : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')
-          }</button>
+                  status === 'pending'
+                    ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading')
+                    : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')
+                }</button>
             </div>`;
 
           overlay.querySelector('button').onclick = async () => {

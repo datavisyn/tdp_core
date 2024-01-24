@@ -126,7 +126,13 @@ export class ObjectNode<T> extends GraphNode implements IObjectRef<T> {
 
   private _persisted: any = null;
 
-  constructor(private _v: T, name: string, category = ObjectRefUtils.category.data, hash = `${name}_${category}`, description = '') {
+  constructor(
+    private _v: T,
+    name: string,
+    category = ObjectRefUtils.category.data,
+    hash = `${name}_${category}`,
+    description = '',
+  ) {
     super('object');
     if (_v != null) {
       // if the value is given, auto generate a promise for it

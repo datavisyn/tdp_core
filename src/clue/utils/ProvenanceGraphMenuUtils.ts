@@ -55,10 +55,10 @@ export class ProvenanceGraphMenuUtils {
               <div class="checkbox form-check">
                 <input type="checkbox" data-testid="agree-input" id="${prefix}_agree" name="${prefix}_agree" required="required" class="form-check-input">
                 <label class="form-label radio-inline form-check-label" for="${prefix}_agree">${I18nextManager.getInstance().i18n.t(
-      'tdp:core.EditProvenanceMenu.confirmMessage',
-    )} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t(
-      'tdp:core.EditProvenanceMenu.dialog',
-    )}.</label>
+                  'tdp:core.EditProvenanceMenu.confirmMessage',
+                )} <strong>'${I18nextManager.getInstance().i18n.t('tdp:core.EditProvenanceMenu.openExisting')}'</strong> ${I18nextManager.getInstance().i18n.t(
+                  'tdp:core.EditProvenanceMenu.dialog',
+                )}.</label>
               </div>
             </div>
         `;

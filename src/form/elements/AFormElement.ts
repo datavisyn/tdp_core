@@ -27,7 +27,11 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(protected readonly form: IForm, protected readonly elementDesc: T, protected readonly pluginDesc: IPluginDesc) {
+  constructor(
+    protected readonly form: IForm,
+    protected readonly elementDesc: T,
+    protected readonly pluginDesc: IPluginDesc,
+  ) {
     super();
     this.id = elementDesc.id;
 

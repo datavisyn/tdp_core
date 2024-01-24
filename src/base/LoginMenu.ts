@@ -40,7 +40,10 @@ export class LoginMenu extends EventHandler {
 
   private readonly customizer: ICustomizedLoginFormPluginDesc[];
 
-  constructor(private readonly header: AppHeader, options: ILoginMenuOptions = {}) {
+  constructor(
+    private readonly header: AppHeader,
+    options: ILoginMenuOptions = {},
+  ) {
     super();
 
     merge(this.options, { document: header.rightMenu.ownerDocument }, options);

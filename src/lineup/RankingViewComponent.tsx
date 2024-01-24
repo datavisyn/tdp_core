@@ -89,10 +89,10 @@ export function RankingViewComponent({
                       <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
                           <p class="lead">${I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationRequired', { name: authConfiguration.name })}</p>
                           <button class="btn btn-primary" ${status === 'pending' ? `disabled` : ''}>${
-            status === 'pending'
-              ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading')
-              : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')
-          }</button>
+                            status === 'pending'
+                              ? I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButtonLoading')
+                              : I18nextManager.getInstance().i18n.t('tdp:core.views.authorizationButton')
+                          }</button>
                       </div>`;
 
           overlay.querySelector('button').onclick = async () => {

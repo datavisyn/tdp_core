@@ -34,7 +34,11 @@ export class GraphBase extends AGraph implements IGraph {
 
   private readonly _edges: GraphEdge[];
 
-  constructor(public readonly desc: IGraphDataDescription, nodes: GraphNode[] = [], edges: GraphEdge[] = []) {
+  constructor(
+    public readonly desc: IGraphDataDescription,
+    nodes: GraphNode[] = [],
+    edges: GraphEdge[] = [],
+  ) {
     super();
     this._nodes = nodes;
     this._edges = edges;

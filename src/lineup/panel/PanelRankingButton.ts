@@ -8,7 +8,14 @@ import { IPanelButton, PanelButton } from './PanelButton';
 export class PanelRankingButton implements IPanelButton {
   readonly node: HTMLElement;
 
-  constructor(parent: HTMLElement, private provider: LocalDataProvider, title: string, cssClass: string, faIcon: string, onClick: (ranking: Ranking) => void) {
+  constructor(
+    parent: HTMLElement,
+    private provider: LocalDataProvider,
+    title: string,
+    cssClass: string,
+    faIcon: string,
+    onClick: (ranking: Ranking) => void,
+  ) {
     this.node = new PanelButton(parent, {
       title,
       faIcon,

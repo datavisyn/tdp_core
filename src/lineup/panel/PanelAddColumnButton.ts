@@ -17,7 +17,11 @@ export class PanelAddColumnButton implements IPanelButton {
    * @param parent The parent HTML DOM element
    * @param search LineUp SearchBox instance
    */
-  constructor(parent: HTMLElement, private readonly search: SearchBox<ISearchOption>, options?: IPanelAddColumnButtonOptions) {
+  constructor(
+    parent: HTMLElement,
+    private readonly search: SearchBox<ISearchOption>,
+    options?: IPanelAddColumnButtonOptions,
+  ) {
     this.node = parent.ownerDocument.createElement('div');
     this.node.classList.add('lu-adder');
     this.node.setAttribute('data-testid', 'lu-adder-div');
