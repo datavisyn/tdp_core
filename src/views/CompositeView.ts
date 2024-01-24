@@ -89,7 +89,10 @@ function unprefix(name: string) {
 class WrapperView implements PHOVEA_UI_IView {
   private _visible = true;
 
-  constructor(public readonly instance: IView, public readonly key: string) {}
+  constructor(
+    public readonly instance: IView,
+    public readonly key: string,
+  ) {}
 
   get minSize() {
     const given = (<any>this.instance).naturalSize;
@@ -160,7 +163,12 @@ export class CompositeView extends EventHandler implements IView {
 
   private itemSelection: ISelection;
 
-  constructor(protected readonly context: IViewContext, protected selection: ISelection, parent: HTMLElement, options: Partial<IACompositeViewOptions> = {}) {
+  constructor(
+    protected readonly context: IViewContext,
+    protected selection: ISelection,
+    parent: HTMLElement,
+    options: Partial<IACompositeViewOptions> = {},
+  ) {
     super();
     Object.assign(this.options, options);
 

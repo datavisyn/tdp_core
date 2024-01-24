@@ -18,7 +18,10 @@ interface IClientBuildInfo extends IBuildInfo {
 }
 
 export class BuildInfo {
-  constructor(private client: IClientBuildInfo, private server?: IServerBuildInfo) {}
+  constructor(
+    private client: IClientBuildInfo,
+    private server?: IServerBuildInfo,
+  ) {}
 
   toString() {
     return 'BuildInfo';

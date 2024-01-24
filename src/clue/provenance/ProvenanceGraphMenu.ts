@@ -12,7 +12,11 @@ export class ProvenanceGraphMenu {
 
   private graph: ProvenanceGraph;
 
-  constructor(private readonly manager: CLUEGraphManager, parent: HTMLElement, appendChild = true) {
+  constructor(
+    private readonly manager: CLUEGraphManager,
+    parent: HTMLElement,
+    appendChild = true,
+  ) {
     this.$node = this.init(parent);
     if (appendChild) {
       parent.appendChild(this.node);
@@ -175,16 +179,16 @@ export class ProvenanceGraphMenu {
                     <button class="btn btn-primary" ${
                       !UserSession.getInstance().isLoggedIn() && !graph.local ? 'disabled="disabled"' : ''
                     } data-action="select" data-bs-toggle="modal"><span class="fas fa-folder-open" aria-hidden="true"></span> ${I18nextManager.getInstance().i18n.t(
-            'phovea:clue.provenanceMenu.select',
-          )}</button>
+                      'phovea:clue.provenanceMenu.select',
+                    )}</button>
                     <button class="btn btn-primary" data-action="clone" data-bs-toggle="modal"><span class="fas fa-clone" aria-hidden="true"></span> ${I18nextManager.getInstance().i18n.t(
                       'phovea:clue.provenanceMenu.clone',
                     )}</button>
                     <button class="btn btn-danger" ${
                       !UserSession.getInstance().isLoggedIn() && !graph.local ? 'disabled="disabled"' : ''
                     } data-bs-toggle="modal"><i class="fas fa-trash" aria-hidden="true"></i> ${I18nextManager.getInstance().i18n.t(
-            'phovea:clue.provenanceMenu.delete',
-          )}</button>
+                      'phovea:clue.provenanceMenu.delete',
+                    )}</button>
                 </div>
             </div>
         </div>`);

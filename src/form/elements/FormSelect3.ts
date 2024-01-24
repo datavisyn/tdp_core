@@ -36,7 +36,11 @@ export class FormSelect3 extends AFormElement<IFormSelect3> {
    * @param elementDesc The form element description
    * @param pluginDesc The phovea extension point description
    */
-  constructor(form: IForm, elementDesc: IFormSelect3, readonly pluginDesc: IPluginDesc) {
+  constructor(
+    form: IForm,
+    elementDesc: IFormSelect3,
+    readonly pluginDesc: IPluginDesc,
+  ) {
     super(form, elementDesc, pluginDesc);
 
     this.isMultiple = pluginDesc.selection === 'multiple';

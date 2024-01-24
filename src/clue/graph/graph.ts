@@ -89,7 +89,10 @@ export class GraphNode extends AttributeContainer {
 
   private _id = NaN;
 
-  constructor(public readonly type: string = 'node', id = NaN) {
+  constructor(
+    public readonly type: string = 'node',
+    id = NaN,
+  ) {
     super();
     this._id = UniqueIdManager.getInstance().flagId('graph_node', id);
   }
@@ -147,7 +150,12 @@ export interface IGraphEdgeDump {
 export class GraphEdge extends AttributeContainer {
   private _id = NaN;
 
-  constructor(public readonly type: string = 'edge', public readonly source: GraphNode = null, public readonly target: GraphNode = null, id = NaN) {
+  constructor(
+    public readonly type: string = 'edge',
+    public readonly source: GraphNode = null,
+    public readonly target: GraphNode = null,
+    id = NaN,
+  ) {
     super();
     this._id = UniqueIdManager.getInstance().flagId('graph_edge', id);
     if (source && target) {

@@ -362,7 +362,10 @@ export class AppHeader {
    * @param parent
    * @param options
    */
-  constructor(private parent: HTMLElement, options: IAppHeaderOptions = {}) {
+  constructor(
+    private parent: HTMLElement,
+    options: IAppHeaderOptions = {},
+  ) {
     merge(this.options, options);
     this.addEUCookieDisclaimer();
     this.build();
