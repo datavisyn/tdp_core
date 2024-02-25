@@ -50,8 +50,8 @@
     "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
     "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
     "test": "visyn_scripts test",
-    "webpack:dev": "visyn_scripts build --mode development --env workspace_mode=single",
-    "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
+    "bundle:dev": "visyn_scripts bundle --mode development --env workspace_mode=single",
+    "bundle:prod": "visyn_scripts bundle --mode production --env workspace_mode=single"
   },
   "dependencies": {
     "@popperjs/core": "^2.9.3",
@@ -107,7 +107,8 @@
     "@types/react-dom": "~18.2.0",
     "react": "~18.2.0",
     "react-dom": "~18.2.0",
-    "webpack": "5.74.0"
+    "visyn_core": "git+ssh://git@github.com/datavisyn/visyn_core#rspack",
+    "visyn_scripts": "git+ssh://git@github.com/datavisyn/visyn_scripts#rspack"
   },
   "visyn": {
     "entries": {
