@@ -47,11 +47,9 @@
     "predist": "yarn run lint && yarn run test && yarn run build",
     "start:fast": "visyn_scripts start --env workspace_mode=single fast=true",
     "start": "visyn_scripts start --env workspace_mode=single",
-    "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
-    "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
     "test": "visyn_scripts test",
-    "bundle:dev": "visyn_scripts bundle --mode development --env workspace_mode=single",
-    "bundle:prod": "visyn_scripts bundle --mode production --env workspace_mode=single"
+    "webpack:dev": "visyn_scripts build --mode development --env workspace_mode=single",
+    "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
   },
   "dependencies": {
     "@popperjs/core": "^2.9.3",
@@ -90,17 +88,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.7",
     "@babel/plugin-transform-typescript": "7.17.12",
-    "@storybook/addon-actions": "^6.5.16",
-    "@storybook/addon-essentials": "^6.5.16",
-    "@storybook/addon-interactions": "^6.5.16",
-    "@storybook/addon-links": "^6.5.16",
-    "@storybook/builder-webpack5": "^6.5.16",
-    "@storybook/manager-webpack5": "^6.5.16",
-    "@storybook/preset-scss": "^1.0.3",
-    "@storybook/react": "^6.5.16",
-    "@storybook/testing-library": "0.0.13",
-    "cypress": "^11.2.0",
-    "storybook-addon-swc": "^1.1.9"
+    "cypress": "^11.2.0"
   },
   "resolutions": {
     "@types/react": "~18.2.0",
