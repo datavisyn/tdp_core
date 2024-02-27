@@ -38,7 +38,7 @@
     "compile": "visyn_scripts compile",
     "copy": "visyn_scripts copy",
     "cy:open": "cypress open",
-    "cy:run": "cypress run --e2e && cypress run --component",
+    "cy:run": "cypress run --e2e",
     "delete-dependencies": "visyn_scripts clean node_modules",
     "dist": "mkdir lib && cd dist && tar cvzf ../lib/tdp_core.tar.gz *",
     "docs": "visyn_scripts docs",
@@ -88,7 +88,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.7",
     "@babel/plugin-transform-typescript": "7.17.12",
-    "cypress": "^11.2.0"
+    "cypress": "^13.0.0"
   },
   "resolutions": {
     "@types/react": "~18.2.0",
