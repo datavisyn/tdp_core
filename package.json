@@ -45,7 +45,7 @@
     "lint:fix": "visyn_scripts lint --fix",
     "lint": "visyn_scripts lint",
     "predist": "yarn run lint && yarn run test && yarn run build",
-    "start:fast": "visyn_scripts start --env workspace_mode=single fast=true",
+    "start:full": "visyn_scripts start --env workspace_mode=single fast=false",
     "start": "visyn_scripts start --env workspace_mode=single",
     "test": "visyn_scripts test",
     "webpack:dev": "visyn_scripts build --mode development --env workspace_mode=single",
