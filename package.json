@@ -48,8 +48,8 @@
     "start:full": "visyn_scripts start --env workspace_mode=single fast=false",
     "start": "visyn_scripts start --env workspace_mode=single",
     "test": "visyn_scripts test",
-    "webpack:dev": "visyn_scripts build --mode development --env workspace_mode=single",
-    "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
+    "bundle:dev": "visyn_scripts bundle --mode development --env workspace_mode=single",
+    "bundle:prod": "visyn_scripts bundle --mode production --env workspace_mode=single"
   },
   "dependencies": {
     "@popperjs/core": "^2.9.3",
