@@ -1,12 +1,12 @@
 $lu_dialog_font_size: 0.9rem !default;
 $lu_toolbar_font_size: 0.9rem !default;
 
-$lu_assets: '../assets' !default;
+$lu_assets: '~lineupjs/src/assets' !default;
 $lu_use_font_awesome: true !default;
 // do not include Font Awesome files from LineUp, but use ours instead
 $lu_include_font_awesome: false !default;
 
-@import 'lineupjs/src/style.scss';
+@import '~lineupjs/src/style.scss';
 
 .lu {
   // use a fixed font-size for the ranking + side panel with the Roboto font family.
