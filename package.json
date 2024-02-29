@@ -38,20 +38,18 @@
     "compile": "visyn_scripts compile",
     "copy": "visyn_scripts copy",
     "cy:open": "cypress open",
-    "cy:run": "cypress run --e2e && cypress run --component",
+    "cy:run": "cypress run --e2e",
     "delete-dependencies": "visyn_scripts clean node_modules",
     "dist": "mkdir lib && cd dist && tar cvzf ../lib/tdp_core.tar.gz *",
     "docs": "visyn_scripts docs",
     "lint:fix": "visyn_scripts lint --fix",
     "lint": "visyn_scripts lint",
     "predist": "yarn run lint && yarn run test && yarn run build",
-    "start:fast": "visyn_scripts start --env workspace_mode=single fast=true",
+    "start:full": "visyn_scripts start --env workspace_mode=single fast=false",
     "start": "visyn_scripts start --env workspace_mode=single",
-    "storybook:build": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook",
-    "storybook": "NODE_OPTIONS=--max_old_space_size=4096 start-storybook -p 6006",
     "test": "visyn_scripts test",
-    "webpack:dev": "visyn_scripts build --mode development --env workspace_mode=single",
-    "webpack:prod": "visyn_scripts build --mode production --env workspace_mode=single"
+    "bundle:dev": "visyn_scripts bundle --mode development --env workspace_mode=single",
+    "bundle:prod": "visyn_scripts bundle --mode production --env workspace_mode=single"
   },
   "dependencies": {
     "@popperjs/core": "^2.9.3",
@@ -84,30 +82,19 @@
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "use-deep-compare-effect": "^1.8.0",
-    "visyn_core": "^8.0.0",
-    "visyn_scripts": "^7.0.1"
+    "visyn_core": "^9.0.0",
+    "visyn_scripts": "^8.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.7",
     "@babel/plugin-transform-typescript": "7.17.12",
-    "@storybook/addon-actions": "^6.5.16",
-    "@storybook/addon-essentials": "^6.5.16",
-    "@storybook/addon-interactions": "^6.5.16",
-    "@storybook/addon-links": "^6.5.16",
-    "@storybook/builder-webpack5": "^6.5.16",
-    "@storybook/manager-webpack5": "^6.5.16",
-    "@storybook/preset-scss": "^1.0.3",
-    "@storybook/react": "^6.5.16",
-    "@storybook/testing-library": "0.0.13",
-    "cypress": "^11.2.0",
-    "storybook-addon-swc": "^1.1.9"
+    "cypress": "^13.0.0"
   },
   "resolutions": {
     "@types/react": "~18.2.0",
     "@types/react-dom": "~18.2.0",
     "react": "~18.2.0",
-    "react-dom": "~18.2.0",
-    "webpack": "5.74.0"
+    "react-dom": "~18.2.0"
   },
   "visyn": {
     "entries": {
