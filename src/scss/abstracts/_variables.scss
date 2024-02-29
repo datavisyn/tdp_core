@@ -73,6 +73,9 @@ $annotation_color_hover: #006b90 !default;
 $anchor_color: red !default;
 $anchor_color_hover: darkred !default;
 
+/* phovea_ui */
+$fa-font-path: '~@fortawesome/fontawesome-free/webfonts' !default;
+
 $phovea-loading-icon-url: url('../../assets/caleydo_c_anim.svg') !default;
 $phovea-loading-icon-size: auto !default;
 
@@ -98,6 +101,8 @@ $anchor_color_hover: darkred !default;
 $select-data-color: orange !default;
 $hover-data-color: #ffc46b !default;
 
-$engine_assets: '../assets';
+// TODO: Without this, we get "Can't resolve './node_modules/lineupengine/src/styles/lineupengine/src/assets/loading.svg' in '.../workspaces/<repo>'"
+// Why do I need to do this? Probably because lineupjs defines $engine_assets and it is resolving it relatively?
+$engine_assets: '~lineupengine/src/assets';
 $engine_loading_image: url('#{$engine_assets}/loading.svg') !default;
 $engine_loading_static_image: url('#{$engine_assets}/loading_s.svg') !default;

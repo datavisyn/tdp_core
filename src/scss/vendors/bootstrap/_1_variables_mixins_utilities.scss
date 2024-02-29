@@ -1,13 +1,13 @@
 // 1. Include functions first (so you can manipulate colors, SVGs, calc, etc)
 // @see https://getbootstrap.com/docs/5.1/customize/sass/#importing
 
-@import "bootstrap/scss/functions";
+@import "~bootstrap/scss/functions";
 
 // 2. Include remainder of required Bootstrap stylesheets (required)
 // @see https://getbootstrap.com/docs/5.1/customize/sass/#importing
 
-@import "bootstrap/scss/variables";
-@import "bootstrap/scss/mixins";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
 
 // $spacers, $theme-colors need to be adapted before importing the utilities to generate the m-* and p-*, text-*, border-*, bg-* utility classes
 // @see https://getbootstrap.com/docs/5.1/utilities/spacing/ and https://getbootstrap.com/docs/5.1/utilities/colors/
