@@ -16,17 +16,8 @@ export class ScoreUtils {
     const scoreId: string = parameter.id;
     const pluginDesc = PluginRegistry.getInstance().getPlugin(EXTENSION_POINT_TDP_SCORE_IMPL, scoreId);
     const plugin = await pluginDesc.load();
-    let view;
-    let params;
-    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-      view = await inputs[0].v;
-      // disable eslint because it is unclear how to avoid the eslint warning and destructure `params` from the `parameter` object with `let` variable `params` in this case
-      // eslint-disable-next-line prefer-destructuring
-      params = parameter.params;
-    } else {
-      view = await inputs[0].v.then((vi) => vi.getInstance());
-      params = await AttachemntUtils.resolveExternalized(parameter.params);
-    }
+    const view = await inputs[0].v.then((vi) => vi.getInstance());
+    const params = await AttachemntUtils.resolveExternalized(parameter.params);
     const score: IScore<any> | IScore<any>[] = plugin.factory(params, pluginDesc);
     const scores = Array.isArray(score) ? score : [score];
 
@@ -83,9 +74,6 @@ export class ScoreUtils {
 
   static async pushScoreAsync(graph: ProvenanceGraph, provider: IObjectRef<IViewProvider>, scoreName: string, scoreId: string, params: any) {
     // skip attachment utils + provenance impl and add score directly when feature flag is enabled
-    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-      return ScoreUtils.addScoreImpl([provider], { id: scoreId, params });
-    }
     const storedParams = await AttachemntUtils.externalize(params);
     const currentParams = { id: scoreId, params, storedParams };
     const result = await ScoreUtils.addScoreAsync([provider], currentParams);

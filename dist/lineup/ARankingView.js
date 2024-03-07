@@ -3,7 +3,6 @@ import { merge } from 'lodash';
 import { LineupVisWrapper } from 'visyn_core/vis';
 import { IDTypeManager } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
-import { WebpackEnv } from 'visyn_core/base';
 import { AView } from '../views/AView';
 import { EViewMode } from '../base/interfaces';
 import { LineupTrackingManager } from './internal/cmds';
@@ -243,9 +242,6 @@ export class ARankingView extends AView {
      */
     init(params, onParameterChange) {
         return super.init(params, onParameterChange).then(() => {
-            if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-                return; // do nothing when feature flag is enabled
-            }
             // inject stats
             const base = params.querySelector('form') || params;
             base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
@@ -524,9 +520,6 @@ export class ARankingView extends AView {
      */
     async addTrackedScoreColumn(score, position) {
         // skip provenance impl when feature flag is enabled
-        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-            return this.addScoreColumn(score, position);
-        }
         return this.withoutTracking(() => this.addScoreColumn(score, position));
     }
     pushTrackedScoreColumn(scoreName, scoreId, params) {
@@ -539,10 +532,6 @@ export class ARankingView extends AView {
      */
     async removeTrackedScoreColumn(columnId) {
         // skip provenance impl when feature flag is enabled
-        if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-            const column = this.provider.find(columnId);
-            return column.removeMe();
-        }
         return this.withoutTracking(() => {
             const column = this.provider.find(columnId);
             return column.removeMe();
