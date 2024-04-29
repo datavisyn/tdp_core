@@ -322,9 +322,6 @@ export abstract class ARankingView extends AView {
    */
   init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>) {
     return super.init(params, onParameterChange).then(() => {
-      if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-        return; // do nothing when feature flag is enabled
-      }
       // inject stats
       const base = <HTMLElement>params.querySelector('form') || params;
       base.insertAdjacentHTML('beforeend', `<div class=col-sm-auto></div>`);
@@ -635,9 +632,6 @@ export abstract class ARankingView extends AView {
    */
   async addTrackedScoreColumn(score: IScore<any>, position?: number): Promise<ILazyLoadedColumn> {
     // skip provenance impl when feature flag is enabled
-    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-      return this.addScoreColumn(score, position);
-    }
     return this.withoutTracking(() => this.addScoreColumn(score, position));
   }
 
@@ -652,10 +646,6 @@ export abstract class ARankingView extends AView {
    */
   async removeTrackedScoreColumn(columnId: string): Promise<boolean> {
     // skip provenance impl when feature flag is enabled
-    if (WebpackEnv.ENABLE_EXPERIMENTAL_REPROVISYN_FEATURES) {
-      const column = this.provider.find(columnId);
-      return column.removeMe();
-    }
     return this.withoutTracking(() => {
       const column = this.provider.find(columnId);
       return column.removeMe();
