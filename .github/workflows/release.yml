@@ -1,8 +1,16 @@
-name: release
+name: Create a new release PR
 
-on: workflow_dispatch
-          
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        type: string
+        description: 'The next version to release'
+        required: true
+
 jobs:
   release:
     uses: datavisyn/github-workflows/.github/workflows/release-source.yml@main
-    secrets: inherit      
+    secrets: inherit 
+    with:
+      release_version: ${{ inputs.release_version }}
