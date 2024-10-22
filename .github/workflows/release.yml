@@ -11,6 +11,6 @@ on:
 jobs:
   release:
     uses: datavisyn/github-workflows/.github/workflows/release-source.yml@main
-    secrets: inherit 
+    secrets: inherit
     with:
       release_version: ${{ inputs.release_version }}
