@@ -1,5 +1,5 @@
-import { EngineRenderer, TaggleRenderer, LocalDataProvider } from 'lineupjs';
-import { IObjectRef, ICmdResult, ProvenanceGraph, IAction } from '../../clue/provenance';
+import { EngineRenderer, LocalDataProvider, TaggleRenderer } from 'lineupjs';
+import { IAction, ICmdResult, IObjectRef, ProvenanceGraph } from '../../clue/provenance';
 export interface IViewProviderLocal {
     data: LocalDataProvider;
     getInstance(): {

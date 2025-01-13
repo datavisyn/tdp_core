@@ -1,5 +1,5 @@
+import { ISelection, IViewContext } from '../../base/interfaces';
 import { AView } from '../AView';
-import { IViewContext, ISelection } from '../../base/interfaces';
 export interface IPartialProxyViewOptions {
     /**
      * direct loading of an iframe site

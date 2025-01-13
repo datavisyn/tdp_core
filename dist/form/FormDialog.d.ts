@@ -1,6 +1,6 @@
 import { PHOVEA_UI_FormDialog } from '../components';
 import { FormBuilder } from './FormBuilder';
-import { IFormElementDesc, IForm } from './interfaces';
+import { IForm, IFormElementDesc } from './interfaces';
 /**
  * a utililty dialog to show a dialog modal using a FormBuilder
  * @see FormBuilder

@@ -4,11 +4,12 @@
  *
  * See IDataDescriptionMetaData in datatype.ts for various legal parameters
  */
-import { PluginRegistry } from 'visyn_core/plugin';
 import { AppContext } from 'visyn_core/base';
-import { BaseUtils } from '../base/BaseUtils';
-import { IDataType, DummyDataType } from './datatype';
+import { PluginRegistry } from 'visyn_core/plugin';
+
 import { IDataDescription } from './DataDescription';
+import { DummyDataType, IDataType } from './datatype';
+import { BaseUtils } from '../base/BaseUtils';
 
 export interface INode {
   readonly name: string;

@@ -1,7 +1,8 @@
 import { select } from 'd3v3';
+
 import { PHOVEA_UI_FormDialog } from '../components';
 import { FormBuilder } from './FormBuilder';
-import { IFormElementDesc, IForm } from './interfaces';
+import { IForm, IFormElementDesc } from './interfaces';
 import { BaseUtils } from '../base';
 
 /**

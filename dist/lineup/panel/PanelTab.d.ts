@@ -1,8 +1,8 @@
-import { SidePanel, SearchBox, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer } from 'lineupjs';
+import { IEngineRankingContext, IRankingHeaderContextContainer, IRenderContext, SearchBox, SidePanel } from 'lineupjs';
 import { EventHandler } from 'visyn_core/base';
+import { IPanelTabDesc } from './IPanelTabDesc';
 import { ISearchOption } from './ISearchOption';
 import { PanelButton, PanelNavButton } from './PanelButton';
-import { IPanelTabDesc } from './IPanelTabDesc';
 /**
  * The PanelTab creates a tab component that with can be toggled through the PanelNavButton
  */

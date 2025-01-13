@@ -1,5 +1,5 @@
 import { AParentLayoutContainer } from './AParentLayoutContainer';
-import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuildAbleOrViewLike, IDropArea } from '../interfaces';
+import { IBuildAbleOrViewLike, IDropArea, ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView } from '../interfaces';
 import { ILayoutContainerOption } from './ALayoutContainer';
 export declare class RootLayoutContainer extends AParentLayoutContainer<ILayoutContainerOption> implements IRootLayoutContainer {
     readonly build: (layout: IBuildAbleOrViewLike) => ILayoutContainer;
@@ -18,7 +18,7 @@ export declare class RootLayoutContainer extends AParentLayoutContainer<ILayoutC
     persist(): ILayoutDump & {
         type: string;
     };
-    static restore(dump: ILayoutDump, doc: Document, build: IBuildLayout, restorer: IRestoreLayout, restoreView: IViewRestorer): any;
+    static restore(dump: ILayoutDump, doc: Document, build: IBuildLayout, restorer: IRestoreLayout, restoreView: IViewRestorer): RootLayoutContainer;
 }
 interface IBuildLayout {
     (root: RootLayoutContainer, layout: IBuildAbleOrViewLike): ILayoutContainer;

@@ -1,5 +1,5 @@
-import { IDTypeLike } from 'visyn_core/idtype';
 import { IRow, IServerColumn } from 'visyn_core/base';
+import { IDTypeLike } from 'visyn_core/idtype';
 import { IScoreRow } from './interfaces';
 /**
  * Describes the properties returned for each database connector
@@ -130,7 +130,7 @@ export declare class RestBaseUtils {
      * @param filters URL filter parameters
      */
     static mergeParamAndFilters(params: IParams, filters: IParams): {
-        [x: string]: string | number | boolean | string[] | number[] | boolean[];
+        [x: string]: string | number | boolean | string[] | boolean[] | number[];
     };
     /**
      * query the TDP rest api to read data with additional given filters

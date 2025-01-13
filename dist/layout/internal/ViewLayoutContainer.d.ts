@@ -1,4 +1,4 @@
-import { ILayoutDump, ISize, PHOVEA_UI_IView, IViewLayoutContainer } from '../interfaces';
+import { ILayoutDump, ISize, IViewLayoutContainer, PHOVEA_UI_IView } from '../interfaces';
 import { ALayoutContainer, ILayoutContainerOption } from './ALayoutContainer';
 export interface IViewLayoutContainerOptions extends ILayoutContainerOption {
     hideHeader: boolean;

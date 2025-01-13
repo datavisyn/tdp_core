@@ -1,5 +1,6 @@
-import { SearchBox, IGroupSearchItem, ISearchBoxOptions } from 'lineupjs';
+import { IGroupSearchItem, ISearchBoxOptions, SearchBox } from 'lineupjs';
 import { I18nextManager } from 'visyn_core/i18n';
+
 import { ISearchOption } from './ISearchOption';
 
 /**

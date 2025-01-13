@@ -3,10 +3,11 @@
  * Copyright (c) The Caleydo Team. All rights reserved.
  * Licensed under the new BSD license, available at http://caleydo.org/license
  **************************************************************************** */
-import { PluginRegistry } from 'visyn_core/plugin';
 import $ from 'jquery';
 // @ts-ignore
 import select2 from 'select2';
+import { PluginRegistry } from 'visyn_core/plugin';
+
 import reg from './phovea';
 /**
  * build a registry by registering all phovea modules

@@ -1,19 +1,53 @@
-name: build
+name: Build repository
 
 on:
   workflow_dispatch:
     inputs:
+      run_parallel:
+        description: 'Run jobs in parallel'
+        required: false
+        type: boolean
+        default: true
+      self_hosted:
+        description: 'Run on self-hosted runner'
+        required: false
+        type: boolean
+        default: true
       cypress:
         description: 'Run cypress'
         required: false
         type: boolean
         default: false
+      playwright:
+        description: 'Run playwright'
+        required: false
+        type: boolean
+        default: false
+      playwright_spec_param:
+        type: string
+        description: 'Run specific playwright test(s) (optional). Example: landing-page.spec.ts'
+        required: false
   push:
+  pull_request: 
+    types: [opened, ready_for_review]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   build:
+    if: ${{ github.event_name != 'pull_request_review' || github.event.review.state == 'approved' }}
     uses: datavisyn/github-workflows/.github/workflows/build-node-python.yml@main
     secrets: inherit
+    # Boolean inputs are tricky in Github Actions. Their default is not honored in non-workflow-dispatch actions, so setting a default on push is tricky: https://stackoverflow.com/a/73495922
+    # To get on push true, use !contains(inputs.myInput, 'false')
+    # To get on push false, use contains(inputs.myInput, 'true')
     with:
+      run_parallel: ${{ !contains(inputs.run_parallel, 'false') }}  # true except if box is not checked
+      runs_on: ${{ (!contains(inputs.self_hosted, 'false') && 'self-hosted') || null }}  # self-hosted except if box is not checked
       cypress_enable: true
-      cypress_run_because_flag: ${{ inputs.cypress == true }}
+      cypress_run_because_flag: ${{ inputs.cypress == true || github.event_name == 'pull_request' || github.event.review.state == 'approved' }}
+      cypress_runs_on: ${{ (!contains(inputs.self_hosted, 'false') && 'self-hosted') || null }}  # self-hosted except if box is not checked
+      playwright_enable: false
+      playwright_run_because_flag: ${{ inputs.playwright == true || github.event_name == 'pull_request' || github.event.review.state == 'approved' }}
+      playwright_spec_param: ${{ inputs.playwright_spec_param }}
+      playwright_runs_on: ${{ (!contains(inputs.self_hosted, 'false') && 'self-hosted') || null }}  # self-hosted except if box is not checked

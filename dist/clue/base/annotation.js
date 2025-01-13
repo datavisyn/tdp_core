@@ -1,11 +1,11 @@
 import * as d3v3 from 'd3v3';
-import marked from 'marked';
 import { merge } from 'lodash';
+import marked from 'marked';
 import { I18nextManager } from 'visyn_core/i18n';
 import { SelectionUtils } from 'visyn_core/idtype';
+import { StoryTransition } from './Player';
 import { ModeWrapper } from './mode';
 import { BaseUtils } from '../../base/BaseUtils';
-import { StoryTransition } from './Player';
 import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 const modeFeatures = {
     isEditable: () => ModeWrapper.getInstance().getMode().authoring > 0.8,
@@ -534,7 +534,7 @@ export class Renderer {
             function updateShift() {
                 $svg
                     .attr({
-                    width: (d) => 30 + Math.abs(d.at[0]),
+                    width: (d) => 30 + Math.abs(d.at[0]), // TODO (50) + xminmax[1] - xminmax[0],
                     height: (d) => 30 + Math.abs(d.at[1]), // TODO yminmax[1] - yminmax[0],
                 })
                     .style({

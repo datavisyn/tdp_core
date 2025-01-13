@@ -1,10 +1,10 @@
-import { LocalDataProvider, EngineRenderer, TaggleRenderer, IColumnDesc } from 'lineupjs';
 import React from 'react';
+import { EngineRenderer, IColumnDesc, LocalDataProvider, TaggleRenderer } from 'lineupjs';
+import { IARankingViewOptions } from './IARankingViewOptions';
+import { IRankingWrapper } from './IRankingWrapper';
 import { ILazyLoadedColumn } from './internal/column';
 import { EViewMode, IAdditionalColumnDesc, IScoreRow, ISelection } from '../base/interfaces';
 import { IContext } from './selection/ISelectionAdapter';
-import { IRankingWrapper } from './IRankingWrapper';
-import { IARankingViewOptions } from './IARankingViewOptions';
 export interface IScoreResult {
     instance: ILazyLoadedColumn;
     colDesc: IColumnDesc & {

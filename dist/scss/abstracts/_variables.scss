@@ -1,3 +1,9 @@
+// TODO: Without this, we get "Can't resolve './node_modules/lineupengine/src/styles/lineupengine/src/assets/loading.svg' in '.../workspaces/<repo>'"
+// Why do I need to do this? Probably because lineupjs defines $engine_assets and it is resolving it relatively?
+$engine_assets: '../assets';
+$engine_loading_image: url('#{$engine_assets}/loading.svg');
+$engine_loading_static_image: url('#{$engine_assets}/loading_s.svg');
+
 $select-color: orange !default;
 $select-color-bright: #ffdca3 !default;
 $hover-color: black !default;
@@ -97,7 +103,3 @@ $anchor_color_hover: darkred !default;
 
 $select-data-color: orange !default;
 $hover-data-color: #ffc46b !default;
-
-$engine_assets: '../assets';
-$engine_loading_image: url('#{$engine_assets}/loading.svg') !default;
-$engine_loading_static_image: url('#{$engine_assets}/loading_s.svg') !default;

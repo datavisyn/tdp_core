@@ -1,13 +1,14 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
-import { IDType } from 'visyn_core/idtype';
 import type { IEventHandler } from 'visyn_core/base';
 import { IBaseViewPluginDesc } from 'visyn_core/base';
+import { IDType } from 'visyn_core/idtype';
 import type { IPlugin, IPluginDesc } from 'visyn_core/plugin';
+
 import type { IAuthorizationConfiguration } from '../auth';
-import { PanelTab } from '../lineup/panel';
-import { ProvenanceGraph } from '../clue/provenance/ProvenanceGraph';
 import type { IObjectRef } from '../clue/provenance/ObjectNode';
+import { ProvenanceGraph } from '../clue/provenance/ProvenanceGraph';
 import { AppHeader } from '../components/header';
+import { PanelTab } from '../lineup/panel';
 
 export interface IAdditionalColumnDesc extends IColumnDesc {
   /**

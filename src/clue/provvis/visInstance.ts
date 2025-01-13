@@ -1,8 +1,9 @@
-import { IEventHandler, EventHandler } from 'visyn_core/base';
-import { IPersistable } from '../../base/IPersistable';
-import { UniqueIdManager } from '../../app/UniqueIdManager';
-import { IDataType } from '../../data/datatype';
+import { EventHandler, IEventHandler } from 'visyn_core/base';
+
 import { ITransform } from './ITransform';
+import { UniqueIdManager } from '../../app/UniqueIdManager';
+import { IPersistable } from '../../base/IPersistable';
+import { IDataType } from '../../data/datatype';
 
 export interface IVisInstanceOptions {
   rotate?: number;

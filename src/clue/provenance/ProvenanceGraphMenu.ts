@@ -1,11 +1,12 @@
-import { event as d3event, select, time, Selection } from 'd3v3';
+import { Selection, event as d3event, select, time } from 'd3v3';
 import * as $ from 'jquery';
 import { I18nextManager } from 'visyn_core/i18n';
 import { UserSession } from 'visyn_core/security';
+
+import type { IProvenanceGraphDataDescription } from './ICmd';
+import type { ProvenanceGraph } from './ProvenanceGraph';
 import { Dialog, PHOVEA_UI_FormDialog } from '../../components';
 import type { CLUEGraphManager } from '../base/CLUEGraphManager';
-import type { ProvenanceGraph } from './ProvenanceGraph';
-import type { IProvenanceGraphDataDescription } from './ICmd';
 
 export class ProvenanceGraphMenu {
   private readonly $node: Selection<any>;

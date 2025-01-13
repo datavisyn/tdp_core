@@ -1,7 +1,7 @@
 import { AParentLayoutContainer } from './AParentLayoutContainer';
-import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, LayoutContainerEvents, PHOVEA_UI_IView, IBuildAbleOrViewLike, IDropArea } from '../interfaces';
-import { TabbingLayoutContainer } from './TabbingLayoutContainer';
+import { IBuildAbleOrViewLike, IDropArea, ILayoutContainer, ILayoutDump, IRootLayoutContainer, LayoutContainerEvents, PHOVEA_UI_IView } from '../interfaces';
 import { ILayoutContainerOption } from './ALayoutContainer';
+import { TabbingLayoutContainer } from './TabbingLayoutContainer';
 
 export class RootLayoutContainer extends AParentLayoutContainer<ILayoutContainerOption> implements IRootLayoutContainer {
   readonly minChildCount = 0;

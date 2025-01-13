@@ -1,4 +1,4 @@
-import { StringColumn, IDataRow, Column, ValueColumn, IValueColumnDesc } from 'lineupjs';
+import { Column, IDataRow, IValueColumnDesc, StringColumn, ValueColumn } from 'lineupjs';
 import { isEqual } from 'lodash';
 
 // internal function copied from lineupjs

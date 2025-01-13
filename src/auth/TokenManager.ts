@@ -1,6 +1,7 @@
 import { castArray } from 'lodash';
-import { IEvent, EventHandler, GlobalEventHandler, IEventListener } from 'visyn_core/base';
+import { EventHandler, GlobalEventHandler, IEvent, IEventListener } from 'visyn_core/base';
 import { UserSession } from 'visyn_core/security';
+
 import { ERenderAuthorizationStatus, IAuthorizationConfiguration, IAuthorizationFlow, IRenderAuthorizationOptions } from './interfaces';
 import { simplePopupFlow } from './simplePopup';
 

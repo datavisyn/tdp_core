@@ -1,9 +1,10 @@
 import { merge, uniqueId } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
-import { UserSession, ISecureItem, EEntity } from 'visyn_core/security';
+import { EEntity, ISecureItem, UserSession } from 'visyn_core/security';
+
 import { PHOVEA_UI_FormDialog } from '../../components';
-import { IProvenanceGraphDataDescription } from '../provenance';
 import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
+import { IProvenanceGraphDataDescription } from '../provenance';
 
 export class ProvenanceGraphMenuUtils {
   public static GLOBAL_EVENT_MANIPULATED = 'provenanceGraphMenuManipulated';

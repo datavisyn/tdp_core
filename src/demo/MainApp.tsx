@@ -1,14 +1,15 @@
 import * as React from 'react';
-import { useVisynAppContext, VisynApp, VisynHeader } from 'visyn_core/app';
+
 import { Menu } from '@mantine/core';
+import { VisynApp, VisynHeader, useVisynAppContext } from 'visyn_core/app';
 import {
-  Vis,
-  ESupportedPlotlyVis,
-  ENumericalColorScaleType,
-  EScatterSelectSettings,
-  IScatterConfig,
   BaseVisConfig,
   EColumnTypes,
+  ENumericalColorScaleType,
+  EScatterSelectSettings,
+  ESupportedPlotlyVis,
+  IScatterConfig,
+  Vis,
   VisColumn,
 } from 'visyn_core/vis';
 

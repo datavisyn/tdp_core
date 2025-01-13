@@ -1,10 +1,11 @@
 import '../webpack/_bootstrap';
+import { Modal } from 'bootstrap';
 import $ from 'jquery';
 import { merge } from 'lodash';
-import { Modal } from 'bootstrap';
 import { I18nextManager } from 'visyn_core/i18n';
-import { TourUtils } from '../tour/TourUtils';
+
 import { BaseUtils } from '../base/BaseUtils';
+import { TourUtils } from '../tour/TourUtils';
 
 export interface IDialogOptions {
   title?: string;

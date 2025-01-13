@@ -1,8 +1,9 @@
-import { IDTypeManager } from 'visyn_core/idtype';
 import { EventHandler } from 'visyn_core/base';
+import { IDTypeManager } from 'visyn_core/idtype';
+
 import { UniqueIdManager } from '../../app/UniqueIdManager';
 import { IPersistable } from '../../base/IPersistable';
-import type { IDataType, IDataDescription } from '../../data';
+import type { IDataDescription, IDataType } from '../../data';
 
 export class AttributeContainer extends EventHandler implements IPersistable {
   private attrMap = new Map<string, any>();

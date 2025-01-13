@@ -1,6 +1,3 @@
-import { merge } from 'lodash';
-import { __extends } from 'tslib';
-
 export class BaseUtils {
   // fixes a javascript bug on using "%" with negative numbers
   static mod(n: number, m: number) {

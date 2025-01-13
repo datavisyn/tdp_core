@@ -1,10 +1,11 @@
 import { Column, LocalDataProvider, isSupportType } from 'lineupjs';
 import { I18nextManager } from 'visyn_core/i18n';
-import { ExportUtils, IExportFormat } from '../internal/ExportUtils';
-import type { IPanelButton } from './PanelButton';
+
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
+import type { IPanelButton } from './PanelButton';
 import { BaseUtils } from '../../base/BaseUtils';
 import { PHOVEA_UI_FormDialog } from '../../components/dialogs';
+import { ExportUtils, IExportFormat } from '../internal/ExportUtils';
 
 interface IExportData {
   type: IExportFormat;

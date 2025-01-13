@@ -1,4 +1,5 @@
 import { merge } from 'lodash';
+
 import not_available from '../../assets/not_available.png';
 import { ProvenanceGraph, StateNode } from '../provenance';
 

@@ -39,11 +39,19 @@ documentation:
 
 .PHONY: install  ## Install the requirements
 install:
-	pip install -e .
+	@if [ ! -z "${CI}" ]; then \
+		uv pip install -e . --system --upgrade; \
+	else \
+		uv pip install -e . --upgrade; \
+	fi
 
 .PHONY: develop  ## Set up the development environment
 develop:
-	pip install -e .[develop]
+	@if [ ! -z "${CI}" ]; then \
+		uv pip install -e ".[develop]" --system --upgrade; \
+	else \
+		uv pip install -e ".[develop]" --upgrade; \
+	fi
 
 .PHONY: env_encrypt ## Encrypts the current ./<app>/.env
 env_encrypt:

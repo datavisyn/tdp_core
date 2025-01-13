@@ -1,4 +1,4 @@
-import { ILayoutDump, ISize, PHOVEA_UI_IView, IViewLayoutContainer, LayoutContainerEvents } from '../interfaces';
+import { ILayoutDump, ISize, IViewLayoutContainer, LayoutContainerEvents, PHOVEA_UI_IView } from '../interfaces';
 import { ALayoutContainer, ILayoutContainerOption } from './ALayoutContainer';
 import { Dropper } from './Dropper';
 

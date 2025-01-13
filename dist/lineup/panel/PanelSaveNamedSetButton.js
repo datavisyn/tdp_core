@@ -1,7 +1,7 @@
-import { I18nextManager } from 'visyn_core/i18n';
 import { EventHandler } from 'visyn_core/base';
-import { StoreUtils } from '../../storage';
+import { I18nextManager } from 'visyn_core/i18n';
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
+import { StoreUtils } from '../../storage';
 /**
  * A button dropdown to download selected/all rows of the ranking
  */

@@ -227,7 +227,7 @@ export class SplitLayoutContainer extends ASequentialLayoutContainer {
     persist() {
         return Object.assign(super.persist(), {
             type: 'split',
-            ratios: this.ratios.map((r) => Math.round(r * 100) / 100),
+            ratios: this.ratios.map((r) => Math.round(r * 100) / 100), // round to 2 digits
             fixedLayout: this.options.fixedLayout,
         });
     }

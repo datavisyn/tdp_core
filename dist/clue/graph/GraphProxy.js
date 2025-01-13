@@ -1,10 +1,10 @@
 import { IDTypeManager } from 'visyn_core/idtype';
-import { ADataType } from '../../data/datatype';
-import { AGraph } from './graph';
 import { GraphFactoryUtils } from './GraphBase';
-import { RemoteStoreGraph } from './RemoteStorageGraph';
-import { MemoryGraph } from './MemoryGraph';
 import { LocalStorageGraph } from './LocalStorageGraph';
+import { MemoryGraph } from './MemoryGraph';
+import { RemoteStoreGraph } from './RemoteStorageGraph';
+import { AGraph } from './graph';
+import { ADataType } from '../../data/datatype';
 export class GraphProxy extends ADataType {
     constructor() {
         super(...arguments);

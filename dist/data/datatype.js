@@ -1,3 +1,6 @@
+/**
+ * This file defines interfaces for various data types and their metadata.
+ */
 import { EventHandler } from 'visyn_core/base';
 /**
  * dummy data type just holding the description

@@ -1,24 +1,24 @@
-import { EngineRenderer, defaultOptions, isGroup, LocalDataProvider, deriveColors, TaggleRenderer, spaceFillingRule, updateLodRules, } from 'lineupjs';
+import { EngineRenderer, LocalDataProvider, TaggleRenderer, defaultOptions, deriveColors, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
 import { merge } from 'lodash';
-import { LineupVisWrapper } from 'visyn_core/vis';
-import { IDTypeManager } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
-import { AView } from '../views/AView';
-import { EViewMode } from '../base/interfaces';
-import { LineupTrackingManager } from './internal/cmds';
-import { RestStorageUtils } from '../storage';
-import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
-import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { LineupVisWrapper } from 'visyn_core/vis';
 import { ColumnDescUtils } from './desc';
-import { ScoreUtils } from './internal/ScoreUtils';
-import { LineUpColors } from './internal/LineUpColors';
-import { LineUpPanelActions } from './internal/LineUpPanelActions';
-import { LazyColumn } from './internal/column';
-import { NotificationHandler } from '../base/NotificationHandler';
 import { LineupUtils } from './utils';
-import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 import { debounceAsync } from '../base';
+import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
+import { NotificationHandler } from '../base/NotificationHandler';
+import { EViewMode } from '../base/interfaces';
+import { RestStorageUtils } from '../storage';
+import { AView } from '../views/AView';
+import { LineUpColors } from './internal/LineUpColors';
+import { LineUpPanelActions } from './internal/LineUpPanelActions';
+import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
+import { ScoreUtils } from './internal/ScoreUtils';
+import { LineupTrackingManager } from './internal/cmds';
+import { LazyColumn } from './internal/column';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.

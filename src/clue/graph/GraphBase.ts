@@ -1,4 +1,4 @@
-import { GraphNode, GraphEdge, AGraph, IGraph, IGraphDataDescription, IGraphNodeDump, IGraphEdgeDump } from './graph';
+import { AGraph, GraphEdge, GraphNode, IGraph, IGraphDataDescription, IGraphEdgeDump, IGraphNodeDump } from './graph';
 
 export interface IGraphFactory {
   makeNode(p: IGraphNodeDump): GraphNode;

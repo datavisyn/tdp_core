@@ -1,5 +1,5 @@
 import { AParentLayoutContainer } from './AParentLayoutContainer';
-import { ILayoutContainer, ISize, EOrientation, IDropArea } from '../interfaces';
+import { EOrientation, IDropArea, ILayoutContainer, ISize } from '../interfaces';
 import { ILayoutContainerOption } from './ALayoutContainer';
 import { LAYOUT_CONTAINER_WRAPPER } from '../constants';
 

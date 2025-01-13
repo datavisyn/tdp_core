@@ -1,5 +1,5 @@
-import { SingleSelectionAdapter } from './internal/SingleSelectionAdapter';
 import { MultiSelectionAdapter } from './internal/MultiSelectionAdapter';
+import { SingleSelectionAdapter } from './internal/SingleSelectionAdapter';
 export class AdapterUtils {
     /**
      * Create a single selection adapter, i.e. that one selected item results in one additional column in LineUp

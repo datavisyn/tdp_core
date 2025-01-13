@@ -1,11 +1,11 @@
-import { IDataRow, Ranking, LocalDataProvider } from 'lineupjs';
+import { IDataRow, LocalDataProvider, Ranking } from 'lineupjs';
 import { Ajax, IRow } from 'visyn_core/base';
 import { IPluginDesc } from 'visyn_core/plugin';
 
-import type { IScoreRow, IScoreLoader } from '../base/interfaces';
-import { RestBaseUtils, IParams } from '../base/rest';
-import { IFormMultiMap, IFormRow, FormMap } from '../form/elements/FormMap';
 import { IRankingWrapper } from './IRankingWrapper';
+import type { IScoreLoader, IScoreRow } from '../base/interfaces';
+import { IParams, RestBaseUtils } from '../base/rest';
+import { FormMap, IFormMultiMap, IFormRow } from '../form/elements/FormMap';
 
 /**
  * Interface for AScoreAccessorProxy

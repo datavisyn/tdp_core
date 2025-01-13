@@ -1,15 +1,16 @@
 import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
-import { SelectionUtils, SelectOperation } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
+import { SelectOperation, SelectionUtils } from 'visyn_core/idtype';
+
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { ActionMetaData, ActionNode, ProvenanceGraph, SlideNode, StateNode } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
 import { DnDUtils } from '../../app';
+import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 import { Dialog } from '../../components/dialogs';
 import { ModeWrapper } from '../base/mode';
-import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 
 const DOI_LARGE = 0.9;
 const DOI_MEDIUM = 0.7;

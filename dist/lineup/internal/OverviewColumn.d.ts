@@ -1,4 +1,4 @@
-import { IDataRow, BooleanColumn, IBooleanColumnDesc } from 'lineupjs';
+import { BooleanColumn, IBooleanColumnDesc, IDataRow } from 'lineupjs';
 /**
  * extra column for highlighting and filtering
  */

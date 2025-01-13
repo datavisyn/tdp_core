@@ -1,6 +1,6 @@
+import { ActionMetaData } from './ActionMeta';
 import { IObjectRef } from './ObjectNode';
 import { IGraphDataDescription } from '../graph/graph';
-import { ActionMetaData } from './ActionMeta';
 export interface IProvenanceGraph {
     clear(): void;
 }

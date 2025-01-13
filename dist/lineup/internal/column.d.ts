@@ -1,4 +1,4 @@
-import { IDataProvider, IColumnDesc, Column } from 'lineupjs';
+import { Column, IColumnDesc, IDataProvider } from 'lineupjs';
 import { IScoreRow } from '../../base/interfaces';
 export interface ILazyLoadedColumn {
     col: Column;

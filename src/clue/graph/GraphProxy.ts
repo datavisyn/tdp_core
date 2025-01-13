@@ -1,10 +1,11 @@
 import { IDTypeManager } from 'visyn_core/idtype';
-import { ADataType } from '../../data/datatype';
-import { AGraph, IGraphDataDescription } from './graph';
+
 import { GraphFactoryUtils, IGraphFactory } from './GraphBase';
-import { RemoteStoreGraph } from './RemoteStorageGraph';
-import { MemoryGraph } from './MemoryGraph';
 import { LocalStorageGraph } from './LocalStorageGraph';
+import { MemoryGraph } from './MemoryGraph';
+import { RemoteStoreGraph } from './RemoteStorageGraph';
+import { AGraph, IGraphDataDescription } from './graph';
+import { ADataType } from '../../data/datatype';
 
 export class GraphProxy extends ADataType<IGraphDataDescription> {
   private cache: PromiseLike<AGraph> = null;

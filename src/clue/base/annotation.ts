@@ -1,13 +1,14 @@
 import * as d3v3 from 'd3v3';
-import marked from 'marked';
 import { merge } from 'lodash';
+import marked from 'marked';
 import { I18nextManager } from 'visyn_core/i18n';
 import { SelectionUtils } from 'visyn_core/idtype';
-import { ModeWrapper } from './mode';
-import { SlideNode, ProvenanceGraph, IStateAnnotation, IFrameStateAnnotation, ITextStateAnnotation, IArrowStateAnnotation } from '../provenance';
-import { BaseUtils } from '../../base/BaseUtils';
+
 import { StoryTransition } from './Player';
+import { ModeWrapper } from './mode';
+import { BaseUtils } from '../../base/BaseUtils';
 import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
+import { IArrowStateAnnotation, IFrameStateAnnotation, IStateAnnotation, ITextStateAnnotation, ProvenanceGraph, SlideNode } from '../provenance';
 
 const modeFeatures = {
   isEditable: () => ModeWrapper.getInstance().getMode().authoring > 0.8,

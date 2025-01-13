@@ -1,5 +1,5 @@
 import { IEventListener } from 'visyn_core/base';
-import { ILayoutContainer, ILayoutDump, ILayoutParentContainer, IRootLayoutContainer, IDropArea } from '../interfaces';
+import { IDropArea, ILayoutContainer, ILayoutDump, ILayoutParentContainer, IRootLayoutContainer } from '../interfaces';
 export interface IParentLayoutContainer extends ILayoutParentContainer {
     id: number;
     on(events: string | {

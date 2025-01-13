@@ -1,9 +1,9 @@
-import { SidePanel, LocalDataProvider, IColumnDesc, IEngineRankingContext, IRenderContext, IRankingHeaderContextContainer } from 'lineupjs';
+import { IColumnDesc, IEngineRankingContext, IRankingHeaderContextContainer, IRenderContext, LocalDataProvider, SidePanel } from 'lineupjs';
+import { EventHandler } from 'visyn_core/base';
 import { IDType } from 'visyn_core/idtype';
 import { IPluginDesc } from 'visyn_core/plugin';
-import { EventHandler } from 'visyn_core/base';
-import { IARankingViewOptions } from '../IARankingViewOptions';
 import { IAdditionalColumnDesc } from '../../base/interfaces';
+import { IARankingViewOptions } from '../IARankingViewOptions';
 export declare function findMappablePlugins(target: IDType, all: IPluginDesc[]): any[] | Promise<IPluginDesc[]>;
 export declare class LineUpPanelActions extends EventHandler {
     protected readonly provider: LocalDataProvider;

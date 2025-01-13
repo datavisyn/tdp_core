@@ -1,5 +1,5 @@
-import { PanelTab } from './PanelTab';
 import { PanelNavButton } from './PanelButton';
+import { PanelTab } from './PanelTab';
 
 /**
  * The header of the PanelTab

@@ -1,6 +1,6 @@
 import { IRow } from 'visyn_core/base';
-import { ISelection, IViewContext } from '../base/interfaces';
 import { AView } from './AView';
+import { ISelection, IViewContext } from '../base/interfaces';
 export interface ISortItem<T> {
     node: HTMLElement;
     row: T;

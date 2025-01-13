@@ -1,6 +1,6 @@
-import { ProvenanceGraph } from './ProvenanceGraph';
-import type { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
 import type { IProvenanceGraphDataDescription } from './ICmd';
+import { ProvenanceGraph } from './ProvenanceGraph';
+import type { ICommonProvenanceGraphManagerOptions, IProvenanceGraphManager } from './provenance';
 import { GraphBase } from '../graph/GraphBase';
 export interface IRemoteStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {
 }

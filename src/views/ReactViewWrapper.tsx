@@ -10,6 +10,7 @@
  ******************************************************** */
 
 import * as React from 'react';
+
 import { IViewPluginDesc } from '../base';
 import { AReactView, ISelector } from './AReactView';
 

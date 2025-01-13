@@ -1,14 +1,15 @@
-import { IDType, IDTypeManager } from 'visyn_core/idtype';
+import { EventHandler, IBaseViewPluginDesc, IEvent, IEventListener } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
-import { EventHandler, IEvent, IEventListener, IBaseViewPluginDesc } from 'visyn_core/base';
-import { IViewProvider } from '../lineup/IViewProvider';
+import { IDType, IDTypeManager } from 'visyn_core/idtype';
+
 import { ISelection, IView, IViewContext, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
-import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
-import { ViewUtils } from '../views/ViewUtils';
-import { AView } from '../views/AView';
-import { TourUtils } from '../tour/TourUtils';
 import { NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph } from '../clue/provenance';
 import { Dialog } from '../components';
+import { IViewProvider } from '../lineup/IViewProvider';
+import { TourUtils } from '../tour/TourUtils';
+import { TDPApplicationUtils } from '../utils/TDPApplicationUtils';
+import { AView } from '../views/AView';
+import { ViewUtils } from '../views/ViewUtils';
 
 export class ViewWrapper extends EventHandler implements IViewProvider {
   static readonly EVENT_VIEW_INITIALIZED = 'viewInitialized';

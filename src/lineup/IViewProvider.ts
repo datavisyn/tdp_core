@@ -1,4 +1,5 @@
 import { Column } from 'lineupjs';
+
 import { IScore } from '../base/interfaces';
 
 export interface IViewProvider {

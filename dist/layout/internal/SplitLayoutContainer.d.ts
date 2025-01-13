@@ -1,4 +1,4 @@
-import { ILayoutContainer, ILayoutDump, ISplitLayoutContainer, IDropArea } from '../interfaces';
+import { IDropArea, ILayoutContainer, ILayoutDump, ISplitLayoutContainer } from '../interfaces';
 import { ASequentialLayoutContainer, ISequentialLayoutContainerOptions } from './ASequentialLayoutContainer';
 export declare class SplitLayoutContainer extends ASequentialLayoutContainer<ISequentialLayoutContainerOptions> implements ISplitLayoutContainer {
     private static readonly SEPARATOR;

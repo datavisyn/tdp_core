@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Modal, Toast, Popover, Alert, Offcanvas, Tooltip, Tab, Collapse, Dropdown } from 'bootstrap';
+import { Alert, Collapse, Dropdown, Modal, Offcanvas, Popover, Tab, Toast, Tooltip } from 'bootstrap';
 import { useSyncedRef } from 'visyn_core/hooks';
 function useBSClass(clazz, ...options) {
     const [instance, setInstance] = React.useState(null);

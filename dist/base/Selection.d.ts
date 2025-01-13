@@ -1,5 +1,5 @@
 import { IDType } from 'visyn_core/idtype';
-import { IObjectRef, ICmdResult, ActionNode, ProvenanceGraph } from '../clue/provenance';
+import { ActionNode, ICmdResult, IObjectRef, ProvenanceGraph } from '../clue/provenance';
 export declare class Selection {
     static select(inputs: IObjectRef<any>[], parameter: any, graph: any, within: any): ICmdResult;
     static capitalize(s: string): string;

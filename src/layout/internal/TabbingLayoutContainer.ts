@@ -1,8 +1,8 @@
 import { AParentLayoutContainer } from './AParentLayoutContainer';
-import { ILayoutContainer, ILayoutDump, ISize, ITabbingLayoutContainer, IDropArea, LayoutContainerEvents } from '../interfaces';
+import { IDropArea, ILayoutContainer, ILayoutDump, ISize, ITabbingLayoutContainer, LayoutContainerEvents } from '../interfaces';
 import { ALayoutContainer, ILayoutContainerOption } from './ALayoutContainer';
-import { LAYOUT_CONTAINER_WRAPPER } from '../constants';
 import { DnDUtils } from '../../app';
+import { LAYOUT_CONTAINER_WRAPPER } from '../constants';
 
 export interface ITabbingLayoutContainerOptions extends ILayoutContainerOption {
   readonly active: number;

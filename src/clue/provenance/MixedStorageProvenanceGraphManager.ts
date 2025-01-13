@@ -1,8 +1,8 @@
-import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';
-import { IProvenanceGraphManager } from './provenance';
 import { IProvenanceGraphDataDescription } from './ICmd';
-import { LocalStorageProvenanceGraphManager, ILocalStorageProvenanceGraphManagerOptions } from './LocalStorageProvenanceGraphManager';
-import { RemoteStorageProvenanceGraphManager, IRemoteStorageProvenanceGraphManagerOptions } from './RemoteStorageProvenanceGraphManager';
+import { ILocalStorageProvenanceGraphManagerOptions, LocalStorageProvenanceGraphManager } from './LocalStorageProvenanceGraphManager';
+import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';
+import { IRemoteStorageProvenanceGraphManagerOptions, RemoteStorageProvenanceGraphManager } from './RemoteStorageProvenanceGraphManager';
+import { IProvenanceGraphManager } from './provenance';
 import { GraphBase } from '../graph/GraphBase';
 
 export type IMixedStorageProvenanceGraphManagerOptions = ILocalStorageProvenanceGraphManagerOptions & IRemoteStorageProvenanceGraphManagerOptions;
