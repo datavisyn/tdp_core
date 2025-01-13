@@ -1,8 +1,32 @@
-name: release
+name: Create a new release
 
-on: workflow_dispatch
-          
+on:
+  workflow_dispatch:
+    inputs:
+      release_version:
+        type: string
+        description: 'The next version to release'
+        required: true
+  pull_request:
+    types: [closed]
+    branches:
+      - 'main'
+
 jobs:
-  release:
+  create_release_pr:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     uses: datavisyn/github-workflows/.github/workflows/release-source.yml@main
-    secrets: inherit      
+    secrets: inherit
+    with:
+      release_version: ${{ inputs.release_version }}
+      is_helm_chart: false
+
+  post_merge_release:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true && startsWith(github.event.pull_request.title, 'Release') }}
+    uses: datavisyn/github-workflows/.github/workflows/release-post-merge.yml@main
+    secrets: inherit
+    with:
+      pr_title: ${{ github.event.pull_request.title }}
+      pr_number: ${{ github.event.pull_request.number }}
+      repository_owner: ${{ github.repository_owner }}
+      repository_name: ${{ github.event.repository.name }}
