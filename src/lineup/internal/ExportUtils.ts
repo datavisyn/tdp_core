@@ -1,4 +1,4 @@
-import { IDataRow, Column, isNumberColumn, isDateColumn } from 'lineupjs';
+import { Column, IDataRow, isDateColumn, isNumberColumn } from 'lineupjs';
 import { XlsxUtils } from 'visyn_core/utils';
 
 export interface IExportFormat {

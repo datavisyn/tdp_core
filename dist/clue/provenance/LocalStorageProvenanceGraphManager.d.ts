@@ -1,6 +1,6 @@
-import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';
-import { IProvenanceGraphManager, ICommonProvenanceGraphManagerOptions } from './provenance';
 import { IProvenanceGraphDataDescription } from './ICmd';
+import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';
+import { ICommonProvenanceGraphManagerOptions, IProvenanceGraphManager } from './provenance';
 import { GraphBase } from '../graph/GraphBase';
 import { LocalStorageGraph } from '../graph/LocalStorageGraph';
 export interface ILocalStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {

@@ -1,6 +1,6 @@
-import { Player } from '../base/Player';
 import { IStateAnnotation, ProvenanceGraph, SlideNode } from '../provenance';
 import { AVisInstance, IVisInstance } from './visInstance';
+import { Player } from '../base/Player';
 export declare class VerticalStoryVis extends AVisInstance implements IVisInstance {
     data: ProvenanceGraph;
     parent: Element;

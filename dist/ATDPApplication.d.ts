@@ -1,12 +1,12 @@
 import './webpack/_bootstrap';
 import { IClientConfig } from 'visyn_core/base';
+import { IAuthorizationConfiguration } from './auth';
+import { LoginMenu } from './base';
+import { CLUEGraphManager } from './clue';
+import { IMixedStorageProvenanceGraphManagerOptions, ProvenanceGraph } from './clue/provenance';
+import { ACLUEWrapper } from './clue/wrapper';
 import { AppHeader } from './components';
 import { TourManager } from './tour/TourManager';
-import { CLUEGraphManager } from './clue';
-import { IAuthorizationConfiguration } from './auth';
-import { ACLUEWrapper } from './clue/wrapper';
-import { LoginMenu } from './base';
-import { IMixedStorageProvenanceGraphManagerOptions, ProvenanceGraph } from './clue/provenance';
 export interface ITDPOptions {
     /**
      * alternative login formular

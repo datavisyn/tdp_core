@@ -12,10 +12,10 @@ import * as React from 'react';
 import { IDTypeManager } from 'visyn_core/idtype';
 import { PluginRegistry } from 'visyn_core/plugin';
 import { EXTENSION_POINT_TDP_VIEW } from '../base';
+import { AReactView } from './AReactView';
 import { AView } from './AView';
 import { ViewUtils } from './ViewUtils';
 import { LocalStorageProvenanceGraphManager, ObjectRefUtils } from '../clue/provenance';
-import { AReactView } from './AReactView';
 export class TDPView extends React.Component {
     constructor(props, context) {
         super(props, context);

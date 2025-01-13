@@ -1,7 +1,8 @@
 import * as d3v3 from 'd3v3';
-import { IPluginDesc } from 'visyn_core/plugin';
 import { EventHandler } from 'visyn_core/base';
-import { FormElementType, IFormElement, IFormElementDesc, IForm } from '../interfaces';
+import { IPluginDesc } from 'visyn_core/plugin';
+
+import { FormElementType, IForm, IFormElement, IFormElementDesc } from '../interfaces';
 
 export interface IButtonElementDesc extends IFormElementDesc {
   type: FormElementType.BUTTON;

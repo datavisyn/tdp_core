@@ -1,5 +1,5 @@
-import { GraphNode, AttributeContainer, GraphEdge } from '../graph/graph';
 import { ActionMetaData } from './ActionMeta';
+import { AttributeContainer, GraphEdge, GraphNode } from '../graph/graph';
 export class ActionUtils {
     /**
      * creates an action given the data

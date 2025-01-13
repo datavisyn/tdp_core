@@ -3,18 +3,18 @@
  */
 /// <amd-dependency path='font-awesome' />
 /// <amd-dependency path='bootstrap' />
-import { merge } from 'lodash';
 import { select } from 'd3v3';
 import * as d3v3 from 'd3v3';
-import { MixedStorageProvenanceGraphManager, ProvenanceGraph } from '../provenance';
-import { SelectionRecorder } from '../../base/Selection';
-import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
-import { VisLoader } from '../provvis/VisLoader';
-import { CLUEGraphManager } from '../base/CLUEGraphManager';
-import { ProvenanceGraphMenu } from '../provenance/ProvenanceGraphMenu';
-import { LoginMenu } from '../../base/LoginMenu';
+import { merge } from 'lodash';
 import { ACLUEWrapper } from './ACLUEWrapper';
+import { LoginMenu } from '../../base/LoginMenu';
+import { SelectionRecorder } from '../../base/Selection';
 import { AppHeader, AppHeaderLink } from '../../components';
+import { CLUEGraphManager } from '../base/CLUEGraphManager';
+import { ButtonModeSelector, CLUEMode, ModeWrapper } from '../base/mode';
+import { MixedStorageProvenanceGraphManager, ProvenanceGraph } from '../provenance';
+import { ProvenanceGraphMenu } from '../provenance/ProvenanceGraphMenu';
+import { VisLoader } from '../provvis/VisLoader';
 export class CLUEWrapper extends ACLUEWrapper {
     constructor(body, options = {}) {
         super();
@@ -36,7 +36,7 @@ export class CLUEWrapper extends ACLUEWrapper {
     buildImpl(body) {
         // create the common header
         const headerOptions = merge(this.options.headerOptions, {
-            showOptionsLink: true,
+            showOptionsLink: true, // always activate options
             appLink: this.options.appLink,
         });
         this.header = AppHeader.create(body.querySelector('div.box'), headerOptions);

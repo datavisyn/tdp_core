@@ -1,6 +1,6 @@
 import * as d3v3 from 'd3v3';
 import { IPluginDesc } from 'visyn_core/plugin';
-import { IFormElementDesc, IForm, FormElementType } from '../interfaces';
+import { FormElementType, IForm, IFormElementDesc } from '../interfaces';
 import { AFormElement } from './AFormElement';
 import { IFormSelectOption } from './FormSelect';
 export interface IRadioElementDesc extends IFormElementDesc {

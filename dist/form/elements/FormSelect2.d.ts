@@ -2,7 +2,7 @@ import 'select2';
 import * as d3v3 from 'd3v3';
 import { IPluginDesc } from 'visyn_core/plugin';
 import { AFormElement } from './AFormElement';
-import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
+import { FormElementType, IForm, IFormElementDesc } from '../interfaces';
 declare type IFormSelect2Options = Select2Options & {
     return?: 'text' | 'id';
     data?: ISelect2Option[] | ((dependents: any) => ISelect2Option[]);

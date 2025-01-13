@@ -1,55 +1,56 @@
 import {
-  SidePanel,
-  IGroupSearchItem,
-  LocalDataProvider,
-  createStackDesc,
   IColumnDesc,
-  createScriptDesc,
-  createSelectionDesc,
+  IEngineRankingContext,
+  IGroupSearchItem,
+  IRankingHeaderContextContainer,
+  IRenderContext,
+  LocalDataProvider,
+  SidePanel,
   createAggregateDesc,
   createGroupDesc,
   createImpositionDesc,
   createNestedDesc,
   createReduceDesc,
-  IEngineRankingContext,
-  IRenderContext,
-  IRankingHeaderContextContainer,
+  createScriptDesc,
+  createSelectionDesc,
+  createStackDesc,
 } from 'lineupjs';
+import { EventHandler } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
 import { IDType, IDTypeManager } from 'visyn_core/idtype';
 import { IPlugin, IPluginDesc, PluginRegistry } from 'visyn_core/plugin';
-import { EventHandler } from 'visyn_core/base';
+
 import {
-  EXTENSION_POINT_TDP_SCORE_LOADER,
-  EXTENSION_POINT_TDP_SCORE,
-  EXTENSION_POINT_TDP_RANKING_BUTTON,
   EP_TDP_CORE_LINEUP_PANEL_TAB,
+  EXTENSION_POINT_TDP_RANKING_BUTTON,
+  EXTENSION_POINT_TDP_SCORE,
+  EXTENSION_POINT_TDP_SCORE_LOADER,
 } from '../../base/extensions';
-import { IARankingViewOptions } from '../IARankingViewOptions';
-import { PanelButton } from '../panel/PanelButton';
-import { ITabContainer, PanelTabContainer, NullTabContainer } from '../panel/PanelTabContainer';
-import { PanelTab, SidePanelTab } from '../panel/PanelTab';
-import { SearchBoxProvider } from '../panel/SearchBoxProvider';
-import { EPanelHeaderToolbar, PanelHeader } from '../panel/PanelHeader';
-import { PanelRankingButton } from '../panel/PanelRankingButton';
-import { PanelAddColumnButton } from '../panel/PanelAddColumnButton';
-import { PanelDownloadButton } from '../panel/PanelDownloadButton';
 import {
-  IScoreLoader,
-  IRankingButtonExtensionDesc,
-  IScoreLoaderExtensionDesc,
-  IRankingButtonExtension,
+  IAdditionalColumnDesc,
   IPanelTabExtension,
   IPanelTabExtensionDesc,
-  IAdditionalColumnDesc,
+  IRankingButtonExtension,
+  IRankingButtonExtensionDesc,
+  IScoreLoader,
+  IScoreLoaderExtensionDesc,
   isAdditionalColumnDesc,
 } from '../../base/interfaces';
-import { ISearchOption } from '../panel/ISearchOption';
-import { LineupUtils } from '../utils';
-import { FormElementType, IForm } from '../../form/interfaces';
 import { FormDialog } from '../../form';
-import { PanelSaveNamedSetButton } from '../panel/PanelSaveNamedSetButton';
+import { FormElementType, IForm } from '../../form/interfaces';
+import { IARankingViewOptions } from '../IARankingViewOptions';
+import { ISearchOption } from '../panel/ISearchOption';
 import { LineUpOrderedRowIndicies } from '../panel/LineUpOrderedRowIndicies';
+import { PanelAddColumnButton } from '../panel/PanelAddColumnButton';
+import { PanelButton } from '../panel/PanelButton';
+import { PanelDownloadButton } from '../panel/PanelDownloadButton';
+import { EPanelHeaderToolbar, PanelHeader } from '../panel/PanelHeader';
+import { PanelRankingButton } from '../panel/PanelRankingButton';
+import { PanelSaveNamedSetButton } from '../panel/PanelSaveNamedSetButton';
+import { PanelTab, SidePanelTab } from '../panel/PanelTab';
+import { ITabContainer, NullTabContainer, PanelTabContainer } from '../panel/PanelTabContainer';
+import { SearchBoxProvider } from '../panel/SearchBoxProvider';
+import { LineupUtils } from '../utils';
 
 export function findMappablePlugins(target: IDType, all: IPluginDesc[]) {
   if (!target) {

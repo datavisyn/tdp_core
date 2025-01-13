@@ -1,9 +1,9 @@
-import { merge, identity } from 'lodash';
 import * as d3v3 from 'd3v3';
+import { identity, merge } from 'lodash';
 import { I18nextManager } from 'visyn_core/i18n';
 import { UserSession } from 'visyn_core/security';
-import { PHOVEA_IMPORTER_ValueTypeUtils } from './valuetype/valuetypes';
 import { BaseUtils } from '../base';
+import { PHOVEA_IMPORTER_ValueTypeUtils } from './valuetype/valuetypes';
 export class ImportUtils {
     static commonFields(name) {
         const prefix = `i${BaseUtils.randomId(3)}`;

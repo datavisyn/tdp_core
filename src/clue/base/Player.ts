@@ -1,5 +1,6 @@
 import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
+
 import { ProvenanceGraph, SlideNode } from '../provenance';
 
 // eslint-disable-next-line @typescript-eslint/no-namespace

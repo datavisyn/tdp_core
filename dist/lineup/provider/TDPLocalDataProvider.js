@@ -1,4 +1,4 @@
-import { isSupportType, LocalDataProvider, StringColumn, } from 'lineupjs';
+import { LocalDataProvider, StringColumn, isSupportType, } from 'lineupjs';
 import { StructureImageColumn } from '../structureImage';
 /**
  * A data provider which changes the default column width from LineUp

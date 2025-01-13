@@ -1,12 +1,13 @@
 import { PluginRegistry } from 'visyn_core/plugin';
-import { ObjectNode, IObjectRef, ObjectRefUtils } from './ObjectNode';
-import { StateNode } from './StateNode';
-import { ActionNode, IActionCompressor } from './ActionNode';
-import { SlideNode } from './SlideNode';
-import { GraphEdge } from '../graph/graph';
-import type { IGraphFactory } from '../graph/GraphBase';
-import type { ICmdFunctionFactory, ICmdResult } from './ICmd';
+
 import { ActionMetaData } from './ActionMeta';
+import { ActionNode, IActionCompressor } from './ActionNode';
+import type { ICmdFunctionFactory, ICmdResult } from './ICmd';
+import { IObjectRef, ObjectNode, ObjectRefUtils } from './ObjectNode';
+import { SlideNode } from './SlideNode';
+import { StateNode } from './StateNode';
+import type { IGraphFactory } from '../graph/GraphBase';
+import { GraphEdge } from '../graph/graph';
 
 export class ProvenanceGraphUtils {
   private static removeNoops(path: ActionNode[]) {

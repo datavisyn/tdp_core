@@ -1,4 +1,4 @@
-import { GraphEdge, AttributeContainer } from '../graph/graph';
+import { AttributeContainer, GraphEdge } from '../graph/graph';
 export class NodeUtils {
     static findLatestPath(state) {
         const path = state.path.slice();

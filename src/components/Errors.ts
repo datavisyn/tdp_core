@@ -1,5 +1,6 @@
-import { I18nextManager } from 'visyn_core/i18n';
 import { Ajax, isAjaxError } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core/i18n';
+
 import { Dialog } from './dialogs';
 
 let globalErrorTemplate = (details: string) => details;

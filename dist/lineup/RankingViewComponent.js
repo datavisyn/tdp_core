@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { isEqual } from 'lodash';
-import { I18nextManager } from 'visyn_core/i18n';
 import { useAsync } from 'visyn_core/hooks';
+import { I18nextManager } from 'visyn_core/i18n';
 // eslint-disable-next-line import/no-cycle
 import { Ranking } from './Ranking';
-import { ERenderAuthorizationStatus } from '../auth/interfaces';
 import { TDPTokenManager, TokenManager } from '../auth/TokenManager';
+import { ERenderAuthorizationStatus } from '../auth/interfaces';
 import { AView } from '../views/AView';
 import { ViewUtils } from '../views/ViewUtils';
 export function RankingViewComponent({ data = [], selection: inputSelection, itemSelection = { idtype: null, ids: [] }, columnDesc = [], parameters = null, provider, selectionAdapter = null, options = {}, authorization = null, onItemSelect, onItemSelectionChanged, onCustomizeRanking, onBuiltLineUp, onUpdateEntryPoint, 

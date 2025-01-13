@@ -1,21 +1,21 @@
 // TODO: Do we need a relative import?
 import './webpack/_bootstrap';
 import { merge } from 'lodash';
+import { loadClientConfig } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
 import { PluginRegistry } from 'visyn_core/plugin';
 import { UserSession } from 'visyn_core/security';
-import { loadClientConfig } from 'visyn_core/base';
-import { AppHeaderLink, AppHeader } from './components';
-import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
-import { DialogUtils } from './clue/base/dialogs';
-import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
-import { TourManager } from './tour/TourManager';
-import { TemporarySessionList, ButtonModeSelector, CLUEGraphManager } from './clue';
 import { TDPTokenManager } from './auth';
-import { ACLUEWrapper } from './clue/wrapper';
 import { LoginMenu } from './base';
+import { EXTENSION_POINT_TDP_APP_EXTENSION } from './base/extensions';
+import { ButtonModeSelector, CLUEGraphManager, TemporarySessionList } from './clue';
+import { DialogUtils } from './clue/base/dialogs';
 import { MixedStorageProvenanceGraphManager } from './clue/provenance';
 import { VisLoader } from './clue/provvis';
+import { EditProvenanceGraphMenu } from './clue/utils/EditProvenanceGraphMenu';
+import { ACLUEWrapper } from './clue/wrapper';
+import { AppHeader, AppHeaderLink } from './components';
+import { TourManager } from './tour/TourManager';
 /**
  * base class for TDP based applications
  */

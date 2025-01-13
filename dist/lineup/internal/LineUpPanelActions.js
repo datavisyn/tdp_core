@@ -1,23 +1,23 @@
-import { createStackDesc, createScriptDesc, createSelectionDesc, createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc, } from 'lineupjs';
+import { createAggregateDesc, createGroupDesc, createImpositionDesc, createNestedDesc, createReduceDesc, createScriptDesc, createSelectionDesc, createStackDesc, } from 'lineupjs';
+import { EventHandler } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
 import { IDTypeManager } from 'visyn_core/idtype';
 import { PluginRegistry } from 'visyn_core/plugin';
-import { EventHandler } from 'visyn_core/base';
-import { EXTENSION_POINT_TDP_SCORE_LOADER, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_RANKING_BUTTON, EP_TDP_CORE_LINEUP_PANEL_TAB, } from '../../base/extensions';
+import { EP_TDP_CORE_LINEUP_PANEL_TAB, EXTENSION_POINT_TDP_RANKING_BUTTON, EXTENSION_POINT_TDP_SCORE, EXTENSION_POINT_TDP_SCORE_LOADER, } from '../../base/extensions';
+import { isAdditionalColumnDesc, } from '../../base/interfaces';
+import { FormDialog } from '../../form';
+import { FormElementType } from '../../form/interfaces';
+import { LineUpOrderedRowIndicies } from '../panel/LineUpOrderedRowIndicies';
+import { PanelAddColumnButton } from '../panel/PanelAddColumnButton';
 import { PanelButton } from '../panel/PanelButton';
-import { PanelTabContainer, NullTabContainer } from '../panel/PanelTabContainer';
-import { PanelTab, SidePanelTab } from '../panel/PanelTab';
-import { SearchBoxProvider } from '../panel/SearchBoxProvider';
+import { PanelDownloadButton } from '../panel/PanelDownloadButton';
 import { EPanelHeaderToolbar, PanelHeader } from '../panel/PanelHeader';
 import { PanelRankingButton } from '../panel/PanelRankingButton';
-import { PanelAddColumnButton } from '../panel/PanelAddColumnButton';
-import { PanelDownloadButton } from '../panel/PanelDownloadButton';
-import { isAdditionalColumnDesc, } from '../../base/interfaces';
-import { LineupUtils } from '../utils';
-import { FormElementType } from '../../form/interfaces';
-import { FormDialog } from '../../form';
 import { PanelSaveNamedSetButton } from '../panel/PanelSaveNamedSetButton';
-import { LineUpOrderedRowIndicies } from '../panel/LineUpOrderedRowIndicies';
+import { PanelTab, SidePanelTab } from '../panel/PanelTab';
+import { NullTabContainer, PanelTabContainer } from '../panel/PanelTabContainer';
+import { SearchBoxProvider } from '../panel/SearchBoxProvider';
+import { LineupUtils } from '../utils';
 export function findMappablePlugins(target, all) {
     if (!target) {
         return [];

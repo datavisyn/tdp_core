@@ -1,4 +1,4 @@
-import type { ITDPTourExtensionDesc, IStep } from './extensions';
+import type { IStep, ITDPTourExtensionDesc } from './extensions';
 import { AppHeader } from '../components/header';
 export interface ITourContext {
     /**

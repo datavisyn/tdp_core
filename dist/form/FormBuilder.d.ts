@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { IFormElementDesc, IForm } from './interfaces';
+import { IForm, IFormElementDesc } from './interfaces';
 /**
  * Builds a form from a given collection of form elements
  */

@@ -1,7 +1,8 @@
 import { PluginRegistry } from 'visyn_core/plugin';
-import type { ITDPTourExtensionDesc, IStep } from './extensions';
-import { AppHeader } from '../components/header';
+
 import { TourUtils } from './TourUtils';
+import type { IStep, ITDPTourExtensionDesc } from './extensions';
+import { AppHeader } from '../components/header';
 
 export interface ITourContext {
   /**

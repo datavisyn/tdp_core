@@ -197,13 +197,13 @@ FormSelect2.DEFAULT_OPTIONS = {
 };
 FormSelect2.DEFAULT_AJAX_OPTIONS = {
     ajax: {
-        url: AppContext.getInstance().api2absURL('url_needed'),
+        url: AppContext.getInstance().api2absURL('url_needed'), // URL
         dataType: 'json',
         delay: 250,
         cache: true,
         data: (params) => {
             return {
-                query: params.term === undefined ? '' : params.term,
+                query: params.term === undefined ? '' : params.term, // search term from select2
                 page: params.page === undefined ? 0 : params.page,
             };
         },

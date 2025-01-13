@@ -1,4 +1,4 @@
-import { IDataRow, Column } from 'lineupjs';
+import { Column, IDataRow } from 'lineupjs';
 export interface IExportFormat {
     name: string;
     separator: string;

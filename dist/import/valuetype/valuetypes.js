@@ -122,7 +122,7 @@ export class PHOVEA_IMPORTER_ValueTypeUtils {
     }
     static string_() {
         return {
-            isType: () => 1,
+            isType: () => 1, // always a string
             parse: PHOVEA_IMPORTER_ValueTypeUtils.parseString,
             guessOptions: PHOVEA_IMPORTER_ValueTypeUtils.guessString,
             edit: PHOVEA_IMPORTER_ValueTypeUtils.editString,

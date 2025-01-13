@@ -1,4 +1,4 @@
-import { ILayoutContainer, ILayoutDump, EOrientation, IDropArea } from '../interfaces';
+import { EOrientation, IDropArea, ILayoutContainer, ILayoutDump } from '../interfaces';
 import { ALayoutContainer } from './ALayoutContainer';
 import { ASequentialLayoutContainer, ISequentialLayoutContainerOptions } from './ASequentialLayoutContainer';
 

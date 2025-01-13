@@ -1,15 +1,15 @@
 import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
-import { SelectionUtils, SelectOperation } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
+import { SelectOperation, SelectionUtils } from 'visyn_core/idtype';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { ThumbnailUtils } from '../base/ThumbnailUtils';
 import { ActionMetaData, SlideNode } from '../provenance';
 import { AVisInstance } from './visInstance';
 import { DnDUtils } from '../../app';
+import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 import { Dialog } from '../../components/dialogs';
 import { ModeWrapper } from '../base/mode';
-import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 const DOI_LARGE = 0.9;
 const DOI_MEDIUM = 0.7;
 const DOI_SMALL = 0.4;
@@ -679,7 +679,7 @@ export class LayoutedProvVis extends AVisInstance {
             edges.push.apply(edges, s.children.map((c) => ({ s, t: c })));
         });
         this.dim = [
-            d3v3.max(states, (s) => s.xy[0] + s.size[0]) + (lod >= LevelOfDetail.Medium ? 200 : 0),
+            d3v3.max(states, (s) => s.xy[0] + s.size[0]) + (lod >= LevelOfDetail.Medium ? 200 : 0), // for label
             d3v3.max(states, (s) => s.xy[1] + s.size[1]),
         ];
         this.$node.select('svg').attr('width', this.dim[0]).attr('height', this.dim[1]);

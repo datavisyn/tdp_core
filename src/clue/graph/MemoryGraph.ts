@@ -1,6 +1,6 @@
-import { IPersistable } from '../../base/IPersistable';
 import { GraphBase, GraphFactoryUtils, IGraphDump, IGraphFactory } from './GraphBase';
 import { GraphEdge, GraphNode, IGraphDataDescription } from './graph';
+import { IPersistable } from '../../base/IPersistable';
 
 export class MemoryGraph extends GraphBase implements IPersistable {
   private factory: IGraphFactory;

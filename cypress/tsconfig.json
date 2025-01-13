@@ -3,6 +3,7 @@
   "compilerOptions": {
     "outDir": "./dist",
     "sourceMap": false,
+    "declarationMap": false,
     "types": [
       "cypress"
     ]

@@ -3,19 +3,20 @@
  */
 /// <amd-dependency path='font-awesome' />
 /// <amd-dependency path='bootstrap' />
-import { merge } from 'lodash';
 import { select } from 'd3v3';
 import * as d3v3 from 'd3v3';
+import { merge } from 'lodash';
 import { IEvent } from 'visyn_core/base';
-import { MixedStorageProvenanceGraphManager, IObjectRef, ProvenanceGraph } from '../provenance';
-import { SelectionRecorder } from '../../base/Selection';
-import { CLUEMode, ButtonModeSelector, ModeWrapper } from '../base/mode';
-import { VisLoader } from '../provvis/VisLoader';
-import { CLUEGraphManager } from '../base/CLUEGraphManager';
-import { ProvenanceGraphMenu } from '../provenance/ProvenanceGraphMenu';
-import { LoginMenu } from '../../base/LoginMenu';
+
 import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';
+import { LoginMenu } from '../../base/LoginMenu';
+import { SelectionRecorder } from '../../base/Selection';
 import { AppHeader, AppHeaderLink, IAppHeaderOptions, IHeaderLink } from '../../components';
+import { CLUEGraphManager } from '../base/CLUEGraphManager';
+import { ButtonModeSelector, CLUEMode, ModeWrapper } from '../base/mode';
+import { IObjectRef, MixedStorageProvenanceGraphManager, ProvenanceGraph } from '../provenance';
+import { ProvenanceGraphMenu } from '../provenance/ProvenanceGraphMenu';
+import { VisLoader } from '../provvis/VisLoader';
 
 export interface ICLUEWrapperOptions extends IACLUEWrapperOptions {
   /**

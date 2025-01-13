@@ -1,5 +1,5 @@
-import { LineupUtils } from '../utils';
 import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
+import { LineupUtils } from '../utils';
 export class LazyColumn {
     static addLazyColumn(colDesc, data, provider, position, done) {
         const ranking = provider.getLastRanking();

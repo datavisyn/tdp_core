@@ -1,6 +1,6 @@
 import * as d3v3 from 'd3v3';
-import { ITypeDefinition, ValueTypeEditor } from './valuetype/valuetypes';
 import { IDataDescription } from '../data';
+import { ITypeDefinition, ValueTypeEditor } from './valuetype/valuetypes';
 export interface IColumnDefinition {
     name: string;
     column: string | number;

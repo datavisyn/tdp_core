@@ -1,4 +1,5 @@
 import { IColumnDesc } from 'lineupjs';
+
 import type { IAdditionalColumnDesc } from '../../base/interfaces';
 
 export interface ISearchOption extends Pick<IAdditionalColumnDesc, 'chooserGroup'> {

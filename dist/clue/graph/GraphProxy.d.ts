@@ -1,6 +1,6 @@
-import { ADataType } from '../../data/datatype';
-import { AGraph, IGraphDataDescription } from './graph';
 import { IGraphFactory } from './GraphBase';
+import { AGraph, IGraphDataDescription } from './graph';
+import { ADataType } from '../../data/datatype';
 export declare class GraphProxy extends ADataType<IGraphDataDescription> {
     private cache;
     private loaded;

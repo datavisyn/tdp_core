@@ -1,49 +1,50 @@
 import {
+  Column,
   EngineRenderer,
-  defaultOptions,
-  IRule,
+  IColumnDesc,
   IGroupData,
   IGroupItem,
-  isGroup,
-  Column,
-  IColumnDesc,
-  LocalDataProvider,
-  deriveColors,
-  TaggleRenderer,
+  IGroupSearchItem,
+  IRule,
   ITaggleOptions,
+  IValueColumnDesc,
+  LocalDataProvider,
+  TaggleRenderer,
+  UIntTypedArray,
+  defaultOptions,
+  deriveColors,
+  isGroup,
   spaceFillingRule,
   updateLodRules,
-  UIntTypedArray,
-  IGroupSearchItem,
-  IValueColumnDesc,
 } from 'lineupjs';
 import { merge } from 'lodash';
-import { LineupVisWrapper } from 'visyn_core/vis';
-import { IDTypeManager } from 'visyn_core/idtype';
+import { IRow, IServerColumn } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
+import { IDTypeManager } from 'visyn_core/idtype';
 import { ISecureItem } from 'visyn_core/security';
-import { IRow, IServerColumn, WebpackEnv } from 'visyn_core/base';
-import { AView } from '../views/AView';
-import { IViewContext, ISelection, EViewMode, IScore, IScoreRow, IAdditionalColumnDesc } from '../base/interfaces';
-import { LineupTrackingManager } from './internal/cmds';
-import { RestStorageUtils } from '../storage';
-import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
-import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
-import { ColumnDescUtils, IInitialRankingOptions, IColumnOptions } from './desc';
-import { IRankingWrapper } from './IRankingWrapper';
-import { ScoreUtils } from './internal/ScoreUtils';
-import { LineUpColors } from './internal/LineUpColors';
-import { IServerColumnDesc } from '../base/rest';
-import { IContext, ISelectionAdapter, ISelectionColumn } from './selection/ISelectionAdapter';
-import { LineUpPanelActions } from './internal/LineUpPanelActions';
-import { LazyColumn, ILazyLoadedColumn } from './internal/column';
-import { NotificationHandler } from '../base/NotificationHandler';
+import { LineupVisWrapper } from 'visyn_core/vis';
+
 import { IARankingViewOptions } from './IARankingViewOptions';
-import { LineupUtils } from './utils';
+import { IRankingWrapper } from './IRankingWrapper';
+import { ColumnDescUtils, IColumnOptions, IInitialRankingOptions } from './desc';
 import { ISearchOption } from './panel';
-import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+import { LineupUtils } from './utils';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';
 import { debounceAsync } from '../base';
+import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
+import { NotificationHandler } from '../base/NotificationHandler';
+import { EViewMode, IAdditionalColumnDesc, IScore, IScoreRow, ISelection, IViewContext } from '../base/interfaces';
+import { RestStorageUtils } from '../storage';
+import { AView } from '../views/AView';
+import { LineUpColors } from './internal/LineUpColors';
+import { LineUpPanelActions } from './internal/LineUpPanelActions';
+import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
+import { ScoreUtils } from './internal/ScoreUtils';
+import { LineupTrackingManager } from './internal/cmds';
+import { IServerColumnDesc } from '../base/rest';
+import { ILazyLoadedColumn, LazyColumn } from './internal/column';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+import { IContext, ISelectionAdapter, ISelectionColumn } from './selection/ISelectionAdapter';
 
 /**
  * base class for views based on LineUp

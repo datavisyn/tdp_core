@@ -1,10 +1,11 @@
 import { merge } from 'lodash';
-import { IDTypeManager, IDType, SelectionUtils } from 'visyn_core/idtype';
 import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
-import { IObjectRef, ICmdResult, ActionNode, ProvenanceGraph, ObjectRefUtils } from '../clue/provenance';
-import { ActionMetaData } from '../clue/provenance/ActionMeta';
-import { Compression } from '../clue/base/Compression';
+import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
+
+import { ActionNode, ICmdResult, IObjectRef, ObjectRefUtils, ProvenanceGraph } from '../clue/provenance';
 import { hashPropertyHandler } from './url/HashPropertyHandler';
+import { Compression } from '../clue/base/Compression';
+import { ActionMetaData } from '../clue/provenance/ActionMeta';
 
 const disabler = new EventHandler();
 

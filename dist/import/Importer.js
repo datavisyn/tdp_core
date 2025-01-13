@@ -1,9 +1,9 @@
 import * as d3v3 from 'd3v3';
 import { merge } from 'lodash';
 import { EventHandler } from 'visyn_core/base';
+import { ImportUtils } from './ImportUtils';
 import { ParserUtils } from './parser';
 import { ValueTypeEditor } from './valuetype/valuetypes';
-import { ImportUtils } from './ImportUtils';
 export class Importer extends EventHandler {
     constructor(parent, options = {}) {
         super();

@@ -1,9 +1,8 @@
 /// <reference types="jest" />
-import { BaseUtils } from '../src/base/BaseUtils';
-import { ArrayUtils } from '../src/base/ArrayUtils';
-import { UniqueIdManager } from '../src/app/UniqueIdManager';
-
 import * as pkg from '../package.json';
+import { UniqueIdManager } from '../src/app/UniqueIdManager';
+import { ArrayUtils } from '../src/base/ArrayUtils';
+import { BaseUtils } from '../src/base/BaseUtils';
 
 describe('argFilter', () => {
   it('evens', () => expect(ArrayUtils.argFilter([1, 3, 5, 2, 4, 6, 7, 9, 11], (d) => d % 2 === 0)).toEqual([3, 4, 5]));

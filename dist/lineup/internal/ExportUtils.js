@@ -1,4 +1,4 @@
-import { isNumberColumn, isDateColumn } from 'lineupjs';
+import { isDateColumn, isNumberColumn } from 'lineupjs';
 import { XlsxUtils } from 'visyn_core/utils';
 export class ExportUtils {
     /**

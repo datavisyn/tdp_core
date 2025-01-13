@@ -1,9 +1,10 @@
-import { I18nextManager } from 'visyn_core/i18n';
 import { EventHandler } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core/i18n';
 import { UserSession } from 'visyn_core/security';
+
+import { CommonPropertyHandler, HashPropertyHandler, QueryPropertyHandler } from '../../base/url';
 import { IProvenanceGraphDataDescription, IProvenanceGraphDump, ProvenanceGraph } from '../provenance';
 import type { MixedStorageProvenanceGraphManager } from '../provenance/MixedStorageProvenanceGraphManager';
-import { CommonPropertyHandler, HashPropertyHandler, QueryPropertyHandler } from '../../base/url';
 
 export interface IClueState {
   graph: string;

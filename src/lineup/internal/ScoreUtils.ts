@@ -1,11 +1,11 @@
 import { I18nextManager } from 'visyn_core/i18n';
 import { PluginRegistry } from 'visyn_core/plugin';
-import { WebpackEnv } from 'visyn_core/base';
-import { IScore } from '../../base/interfaces';
+
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
+import { IScore } from '../../base/interfaces';
+import { ActionMetaData, ActionNode, ActionUtils, IObjectRef, ObjectRefUtils, ProvenanceGraph } from '../../clue/provenance';
 import { AttachemntUtils } from '../../storage/internal/attachment';
 import { IViewProvider } from '../IViewProvider';
-import { IObjectRef, ActionUtils, ActionMetaData, ObjectRefUtils, ProvenanceGraph, ActionNode } from '../../clue/provenance';
 
 export class ScoreUtils {
   public static readonly CMD_ADD_SCORE = 'tdpAddScore';

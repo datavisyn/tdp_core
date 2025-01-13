@@ -1,9 +1,10 @@
 import { UserSession } from 'visyn_core/security';
+
+import { ISelection, IViewContext } from '../base/interfaces';
+import { IParams } from '../base/rest';
 import { ARankingView } from '../lineup/ARankingView';
 import { IARankingViewOptions } from '../lineup/IARankingViewOptions';
 import { ENamedSetType, INamedSet } from '../storage/interfaces';
-import { ISelection, IViewContext } from '../base/interfaces';
-import { IParams } from '../base/rest';
 
 export interface IAStartListOptions extends IARankingViewOptions {
   namedSet: INamedSet;

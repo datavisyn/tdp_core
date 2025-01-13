@@ -1,8 +1,8 @@
 import { merge } from 'lodash';
+import { AppContext, EventHandler } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
 import { PluginRegistry } from 'visyn_core/plugin';
-import { EventHandler, AppContext } from 'visyn_core/base';
-import { LoginUtils, UserSession, SessionWatcher } from 'visyn_core/security';
+import { LoginUtils, SessionWatcher, UserSession } from 'visyn_core/security';
 import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM } from './extensions';
 /**
  * utility login menu that can be added to the Appheader for instance

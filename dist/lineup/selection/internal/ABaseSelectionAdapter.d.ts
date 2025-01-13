@@ -1,5 +1,5 @@
 import { IAdditionalColumnDesc } from '../../../base/interfaces';
-import { ISelectionColumn, IContext, ISelectionAdapter } from '../ISelectionAdapter';
+import { IContext, ISelectionAdapter, ISelectionColumn } from '../ISelectionAdapter';
 export declare abstract class ABaseSelectionAdapter implements ISelectionAdapter {
     protected addDynamicColumns(context: IContext, ids: string[]): Promise<void>;
     protected removeDynamicColumns(context: IContext, ids: string[]): Promise<void>;

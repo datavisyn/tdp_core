@@ -1,7 +1,7 @@
+import { IBaseViewPluginDesc } from 'visyn_core/base';
 import { IDType } from 'visyn_core/idtype';
 import { IPluginDesc } from 'visyn_core/plugin';
-import { IBaseViewPluginDesc } from 'visyn_core/base';
-import type { IViewContext, ISelection, IViewPluginDesc, IInstanceViewExtensionDesc, IGroupData } from '../base/interfaces';
+import type { IGroupData, IInstanceViewExtensionDesc, ISelection, IViewContext, IViewPluginDesc } from '../base/interfaces';
 import type { IObjectRef, ProvenanceGraph } from '../clue/provenance';
 export interface IGroupedViews<T extends IBaseViewPluginDesc> extends IGroupData {
     views: T[];

@@ -1,6 +1,7 @@
 import { difference } from 'lodash';
+
 import { IAdditionalColumnDesc } from '../../../base/interfaces';
-import { ISelectionColumn, IContext, ISelectionAdapter } from '../ISelectionAdapter';
+import { IContext, ISelectionAdapter, ISelectionColumn } from '../ISelectionAdapter';
 
 export abstract class ABaseSelectionAdapter implements ISelectionAdapter {
   protected async addDynamicColumns(context: IContext, ids: string[]): Promise<void> {

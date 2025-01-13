@@ -1,7 +1,7 @@
-import { StateNode } from './StateNode';
-import { ObjectNode } from './ObjectNode';
-import { GraphEdge, AttributeContainer, GraphNode } from '../graph/graph';
 import { ActionNode } from './ActionNode';
+import { ObjectNode } from './ObjectNode';
+import { StateNode } from './StateNode';
+import { AttributeContainer, GraphEdge } from '../graph/graph';
 
 export class NodeUtils {
   static findLatestPath(state: StateNode) {

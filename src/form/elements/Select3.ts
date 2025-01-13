@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import { EventHandler } from 'visyn_core/base';
+
 import 'select2';
 import { BaseUtils } from '../../base';
 

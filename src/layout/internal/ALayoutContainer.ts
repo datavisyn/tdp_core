@@ -1,6 +1,7 @@
 import { EventHandler } from 'visyn_core/base';
-import { UniqueIdManager, DnDUtils } from '../../app';
-import { ILayoutDump, LayoutContainerEvents, ILayoutContainer, ILayoutParentContainer } from '../interfaces';
+
+import { DnDUtils, UniqueIdManager } from '../../app';
+import { ILayoutContainer, ILayoutDump, ILayoutParentContainer, LayoutContainerEvents } from '../interfaces';
 import { IParentLayoutContainer } from './IParentLayoutContainer';
 
 export interface ILayoutContainerOption {

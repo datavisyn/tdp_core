@@ -1,6 +1,6 @@
-import { IViewContext, ISelection } from '../base/interfaces';
-import { IFormSelectOption } from '../form/elements/FormSelect';
 import { AD3View } from './AD3View';
+import { ISelection, IViewContext } from '../base/interfaces';
+import { IFormSelectOption } from '../form/elements/FormSelect';
 export interface IProxyViewOptions {
     proxy?: string;
     site?: string;

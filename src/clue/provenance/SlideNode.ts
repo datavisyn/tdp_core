@@ -1,5 +1,5 @@
-import { GraphNode, GraphEdge } from '../graph/graph';
 import { StateNode } from './StateNode';
+import { GraphEdge, GraphNode } from '../graph/graph';
 
 export interface IStateAnnotation {
   readonly type: string;

@@ -1,4 +1,4 @@
-import { RestBaseUtils, IParams } from '../../base/rest';
+import { IParams, RestBaseUtils } from '../../base/rest';
 import { FormElementType, IFormElementDesc } from '../interfaces';
 
 export interface INameLookupOptions {

@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { SlideNode, ProvenanceGraph } from '../provenance';
+import { ProvenanceGraph, SlideNode } from '../provenance';
 export declare class Renderer {
     private $main;
     private graph;

@@ -1,22 +1,22 @@
 import { behavior, mouse as d3mouse, select, selectAll } from 'd3v3';
 import * as d3v3 from 'd3v3';
-import marked from 'marked';
 import * as $ from 'jquery';
 import { merge } from 'lodash';
-import { SelectionUtils, SelectOperation } from 'visyn_core/idtype';
+import marked from 'marked';
 import { I18nextManager } from 'visyn_core/i18n';
-import { Renderer } from '../base/annotation';
-import { ModeWrapper } from '../base/mode';
-import { ThumbnailUtils } from '../base/ThumbnailUtils';
+import { SelectOperation, SelectionUtils } from 'visyn_core/idtype';
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
-import { StoryTransition, Player } from '../base/Player';
+import { DnDUtils } from '../../app';
 import textPNG from '../../assets/text.png';
 import { Dialog } from '../../components';
 import { SlideNode } from '../provenance';
 import { AVisInstance } from './visInstance';
 import { ArrayUtils, BaseUtils } from '../../base';
-import { DnDUtils } from '../../app';
 import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
+import { Player, StoryTransition } from '../base/Player';
+import { ThumbnailUtils } from '../base/ThumbnailUtils';
+import { Renderer } from '../base/annotation';
+import { ModeWrapper } from '../base/mode';
 export class VerticalStoryVis extends AVisInstance {
     constructor(data, parent, options = {}) {
         super();

@@ -1,59 +1,61 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
-import {
-  IGroupSearchItem,
-  LocalDataProvider,
-  EngineRenderer,
-  TaggleRenderer,
-  Column,
-  ITaggleOptions,
-  defaultOptions,
-  IGroupItem,
-  IGroupData,
-  isGroup,
-  IRule,
-  spaceFillingRule,
-  updateLodRules,
-  IColumnDesc,
-  UIntTypedArray,
-  toolbar,
-  IRankingHeaderContext,
-  dialogContext,
-  Ranking as LineUpRanking,
-  IDynamicHeight,
-} from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
+
+import {
+  Column,
+  EngineRenderer,
+  IColumnDesc,
+  IDynamicHeight,
+  IGroupData,
+  IGroupItem,
+  IGroupSearchItem,
+  IRankingHeaderContext,
+  IRule,
+  ITaggleOptions,
+  Ranking as LineUpRanking,
+  LocalDataProvider,
+  TaggleRenderer,
+  UIntTypedArray,
+  defaultOptions,
+  dialogContext,
+  isGroup,
+  spaceFillingRule,
+  toolbar,
+  updateLodRules,
+} from 'lineupjs';
 import { merge } from 'lodash';
-import { LineupVisWrapper } from 'visyn_core/vis';
-import { IDTypeManager, IDType, SelectionUtils } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
 import { useAsync } from 'visyn_core/hooks';
-import { ISecureItem } from 'visyn_core/security';
+import { I18nextManager } from 'visyn_core/i18n';
+import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
 import { PluginRegistry } from 'visyn_core/plugin';
-import { WebpackEnv } from 'visyn_core/base';
-import { ILazyLoadedColumn, LazyColumn } from './internal/column';
+import { ISecureItem } from 'visyn_core/security';
+import { LineupVisWrapper } from 'visyn_core/vis';
+
+import { IARankingViewOptions } from './IARankingViewOptions';
+import { IRankingWrapper } from './IRankingWrapper';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
-import { AttachemntUtils } from '../storage/internal/internal';
-import { EViewMode, IAdditionalColumnDesc, IScore, IScoreRow, ISelection } from '../base/interfaces';
-import { IContext, ISelectionColumn } from './selection/ISelectionAdapter';
-import { IRankingWrapper } from './IRankingWrapper';
+import { ILazyLoadedColumn, LazyColumn } from './internal/column';
 import { ISearchOption } from './panel/ISearchOption';
-import { IARankingViewOptions } from './IARankingViewOptions';
-import { ColumnDescUtils, LineupUtils } from '.';
-import { BaseUtils } from '../base/BaseUtils';
-import { AView } from '../views/AView';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import { InvalidTokenError, TDPTokenManager } from '../auth/TokenManager';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
-import { RestStorageUtils } from '../storage/rest';
+import { EViewMode, IAdditionalColumnDesc, IScore, IScoreRow, ISelection } from '../base/interfaces';
+import { IContext, ISelectionColumn } from './selection/ISelectionAdapter';
+import { BaseUtils } from '../base/BaseUtils';
+import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { NotificationHandler } from '../base/NotificationHandler';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
+import { AttachemntUtils } from '../storage/internal/internal';
+import { RestStorageUtils } from '../storage/rest';
+import { AView } from '../views/AView';
 import { ViewUtils } from '../views/ViewUtils';
-import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
-import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
-import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+
+import { ColumnDescUtils, LineupUtils } from '.';
 
 export interface IScoreResult {
   instance: ILazyLoadedColumn;

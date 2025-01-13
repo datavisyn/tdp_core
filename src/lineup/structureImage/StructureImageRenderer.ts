@@ -1,16 +1,17 @@
+import { abortAble } from 'lineupengine';
 import {
-  ICellRendererFactory,
   ERenderMode,
   ICellRenderer,
+  ICellRendererFactory,
   IDataRow,
-  IRenderContext,
   IGroupCellRenderer,
   IOrderedGroup,
-  renderMissingDOM,
+  IRenderContext,
   ISummaryRenderer,
+  renderMissingDOM,
 } from 'lineupjs';
-import { abortAble } from 'lineupengine';
 import { I18nextManager } from 'visyn_core/i18n';
+
 import { StructureImageColumn } from './StructureImageColumn';
 
 const template = '<div style="background-size: contain; background-position: center; background-repeat: no-repeat;"></div>';

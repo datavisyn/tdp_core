@@ -1,4 +1,4 @@
-import { GraphNode, GraphEdge } from '../graph/graph';
+import { GraphEdge, GraphNode } from '../graph/graph';
 export class SlideNode extends GraphNode {
     constructor() {
         super('story');

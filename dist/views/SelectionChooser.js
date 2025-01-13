@@ -1,7 +1,7 @@
-import { IDTypeManager } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
-import { FormElementType } from '../form/interfaces';
+import { IDTypeManager } from 'visyn_core/idtype';
 import { BaseUtils } from '../base';
+import { FormElementType } from '../form/interfaces';
 /**
  * helper class for chooser logic
  */
@@ -100,11 +100,11 @@ export class SelectionChooser {
             return {
                 name,
                 children: group.map((d, j) => ({
-                    name: groupNames[j],
+                    name: groupNames[j], // either the original ID of the target or the readableTargetID is shown as an option if the readableTargetIDType is available
                     value: String(d),
                     data: {
                         id: d,
-                        name: originalTargetNames[j],
+                        name: originalTargetNames[j], // this is the original ID from the target's idType to be used internally in the detail view
                         label: groupNames[j],
                     },
                 })),

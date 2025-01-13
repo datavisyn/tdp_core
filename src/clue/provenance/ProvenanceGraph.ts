@@ -1,19 +1,20 @@
 import { merge } from 'lodash';
-import { IDType, SelectOperation, SelectionUtils, IDTypeManager } from 'visyn_core/idtype';
-import { BaseUtils } from '../../base/BaseUtils';
-import { ADataType } from '../../data/datatype';
-import { ObjectNode, IObjectRef, ObjectRefUtils } from './ObjectNode';
-import { StateNode } from './StateNode';
-import { ActionNode } from './ActionNode';
-import { IAction, IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph } from './ICmd';
-import { SlideNode } from './SlideNode';
-import { GraphEdge, GraphNode } from '../graph/graph';
-import { GraphBase, IGraphDump } from '../graph/GraphBase';
-import { ProvenanceGraphDim } from './provenance';
-import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
-import { MemoryGraph } from '../graph/MemoryGraph';
+import { IDType, IDTypeManager, SelectOperation, SelectionUtils } from 'visyn_core/idtype';
+
 import { ActionMetaData } from './ActionMeta';
+import { ActionNode } from './ActionNode';
+import { IAction, ICmdFunction, ICmdResult, IInverseActionCreator, IProvenanceGraph, IProvenanceGraphDataDescription } from './ICmd';
+import { IObjectRef, ObjectNode, ObjectRefUtils } from './ObjectNode';
+import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
+import { SlideNode } from './SlideNode';
+import { StateNode } from './StateNode';
+import { ProvenanceGraphDim } from './provenance';
+import { BaseUtils } from '../../base/BaseUtils';
 import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
+import { ADataType } from '../../data/datatype';
+import { GraphBase, IGraphDump } from '../graph/GraphBase';
+import { MemoryGraph } from '../graph/MemoryGraph';
+import { GraphEdge, GraphNode } from '../graph/graph';
 
 export interface IProvenanceGraphDump extends IGraphDump {
   /**

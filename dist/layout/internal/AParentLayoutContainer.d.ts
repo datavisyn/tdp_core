@@ -1,6 +1,6 @@
-import { ILayoutContainer, ILayoutDump, ILayoutParentContainer, IRootLayoutContainer, ISize, IDropArea } from '../interfaces';
-import { IParentLayoutContainer } from './IParentLayoutContainer';
+import { IDropArea, ILayoutContainer, ILayoutDump, ILayoutParentContainer, IRootLayoutContainer, ISize } from '../interfaces';
 import { ALayoutContainer, ILayoutContainerOption } from './ALayoutContainer';
+import { IParentLayoutContainer } from './IParentLayoutContainer';
 export declare abstract class AParentLayoutContainer<T extends ILayoutContainerOption> extends ALayoutContainer<T> implements IParentLayoutContainer {
     readonly node: HTMLElement;
     abstract readonly minChildCount: number;

@@ -1,6 +1,6 @@
 import { AView } from './AView';
-import { IViewContext, ISelection } from '../base/interfaces';
-import { SelectionChooser, ISelectionChooserOptions } from './SelectionChooser';
+import { ISelectionChooserOptions, SelectionChooser } from './SelectionChooser';
+import { ISelection, IViewContext } from '../base/interfaces';
 export interface IProxyViewChooserOptions extends Partial<ISelectionChooserOptions> {
     /**
      * site name

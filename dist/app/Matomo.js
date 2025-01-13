@@ -1,6 +1,6 @@
 import md5 from 'md5';
-import { PluginRegistry } from 'visyn_core/plugin';
 import { AppContext } from 'visyn_core/base';
+import { PluginRegistry } from 'visyn_core/plugin';
 // assume `_pag` is already declared
 window._paq = window._paq || [];
 export class Matomo {

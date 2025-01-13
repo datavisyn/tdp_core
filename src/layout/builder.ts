@@ -1,11 +1,11 @@
-import { ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView, IBuilder, IBuildAbleOrViewLike, EOrientation } from './interfaces';
-import { ViewLayoutContainer, HTMLView, IViewLayoutContainerOptions, NodeView } from './internal/ViewLayoutContainer';
-import { SplitLayoutContainer } from './internal/SplitLayoutContainer';
-import { LineUpLayoutContainer, ILineUpLayoutContainer } from './internal/LineUpLayoutContainer';
-import { TabbingLayoutContainer, ITabbingLayoutContainerOptions } from './internal/TabbingLayoutContainer';
-import { RootLayoutContainer } from './internal/RootLayoutContainer';
+import { EOrientation, IBuildAbleOrViewLike, IBuilder, ILayoutContainer, ILayoutDump, IRootLayoutContainer, PHOVEA_UI_IView } from './interfaces';
 import { ILayoutContainerOption } from './internal/ALayoutContainer';
 import { ISequentialLayoutContainerOptions } from './internal/ASequentialLayoutContainer';
+import { ILineUpLayoutContainer, LineUpLayoutContainer } from './internal/LineUpLayoutContainer';
+import { RootLayoutContainer } from './internal/RootLayoutContainer';
+import { SplitLayoutContainer } from './internal/SplitLayoutContainer';
+import { ITabbingLayoutContainerOptions, TabbingLayoutContainer } from './internal/TabbingLayoutContainer';
+import { HTMLView, IViewLayoutContainerOptions, NodeView, ViewLayoutContainer } from './internal/ViewLayoutContainer';
 import { ILayoutElem, IPadding } from './layout';
 
 export abstract class ABuilder implements IBuilder {

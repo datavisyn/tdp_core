@@ -1,6 +1,6 @@
-import { ITaggleOptions, ILocalDataProviderOptions, IDataProviderOptions, IGroupItem, IGroupData, IGroupSearchItem, Column } from 'lineupjs';
+import { Column, IDataProviderOptions, IGroupData, IGroupItem, IGroupSearchItem, ILocalDataProviderOptions, ITaggleOptions } from 'lineupjs';
 import { IDTypeLike } from 'visyn_core/idtype';
-import { ISearchOption, IPanelAddColumnButtonOptions } from './panel';
+import { IPanelAddColumnButtonOptions, ISearchOption } from './panel';
 export interface IARankingViewOptions {
     /**
      * name of a single item in LineUp

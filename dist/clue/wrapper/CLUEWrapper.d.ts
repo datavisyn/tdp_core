@@ -1,10 +1,10 @@
 /// <amd-dependency path="font-awesome" />
 /// <amd-dependency path="bootstrap" />
 import * as d3v3 from 'd3v3';
-import { IObjectRef, ProvenanceGraph } from '../provenance';
-import { CLUEGraphManager } from '../base/CLUEGraphManager';
 import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';
 import { AppHeader, IAppHeaderOptions, IHeaderLink } from '../../components';
+import { CLUEGraphManager } from '../base/CLUEGraphManager';
+import { IObjectRef, ProvenanceGraph } from '../provenance';
 export interface ICLUEWrapperOptions extends IACLUEWrapperOptions {
     /**
      * the name of the application
