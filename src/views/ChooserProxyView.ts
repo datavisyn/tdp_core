@@ -1,8 +1,9 @@
 import { I18nextManager } from 'visyn_core/i18n';
+
 import { AView } from './AView';
-import { IViewContext, ISelection } from '../base/interfaces';
+import { ISelectionChooserOptions, SelectionChooser } from './SelectionChooser';
+import { ISelection, IViewContext } from '../base/interfaces';
 import { RestBaseUtils } from '../base/rest';
-import { SelectionChooser, ISelectionChooserOptions } from './SelectionChooser';
 
 export interface IProxyViewChooserOptions extends Partial<ISelectionChooserOptions> {
   /**

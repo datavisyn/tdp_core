@@ -1,6 +1,6 @@
-import { GraphNode } from '../graph/graph';
 import { ActionNode } from './ActionNode';
 import { ObjectNode } from './ObjectNode';
+import { GraphNode } from '../graph/graph';
 /**
  * a state node is one state in the visual exploration consisting of an action creating it and one or more following ones.
  * In addition, a state is characterized by the set of active object nodes

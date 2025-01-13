@@ -1,4 +1,4 @@
-import { Column, IDataRow, BooleanColumn, IBooleanColumnDesc } from 'lineupjs';
+import { BooleanColumn, Column, IBooleanColumnDesc, IDataRow } from 'lineupjs';
 import { I18nextManager } from 'visyn_core/i18n';
 
 /**

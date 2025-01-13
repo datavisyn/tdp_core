@@ -1,5 +1,5 @@
 import { AParentLayoutContainer } from './AParentLayoutContainer';
-import { ILayoutContainer, ILayoutDump, ISize, ITabbingLayoutContainer, IDropArea } from '../interfaces';
+import { IDropArea, ILayoutContainer, ILayoutDump, ISize, ITabbingLayoutContainer } from '../interfaces';
 import { ILayoutContainerOption } from './ALayoutContainer';
 export interface ITabbingLayoutContainerOptions extends ILayoutContainerOption {
     readonly active: number;
@@ -12,7 +12,7 @@ export declare class TabbingLayoutContainer extends AParentLayoutContainer<ITabb
     private readonly mouseLeave;
     private _active;
     constructor(document: Document, options: Partial<ITabbingLayoutContainerOptions>, ...children: ILayoutContainer[]);
-    canDrop(area: IDropArea): boolean;
+    canDrop(area: IDropArea): area is "center";
     place(child: ILayoutContainer, reference: ILayoutContainer, area: IDropArea): boolean;
     protected defaultOptions(): ITabbingLayoutContainerOptions;
     get active(): ILayoutContainer;

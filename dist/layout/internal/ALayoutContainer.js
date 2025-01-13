@@ -1,5 +1,5 @@
 import { EventHandler } from 'visyn_core/base';
-import { UniqueIdManager, DnDUtils } from '../../app';
+import { DnDUtils, UniqueIdManager } from '../../app';
 import { LayoutContainerEvents } from '../interfaces';
 export class ALayoutContainer extends EventHandler {
     constructor(document, options) {

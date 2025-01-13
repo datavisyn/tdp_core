@@ -1,0 +1,12 @@
+{
+	"extends": "visyn_scripts/config/tsconfig.lenient.template.json",
+	"compilerOptions": {
+		"jsx": "react",
+		"outDir": "./dist",
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"tsd.d.ts"
+	]
+}

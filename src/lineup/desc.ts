@@ -1,6 +1,7 @@
-import { LocalDataProvider, createSelectionDesc, createAggregateDesc, DEFAULT_COLOR, IColumnDesc, ICategory, ICategoryNode, createRankDesc } from 'lineupjs';
-import { IServerColumn } from 'visyn_core/base';
 import { extent } from 'd3v3';
+import { DEFAULT_COLOR, ICategory, ICategoryNode, IColumnDesc, LocalDataProvider, createAggregateDesc, createRankDesc, createSelectionDesc } from 'lineupjs';
+import { IServerColumn } from 'visyn_core/base';
+
 import { IAdditionalColumnDesc } from '../base/interfaces';
 
 export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'chooserGroup'> {

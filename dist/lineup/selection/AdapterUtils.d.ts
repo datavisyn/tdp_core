@@ -1,6 +1,6 @@
 import { ISelectionAdapter } from './ISelectionAdapter';
-import { ISingleSelectionAdapter } from './internal/SingleSelectionAdapter';
 import { IMultiSelectionAdapter } from './internal/MultiSelectionAdapter';
+import { ISingleSelectionAdapter } from './internal/SingleSelectionAdapter';
 export declare class AdapterUtils {
     /**
      * Create a single selection adapter, i.e. that one selected item results in one additional column in LineUp

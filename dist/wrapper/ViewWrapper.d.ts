@@ -1,9 +1,9 @@
+import { EventHandler, IBaseViewPluginDesc, IEvent } from 'visyn_core/base';
 import { IDType } from 'visyn_core/idtype';
-import { EventHandler, IEvent, IBaseViewPluginDesc } from 'visyn_core/base';
-import { IViewProvider } from '../lineup/IViewProvider';
 import { ISelection, IView, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
-import { AView } from '../views/AView';
 import { ObjectNode, ProvenanceGraph } from '../clue/provenance';
+import { IViewProvider } from '../lineup/IViewProvider';
+import { AView } from '../views/AView';
 export declare class ViewWrapper extends EventHandler implements IViewProvider {
     readonly plugin: IViewPluginDesc;
     private readonly graph;

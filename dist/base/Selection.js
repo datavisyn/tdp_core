@@ -1,10 +1,10 @@
 import { merge } from 'lodash';
-import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
 import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
+import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
 import { ObjectRefUtils } from '../clue/provenance';
-import { ActionMetaData } from '../clue/provenance/ActionMeta';
-import { Compression } from '../clue/base/Compression';
 import { hashPropertyHandler } from './url/HashPropertyHandler';
+import { Compression } from '../clue/base/Compression';
+import { ActionMetaData } from '../clue/provenance/ActionMeta';
 const disabler = new EventHandler();
 export class Selection {
     static select(inputs, parameter, graph, within) {

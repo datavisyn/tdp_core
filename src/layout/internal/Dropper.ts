@@ -1,9 +1,9 @@
 import { ALayoutContainer, ILayoutContainerOption } from './ALayoutContainer';
-import { TabbingLayoutContainer } from './TabbingLayoutContainer';
 import { SplitLayoutContainer } from './SplitLayoutContainer';
 import { EOrientation, IDropArea, ILayoutContainer } from '../interfaces';
 import { AParentLayoutContainer } from './AParentLayoutContainer';
 import { LineUpLayoutContainer } from './LineUpLayoutContainer';
+import { TabbingLayoutContainer } from './TabbingLayoutContainer';
 import { DnDUtils } from '../../app';
 
 export class Dropper {

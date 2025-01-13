@@ -1,5 +1,5 @@
 import { AParentLayoutContainer } from './AParentLayoutContainer';
-import { ILayoutContainer, ISize, EOrientation, IDropArea } from '../interfaces';
+import { EOrientation, IDropArea, ILayoutContainer, ISize } from '../interfaces';
 import { ILayoutContainerOption } from './ALayoutContainer';
 export interface ISequentialLayoutContainerOptions extends ILayoutContainerOption {
     readonly orientation: EOrientation;

@@ -1,21 +1,22 @@
-import { IDType, IDTypeManager } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
-import { PluginRegistry } from 'visyn_core/plugin';
 import { EventHandler, IEvent, WebpackEnv } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core/i18n';
+import { IDType, IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry } from 'visyn_core/plugin';
+
 import { BaseUtils } from '../base';
 import { AView } from './AView';
-import { ISelection, IView, IViewContext, IViewPluginDesc, EViewMode } from '../base/interfaces';
 import { ViewUtils } from './ViewUtils';
+import { EViewMode, ISelection, IView, IViewContext, IViewPluginDesc } from '../base/interfaces';
 import {
   BuilderUtils,
   IRootLayoutContainer,
   ISplitLayoutContainer,
   ITabbingLayoutContainer,
   IViewLayoutContainer,
-  LayoutContainerEvents,
   LAYOUT_CONTAINER_WRAPPER,
-  ViewBuilder,
+  LayoutContainerEvents,
   PHOVEA_UI_IView,
+  ViewBuilder,
 } from '../layout';
 
 interface IElementDesc {

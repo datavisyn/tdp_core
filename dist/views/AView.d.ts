@@ -1,8 +1,8 @@
-import { IDType } from 'visyn_core/idtype';
 import { EventHandler } from 'visyn_core/base';
-import { IFormElementDesc } from '../form/interfaces';
-import { ISelection, IView, IViewContext, EViewMode } from '../base/interfaces';
+import { IDType } from 'visyn_core/idtype';
 import { IAuthorizationConfiguration } from '../auth';
+import { EViewMode, ISelection, IView, IViewContext } from '../base/interfaces';
+import { IFormElementDesc } from '../form/interfaces';
 /**
  * base class for all views
  */

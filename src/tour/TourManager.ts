@@ -1,11 +1,12 @@
 import Popper, { PopperOptions, ReferenceObject } from 'popper.js';
-import { I18nextManager } from 'visyn_core/i18n';
 import { GlobalEventHandler } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core/i18n';
+
 import { ITourContext, Tour } from './Tour';
-import type { IStep } from './extensions';
-import { AppHeader } from '../components/header';
 import { TourUtils } from './TourUtils';
+import type { IStep } from './extensions';
 import { BaseUtils } from '../base/BaseUtils';
+import { AppHeader } from '../components/header';
 
 const LOCALSTORAGE_FINISHED_TOURS = 'tdpFinishedTours';
 const SESSION_STORAGE_MEMORIZED_TOUR = 'tdpMemorizeTour';

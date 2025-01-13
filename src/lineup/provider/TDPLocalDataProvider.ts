@@ -3,11 +3,12 @@ import {
   IColumnDesc,
   IDataProviderOptions,
   ILocalDataProviderOptions,
-  isSupportType,
   ITypeFactory,
   LocalDataProvider,
   StringColumn,
+  isSupportType,
 } from 'lineupjs';
+
 import { StructureImageColumn } from '../structureImage';
 
 /**

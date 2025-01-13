@@ -1,10 +1,10 @@
 import { PluginRegistry } from 'visyn_core/plugin';
-import { ObjectNode, ObjectRefUtils } from './ObjectNode';
-import { StateNode } from './StateNode';
-import { ActionNode } from './ActionNode';
-import { SlideNode } from './SlideNode';
-import { GraphEdge } from '../graph/graph';
 import { ActionMetaData } from './ActionMeta';
+import { ActionNode } from './ActionNode';
+import { ObjectNode, ObjectRefUtils } from './ObjectNode';
+import { SlideNode } from './SlideNode';
+import { StateNode } from './StateNode';
+import { GraphEdge } from '../graph/graph';
 export class ProvenanceGraphUtils {
     static removeNoops(path) {
         return path.filter((a) => a.f_id !== 'noop');

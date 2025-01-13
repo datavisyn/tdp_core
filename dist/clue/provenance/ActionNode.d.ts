@@ -1,7 +1,7 @@
-import { GraphNode } from '../graph/graph';
-import { ObjectNode, IObjectRef } from './ObjectNode';
-import { ICmdFunction, IInverseActionCreator, ICmdFunctionFactory, IAction } from './ICmd';
 import { ActionMetaData } from './ActionMeta';
+import { IAction, ICmdFunction, ICmdFunctionFactory, IInverseActionCreator } from './ICmd';
+import { IObjectRef, ObjectNode } from './ObjectNode';
+import { GraphNode } from '../graph/graph';
 export declare class ActionUtils {
     /**
      * creates an action given the data

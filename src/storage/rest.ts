@@ -1,8 +1,9 @@
 import { Ajax, AppContext } from 'visyn_core/base';
 import { IDType, IDTypeManager } from 'visyn_core/idtype';
 import { ISecureItem, Permission, UserSession } from 'visyn_core/security';
-import { RestBaseUtils } from '../base/rest';
+
 import { ENamedSetType, IStoredNamedSet } from './interfaces';
+import { RestBaseUtils } from '../base/rest';
 
 export class RestStorageUtils {
   public static readonly REST_NAMESPACE = `${RestBaseUtils.REST_NAMESPACE}/storage`;

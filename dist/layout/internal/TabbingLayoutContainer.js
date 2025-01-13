@@ -1,8 +1,8 @@
 import { AParentLayoutContainer } from './AParentLayoutContainer';
 import { LayoutContainerEvents } from '../interfaces';
 import { ALayoutContainer } from './ALayoutContainer';
-import { LAYOUT_CONTAINER_WRAPPER } from '../constants';
 import { DnDUtils } from '../../app';
+import { LAYOUT_CONTAINER_WRAPPER } from '../constants';
 export class TabbingLayoutContainer extends AParentLayoutContainer {
     constructor(document, options, ...children) {
         super(document, options);

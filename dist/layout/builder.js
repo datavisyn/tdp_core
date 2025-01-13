@@ -1,9 +1,9 @@
 import { EOrientation } from './interfaces';
-import { ViewLayoutContainer, HTMLView, NodeView } from './internal/ViewLayoutContainer';
-import { SplitLayoutContainer } from './internal/SplitLayoutContainer';
 import { LineUpLayoutContainer } from './internal/LineUpLayoutContainer';
-import { TabbingLayoutContainer } from './internal/TabbingLayoutContainer';
 import { RootLayoutContainer } from './internal/RootLayoutContainer';
+import { SplitLayoutContainer } from './internal/SplitLayoutContainer';
+import { TabbingLayoutContainer } from './internal/TabbingLayoutContainer';
+import { HTMLView, NodeView, ViewLayoutContainer } from './internal/ViewLayoutContainer';
 export class ABuilder {
     constructor() {
         this._name = 'View';

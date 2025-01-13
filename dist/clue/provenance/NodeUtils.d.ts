@@ -1,6 +1,6 @@
-import { StateNode } from './StateNode';
-import { ObjectNode } from './ObjectNode';
 import { ActionNode } from './ActionNode';
+import { ObjectNode } from './ObjectNode';
+import { StateNode } from './StateNode';
 export declare class NodeUtils {
     static findLatestPath(state: StateNode): StateNode[];
     static createdBy<T>(node: ObjectNode<T>): ActionNode;

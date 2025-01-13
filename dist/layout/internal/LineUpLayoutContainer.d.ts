@@ -1,4 +1,4 @@
-import { ILayoutContainer, ILayoutDump, EOrientation, IDropArea } from '../interfaces';
+import { EOrientation, IDropArea, ILayoutContainer, ILayoutDump } from '../interfaces';
 import { ASequentialLayoutContainer, ISequentialLayoutContainerOptions } from './ASequentialLayoutContainer';
 export interface ILineUpLayoutContainer extends ISequentialLayoutContainerOptions {
     stackLayout: boolean;

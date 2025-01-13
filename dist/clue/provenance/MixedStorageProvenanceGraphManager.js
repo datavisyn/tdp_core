@@ -1,5 +1,5 @@
-import { ProvenanceGraph } from './ProvenanceGraph';
 import { LocalStorageProvenanceGraphManager } from './LocalStorageProvenanceGraphManager';
+import { ProvenanceGraph } from './ProvenanceGraph';
 import { RemoteStorageProvenanceGraphManager } from './RemoteStorageProvenanceGraphManager';
 export class MixedStorageProvenanceGraphManager {
     constructor(options = {}) {

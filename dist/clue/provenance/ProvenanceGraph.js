@@ -1,17 +1,17 @@
 import { merge } from 'lodash';
-import { SelectOperation, SelectionUtils, IDTypeManager } from 'visyn_core/idtype';
-import { BaseUtils } from '../../base/BaseUtils';
-import { ADataType } from '../../data/datatype';
-import { ObjectNode, ObjectRefUtils } from './ObjectNode';
-import { StateNode } from './StateNode';
-import { ActionNode } from './ActionNode';
-import { SlideNode } from './SlideNode';
-import { GraphEdge } from '../graph/graph';
-import { ProvenanceGraphDim } from './provenance';
-import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
-import { MemoryGraph } from '../graph/MemoryGraph';
+import { IDTypeManager, SelectOperation, SelectionUtils } from 'visyn_core/idtype';
 import { ActionMetaData } from './ActionMeta';
+import { ActionNode } from './ActionNode';
+import { ObjectNode, ObjectRefUtils } from './ObjectNode';
+import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';
+import { SlideNode } from './SlideNode';
+import { StateNode } from './StateNode';
+import { ProvenanceGraphDim } from './provenance';
+import { BaseUtils } from '../../base/BaseUtils';
 import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
+import { ADataType } from '../../data/datatype';
+import { MemoryGraph } from '../graph/MemoryGraph';
+import { GraphEdge } from '../graph/graph';
 export class ProvenanceGraph extends ADataType {
     constructor(desc, backend) {
         super(desc);

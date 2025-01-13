@@ -1,8 +1,8 @@
 import { merge } from 'lodash';
-import { I18nextManager } from 'visyn_core/i18n';
 import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
-import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
+import { I18nextManager } from 'visyn_core/i18n';
 import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
+import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';
 /**
  * normalizes the given coordinates to sum up to one
  * @param arr

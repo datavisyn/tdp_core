@@ -1,6 +1,7 @@
 import { EventHandler } from 'visyn_core/base';
-import { IVisInstance } from './visInstance';
+
 import { IVisMetaData } from './IVisMetaData';
+import { IVisInstance } from './visInstance';
 
 /**
  * utility logic for zooming a vis instance

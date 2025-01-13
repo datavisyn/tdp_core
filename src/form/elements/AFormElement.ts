@@ -1,9 +1,10 @@
 import { Selection } from 'd3v3';
-import { PluginRegistry, IPluginDesc } from 'visyn_core/plugin';
-import { UserSession } from 'visyn_core/security';
 import { EventHandler } from 'visyn_core/base';
+import { IPluginDesc, PluginRegistry } from 'visyn_core/plugin';
+import { UserSession } from 'visyn_core/security';
+
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
-import { IFormElementDesc, IForm, IFormElement, FormElementType } from '../interfaces';
+import { FormElementType, IForm, IFormElement, IFormElementDesc } from '../interfaces';
 
 /**
  * Abstract form element class that is used as parent class for other form elements

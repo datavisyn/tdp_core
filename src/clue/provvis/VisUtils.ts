@@ -1,7 +1,8 @@
-import { PluginRegistry, IPluginDesc } from 'visyn_core/plugin';
-import { IDataType } from '../../data/datatype';
+import { IPluginDesc, PluginRegistry } from 'visyn_core/plugin';
+
 import { IVisPluginDesc } from './IVisPluginDesc';
 import { IVisInstance } from './visInstance';
+import { IDataType } from '../../data/datatype';
 
 export class VisUtils {
   static extrapolateFilter(r: { filter?: string | ((data: IDataType) => boolean) }) {

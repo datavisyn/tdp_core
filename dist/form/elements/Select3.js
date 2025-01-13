@@ -127,7 +127,7 @@ export class Select3 extends EventHandler {
             minimumInputLength: this.options.minimumInputLength,
             multiple: this.options.multiple,
             placeholder: this.options.placeholder,
-            tags: Boolean(this.options.validate),
+            tags: Boolean(this.options.validate), // only if a validate method is there
             ajax: Object.assign(this.select2Options.ajax, {
                 // also override ajax options
                 delay: this.options.queryDelay,

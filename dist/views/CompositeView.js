@@ -1,12 +1,12 @@
-import { IDTypeManager } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
-import { PluginRegistry } from 'visyn_core/plugin';
 import { EventHandler, WebpackEnv } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core/i18n';
+import { IDTypeManager } from 'visyn_core/idtype';
+import { PluginRegistry } from 'visyn_core/plugin';
 import { BaseUtils } from '../base';
 import { AView } from './AView';
-import { EViewMode } from '../base/interfaces';
 import { ViewUtils } from './ViewUtils';
-import { BuilderUtils, LayoutContainerEvents, LAYOUT_CONTAINER_WRAPPER, } from '../layout';
+import { EViewMode } from '../base/interfaces';
+import { BuilderUtils, LAYOUT_CONTAINER_WRAPPER, LayoutContainerEvents, } from '../layout';
 export function isCompositeViewPluginDesc(desc) {
     return Array.isArray(desc.elements);
 }
@@ -375,7 +375,7 @@ export class CompositeView extends EventHandler {
             return Promise.resolve(d.loader()).then((instance) => ({
                 key: d.key,
                 desc: d,
-                options: { ...descOptions, ...this.options },
+                options: { ...descOptions, ...this.options }, // also pass the view options from the ViewWrapper to all views
                 create: PluginRegistry.getInstance().getFactoryMethod(instance, d.factory || 'create'),
             }));
         };

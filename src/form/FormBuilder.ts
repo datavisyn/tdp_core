@@ -1,8 +1,9 @@
 import * as d3v3 from 'd3v3';
+
 import { BaseUtils } from '../base';
-import { IFormElement, IFormElementDesc, IForm } from './interfaces';
 import { AFormElement } from './elements/AFormElement';
 import { Form } from './elements/Form';
+import { IForm, IFormElement, IFormElementDesc } from './interfaces';
 
 /**
  * Builds a form from a given collection of form elements

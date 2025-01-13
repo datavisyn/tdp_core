@@ -1,32 +1,32 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable import/no-cycle */
 /* eslint-disable @typescript-eslint/no-shadow */
-import { LocalDataProvider, EngineRenderer, TaggleRenderer, Column, defaultOptions, isGroup, spaceFillingRule, updateLodRules, toolbar, dialogContext, } from 'lineupjs';
 import React, { useCallback, useEffect, useMemo } from 'react';
+import { Column, EngineRenderer, LocalDataProvider, TaggleRenderer, defaultOptions, dialogContext, isGroup, spaceFillingRule, toolbar, updateLodRules, } from 'lineupjs';
 import { merge } from 'lodash';
-import { LineupVisWrapper } from 'visyn_core/vis';
-import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
 import { useAsync } from 'visyn_core/hooks';
+import { I18nextManager } from 'visyn_core/i18n';
+import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
 import { PluginRegistry } from 'visyn_core/plugin';
-import { LazyColumn } from './internal/column';
+import { LineupVisWrapper } from 'visyn_core/vis';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
-import { AttachemntUtils } from '../storage/internal/internal';
-import { EViewMode } from '../base/interfaces';
-import { ColumnDescUtils, LineupUtils } from '.';
-import { BaseUtils } from '../base/BaseUtils';
-import { AView } from '../views/AView';
+import { LazyColumn } from './internal/column';
+import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
 import { InvalidTokenError, TDPTokenManager } from '../auth/TokenManager';
 import { ERenderAuthorizationStatus } from '../auth/interfaces';
-import { RestStorageUtils } from '../storage/rest';
+import { EViewMode } from '../base/interfaces';
+import { BaseUtils } from '../base/BaseUtils';
+import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
 import { NotificationHandler } from '../base/NotificationHandler';
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
+import { AttachemntUtils } from '../storage/internal/internal';
+import { RestStorageUtils } from '../storage/rest';
+import { AView } from '../views/AView';
 import { ViewUtils } from '../views/ViewUtils';
-import { ErrorAlertHandler } from '../base/ErrorAlertHandler';
-import { StructureImageColumn, StructureImageFilterDialog, StructureImageRenderer } from './structureImage';
-import TDPLocalDataProvider from './provider/TDPLocalDataProvider';
+import { ColumnDescUtils, LineupUtils } from '.';
 const defaults = {
     itemName: 'item',
     itemNamePlural: 'items',
@@ -257,7 +257,7 @@ onAddScoreColumn, }) {
                 toolbarActions: {
                     // TODO remove default string filter; use `filterString` as key would override the default string filter, but also for string columns
                     filterStructureImage: {
-                        title: 'Filter …',
+                        title: 'Filter …', // the toolbar icon is derived from this string! (= transformed to `lu-action-filter`)
                         onClick: (col, evt, ctx, level, viaShortcut) => {
                             const dialog = new StructureImageFilterDialog(col, dialogContext(ctx, level, evt), ctx);
                             dialog.open();

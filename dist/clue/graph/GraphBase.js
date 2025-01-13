@@ -1,4 +1,4 @@
-import { GraphNode, GraphEdge, AGraph } from './graph';
+import { AGraph, GraphEdge, GraphNode } from './graph';
 export class GraphFactoryUtils {
 }
 GraphFactoryUtils.defaultGraphFactory = {

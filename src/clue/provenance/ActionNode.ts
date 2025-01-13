@@ -1,7 +1,7 @@
-import { GraphNode, AttributeContainer, GraphEdge } from '../graph/graph';
-import { ObjectNode, IObjectRef } from './ObjectNode';
-import { ICmdFunction, IInverseActionCreator, ICmdFunctionFactory, IAction } from './ICmd';
 import { ActionMetaData } from './ActionMeta';
+import { IAction, ICmdFunction, ICmdFunctionFactory, IInverseActionCreator } from './ICmd';
+import { IObjectRef, ObjectNode } from './ObjectNode';
+import { AttributeContainer, GraphEdge, GraphNode } from '../graph/graph';
 
 export class ActionUtils {
   /**

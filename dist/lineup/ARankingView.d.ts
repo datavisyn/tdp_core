@@ -1,14 +1,14 @@
 import { EngineRenderer, LocalDataProvider, TaggleRenderer } from 'lineupjs';
 import { IRow, IServerColumn } from 'visyn_core/base';
-import { AView } from '../views/AView';
-import { IViewContext, ISelection, EViewMode, IScore, IAdditionalColumnDesc } from '../base/interfaces';
-import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
-import { IInitialRankingOptions } from './desc';
-import { IRankingWrapper } from './IRankingWrapper';
-import { IServerColumnDesc } from '../base/rest';
-import { ISelectionAdapter } from './selection/ISelectionAdapter';
-import { ILazyLoadedColumn } from './internal/column';
 import { IARankingViewOptions } from './IARankingViewOptions';
+import { IRankingWrapper } from './IRankingWrapper';
+import { IInitialRankingOptions } from './desc';
+import { EViewMode, IAdditionalColumnDesc, IScore, ISelection, IViewContext } from '../base/interfaces';
+import { AView } from '../views/AView';
+import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';
+import { IServerColumnDesc } from '../base/rest';
+import { ILazyLoadedColumn } from './internal/column';
+import { ISelectionAdapter } from './selection/ISelectionAdapter';
 /**
  * base class for views based on LineUp
  * There is also AEmbeddedRanking to display simple rankings with LineUp.

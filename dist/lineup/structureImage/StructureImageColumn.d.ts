@@ -1,4 +1,4 @@
-import { IDataRow, ValueColumn, IValueColumnDesc } from 'lineupjs';
+import { IDataRow, IValueColumnDesc, ValueColumn } from 'lineupjs';
 export interface IStructureImageFilter {
     /**
      * Search string which is used to filter the column data

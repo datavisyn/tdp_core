@@ -1,5 +1,5 @@
-import { IDataType } from './datatype';
 import { IDataDescription } from './DataDescription';
+import { IDataType } from './datatype';
 export interface INode {
     readonly name: string;
     readonly children: INode[];

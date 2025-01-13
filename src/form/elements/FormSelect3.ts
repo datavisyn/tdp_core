@@ -1,9 +1,10 @@
 import * as d3v3 from 'd3v3';
 import { IPluginDesc } from 'visyn_core/plugin';
+
 import { AFormElement } from './AFormElement';
-import { IForm, IFormElementDesc, FormElementType } from '../interfaces';
-import { Select3, IdTextPair, ISelect3Item, ISelect3Options } from './Select3';
+import { FormElementType, IForm, IFormElementDesc } from '../interfaces';
 import { ISelect2Option } from './FormSelect2';
+import { ISelect3Item, ISelect3Options, IdTextPair, Select3 } from './Select3';
 
 declare type IFormSelect3Options = Partial<ISelect3Options<ISelect2Option>> & {
   return?: 'text' | 'id';

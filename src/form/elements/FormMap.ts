@@ -1,16 +1,17 @@
 import { merge } from 'lodash';
 import 'select2';
 import { event as d3event } from 'd3v3';
-import $ from 'jquery';
 import * as d3v3 from 'd3v3';
+import $ from 'jquery';
 import { I18nextManager } from 'visyn_core/i18n';
-import { UserSession } from 'visyn_core/security';
 import { IPluginDesc } from 'visyn_core/plugin';
+import { UserSession } from 'visyn_core/security';
+
 import { AFormElement } from './AFormElement';
-import { IFormElementDesc, IForm, FormElementType, IFormElement } from '../interfaces';
-import { ISelectOptions, IFormSelectOption, FormSelect } from './FormSelect';
+import { FormElementType, IForm, IFormElement, IFormElementDesc } from '../interfaces';
+import { FormSelect, IFormSelectOption, ISelectOptions } from './FormSelect';
 import { FormSelect2 } from './FormSelect2';
-import { ISelect3Options, Select3, IdTextPair } from './Select3';
+import { ISelect3Options, IdTextPair, Select3 } from './Select3';
 
 export interface ISubDesc {
   name: string;

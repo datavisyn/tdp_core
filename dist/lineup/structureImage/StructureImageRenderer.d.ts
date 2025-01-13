@@ -1,4 +1,4 @@
-import { ICellRendererFactory, ERenderMode, ICellRenderer, IRenderContext, IGroupCellRenderer, ISummaryRenderer } from 'lineupjs';
+import { ERenderMode, ICellRenderer, ICellRendererFactory, IGroupCellRenderer, IRenderContext, ISummaryRenderer } from 'lineupjs';
 import { StructureImageColumn } from './StructureImageColumn';
 export declare class StructureImageRenderer implements ICellRendererFactory {
     readonly title: string;

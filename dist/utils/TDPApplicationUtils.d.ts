@@ -1,5 +1,5 @@
 import { ISecureItem } from 'visyn_core/security';
-import { IObjectRef, ProvenanceGraph, ActionNode } from '../clue/provenance';
+import { ActionNode, IObjectRef, ProvenanceGraph } from '../clue/provenance';
 export interface IPermissionFormOptions {
     /**
      * extra html

@@ -1,14 +1,14 @@
-import { select, event } from 'd3v3';
+import { event, select } from 'd3v3';
 import $ from 'jquery';
-import { I18nextManager } from 'visyn_core/i18n';
 import { GlobalEventHandler } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core/i18n';
 import { UserSession } from 'visyn_core/security';
-import { PHOVEA_UI_FormDialog } from '../../components';
-import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
-import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
-import { NotificationHandler } from '../../base/NotificationHandler';
 import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
 import { UniqueIdManager } from '../../app';
+import { ErrorAlertHandler } from '../../base/ErrorAlertHandler';
+import { NotificationHandler } from '../../base/NotificationHandler';
+import { PHOVEA_UI_FormDialog } from '../../components';
+import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';
 class ASessionList {
     constructor(parent, graphManager, mode = 'table') {
         this.parent = parent;

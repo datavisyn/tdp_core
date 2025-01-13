@@ -1,13 +1,14 @@
 import { select } from 'd3v3';
-import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
-import { I18nextManager } from 'visyn_core/i18n';
 import { EventHandler, WebpackEnv } from 'visyn_core/base';
-import { IFormElementDesc, IForm } from '../form/interfaces';
+import { I18nextManager } from 'visyn_core/i18n';
+import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
+
+import { ViewUtils } from './ViewUtils';
+import { ERenderAuthorizationStatus, IAuthorizationConfiguration, TDPTokenManager, TokenManager } from '../auth';
+import { EViewMode, ISelection, IView, IViewContext } from '../base/interfaces';
 import { FormBuilder } from '../form/FormBuilder';
 import { AFormElement } from '../form/elements/AFormElement';
-import { ISelection, IView, IViewContext, EViewMode } from '../base/interfaces';
-import { ViewUtils } from './ViewUtils';
-import { ERenderAuthorizationStatus, IAuthorizationConfiguration, TokenManager, TDPTokenManager } from '../auth';
+import { IForm, IFormElementDesc } from '../form/interfaces';
 
 /**
  * base class for all views

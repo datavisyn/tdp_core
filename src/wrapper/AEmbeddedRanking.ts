@@ -2,15 +2,16 @@ import { IColumnDesc, LocalDataProvider } from 'lineupjs';
 import { IRow } from 'visyn_core/base';
 import { IDTypeManager } from 'visyn_core/idtype';
 import { PluginRegistry } from 'visyn_core/plugin';
-import { ProvenanceGraph, ObjectRefUtils } from '../clue/provenance';
+
+import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
+import { IScore } from '../base/interfaces';
+import { IServerColumnDesc } from '../base/rest';
+import { ObjectRefUtils, ProvenanceGraph } from '../clue/provenance';
+import { IFormElementDesc } from '../form/interfaces';
 import { ARankingView } from '../lineup/ARankingView';
 import { IARankingViewOptions } from '../lineup/IARankingViewOptions';
 import { IInitialRankingOptions } from '../lineup/desc';
 import { IViewProviderLocal } from '../lineup/internal/cmds';
-import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
-import { IScore } from '../base/interfaces';
-import { IServerColumnDesc } from '../base/rest';
-import { IFormElementDesc } from '../form/interfaces';
 import { ILazyLoadedColumn } from '../lineup/internal/column';
 
 export interface IEmbeddedRanking extends ARankingView {

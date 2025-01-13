@@ -1,7 +1,8 @@
 import { SearchBox } from 'lineupjs';
 import { I18nextManager } from 'visyn_core/i18n';
+
 import { ISearchOption } from './ISearchOption';
-import { IPanelButton, PanelButton, IPanelButtonOptions } from './PanelButton';
+import { IPanelButton, IPanelButtonOptions, PanelButton } from './PanelButton';
 
 export type IPanelAddColumnButtonOptions = Pick<IPanelButtonOptions, 'btnClass'>;
 

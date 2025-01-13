@@ -1,4 +1,4 @@
-import { LocalDataProvider, ICategory, ICategoryNode } from 'lineupjs';
+import { ICategory, ICategoryNode, LocalDataProvider } from 'lineupjs';
 import { IServerColumn } from 'visyn_core/base';
 import { IAdditionalColumnDesc } from '../base/interfaces';
 export interface IColumnOptions extends Pick<IAdditionalColumnDesc, 'selectedId' | 'selectedSubtype' | 'initialRanking' | 'chooserGroup'> {

@@ -1,5 +1,5 @@
-import { I18nextManager } from 'visyn_core/i18n';
 import { Ajax, isAjaxError } from 'visyn_core/base';
+import { I18nextManager } from 'visyn_core/i18n';
 import { NotificationHandler } from './NotificationHandler';
 export class ErrorAlertHandler {
     constructor() {

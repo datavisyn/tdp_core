@@ -1,4 +1,4 @@
-import { SearchBox, IGroupSearchItem, ISearchBoxOptions } from 'lineupjs';
+import { IGroupSearchItem, ISearchBoxOptions, SearchBox } from 'lineupjs';
 import { ISearchOption } from './ISearchOption';
 /**
  * The SearchBoxProvider allows creating multiple LineUp SearchBoxes and stores them internally in a list.

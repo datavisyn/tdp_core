@@ -1,4 +1,5 @@
 import { LocalDataProvider, Ranking } from 'lineupjs';
+
 import { IPanelButton, PanelButton } from './PanelButton';
 
 /**

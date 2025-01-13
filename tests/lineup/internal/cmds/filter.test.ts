@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 import { EStringGroupCriteriaType } from 'lineupjs';
+
 import { LineUpFilterUtils } from '../../../../src/lineup/internal/lineUpFilter';
 
 // The following tests worked with LineUp v3.

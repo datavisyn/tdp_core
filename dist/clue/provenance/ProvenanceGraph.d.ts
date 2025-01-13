@@ -1,13 +1,13 @@
 import { IDType, SelectOperation } from 'visyn_core/idtype';
-import { ADataType } from '../../data/datatype';
-import { ObjectNode, IObjectRef } from './ObjectNode';
-import { StateNode } from './StateNode';
-import { ActionNode } from './ActionNode';
-import { IAction, IProvenanceGraphDataDescription, ICmdFunction, IInverseActionCreator, ICmdResult, IProvenanceGraph } from './ICmd';
-import { SlideNode } from './SlideNode';
-import { GraphEdge } from '../graph/graph';
-import { GraphBase, IGraphDump } from '../graph/GraphBase';
 import { ActionMetaData } from './ActionMeta';
+import { ActionNode } from './ActionNode';
+import { IAction, ICmdFunction, ICmdResult, IInverseActionCreator, IProvenanceGraph, IProvenanceGraphDataDescription } from './ICmd';
+import { IObjectRef, ObjectNode } from './ObjectNode';
+import { SlideNode } from './SlideNode';
+import { StateNode } from './StateNode';
+import { ADataType } from '../../data/datatype';
+import { GraphBase, IGraphDump } from '../graph/GraphBase';
+import { GraphEdge } from '../graph/graph';
 export interface IProvenanceGraphDump extends IGraphDump {
     /**
      * Id of the last state node

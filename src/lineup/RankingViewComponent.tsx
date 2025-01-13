@@ -1,15 +1,17 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { isEqual } from 'lodash';
-import { I18nextManager } from 'visyn_core/i18n';
-import { useAsync } from 'visyn_core/hooks';
+
 import { LocalDataProvider } from 'lineupjs';
+import { isEqual } from 'lodash';
+import { useAsync } from 'visyn_core/hooks';
+import { I18nextManager } from 'visyn_core/i18n';
+
 import type { IRankingProps } from './Ranking';
 // eslint-disable-next-line import/no-cycle
 import { Ranking } from './Ranking';
+import { TDPTokenManager, TokenManager } from '../auth/TokenManager';
 import { ISelection } from '../base/interfaces';
 import { IContext, ISelectionAdapter } from './selection/ISelectionAdapter';
 import { ERenderAuthorizationStatus, IAuthorizationConfiguration } from '../auth/interfaces';
-import { TDPTokenManager, TokenManager } from '../auth/TokenManager';
 import { AView } from '../views/AView';
 import { ViewUtils } from '../views/ViewUtils';
 

@@ -1,4 +1,4 @@
-import { IProvenanceGraphDataDescription, IProvenanceGraph } from './ICmd';
+import { IProvenanceGraph, IProvenanceGraphDataDescription } from './ICmd';
 export declare enum ProvenanceGraphDim {
     Action = 0,
     Object = 1,

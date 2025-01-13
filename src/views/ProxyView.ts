@@ -1,11 +1,12 @@
 import { merge } from 'lodash';
-import { IDTypeManager } from 'visyn_core/idtype';
 import { I18nextManager } from 'visyn_core/i18n';
-import { IViewContext, ISelection } from '../base/interfaces';
-import { FormElementType } from '../form/interfaces';
-import { IFormSelectElement, IFormSelectOption } from '../form/elements/FormSelect';
+import { IDTypeManager } from 'visyn_core/idtype';
+
 import { AD3View } from './AD3View';
+import { ISelection, IViewContext } from '../base/interfaces';
 import { RestBaseUtils } from '../base/rest';
+import { IFormSelectElement, IFormSelectOption } from '../form/elements/FormSelect';
+import { FormElementType } from '../form/interfaces';
 
 export interface IProxyViewOptions {
   proxy?: string;

@@ -1,6 +1,7 @@
 import { I18nextManager } from 'visyn_core/i18n';
-import { Dialog } from '../../components';
+
 import { CLUEGraphManager } from './CLUEGraphManager';
+import { Dialog } from '../../components';
 
 export class DialogUtils {
   /**

@@ -1,6 +1,6 @@
 import { ALayoutContainer } from './ALayoutContainer';
-import { TabbingLayoutContainer } from './TabbingLayoutContainer';
 import { IDropArea, ILayoutContainer } from '../interfaces';
+import { TabbingLayoutContainer } from './TabbingLayoutContainer';
 export declare class Dropper {
     static determineDropArea(x: number, y: number): IDropArea;
     static dropViews(node: HTMLElement, reference: ALayoutContainer<any> & ILayoutContainer): void;
