@@ -12,7 +12,7 @@ export declare abstract class AParentLayoutContainer<T extends ILayoutContainerO
     get rootParent(): IRootLayoutContainer & ILayoutParentContainer;
     forEach(callback: (child: ILayoutContainer, index: number) => void): void;
     get children(): ILayoutContainer[];
-    [Symbol.iterator](): IterableIterator<ILayoutContainer>;
+    [Symbol.iterator](): ArrayIterator<ILayoutContainer>;
     get length(): number;
     get visible(): boolean;
     set visible(visible: boolean);

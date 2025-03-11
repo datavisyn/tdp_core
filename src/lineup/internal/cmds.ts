@@ -16,7 +16,7 @@ import {
   isMapAbleColumn,
   mappingFunctions,
 } from 'lineupjs';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { I18nextManager } from 'visyn_core/i18n';
 
 import { LineUpFilterUtils } from './lineUpFilter';

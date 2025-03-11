@@ -1,8 +1,8 @@
 import { EngineRenderer, LocalDataProvider, TaggleRenderer, defaultOptions, deriveColors, isGroup, spaceFillingRule, updateLodRules, } from 'lineupjs';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { I18nextManager } from 'visyn_core/i18n';
 import { IDTypeManager } from 'visyn_core/idtype';
-import { LineupVisWrapper } from 'visyn_core/vis';
+import { LineupVisWrapper } from 'visyn_core/vis/lineupWrapper';
 import { ColumnDescUtils } from './desc';
 import { LineupUtils } from './utils';
 import { ERenderAuthorizationStatus, InvalidTokenError, TDPTokenManager } from '../auth';

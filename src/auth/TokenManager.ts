@@ -1,4 +1,4 @@
-import { castArray } from 'lodash';
+import castArray from 'lodash/castArray';
 import { EventHandler, GlobalEventHandler, IEvent, IEventListener } from 'visyn_core/base';
 import { UserSession } from 'visyn_core/security';
 
@@ -6,7 +6,7 @@ import { ERenderAuthorizationStatus, IAuthorizationConfiguration, IAuthorization
 import { simplePopupFlow } from './simplePopup';
 
 // Extract all parameters except the first one
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 type ExtractParametersExceptEvent<F extends Function> = F extends (event: IEvent, ...args: infer A) => any ? A : never;
 
 export declare function authorizationStored(event: IEvent, id: string, token: string): void;

@@ -71,7 +71,7 @@ export declare abstract class AView extends EventHandler implements IView {
      * @param {string} id
      * @returns {IFormElement}
      */
-    protected getParameterElement(id: string): import("../form/interfaces").IFormElement;
+    protected getParameterElement(id: string): import("..").IFormElement;
     /**
      * returns the value of the given parameter
      */

@@ -1,5 +1,5 @@
 import { Column, StringColumn, ValueColumn } from 'lineupjs';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 // internal function copied from lineupjs
 function integrateDefaults(desc, defaults = {}) {
     Object.keys(defaults).forEach((key) => {

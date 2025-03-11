@@ -1,9 +1,8 @@
-import { merge } from 'lodash';
 import 'select2';
 import { event as d3event } from 'd3v3';
 import $ from 'jquery';
+import merge from 'lodash/merge';
 import { I18nextManager } from 'visyn_core/i18n';
-import { UserSession } from 'visyn_core/security';
 import { AFormElement } from './AFormElement';
 import { FormElementType } from '../interfaces';
 import { FormSelect } from './FormSelect';
@@ -39,13 +38,13 @@ export class FormMap extends AFormElement {
         if (!this.elementDesc.useSession) {
             return;
         }
-        UserSession.getInstance().store(this.sessionKey, this.value);
+        window.sessionStorage.setItem(this.sessionKey, JSON.stringify(this.value));
     }
     getStoredValue(defaultValue) {
         if (!this.elementDesc.useSession) {
             return defaultValue;
         }
-        return UserSession.getInstance().retrieve(this.sessionKey, defaultValue);
+        return typeof window.sessionStorage.getItem(this.sessionKey) === 'string' ? JSON.parse(window.sessionStorage.getItem(this.sessionKey)) : defaultValue;
     }
     /**
      * Build the label and input element

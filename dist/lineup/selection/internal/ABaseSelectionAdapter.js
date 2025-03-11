@@ -1,4 +1,4 @@
-import { difference } from 'lodash';
+import difference from 'lodash/difference';
 export class ABaseSelectionAdapter {
     async addDynamicColumns(context, ids) {
         const columns = await Promise.all(ids.map((id) => this.createColumnsFor(context, id)));

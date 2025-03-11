@@ -1,4 +1,5 @@
-import { difference, isFunction } from 'lodash';
+import difference from 'lodash/difference';
+import isFunction from 'lodash/isFunction';
 import { ABaseSelectionAdapter } from './ABaseSelectionAdapter';
 export class MultiSelectionAdapter extends ABaseSelectionAdapter {
     constructor(adapter) {

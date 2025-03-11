@@ -207,6 +207,7 @@ export class TDPView extends React.Component<Readonly<ITDPViewProps>, ITDPViewSt
         <main>
           {/* TS 5 migration */}
           {/* eslint-disable react/jsx-no-useless-fragment */}
+          {/* @ts-ignore */}
           <>{buildItem()}</>
         </main>
       </div>

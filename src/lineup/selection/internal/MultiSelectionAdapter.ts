@@ -1,4 +1,5 @@
-import { difference, isFunction } from 'lodash';
+import difference from 'lodash/difference';
+import isFunction from 'lodash/isFunction';
 
 import { IAdditionalColumnDesc, IScoreRow } from '../../../base/interfaces';
 import { IContext, ISelectionColumn } from '../ISelectionAdapter';

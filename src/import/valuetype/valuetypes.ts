@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { I18nextManager } from 'visyn_core/i18n';
 import { IPlugin, PluginRegistry } from 'visyn_core/plugin';
 

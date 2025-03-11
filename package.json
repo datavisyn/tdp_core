@@ -1,7 +1,7 @@
 {
   "name": "tdp_core",
   "description": "Target discovery platform for exploring rankings of genes, disease models, and other entities.",
-  "version": "26.0.0",
+  "version": "27.0.0",
   "author": {
     "name": "datavisyn GmbH",
     "email": "contact@datavisyn.io",
@@ -84,8 +84,8 @@
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "use-deep-compare-effect": "^1.8.0",
-    "visyn_core": "^14.4.3",
-    "visyn_scripts": "^11.3.0"
+    "visyn_core": "^17.2.0",
+    "visyn_scripts": "^13.0.0"
   },
   "devDependencies": {
     "cypress": "^13.0.0"
@@ -107,5 +107,5 @@
       }
     }
   },
-  "packageManager": "yarn@3.2.2"
+  "packageManager": "yarn@4.7.0"
 }
