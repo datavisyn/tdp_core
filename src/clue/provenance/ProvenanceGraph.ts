@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { IDType, IDTypeManager, SelectOperation, SelectionUtils } from 'visyn_core/idtype';
 
 import { ActionMetaData } from './ActionMeta';

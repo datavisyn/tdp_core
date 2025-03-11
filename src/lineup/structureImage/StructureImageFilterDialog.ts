@@ -1,5 +1,5 @@
 import { ADialog, IDialogContext, IRankingHeaderContext, LocalDataProvider } from 'lineupjs';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { I18nextManager } from 'visyn_core/i18n';
 
 import { IStructureImageFilter, StructureImageColumn } from './StructureImageColumn';

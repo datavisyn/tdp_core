@@ -1,7 +1,7 @@
-import { merge } from 'lodash';
 import 'select2';
 import * as d3v3 from 'd3v3';
 import $ from 'jquery';
+import merge from 'lodash/merge';
 import { AppContext } from 'visyn_core/base';
 import { IPluginDesc } from 'visyn_core/plugin';
 

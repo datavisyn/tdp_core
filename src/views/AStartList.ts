@@ -1,5 +1,3 @@
-import { UserSession } from 'visyn_core/security';
-
 import { ISelection, IViewContext } from '../base/interfaces';
 import { IParams } from '../base/rest';
 import { ARankingView } from '../lineup/ARankingView';
@@ -52,7 +50,10 @@ export abstract class AStartList extends ARankingView {
     // TODO can't remember why the all exception
     if (this.namedSet.subTypeKey && validFilterKey(this.namedSet.subTypeKey) && this.namedSet.subTypeValue !== 'all') {
       if (this.namedSet.subTypeFromSession) {
-        filter[this.namedSet.subTypeKey] = UserSession.getInstance().retrieve(this.namedSet.subTypeKey, this.namedSet.subTypeValue);
+        filter[this.namedSet.subTypeKey] =
+          typeof window.sessionStorage.getItem(this.namedSet.subTypeKey) === 'string'
+            ? JSON.parse(window.sessionStorage.getItem(this.namedSet.subTypeKey)!)
+            : this.namedSet.subTypeValue;
       } else {
         filter[this.namedSet.subTypeKey] = this.namedSet.subTypeValue;
       }

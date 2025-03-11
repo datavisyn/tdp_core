@@ -1,5 +1,4 @@
 import * as d3v3 from 'd3v3';
-import { UserSession } from 'visyn_core/security';
 import { AFormElement } from './AFormElement';
 /**
  * ResolveNow executes the result without an intermediate tick, and because FormSelect#resolveData is sometimes used
@@ -46,13 +45,15 @@ export class FormSelect extends AFormElement {
         if (!this.elementDesc.useSession) {
             return;
         }
-        UserSession.getInstance().store(`${this.id}_selectedIndex`, this.getSelectedIndex());
+        window.sessionStorage.setItem(`${this.id}_selectedIndex`, JSON.stringify(this.getSelectedIndex()));
     }
     getStoredValue(defaultValue) {
         if (!this.elementDesc.useSession) {
             return defaultValue;
         }
-        return UserSession.getInstance().retrieve(`${this.id}_selectedIndex`, defaultValue);
+        return typeof window.sessionStorage.getItem(`${this.id}_selectedIndex`) === 'string'
+            ? JSON.parse(window.sessionStorage.getItem(`${this.id}_selectedIndex`))
+            : defaultValue;
     }
     /**
      * Build the label and select element

@@ -1,6 +1,6 @@
 /// <reference types="jest" />
 import { CategoricalColumn, Column, buildCategoricalColumn } from 'lineupjs';
-import { difference } from 'lodash';
+import difference from 'lodash/difference';
 import { IDTypeManager } from 'visyn_core/idtype';
 
 import { IAdditionalColumnDesc } from '../../../src/base';

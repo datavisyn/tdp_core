@@ -5,7 +5,7 @@
 /// <amd-dependency path='bootstrap' />
 import { select } from 'd3v3';
 import * as d3v3 from 'd3v3';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { IEvent } from 'visyn_core/base';
 
 import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';

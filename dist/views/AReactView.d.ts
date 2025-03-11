@@ -36,10 +36,10 @@ export declare abstract class AReactView extends AView {
     private reactViewBodyRoot;
     constructor(context: IViewContext, selection: ISelection, parent: HTMLElement, options?: Partial<Readonly<IReactViewOptions>>);
     protected initImpl(): Promise<void | (({ generateDialog }: {
-        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
     protected initReact(): Promise<void | (({ generateDialog }: {
-        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
     private selectImpl;
     get itemIDType(): import("visyn_core/idtype").IDType;
@@ -58,16 +58,16 @@ export declare abstract class AReactView extends AView {
      */
     abstract render(inputSelection: string[], itemSelection: string[], itemSelector: ISelector): Promise<ReactElement<any>> | ReactElement<any>;
     protected forceUpdate(): Promise<void | (({ generateDialog }: {
-        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
     selectionChanged(): Promise<void | (({ generateDialog }: {
-        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
     itemSelectionChanged(): Promise<void | (({ generateDialog }: {
-        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
     protected parameterChanged(name: string): Promise<void | (({ generateDialog }: {
-        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("../components").Dialog;
+        generateDialog(title: string, primaryBtnText: string, additionalCSSClasses?: string): import("..").Dialog;
     }) => Promise<unknown>)>;
 }
 //# sourceMappingURL=AReactView.d.ts.map

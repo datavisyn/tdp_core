@@ -1,5 +1,5 @@
 import { Column, CompositeColumn, DateColumn, EngineRenderer, LocalDataProvider, NumberColumn, OrdinalColumn, Ranking, ScriptColumn, StackColumn, StringColumn, isMapAbleColumn, mappingFunctions, } from 'lineupjs';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { I18nextManager } from 'visyn_core/i18n';
 import { LineUpFilterUtils } from './lineUpFilter';
 import { ActionMetaData, ActionUtils, ObjectRefUtils } from '../../clue/provenance';

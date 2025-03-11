@@ -9,7 +9,7 @@ import '../../src/phovea_registry';
 describe('Health check for Cypress component test', () => {
   it('should mount MainApp', () => {
     cy.mount(
-      <VisynAppProvider disableMantine6 appName="Demo App">
+      <VisynAppProvider appName="Demo App">
         <MainApp />
       </VisynAppProvider>,
     );

@@ -3,12 +3,12 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { Column, EngineRenderer, LocalDataProvider, TaggleRenderer, defaultOptions, dialogContext, isGroup, spaceFillingRule, toolbar, updateLodRules, } from 'lineupjs';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { useAsync } from 'visyn_core/hooks';
 import { I18nextManager } from 'visyn_core/i18n';
 import { IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
 import { PluginRegistry } from 'visyn_core/plugin';
-import { LineupVisWrapper } from 'visyn_core/vis';
+import { LineupVisWrapper } from 'visyn_core/vis/lineupWrapper';
 import { LineUpColors } from './internal/LineUpColors';
 import { LineUpPanelActions } from './internal/LineUpPanelActions';
 import { LineUpSelectionHelper } from './internal/LineUpSelectionHelper';

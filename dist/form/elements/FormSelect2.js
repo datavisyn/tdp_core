@@ -1,6 +1,6 @@
-import { merge } from 'lodash';
 import 'select2';
 import $ from 'jquery';
+import merge from 'lodash/merge';
 import { AppContext } from 'visyn_core/base';
 import { AFormElement } from './AFormElement';
 /**

@@ -1,5 +1,6 @@
 import * as d3v3 from 'd3v3';
-import { identity, merge } from 'lodash';
+import identity from 'lodash/identity';
+import merge from 'lodash/merge';
 import { I18nextManager } from 'visyn_core/i18n';
 import { UserSession } from 'visyn_core/security';
 import { BaseUtils } from '../base';

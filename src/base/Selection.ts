@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
 import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
 

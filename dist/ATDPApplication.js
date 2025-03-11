@@ -1,6 +1,6 @@
 // TODO: Do we need a relative import?
 import './webpack/_bootstrap';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { loadClientConfig } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
 import { PluginRegistry } from 'visyn_core/plugin';

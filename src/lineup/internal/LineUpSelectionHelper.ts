@@ -1,5 +1,5 @@
 import { LocalDataProvider } from 'lineupjs';
-import { difference } from 'lodash';
+import difference from 'lodash/difference';
 import { EventHandler, IRow } from 'visyn_core/base';
 import { IDType } from 'visyn_core/idtype';
 

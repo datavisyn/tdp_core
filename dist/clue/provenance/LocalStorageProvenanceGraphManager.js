@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { Permission, UserSession } from 'visyn_core/security';
 import { ProvenanceGraph } from './ProvenanceGraph';
 import { ProvenanceGraphUtils } from './ProvenanceGraphUtils';

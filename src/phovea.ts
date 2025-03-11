@@ -4,7 +4,7 @@ import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH, EP_TDP_CORE_FORM_ELEMENT } from './bas
 import { FormElementType } from './form/interfaces';
 
 export default function (registry: IRegistry) {
-  // eslint-disable-next-line @typescript-eslint/ban-types
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   function actionFunction(id: string, factory: string, loader: () => any, options?: {}) {
     registry.push('actionFunction', id, loader, { factory, ...options });
   }

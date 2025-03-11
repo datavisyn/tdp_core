@@ -1,4 +1,4 @@
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { IDTypeManager } from 'visyn_core/idtype';
 import { PluginRegistry } from 'visyn_core/plugin';
 import { UserSession } from 'visyn_core/security';

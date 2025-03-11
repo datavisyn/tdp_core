@@ -10,7 +10,7 @@ export declare class RootLayoutContainer extends AParentLayoutContainer<ILayoutC
     constructor(document: Document, build: (layout: IBuildAbleOrViewLike) => ILayoutContainer, restorer: (dump: ILayoutDump, restoreView: (referenceId: number) => PHOVEA_UI_IView) => ILayoutContainer);
     set root(root: ILayoutContainer);
     get root(): ILayoutContainer;
-    get minSize(): import("../interfaces").ISize;
+    get minSize(): import("..").ISize;
     protected addedChild(child: ILayoutContainer, index: number): void;
     place(child: ILayoutContainer, reference: ILayoutContainer, area: IDropArea): boolean;
     protected takeDownChild(child: ILayoutContainer): void;
@@ -18,7 +18,7 @@ export declare class RootLayoutContainer extends AParentLayoutContainer<ILayoutC
     persist(): ILayoutDump & {
         type: string;
     };
-    static restore(dump: ILayoutDump, doc: Document, build: IBuildLayout, restorer: IRestoreLayout, restoreView: IViewRestorer): RootLayoutContainer;
+    static restore(dump: ILayoutDump, doc: Document, build: IBuildLayout, restorer: IRestoreLayout, restoreView: IViewRestorer): any;
 }
 interface IBuildLayout {
     (root: RootLayoutContainer, layout: IBuildAbleOrViewLike): ILayoutContainer;

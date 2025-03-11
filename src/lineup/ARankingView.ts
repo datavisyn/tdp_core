@@ -17,12 +17,12 @@ import {
   spaceFillingRule,
   updateLodRules,
 } from 'lineupjs';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { IRow, IServerColumn } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
 import { IDTypeManager } from 'visyn_core/idtype';
 import { ISecureItem } from 'visyn_core/security';
-import { LineupVisWrapper } from 'visyn_core/vis';
+import { LineupVisWrapper } from 'visyn_core/vis/lineupWrapper';
 
 import { IARankingViewOptions } from './IARankingViewOptions';
 import { IRankingWrapper } from './IRankingWrapper';

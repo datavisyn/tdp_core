@@ -1,7 +1,6 @@
 import { Selection } from 'd3v3';
 import { EventHandler } from 'visyn_core/base';
 import { IPluginDesc, PluginRegistry } from 'visyn_core/plugin';
-import { UserSession } from 'visyn_core/security';
 
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
 import { FormElementType, IForm, IFormElement, IFormElementDesc } from '../interfaces';
@@ -47,18 +46,20 @@ export abstract class AFormElement<T extends IFormElementDesc> extends EventHand
     if (!this.elementDesc.useSession) {
       return;
     }
-    UserSession.getInstance().store(`${this.id}_value`, this.value);
+    window.sessionStorage.setItem(`${this.id}_value`, JSON.stringify(this.value));
   }
 
   protected getStoredValue<D>(defaultValue: D): D {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
-    return UserSession.getInstance().retrieve(`${this.id}_value`, defaultValue);
+    return typeof window.sessionStorage.getItem(`${this.id}_value`) === 'string'
+      ? JSON.parse(window.sessionStorage.getItem(`${this.id}_value`)!)
+      : defaultValue;
   }
 
   protected hasStoredValue(): boolean {
-    return UserSession.getInstance().retrieve(`${this.id}_value`) != null;
+    return typeof window.sessionStorage.getItem(`${this.id}_value`) === 'string' ? JSON.parse(window.sessionStorage.getItem(`${this.id}_value`)!) : null;
   }
 
   isRequired() {

@@ -1,7 +1,7 @@
 import '../webpack/_bootstrap';
 import { Modal } from 'bootstrap';
 import $ from 'jquery';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { I18nextManager } from 'visyn_core/i18n';
 import { BaseUtils } from '../base/BaseUtils';
 import { TourUtils } from '../tour/TourUtils';
