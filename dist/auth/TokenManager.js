@@ -1,4 +1,4 @@
-import { castArray } from 'lodash';
+import castArray from 'lodash/castArray';
 import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
 import { UserSession } from 'visyn_core/security';
 import { ERenderAuthorizationStatus } from './interfaces';

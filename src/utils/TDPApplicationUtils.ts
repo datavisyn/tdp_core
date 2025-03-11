@@ -302,10 +302,10 @@ export class TDPApplicationUtils {
     const old = {};
     // clear the session as part of it?
     Object.keys(parameters).forEach((key) => {
-      old[key] = UserSession.getInstance().retrieve(key, null);
+      old[key] = typeof window.sessionStorage.getItem(key) === 'string' ? JSON.parse(window.sessionStorage.getItem(key)!) : null;
       const value = parameters[key];
       if (value !== null) {
-        UserSession.getInstance().store(key, parameters[key]);
+        window.sessionStorage.setItem(key, parameters[key]);
       }
     });
     return {

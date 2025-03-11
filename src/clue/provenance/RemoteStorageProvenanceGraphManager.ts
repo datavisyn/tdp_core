@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { userSession } from 'visyn_core/security';
 
 import type { IProvenanceGraphDataDescription } from './ICmd';
@@ -10,7 +10,7 @@ import { GraphBase } from '../graph/GraphBase';
 import { GraphProxy } from '../graph/GraphProxy';
 import { RemoteStoreGraph } from '../graph/RemoteStorageGraph';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IRemoteStorageProvenanceGraphManagerOptions extends ICommonProvenanceGraphManagerOptions {
   // empty for now
 }

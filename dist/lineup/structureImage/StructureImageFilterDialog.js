@@ -1,5 +1,5 @@
 import { ADialog } from 'lineupjs';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { I18nextManager } from 'visyn_core/i18n';
 // copied from lineupjs
 function findFilterMissing(node) {

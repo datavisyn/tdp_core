@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { EventHandler } from 'visyn_core/base';
 import { ImportUtils } from './ImportUtils';
 import { ParserUtils } from './parser';

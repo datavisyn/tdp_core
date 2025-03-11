@@ -38,13 +38,13 @@ export declare class TDPApplicationUtils {
      * @param parameters
      */
     static initSessionImpl(_inputs: IObjectRef<any>[], parameters: object): {
-        inverse: import("../clue/provenance").IAction;
+        inverse: import("..").IAction;
     };
-    static initSession(map: Record<string, unknown>): import("../clue/provenance").IAction;
+    static initSession(map: Record<string, unknown>): import("..").IAction;
     static setParameterImpl(inputs: IObjectRef<any>[], parameter: any, graph: ProvenanceGraph): Promise<{
-        inverse: import("../clue/provenance").IAction;
+        inverse: import("..").IAction;
     }>;
-    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): import("../clue/provenance").IAction;
+    static setParameter(view: IObjectRef<IParameterAble>, name: string, value: any, previousValue: any): import("..").IAction;
     static compressSetParameter(path: ActionNode[]): ActionNode[];
     /**
      * @deprecated

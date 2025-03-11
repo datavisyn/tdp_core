@@ -1,4 +1,4 @@
-import { difference } from 'lodash';
+import difference from 'lodash/difference';
 
 import { IAdditionalColumnDesc } from '../../../base/interfaces';
 import { IContext, ISelectionAdapter, ISelectionColumn } from '../ISelectionAdapter';

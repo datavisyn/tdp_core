@@ -2,5 +2,5 @@ flask-swagger-ui==3.36.0
 Pillow==9.3.0
 pymongo~=3.11.1
 python-memcached==1.59
-visyn_core>=14.0.0,<15.0.0
+visyn_core>=17.0.0,<18.0.0
 yamlreader==3.0.4

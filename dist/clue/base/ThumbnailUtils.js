@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import not_available from '../../assets/not_available.png';
 export class ThumbnailUtils {
     static thumbnail_url(graph, state, options = {}) {

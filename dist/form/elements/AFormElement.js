@@ -1,6 +1,5 @@
 import { EventHandler } from 'visyn_core/base';
 import { PluginRegistry } from 'visyn_core/plugin';
-import { UserSession } from 'visyn_core/security';
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
 import { FormElementType } from '../interfaces';
 /**
@@ -30,16 +29,18 @@ export class AFormElement extends EventHandler {
         if (!this.elementDesc.useSession) {
             return;
         }
-        UserSession.getInstance().store(`${this.id}_value`, this.value);
+        window.sessionStorage.setItem(`${this.id}_value`, JSON.stringify(this.value));
     }
     getStoredValue(defaultValue) {
         if (!this.elementDesc.useSession) {
             return defaultValue;
         }
-        return UserSession.getInstance().retrieve(`${this.id}_value`, defaultValue);
+        return typeof window.sessionStorage.getItem(`${this.id}_value`) === 'string'
+            ? JSON.parse(window.sessionStorage.getItem(`${this.id}_value`))
+            : defaultValue;
     }
     hasStoredValue() {
-        return UserSession.getInstance().retrieve(`${this.id}_value`) != null;
+        return typeof window.sessionStorage.getItem(`${this.id}_value`) === 'string' ? JSON.parse(window.sessionStorage.getItem(`${this.id}_value`)) : null;
     }
     isRequired() {
         return this.elementDesc.required;

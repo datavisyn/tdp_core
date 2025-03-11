@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { isEqual } from 'lodash';
+import isEqual from 'lodash/isEqual';
 import { useAsync } from 'visyn_core/hooks';
 import { I18nextManager } from 'visyn_core/i18n';
 // eslint-disable-next-line import/no-cycle

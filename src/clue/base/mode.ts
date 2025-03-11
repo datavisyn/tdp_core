@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { EventHandler, GlobalEventHandler, IEvent } from 'visyn_core/base';
 import { I18nextManager } from 'visyn_core/i18n';
 

@@ -13,7 +13,7 @@ export declare abstract class ASequentialLayoutContainer<T extends ISequentialLa
     get hideAbleHeader(): boolean;
     protected getPadding(): number;
     get minSize(): ISize;
-    persist(): import("../interfaces").ILayoutDump & {
+    persist(): import("..").ILayoutDump & {
         type: string;
         orientation: string;
     };

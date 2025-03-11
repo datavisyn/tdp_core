@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import marked from 'marked';
 import { I18nextManager } from 'visyn_core/i18n';
 import { SelectionUtils } from 'visyn_core/idtype';

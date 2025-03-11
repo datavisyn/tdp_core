@@ -21,7 +21,7 @@ export declare class ProxyView extends AD3View {
     init(params: HTMLElement, onParameterChange: (name: string, value: any, previousValue: any) => Promise<any>): Promise<any>;
     protected initImpl(): Promise<void>;
     protected createUrl(args: any): string;
-    protected getParameterFormDescs(): import("../form/interfaces").IFormElementDesc[];
+    protected getParameterFormDescs(): import("..").IFormElementDesc[];
     protected parameterChanged(name: string): void;
     protected selectionChanged(): void;
     protected updateSelectedItemSelect(forceUseLastSelection?: boolean): Promise<void>;

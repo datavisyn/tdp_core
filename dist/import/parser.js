@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import * as papaparse from 'papaparse';
 const defaultOptions = {
     skipEmptyLines: true,

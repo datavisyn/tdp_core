@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 import { Permission, UserSession } from 'visyn_core/security';
 
 import { IProvenanceGraphDataDescription } from './ICmd';

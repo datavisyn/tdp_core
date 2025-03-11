@@ -1,6 +1,5 @@
 import * as d3v3 from 'd3v3';
 import { IPluginDesc } from 'visyn_core/plugin';
-import { UserSession } from 'visyn_core/security';
 
 import { AFormElement } from './AFormElement';
 import { FormElementType, IForm, IFormElement, IFormElementDesc } from '../interfaces';
@@ -104,14 +103,16 @@ export class FormSelect extends AFormElement<IFormSelectDesc> implements IFormSe
     if (!this.elementDesc.useSession) {
       return;
     }
-    UserSession.getInstance().store(`${this.id}_selectedIndex`, this.getSelectedIndex());
+    window.sessionStorage.setItem(`${this.id}_selectedIndex`, JSON.stringify(this.getSelectedIndex()));
   }
 
   protected getStoredValue<T>(defaultValue: T): T {
     if (!this.elementDesc.useSession) {
       return defaultValue;
     }
-    return UserSession.getInstance().retrieve(`${this.id}_selectedIndex`, defaultValue);
+    return typeof window.sessionStorage.getItem(`${this.id}_selectedIndex`) === 'string'
+      ? JSON.parse(window.sessionStorage.getItem(`${this.id}_selectedIndex`)!)
+      : defaultValue;
   }
 
   /**
