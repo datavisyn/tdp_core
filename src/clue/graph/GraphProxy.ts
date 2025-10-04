@@ -1,4 +1,4 @@
-import { IDTypeManager } from 'visyn_core/idtype';
+import { IDTypeManager } from 'visyn_pro/idtype';
 
 import { GraphFactoryUtils, IGraphFactory } from './GraphBase';
 import { LocalStorageGraph } from './LocalStorageGraph';

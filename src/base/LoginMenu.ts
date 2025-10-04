@@ -1,8 +1,8 @@
 import merge from 'lodash/merge';
-import { AppContext, EventHandler } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
-import { PluginRegistry } from 'visyn_core/plugin';
-import { IUser, LoginUtils, SessionWatcher, UserSession } from 'visyn_core/security';
+import { AppContext, EventHandler } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { PluginRegistry } from 'visyn_pro/plugin';
+import { IUser, LoginUtils, SessionWatcher, UserSession } from 'visyn_pro/security';
 
 import type { ICustomizedLoginFormPlugin, ICustomizedLoginFormPluginDesc } from './extensions';
 import { EXTENSION_POINT_CUSTOMIZED_LOGIN_FORM } from './extensions';

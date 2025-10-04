@@ -1,6 +1,6 @@
 import { Selection } from 'd3v3';
-import { EventHandler } from 'visyn_core/base';
-import { IPluginDesc, PluginRegistry } from 'visyn_core/plugin';
+import { EventHandler } from 'visyn_pro/base';
+import { IPluginDesc, PluginRegistry } from 'visyn_pro/plugin';
 
 import { EP_TDP_CORE_FORM_ELEMENT } from '../../base/extensions';
 import { FormElementType, IForm, IFormElement, IFormElementDesc } from '../interfaces';

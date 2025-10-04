@@ -1,7 +1,7 @@
 import { LocalDataProvider } from 'lineupjs';
 import difference from 'lodash/difference';
-import { EventHandler, IRow } from 'visyn_core/base';
-import { IDType } from 'visyn_core/idtype';
+import { EventHandler, IRow } from 'visyn_pro/base';
+import { IDType } from 'visyn_pro/idtype';
 
 import { ISelection } from '../../base';
 

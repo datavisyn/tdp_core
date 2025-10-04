@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import { Alert, Collapse, Dropdown, Modal, Offcanvas, Popover, Tab, Toast, Tooltip } from 'bootstrap';
-import { useSyncedRef } from 'visyn_core/hooks';
+import { useSyncedRef } from 'visyn_pro/hooks';
 
 type SupportedBootstrapClasses =
   | typeof Modal

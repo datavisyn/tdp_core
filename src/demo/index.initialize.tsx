@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { createRoot } from 'react-dom/client';
-import { VisynAppProvider } from 'visyn_core/app';
+import { VisynAppProvider } from 'visyn_pro/app';
 
 import { MainApp } from './MainApp';
 

@@ -3,8 +3,8 @@ import { event as d3event } from 'd3v3';
 import * as d3v3 from 'd3v3';
 import $ from 'jquery';
 import merge from 'lodash/merge';
-import { I18nextManager } from 'visyn_core/i18n';
-import { IPluginDesc } from 'visyn_core/plugin';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { IPluginDesc } from 'visyn_pro/plugin';
 
 import { AFormElement } from './AFormElement';
 import { FormElementType, IForm, IFormElement, IFormElementDesc } from '../interfaces';

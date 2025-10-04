@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from visyn_core import manager
+from visyn_pro import manager
 
 
 class MatomoSettings(BaseModel):

@@ -17,7 +17,7 @@ import {
   mappingFunctions,
 } from 'lineupjs';
 import isEqual from 'lodash/isEqual';
-import { I18nextManager } from 'visyn_core/i18n';
+import { I18nextManager } from 'visyn_pro/i18n';
 
 import { LineUpFilterUtils } from './lineUpFilter';
 import { ActionMetaData, ActionNode, ActionUtils, IAction, ICmdResult, IObjectRef, ObjectRefUtils, ProvenanceGraph } from '../../clue/provenance';

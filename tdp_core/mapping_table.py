@@ -1,7 +1,7 @@
 import itertools
 import logging
 
-from visyn_core import manager
+from visyn_pro import manager
 
 from . import db
 from .dbview import DBMapping

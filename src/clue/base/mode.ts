@@ -1,6 +1,6 @@
 import merge from 'lodash/merge';
-import { EventHandler, GlobalEventHandler, IEvent } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
+import { EventHandler, GlobalEventHandler, IEvent } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
 
 import { hashPropertyHandler } from '../../base/url/HashPropertyHandler';
 import { onDOMNodeRemoved } from '../../components/RemoveNodeObserver';

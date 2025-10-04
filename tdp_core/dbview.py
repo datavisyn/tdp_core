@@ -8,7 +8,7 @@ from opentelemetry import trace
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import QueuePool
-from visyn_core.security import current_user, is_logged_in
+from visyn_pro.security import current_user, is_logged_in
 
 from .utils import clean_query
 

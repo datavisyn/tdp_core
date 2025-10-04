@@ -1,8 +1,8 @@
 import { Selection, event, select } from 'd3v3';
 import $ from 'jquery';
-import { GlobalEventHandler } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
-import { UserSession } from 'visyn_core/security';
+import { GlobalEventHandler } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { UserSession } from 'visyn_pro/security';
 
 import { ProvenanceGraphMenuUtils } from './ProvenanceGraphMenuUtils';
 import { UniqueIdManager } from '../../app';

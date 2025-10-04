@@ -5,7 +5,7 @@ from flask import abort
 from opentelemetry import trace
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 from sqlalchemy.orm import Session
-from visyn_core import manager
+from visyn_pro import manager
 from werkzeug.datastructures import MultiDict
 
 from .sql_filter import filter_logic

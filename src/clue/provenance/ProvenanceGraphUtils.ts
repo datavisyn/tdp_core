@@ -1,4 +1,4 @@
-import { PluginRegistry } from 'visyn_core/plugin';
+import { PluginRegistry } from 'visyn_pro/plugin';
 
 import { ActionMetaData } from './ActionMeta';
 import { ActionNode, IActionCompressor } from './ActionNode';

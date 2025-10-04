@@ -6,7 +6,7 @@
 import { select } from 'd3v3';
 import * as d3v3 from 'd3v3';
 import merge from 'lodash/merge';
-import { IEvent } from 'visyn_core/base';
+import { IEvent } from 'visyn_pro/base';
 
 import { ACLUEWrapper, IACLUEWrapperOptions } from './ACLUEWrapper';
 import { LoginMenu } from '../../base/LoginMenu';

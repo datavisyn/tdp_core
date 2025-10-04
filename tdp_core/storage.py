@@ -1,6 +1,6 @@
 import logging
 
-import visyn_core.security as security
+import visyn_pro.security as security
 from flask import Flask, abort, jsonify, request
 from pymongo import MongoClient
 from pymongo.collection import ReturnDocument

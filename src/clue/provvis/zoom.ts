@@ -1,4 +1,4 @@
-import { EventHandler } from 'visyn_core/base';
+import { EventHandler } from 'visyn_pro/base';
 
 import { IVisMetaData } from './IVisMetaData';
 import { IVisInstance } from './visInstance';

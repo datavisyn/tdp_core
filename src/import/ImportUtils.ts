@@ -1,8 +1,8 @@
 import * as d3v3 from 'd3v3';
 import identity from 'lodash/identity';
 import merge from 'lodash/merge';
-import { I18nextManager } from 'visyn_core/i18n';
-import { UserSession } from 'visyn_core/security';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { UserSession } from 'visyn_pro/security';
 
 import { BaseUtils } from '../base';
 import { IDataDescription } from '../data';

@@ -1,5 +1,5 @@
-import { Ajax, AjaxError, isAjaxError } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
+import { Ajax, AjaxError, isAjaxError } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
 
 import { NotificationHandler } from './NotificationHandler';
 

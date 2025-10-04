@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from visyn_core.plugin.model import AVisynPlugin, RegHelper
+from visyn_pro.plugin.model import AVisynPlugin, RegHelper
 
 from .settings import TDPCoreSettings
 

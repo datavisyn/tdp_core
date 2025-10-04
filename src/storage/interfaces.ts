@@ -1,4 +1,4 @@
-import { ISecureItem } from 'visyn_core/security';
+import { ISecureItem } from 'visyn_pro/security';
 
 export enum ENamedSetType {
   NAMEDSET,

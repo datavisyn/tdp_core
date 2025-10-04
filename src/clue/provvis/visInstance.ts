@@ -1,4 +1,4 @@
-import { EventHandler, IEventHandler } from 'visyn_core/base';
+import { EventHandler, IEventHandler } from 'visyn_pro/base';
 
 import { ITransform } from './ITransform';
 import { UniqueIdManager } from '../../app/UniqueIdManager';

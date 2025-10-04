@@ -15,10 +15,10 @@ import {
   createSelectionDesc,
   createStackDesc,
 } from 'lineupjs';
-import { EventHandler } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
-import { IDType, IDTypeManager } from 'visyn_core/idtype';
-import { IPlugin, IPluginDesc, PluginRegistry } from 'visyn_core/plugin';
+import { EventHandler } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { IDType, IDTypeManager } from 'visyn_pro/idtype';
+import { IPlugin, IPluginDesc, PluginRegistry } from 'visyn_pro/plugin';
 
 import {
   EP_TDP_CORE_LINEUP_PANEL_TAB,

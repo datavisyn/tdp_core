@@ -6,7 +6,7 @@ from typing import Any
 from flask import Flask, render_template
 from flask.wrappers import Response
 from jinja2 import Template
-from visyn_core import manager
+from visyn_pro import manager
 
 from . import db
 from .utils import secure_replacements

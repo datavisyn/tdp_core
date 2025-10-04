@@ -2,8 +2,8 @@ import logging
 from functools import wraps
 
 from flask import Flask, abort, jsonify, request
-from visyn_core import manager
-from visyn_core.security import login_required
+from visyn_pro import manager
+from visyn_pro.security import login_required
 
 from . import db
 from .formatter import formatter

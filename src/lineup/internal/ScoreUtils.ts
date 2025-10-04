@@ -1,5 +1,5 @@
-import { I18nextManager } from 'visyn_core/i18n';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { PluginRegistry } from 'visyn_pro/plugin';
 
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../../base/extensions';
 import { IScore } from '../../base/interfaces';

@@ -1,6 +1,6 @@
 import { IDataRow, LocalDataProvider, Ranking } from 'lineupjs';
-import { Ajax, IRow } from 'visyn_core/base';
-import { IPluginDesc } from 'visyn_core/plugin';
+import { Ajax, IRow } from 'visyn_pro/base';
+import { IPluginDesc } from 'visyn_pro/plugin';
 
 import { IRankingWrapper } from './IRankingWrapper';
 import type { IScoreLoader, IScoreRow } from '../base/interfaces';

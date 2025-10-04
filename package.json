@@ -84,7 +84,7 @@
     "select2": "~4.0.13",
     "select2-bootstrap-theme": "0.1.0-beta.9",
     "use-deep-compare-effect": "^1.8.0",
-    "visyn_core": "^17.2.0",
+    "visyn_pro": "git+ssh://git@github.com:datavisyn/visyn_pro#semver:~20.1.6",
     "visyn_scripts": "^13.0.0"
   },
   "devDependencies": {

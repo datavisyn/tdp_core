@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { EventHandler } from 'visyn_core/base';
+import { EventHandler } from 'visyn_pro/base';
 
 import 'select2';
 import { BaseUtils } from '../../base';

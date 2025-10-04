@@ -4,8 +4,8 @@
  *
  * See IDataDescriptionMetaData in datatype.ts for various legal parameters
  */
-import { AppContext } from 'visyn_core/base';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { AppContext } from 'visyn_pro/base';
+import { PluginRegistry } from 'visyn_pro/plugin';
 
 import { IDataDescription } from './DataDescription';
 import { DummyDataType, IDataType } from './datatype';

@@ -1,6 +1,6 @@
-import { EventHandler } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { EventHandler } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { PluginRegistry } from 'visyn_pro/plugin';
 
 import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH, IProvenanceGraphEP, IProvenanceGraphEPDesc } from '../../base/extensions';
 import { CLUEMode, ModeWrapper } from '../base';

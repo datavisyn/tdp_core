@@ -1,7 +1,7 @@
 import { select } from 'd3v3';
-import { EventHandler, WebpackEnv } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
-import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
+import { EventHandler, WebpackEnv } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { IDType, IDTypeManager, SelectionUtils } from 'visyn_pro/idtype';
 
 import { ViewUtils } from './ViewUtils';
 import { ERenderAuthorizationStatus, IAuthorizationConfiguration, TDPTokenManager, TokenManager } from '../auth';

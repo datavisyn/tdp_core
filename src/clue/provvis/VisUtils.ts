@@ -1,4 +1,4 @@
-import { IPluginDesc, PluginRegistry } from 'visyn_core/plugin';
+import { IPluginDesc, PluginRegistry } from 'visyn_pro/plugin';
 
 import { IVisPluginDesc } from './IVisPluginDesc';
 import { IVisInstance } from './visInstance';

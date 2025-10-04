@@ -1,5 +1,5 @@
 from flask import abort, jsonify, request
-from visyn_core import manager
+from visyn_pro import manager
 
 
 def _to_desc():

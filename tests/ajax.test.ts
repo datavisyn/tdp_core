@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { Ajax, AppContext } from 'visyn_core/base';
+import { Ajax, AppContext } from 'visyn_pro/base';
 
 describe('api2absURL', () => {
   it('one arg', () => expect(AppContext.getInstance().api2absURL('/path')).toEqual(`${AppContext.context || '/'}api/path`));

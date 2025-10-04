@@ -295,7 +295,7 @@ class GraphProvider(ADataSetProvider):
     def upload(self, data, files, id=None):
         if data.get("type", "unknown") != "graph":
             return None  # can't handle
-        from visyn_core.security import current_user
+        from visyn_pro.security import current_user
 
         user = current_user()
 

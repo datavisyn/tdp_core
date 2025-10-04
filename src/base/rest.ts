@@ -1,5 +1,5 @@
-import { Ajax, AppContext, IRow, IServerColumn } from 'visyn_core/base';
-import { IDTypeLike } from 'visyn_core/idtype';
+import { Ajax, AppContext, IRow, IServerColumn } from 'visyn_pro/base';
+import { IDTypeLike } from 'visyn_pro/idtype';
 
 import { IScoreRow } from './interfaces';
 

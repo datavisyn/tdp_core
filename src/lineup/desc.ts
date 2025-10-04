@@ -1,6 +1,6 @@
 import { extent } from 'd3v3';
 import { DEFAULT_COLOR, ICategory, ICategoryNode, IColumnDesc, LocalDataProvider, createAggregateDesc, createRankDesc, createSelectionDesc } from 'lineupjs';
-import { IServerColumn } from 'visyn_core/base';
+import { IServerColumn } from 'visyn_pro/base';
 
 import { IAdditionalColumnDesc } from '../base/interfaces';
 

@@ -6,14 +6,14 @@
 import $ from 'jquery';
 // @ts-ignore
 import select2 from 'select2';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { PluginRegistry } from 'visyn_pro/plugin';
 
 import reg from './phovea';
 /**
  * build a registry by registering all phovea modules
  */
 // other modules
-import 'visyn_core/phovea_registry';
+import 'visyn_pro/phovea_registry';
 
 select2(window, $);
 

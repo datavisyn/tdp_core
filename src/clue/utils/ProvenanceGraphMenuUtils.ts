@@ -1,7 +1,7 @@
 import merge from 'lodash/merge';
 import uniqueId from 'lodash/uniqueId';
-import { I18nextManager } from 'visyn_core/i18n';
-import { EEntity, ISecureItem, UserSession } from 'visyn_core/security';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { EEntity, ISecureItem, UserSession } from 'visyn_pro/security';
 
 import { PHOVEA_UI_FormDialog } from '../../components';
 import { TDPApplicationUtils } from '../../utils/TDPApplicationUtils';

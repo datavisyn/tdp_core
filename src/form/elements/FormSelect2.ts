@@ -2,8 +2,8 @@ import 'select2';
 import * as d3v3 from 'd3v3';
 import $ from 'jquery';
 import merge from 'lodash/merge';
-import { AppContext } from 'visyn_core/base';
-import { IPluginDesc } from 'visyn_core/plugin';
+import { AppContext } from 'visyn_pro/base';
+import { IPluginDesc } from 'visyn_pro/plugin';
 
 import { AFormElement } from './AFormElement';
 import { FormElementType, IForm, IFormElementDesc } from '../interfaces';

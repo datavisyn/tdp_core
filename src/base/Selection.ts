@@ -1,6 +1,6 @@
 import merge from 'lodash/merge';
-import { EventHandler, GlobalEventHandler } from 'visyn_core/base';
-import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
+import { EventHandler, GlobalEventHandler } from 'visyn_pro/base';
+import { IDType, IDTypeManager, SelectionUtils } from 'visyn_pro/idtype';
 
 import { ActionNode, ICmdResult, IObjectRef, ObjectRefUtils, ProvenanceGraph } from '../clue/provenance';
 import { hashPropertyHandler } from './url/HashPropertyHandler';

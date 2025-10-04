@@ -10,7 +10,7 @@ import {
   ISummaryRenderer,
   renderMissingDOM,
 } from 'lineupjs';
-import { I18nextManager } from 'visyn_core/i18n';
+import { I18nextManager } from 'visyn_pro/i18n';
 
 import { StructureImageColumn } from './StructureImageColumn';
 

@@ -1,4 +1,4 @@
-import { IEventListener } from 'visyn_core/base';
+import { IEventListener } from 'visyn_pro/base';
 
 import { IDropArea, ILayoutContainer, ILayoutDump, ILayoutParentContainer, IRootLayoutContainer } from '../interfaces';
 

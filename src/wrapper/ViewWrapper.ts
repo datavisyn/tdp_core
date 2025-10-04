@@ -1,6 +1,6 @@
-import { EventHandler, IBaseViewPluginDesc, IEvent, IEventListener } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
-import { IDType, IDTypeManager } from 'visyn_core/idtype';
+import { EventHandler, IBaseViewPluginDesc, IEvent, IEventListener } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { IDType, IDTypeManager } from 'visyn_pro/idtype';
 
 import { ISelection, IView, IViewContext, IViewPluginDesc, IViewWrapperDump } from '../base/interfaces';
 import { NodeUtils, ObjectNode, ObjectRefUtils, ProvenanceGraph } from '../clue/provenance';

@@ -1,4 +1,4 @@
-import type { IPlugin, IPluginDesc } from 'visyn_core/plugin';
+import type { IPlugin, IPluginDesc } from 'visyn_pro/plugin';
 
 import type { ProvenanceGraph } from '../clue/provenance';
 

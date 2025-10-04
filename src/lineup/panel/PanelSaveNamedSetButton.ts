@@ -1,5 +1,5 @@
-import { EventHandler } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
+import { EventHandler } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
 
 import { LineUpOrderedRowIndicies } from './LineUpOrderedRowIndicies';
 import { IPanelButton } from './PanelButton';

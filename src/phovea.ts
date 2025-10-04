@@ -1,4 +1,4 @@
-import { EP_PHOVEA_CORE_LOCALE, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT, ILocaleEPDesc, IRegistry, PluginRegistry } from 'visyn_core/plugin';
+import { EP_PHOVEA_CORE_LOCALE, EP_PHOVEA_CORE_LOGIN, EP_PHOVEA_CORE_LOGOUT, ILocaleEPDesc, IRegistry, PluginRegistry } from 'visyn_pro/plugin';
 
 import { EP_PHOVEA_CLUE_PROVENANCE_GRAPH, EP_TDP_CORE_FORM_ELEMENT } from './base/extensions';
 import { FormElementType } from './form/interfaces';

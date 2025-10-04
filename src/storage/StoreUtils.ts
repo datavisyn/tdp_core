@@ -1,5 +1,5 @@
-import { I18nextManager } from 'visyn_core/i18n';
-import { ISecureItem } from 'visyn_core/security';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { ISecureItem } from 'visyn_pro/security';
 
 import { IStoredNamedSet } from './interfaces';
 import { PHOVEA_UI_FormDialog } from '../components';

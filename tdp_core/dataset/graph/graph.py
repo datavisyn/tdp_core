@@ -1,6 +1,6 @@
 import abc
 
-from visyn_core import manager
+from visyn_pro import manager
 
 from ..dataset_def import ADataSetEntry
 

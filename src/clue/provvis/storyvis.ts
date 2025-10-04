@@ -3,8 +3,8 @@ import * as d3v3 from 'd3v3';
 import * as $ from 'jquery';
 import merge from 'lodash/merge';
 import marked from 'marked';
-import { I18nextManager } from 'visyn_core/i18n';
-import { SelectOperation, SelectionUtils } from 'visyn_core/idtype';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { SelectOperation, SelectionUtils } from 'visyn_pro/idtype';
 
 import { DetailUtils, LevelOfDetail } from './DetailUtils';
 import { DnDUtils } from '../../app';

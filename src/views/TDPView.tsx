@@ -11,8 +11,8 @@
 
 import * as React from 'react';
 
-import { IDType, IDTypeManager } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { IDType, IDTypeManager } from 'visyn_pro/idtype';
+import { PluginRegistry } from 'visyn_pro/plugin';
 
 import { EXTENSION_POINT_TDP_VIEW, ISelection, IView, IViewContext, IViewPlugin, IViewPluginDesc } from '../base';
 import { AReactView, IReactHandler } from './AReactView';

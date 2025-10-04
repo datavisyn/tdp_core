@@ -1,7 +1,7 @@
 import { IColumnDesc, LocalDataProvider } from 'lineupjs';
-import { IRow } from 'visyn_core/base';
-import { IDTypeManager } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { IRow } from 'visyn_pro/base';
+import { IDTypeManager } from 'visyn_pro/idtype';
+import { PluginRegistry } from 'visyn_pro/plugin';
 
 import { EXTENSION_POINT_TDP_SCORE_IMPL } from '../base/extensions';
 import { IScore } from '../base/interfaces';

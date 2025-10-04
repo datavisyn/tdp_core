@@ -1,10 +1,10 @@
 // TODO: Do we need a relative import?
 import './webpack/_bootstrap';
 import merge from 'lodash/merge';
-import { IClientConfig, loadClientConfig } from 'visyn_core/base';
-import { I18nextManager } from 'visyn_core/i18n';
-import { PluginRegistry } from 'visyn_core/plugin';
-import { UserSession } from 'visyn_core/security';
+import { IClientConfig, loadClientConfig } from 'visyn_pro/base';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { PluginRegistry } from 'visyn_pro/plugin';
+import { UserSession } from 'visyn_pro/security';
 
 import { IAuthorizationConfiguration, TDPTokenManager } from './auth';
 import { LoginMenu } from './base';
@@ -117,7 +117,7 @@ export interface ITDPOptions {
 }
 
 // Globally extend the clientConfig with settings relevant for tdp_core.
-declare module 'visyn_core/base' {
+declare module 'visyn_pro/base' {
   export interface IClientConfig {
     tokenManager?: {
       authorizationConfigurations?: IAuthorizationConfiguration[];

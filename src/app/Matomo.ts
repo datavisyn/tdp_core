@@ -1,7 +1,7 @@
 import md5 from 'md5';
-import { AppContext } from 'visyn_core/base';
-import { PluginRegistry } from 'visyn_core/plugin';
-import { IUser } from 'visyn_core/security';
+import { AppContext } from 'visyn_pro/base';
+import { PluginRegistry } from 'visyn_pro/plugin';
+import { IUser } from 'visyn_pro/security';
 
 import { ActionNode, ProvenanceGraph } from '../clue/provenance';
 

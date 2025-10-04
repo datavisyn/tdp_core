@@ -1,6 +1,6 @@
-import { I18nextManager } from 'visyn_core/i18n';
-import { IDTypeManager } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { IDTypeManager } from 'visyn_pro/idtype';
+import { PluginRegistry } from 'visyn_pro/plugin';
 
 import { ITypeDefinition, IValueTypeEditor, PHOVEA_IMPORTER_ValueTypeUtils, ValueTypeEditor } from './valuetypes';
 

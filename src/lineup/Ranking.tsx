@@ -26,12 +26,12 @@ import {
   updateLodRules,
 } from 'lineupjs';
 import merge from 'lodash/merge';
-import { useAsync } from 'visyn_core/hooks';
-import { I18nextManager } from 'visyn_core/i18n';
-import { IDType, IDTypeManager, SelectionUtils } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
-import { ISecureItem } from 'visyn_core/security';
-import { LineupVisWrapper } from 'visyn_core/vis/lineupWrapper';
+import { useAsync } from 'visyn_pro/hooks';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { IDType, IDTypeManager, SelectionUtils } from 'visyn_pro/idtype';
+import { PluginRegistry } from 'visyn_pro/plugin';
+import { ISecureItem } from 'visyn_pro/security';
+import { LineupVisWrapper } from 'visyn_pro/vis/lineupWrapper';
 
 import { IARankingViewOptions } from './IARankingViewOptions';
 import { IRankingWrapper } from './IRankingWrapper';

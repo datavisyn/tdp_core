@@ -11,7 +11,7 @@
 import { ReactElement } from 'react';
 
 import { Root, createRoot } from 'react-dom/client';
-import { IDTypeLike, IDTypeManager } from 'visyn_core/idtype';
+import { IDTypeLike, IDTypeManager } from 'visyn_pro/idtype';
 
 import { AView } from './AView';
 import { ISelection, IViewContext } from '../base';

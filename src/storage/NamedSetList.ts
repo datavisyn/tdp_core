@@ -1,8 +1,8 @@
 import { Selection, event as d3event, select } from 'd3v3';
-import { I18nextManager } from 'visyn_core/i18n';
-import { IDType } from 'visyn_core/idtype';
-import { PluginRegistry } from 'visyn_core/plugin';
-import { EEntity, UserSession } from 'visyn_core/security';
+import { I18nextManager } from 'visyn_pro/i18n';
+import { IDType } from 'visyn_pro/idtype';
+import { PluginRegistry } from 'visyn_pro/plugin';
+import { EEntity, UserSession } from 'visyn_pro/security';
 
 import { PHOVEA_UI_FormDialog } from '../components';
 import { StoreUtils } from './StoreUtils';

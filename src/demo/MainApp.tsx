@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import { Menu } from '@mantine/core';
-import { VisynApp, VisynHeader, useVisynAppContext } from 'visyn_core/app';
+import { VisynApp, VisynHeader, useVisynAppContext } from 'visyn_pro/app';
 import {
   BaseVisConfig,
   EColumnTypes,
@@ -11,7 +11,7 @@ import {
   IScatterConfig,
   Vis,
   VisColumn,
-} from 'visyn_core/vis';
+} from 'visyn_pro/vis';
 
 export function fetchIrisData(): VisColumn[] {
   const dataPromise = import('./irisData').then((m) => m.iris);

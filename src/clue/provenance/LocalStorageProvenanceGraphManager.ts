@@ -1,5 +1,5 @@
 import merge from 'lodash/merge';
-import { Permission, UserSession } from 'visyn_core/security';
+import { Permission, UserSession } from 'visyn_pro/security';
 
 import { IProvenanceGraphDataDescription } from './ICmd';
 import { IProvenanceGraphDump, ProvenanceGraph } from './ProvenanceGraph';

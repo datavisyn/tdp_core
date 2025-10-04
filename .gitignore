@@ -7,6 +7,7 @@
 /storybook-static/
 /dist/tsconfig.tsbuildinfo
 /dist_python/
+/dist/
 /lib/
 *.egg-info/
 *.egg

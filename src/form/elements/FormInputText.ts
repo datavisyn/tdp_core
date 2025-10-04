@@ -1,5 +1,5 @@
 import * as d3v3 from 'd3v3';
-import { IPluginDesc } from 'visyn_core/plugin';
+import { IPluginDesc } from 'visyn_pro/plugin';
 
 import { AFormElement } from './AFormElement';
 import { FormElementType, IForm, IFormElementDesc } from '../interfaces';
